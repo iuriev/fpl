@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { BrowserRouter } from 'react-router-dom';
-import { fn } from 'storybook/test';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { fn, expect } from 'storybook/test';
+import { http, HttpResponse } from 'msw';
 import { EntryScreen } from './EntryScreen';
 
 const meta = {
@@ -9,87 +9,95 @@ const meta = {
   parameters: {
     layout: 'fullscreen',
   },
-  tags: ['autodocs'],
-  decorators: [
-    (Story) => (
-      <BrowserRouter>
-        <Story />
-      </BrowserRouter>
-    ),
-  ],
+  tags: ['autodocs', 'ai-generated', 'needs-work'],
 } satisfies Meta<typeof EntryScreen>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/**
- * Default state: empty form, ready for input.
- * User sees the entry screen without errors.
- */
 export const Idle: Story = {
-  args: {
-    onSubmit: fn(),
-  },
+  args: { onSubmit: fn() },
 };
 
-/**
- * Invalid input state: user entered non-numeric or empty value.
- * Error message is displayed with visual feedback (red border, error icon).
- * Corresponds to spec scenario: "Non-numeric input"
- */
 export const Invalid: Story = {
-  args: {
-    onSubmit: fn(),
-    _storyInputValue: '12abc34',
-    _storyError: 'Team ID must be a positive number',
+  args: { onSubmit: fn() },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.type(canvas.getByRole('textbox'), 'abc');
+    await userEvent.click(canvas.getByRole('button', { name: /view squad/i }));
+    await expect(canvas.getByText('Team ID must be a positive number')).toBeVisible();
   },
 };
 
-/**
- * Submitting state: request in flight, button disabled and in loading state.
- * Corresponds to spec scenario during network request validation.
- */
+export const NotFound: Story = {
+  args: { onSubmit: fn() },
+  parameters: {
+    msw: {
+      handlers: {
+        entry: [
+          http.get('/api/entry/:teamId', () =>
+            HttpResponse.json({ message: 'Not found' }, { status: 404 })
+          ),
+        ],
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.type(canvas.getByRole('textbox'), '9999999');
+    await userEvent.click(canvas.getByRole('button', { name: /view squad/i }));
+    await expect(
+      await canvas.findByText(/couldn't find a team/i)
+    ).toBeVisible();
+  },
+};
+
+export const Unreachable: Story = {
+  args: { onSubmit: fn() },
+  parameters: {
+    msw: {
+      handlers: {
+        entry: [http.get('/api/entry/:teamId', () => HttpResponse.error())],
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.type(canvas.getByRole('textbox'), '1234567');
+    await userEvent.click(canvas.getByRole('button', { name: /view squad/i }));
+    await expect(
+      await canvas.findByText(/couldn't reach/i)
+    ).toBeVisible();
+  },
+};
+
 export const Submitting: Story = {
   args: {
     onSubmit: fn(),
     _storyInputValue: '72828',
     _storyIsSubmitting: true,
   },
-};
+  play: async ({ canvas }) => {
+    const input = canvas.getByRole('textbox');
+    const button = canvas.getByRole('button', { name: /view squad/i });
 
-/**
- * Team not found (404): the entered team ID does not correspond to any FPL team.
- * Error message: "We couldn't find a team with that ID. Please check and try again."
- * Corresponds to spec scenario: "Unknown team ID"
- */
-export const NotFound: Story = {
-  args: {
-    onSubmit: fn(),
-    _storyInputValue: '9999999',
-    _storyError: "We couldn't find a team with that ID. Please check and try again.",
+    await expect(input).toBeDisabled();
+    await expect(button).toBeDisabled();
+    await expect(button).toHaveAttribute('aria-busy', 'true');
   },
 };
 
-/**
- * Error state: FPL API unreachable (network error or 5xx).
- * Error message: "Couldn't reach the FPL servers. Please try again."
- * Corresponds to spec scenario: "Data source unavailable"
- */
-export const Error: Story = {
-  args: {
-    onSubmit: fn(),
-    _storyInputValue: '72828',
-    _storyError: "Couldn't reach the FPL servers. Please try again.",
-  },
-};
-
-/**
- * Success state: valid team ID entered, ready to navigate to squad view.
- * Button is enabled and shows success state.
- */
 export const Success: Story = {
   args: {
     onSubmit: fn(),
     _storyInputValue: '72828',
+  },
+  play: async ({ canvas }) => {
+    const input = canvas.getByRole('textbox');
+    const button = canvas.getByRole('button', { name: /view squad/i });
+
+    await expect(input).toHaveValue('72828');
+    await expect(input).toBeEnabled();
+    await expect(button).toBeEnabled();
+    await expect(canvas.queryByText(/must be/i)).not.toBeInTheDocument();
+    await expect(canvas.queryByText(/couldn't find/i)).not.toBeInTheDocument();
+    await expect(canvas.queryByText(/couldn't reach/i)).not.toBeInTheDocument();
   },
 };
