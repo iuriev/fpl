@@ -1,31 +1,16 @@
-/**
- * Entry screen — team ID input and validation.
- * States: idle, invalid, submitting, not-found, unreachable, success.
- */
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import { api, ApiError } from '@/api/client';
 import { Button, Input } from '@/components';
 import { copy } from '@/lib/copy';
-import { api, ApiError } from '@/api/client';
+
 import styles from './EntryScreen.module.css';
 
 export interface EntryScreenProps {
   onSubmit?: (teamId: number) => void;
-  /**
-   * Story demo only: pre-populate error state for visual testing.
-   * Not used in production.
-   */
   _storyError?: string | null;
-  /**
-   * Story demo only: pre-populate input value for visual testing.
-   * Not used in production.
-   */
   _storyInputValue?: string;
-  /**
-   * Story demo only: simulate submitting state for visual testing.
-   * Not used in production.
-   */
   _storyIsSubmitting?: boolean;
 }
 
@@ -43,7 +28,6 @@ export const EntryScreen: React.FC<EntryScreenProps> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setTeamId(value);
-    // Clear error on input change
     if (error) setError(null);
   };
 

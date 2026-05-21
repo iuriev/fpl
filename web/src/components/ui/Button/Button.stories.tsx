@@ -1,4 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect } from 'storybook/test';
+
 import { Button } from './Button';
 
 const meta = {
@@ -7,7 +9,7 @@ const meta = {
   parameters: {
     layout: 'centered',
   },
-  tags: ['autodocs'],
+  tags: ['autodocs', 'ai-generated', 'needs-work'],
 } satisfies Meta<typeof Button>;
 
 export default meta;
@@ -16,6 +18,10 @@ type Story = StoryObj<typeof meta>;
 export const Primary: Story = {
   args: {
     children: 'View squad',
+  },
+  play: async ({ canvas }) => {
+    const button = canvas.getByRole('button', { name: /view squad/i });
+    await expect(button).toHaveAttribute('aria-busy', 'false');
   },
 };
 
@@ -67,5 +73,14 @@ export const PillDisabled: Story = {
     variant: 'pill',
     children: '→',
     disabled: true,
+  },
+};
+
+// Asserts the design token resolves: --fpl-accent (#00FF87 = rgb(0, 255, 135))
+export const CssCheck: Story = {
+  args: { children: 'Submit' },
+  play: async ({ canvas }) => {
+    const button = canvas.getByRole('button', { name: /submit/i });
+    await expect(getComputedStyle(button).backgroundColor).toBe('rgb(0, 255, 135)');
   },
 };

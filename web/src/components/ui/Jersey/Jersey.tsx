@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+
 import styles from './Jersey.module.css';
 
 export interface JerseyProps {

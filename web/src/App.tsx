@@ -3,8 +3,9 @@
  * Team ID and gameweek are URL query parameters.
  */
 
-import { BrowserRouter, Routes, Route, useSearchParams } from 'react-router-dom';
-import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
+import { QueryClient,QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter, Route, Routes, useSearchParams } from 'react-router-dom';
+
 import { EntryScreen, SquadScreen } from '@/screens';
 
 const queryClient = new QueryClient();

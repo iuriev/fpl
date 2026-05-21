@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+
 import styles from './Pitch.module.css';
 
 export interface PitchProps {

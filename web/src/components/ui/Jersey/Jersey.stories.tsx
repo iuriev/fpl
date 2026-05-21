@@ -1,4 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+
 import { Jersey } from './Jersey';
 
 const meta = {
@@ -7,7 +8,7 @@ const meta = {
   parameters: {
     layout: 'centered',
   },
-  tags: ['autodocs'],
+  tags: ['autodocs', 'ai-generated', 'needs-work'],
 } satisfies Meta<typeof Jersey>;
 
 export default meta;

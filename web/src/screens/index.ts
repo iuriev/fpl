@@ -1,5 +1,4 @@
-export { EntryScreen } from './EntryScreen';
 export type { EntryScreenProps } from './EntryScreen';
-
-export { SquadScreen } from './SquadScreen';
+export { EntryScreen } from './EntryScreen';
 export type { SquadScreenProps } from './SquadScreen';
+export { SquadScreen } from './SquadScreen';

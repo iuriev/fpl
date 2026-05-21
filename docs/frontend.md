@@ -11,6 +11,19 @@ How the web SPA is written. Rationale lives in ADR 0006; this is the practical r
   drawing). Keep it in sync with the CSS variables.
 - **Fonts are self-hosted** (Space Grotesk, JetBrains Mono as woff2) — no third-party CDN.
 
+## Modern CSS baseline
+
+CSS target: modern mobile Chrome and mobile Safari. Use container queries (`@container`),
+`:has()` selectors, CSS Grid, and other modern CSS features freely. No polyfills or
+fallbacks needed for the MVP.
+
+Minimum browser support: Chrome ≥ 105, Safari ≥ 16. Both support:
+- Container queries (`@container`)
+- `:has()` pseudo-class selector
+- CSS Grid
+
+Leverage these features to write cleaner, more maintainable CSS without backwards-compatibility constraints.
+
 ## Design system -> base components
 - The design system (from `design/exports/<vN>/`) is ported into a **base component kit** under
   `components/`: e.g. `Button`, `Input`, `Jersey`, `Pitch`, `PitchPlayer`, `PlayerPill`,
