@@ -64,7 +64,9 @@ export async function getSquad(teamId: number, gameweek: number): Promise<SquadR
     picks = await getPicksWithCache(teamId, gameweek, gameweekEvent.finished);
   } catch (error) {
     if (error instanceof Error && error.message.includes('404')) {
-      throw new Error(`No picks available for gameweek ${gameweek}`, { cause: error });
+      const err = new Error(`No picks available for gameweek ${gameweek}`);
+      (err as unknown as { cause: Error }).cause = error;
+      throw err;
     }
     throw error;
   }
