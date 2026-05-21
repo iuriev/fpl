@@ -54,9 +54,13 @@ web/src/
 - The MVP renders a single placeholder shirt for all players. Real per-club kit images load from
   a CDN after the backend is in place (backlog). See ADR 0007.
 
-## Mocking
-- The proxy is mocked with **MSW + JSON fixtures** for both local dev and tests, so the frontend
-  is built and tested independently of the backend. Contracts: `docs/fpl-api.md` and design.md D1.
+## Stories and fixtures
+- **Storybook**: every base component and every screen state has a story with fixed data. Stories
+  are the catalog of states and the source of QA screenshots. See ADR 0009 and `docs/testing.md`.
+- **Shared `fixtures/`** (JSON) are the single source of test data, passed to stories via
+  args/decorators (e.g. a decorator that seeds the React Query cache). Contracts: `docs/fpl-api.md`
+  and design.md D1.
+- Deferred (backlog): real-app E2E with MSW + Playwright (routing, data fetching, navigation).
 
 ## Accessibility
 - Deferred from the MVP (ADR 0007). A dedicated accessibility pass is planned post-MVP.

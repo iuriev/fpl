@@ -24,6 +24,8 @@ it behaves. Avoid duplicating: link between them instead.
 | [0005](0005-mvp-scope-expansion.md) | Expand MVP scope: player statuses + gameweek summary | Accepted |
 | [0006](0006-frontend-architecture.md) | Frontend architecture and conventions | Accepted |
 | [0007](0007-frontend-impl-choices.md) | Frontend implementation choices (fonts, kits, copy, mocking, a11y) | Accepted |
+| [0008](0008-screen-validation.md) | Screen validation (QA gate) | Superseded by 0009 |
+| [0009](0009-screen-validation-storybook.md) | Screen validation via Storybook | Accepted |
 
 ## Template
 

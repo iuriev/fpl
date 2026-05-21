@@ -17,6 +17,9 @@ get promoted into an OpenSpec change when we decide to build them.
 - **Accessibility pass** — deferred from the MVP (ADR 0007): semantics, keyboard, reduced-motion,
   ARIA labels for jerseys and C/V/availability badges, contrast, aiming for WCAG AA.
 - **Multi-language UI (i18n)** — copy is centralized and i18n-ready; add languages beyond English.
+- **Real-app E2E (MSW + Playwright)** — drive the running app for integration and flows (URL/router
+  -> React Query -> render, gameweek navigation, error retry). Deferred from the QA gate in ADR 0009;
+  add when the real data layer is wired.
 - **Team of the Week** — the symbolic best XI of a gameweek (the official app links to it).
   Deferred in ADR 0005.
 - **Gameweek bonus breakdown** — bonus points detail per player.

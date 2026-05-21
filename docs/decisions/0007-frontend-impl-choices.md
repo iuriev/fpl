@@ -19,7 +19,8 @@ already defined (specs + design.md D1) and the FPL endpoints are documented in `
 3. **UI copy is centralized** in one module (English), structured to be i18n-ready. Components
    never inline raw strings. Additional languages may come later.
 4. **The proxy is mocked with MSW + JSON fixtures** for both local dev and tests, so the frontend
-   progresses independently of the backend.
+   progresses independently of the backend. (Refined by ADR 0009: app-level MSW + Playwright E2E
+   are deferred; the frontend is built and verified via Storybook + fixtures for now.)
 5. **Accessibility is deferred from the MVP.** A dedicated accessibility pass is planned post-MVP.
 
 ## Consequences

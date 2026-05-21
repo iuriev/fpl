@@ -16,6 +16,7 @@ The project is built spec-first; application code comes last. Read these before 
 - `docs/frontend.md` — frontend conventions (styling, structure, testing).
 - `docs/design-workflow.md` — how Claude Design exports flow into the codebase.
 - `docs/fpl-api.md` — local reference for the public FPL API endpoints we use.
+- `docs/testing.md` — testing strategy (unit tests + the screen-validation QA gate).
 
 ## Rules
 
@@ -27,6 +28,8 @@ The project is built spec-first; application code comes last. Read these before 
   mark it `Superseded by ADR-XXXX` and link it.
 - **No hardcoded design values.** Components reference design tokens via CSS variables
   (`--fpl-*`) or base components — never literal colors, sizes, or spacing. See `docs/frontend.md`.
+- **Every base component and screen state has a Storybook story.** Stories use shared fixtures and
+  are the source of QA screenshots. See `docs/testing.md` / ADR 0009.
 
 ## Commands
 

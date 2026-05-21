@@ -18,6 +18,11 @@ Keeping every export gives a visual diff history between iterations.
 
 ## Steps for a new design iteration
 
+> The **`design-integrator`** agent automates steps 3–6: it versions the export, diffs it against
+> the previous version, writes a change report, and creates an OpenSpec change with tasks for the
+> developer agents. You just iterate in Claude Design (1) and export (2), then hand the export to
+> that agent.
+
 1. **Iterate in Claude Design** — add or change screens, extend the design system.
 2. **Export** the project archive from Claude Design.
 3. **Drop** the extracted contents into a new `design/exports/<vN>/` folder. Do not overwrite a
@@ -35,6 +40,10 @@ Keeping every export gives a visual diff history between iterations.
    `docs/decisions/` (supersede the old one if it changes).
 7. **Commit** the export and the code changes together, so design and implementation stay in
    lockstep.
+
+After the developer agents implement the tasks, the **`qa-tester`** validates the screens as a
+**hard gate** (screenshots from Storybook stories, state coverage vs spec scenarios, visual
+fidelity vs this export) before the change is considered done. See `docs/testing.md` and ADR 0009.
 
 ## Principles that keep this cheap over time
 
