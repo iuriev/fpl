@@ -1,8 +1,12 @@
 # ADR 0002: MVP scope — squad viewer
 
-- Status: Accepted
+- Status: Superseded by [ADR 0005](0005-mvp-scope-expansion.md)
 - Date: 2026-05-21
 - Deciders: ivan.iuriev, Claude
+
+> Superseded by ADR 0005: the MVP now also includes player availability statuses and a
+> per-gameweek team summary. The core scope below still holds; only the deferral of the
+> gameweek summary changed.
 
 ## Context
 

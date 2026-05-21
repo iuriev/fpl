@@ -18,7 +18,10 @@ it behaves. Avoid duplicating: link between them instead.
 | ADR | Title | Status |
 | --- | --- | --- |
 | [0001](0001-tech-stack.md) | Tech stack: Vite SPA + thin Node proxy | Accepted (tentative start) |
-| [0002](0002-mvp-scope.md) | MVP scope: squad viewer | Accepted |
+| [0002](0002-mvp-scope.md) | MVP scope: squad viewer | Superseded by 0005 |
+| [0003](0003-proxy-framework.md) | Proxy framework: Hono | Accepted |
+| [0004](0004-design-pipeline.md) | Design pipeline: Claude Design -> Claude Code | Accepted |
+| [0005](0005-mvp-scope-expansion.md) | Expand MVP scope: player statuses + gameweek summary | Accepted |
 
 ## Template
 
