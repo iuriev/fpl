@@ -13,8 +13,10 @@
 - [ ] 2.4 Set up local dev (run web + proxy together), env config, and finalize `.gitignore` (add `dist/`, `.env*`)
 - [ ] 2.5 Remove the placeholder `src/index.ts` stub and old single-package config
 - [ ] 2.6 Set up ESLint + Prettier (enforced) and Vitest + React Testing Library
-- [ ] 2.7 Port design tokens: `tokens.ts` + `colors_and_type.css` (global CSS variables); copy shirt assets to `web/public/shirts/`
+- [ ] 2.7 Port design tokens: `tokens.ts` + `colors_and_type.css` (global CSS variables); add one placeholder shirt to `web/public/shirts/` (used for all players in MVP)
 - [ ] 2.8 Port the design system into a base component kit (CSS Modules, values via CSS variables) with RTL tests
+- [ ] 2.9 Add self-hosted fonts (Space Grotesk, JetBrains Mono as woff2) to the theme
+- [ ] 2.10 Add a centralized UI copy module (English, structured for future i18n)
 
 ## 3. Proxy: FPL integration and endpoints
 
@@ -32,6 +34,7 @@
 - [ ] 4.1 Add an API client for the proxy endpoints
 - [ ] 4.2 Set up React Query for fetching, caching, and loading/error states
 - [ ] 4.3 Set up React Router with the team ID and gameweek as URL query parameters
+- [ ] 4.4 Mock the proxy with MSW + JSON fixtures for dev and tests
 
 ## 5. Frontend: Entry screen (team-entry)
 

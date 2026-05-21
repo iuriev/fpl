@@ -23,6 +23,7 @@ it behaves. Avoid duplicating: link between them instead.
 | [0004](0004-design-pipeline.md) | Design pipeline: Claude Design -> Claude Code | Accepted |
 | [0005](0005-mvp-scope-expansion.md) | Expand MVP scope: player statuses + gameweek summary | Accepted |
 | [0006](0006-frontend-architecture.md) | Frontend architecture and conventions | Accepted |
+| [0007](0007-frontend-impl-choices.md) | Frontend implementation choices (fonts, kits, copy, mocking, a11y) | Accepted |
 
 ## Template
 

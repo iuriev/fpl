@@ -15,6 +15,7 @@ The project is built spec-first; application code comes last. Read these before 
 - `docs/decisions/` — Architecture Decision Records (the *why*); see the README index.
 - `docs/frontend.md` — frontend conventions (styling, structure, testing).
 - `docs/design-workflow.md` — how Claude Design exports flow into the codebase.
+- `docs/fpl-api.md` — local reference for the public FPL API endpoints we use.
 
 ## Rules
 

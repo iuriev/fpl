@@ -9,6 +9,7 @@ How the web SPA is written. Rationale lives in ADR 0006; this is the practical r
   spacing, radii, or shadows.
 - A typed `theme/tokens.ts` mirrors the tokens for the rare cases JS needs a value (e.g. SVG
   drawing). Keep it in sync with the CSS variables.
+- **Fonts are self-hosted** (Space Grotesk, JetBrains Mono as woff2) — no third-party CDN.
 
 ## Design system -> base components
 - The design system (from `design/exports/<vN>/`) is ported into a **base component kit** under
@@ -44,3 +45,18 @@ web/src/
 - **Mobile-first** (reference design 390x844). On desktop the app is a centered phone-width
   container for now. A **dedicated desktop design is planned** for a future iteration
   (`docs/backlog.md`).
+
+## Copy and i18n
+- All user-facing text lives in a centralized copy module (English). Components never inline raw
+  strings. The structure is i18n-ready so languages can be added later (backlog). See ADR 0007.
+
+## Assets
+- The MVP renders a single placeholder shirt for all players. Real per-club kit images load from
+  a CDN after the backend is in place (backlog). See ADR 0007.
+
+## Mocking
+- The proxy is mocked with **MSW + JSON fixtures** for both local dev and tests, so the frontend
+  is built and tested independently of the backend. Contracts: `docs/fpl-api.md` and design.md D1.
+
+## Accessibility
+- Deferred from the MVP (ADR 0007). A dedicated accessibility pass is planned post-MVP.
