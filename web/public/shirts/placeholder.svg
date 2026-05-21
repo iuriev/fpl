@@ -1,0 +1,27 @@
+<svg width="100" height="140" viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+  <!-- Placeholder jersey shape -->
+  <defs>
+    <linearGradient id="jerseyGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00FF87;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#04E36A;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Main jersey body -->
+  <ellipse cx="50" cy="30" rx="20" ry="25" fill="url(#jerseyGrad)" />
+
+  <!-- Jersey torso -->
+  <rect x="30" y="45" width="40" height="65" rx="5" fill="url(#jerseyGrad)" />
+
+  <!-- Left sleeve -->
+  <ellipse cx="15" cy="55" rx="15" ry="22" fill="url(#jerseyGrad)" />
+
+  <!-- Right sleeve -->
+  <ellipse cx="85" cy="55" rx="15" ry="22" fill="url(#jerseyGrad)" />
+
+  <!-- Collar cutout -->
+  <ellipse cx="50" cy="35" rx="8" ry="10" fill="#220035" />
+
+  <!-- Stripe detail -->
+  <line x1="50" y1="45" x2="50" y2="110" stroke="#170027" stroke-width="2" opacity="0.3" />
+</svg>

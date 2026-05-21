@@ -1,6 +1,7 @@
 ---
 name: qa-tester
 description: Use to validate implemented screens as a hard QA gate — captures screenshots from Storybook stories across mobile and desktop, then verifies state coverage against the spec scenarios and visual fidelity against the design export. Reports pass/fail; it does not modify application code.
+model: sonnet
 tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 

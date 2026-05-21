@@ -1,14 +1,21 @@
 {
   "name": "fpl",
   "version": "1.0.0",
-  "description": "",
-  "main": "dist/index.js",
+   "description": "Fantasy Premier League squad viewer (mobile-first)",
+  "private": true,
+  "workspaces": [
+    "web",
+    "proxy"
+  ],
   "scripts": {
-    "build": "tsc"
+    "dev": "npm run --workspaces dev",
+    "build": "npm run --workspaces build",
+    "lint": "npm run --workspaces lint",
+    "format": "prettier --write \"**/*.{ts,tsx,json,css,md}\" --ignore-path .gitignore",
+    "test": "npm run --workspaces test"
   },
-  "dependencies": {},
   "devDependencies": {
+    "prettier": "^3.2.5",
     "typescript": "^5.5.3"
-  },
-  "private": true
+  }
 }

@@ -1,6 +1,7 @@
 ---
 name: frontend-developer
 description: Use to implement the React + Vite + TypeScript SPA for the FPL Squad Viewer — porting the Claude Design system, building screens, state/routing, and tests, following the project's frontend conventions.
+model: haiku
 tools: Read, Write, Edit, Bash, Glob, Grep, WebSearch, WebFetch
 ---
 

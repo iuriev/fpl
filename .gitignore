@@ -1,13 +1,36 @@
+# Dependencies
+/node_modules
+
+# Outputs
+dist/
+dist-ssr/
+
+# Environment
 .env
+.env.local
+.env.*.local
+
+# Build artifacts
 /tmp
 /out-tsc
-
-/node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 /.pnp
 .pnp.js
 
+# IDE
 .vscode/*
 .idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+
+# Coverage
+coverage/
+
+# Storybook
+storybook-static/

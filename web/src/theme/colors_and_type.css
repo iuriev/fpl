@@ -1,0 +1,175 @@
+/* colors_and_type.css — CSS-variable form of the FPL design tokens.
+ * Use either form: import this file and read `var(--fpl-color-accent)` etc,
+ * or read window.FPL_TOKENS from tokens.ts.  Both stay in sync via the
+ * same names below.
+ */
+
+:root {
+  /* ── colors ─────────────────────────────────────────────────────── */
+  --fpl-bg-deep: #170027;
+  --fpl-bg: #220035;
+  --fpl-bg-soft: #2D0844;
+  --fpl-bg-hair: #3D1A55;
+
+  --fpl-pitch-a: #1FA64B;
+  --fpl-pitch-b: #17933E;
+  --fpl-pitch-line: rgba(255, 255, 255, 0.7);
+
+  --fpl-text: #FFFFFF;
+  --fpl-text-soft: #E8E0F0;
+  --fpl-muted: #A89BBA;
+  --fpl-muted-soft: #7A6B8E;
+
+  --fpl-accent: #00FF87;
+  --fpl-accent-deep: #04E36A;
+  --fpl-accent-ink: #170027;
+
+  --fpl-error: #FF4D6D;
+  --fpl-error-soft: rgba(255, 77, 109, 0.12);
+  --fpl-warn: #FFC000;
+  --fpl-warn-ink: #241500;
+
+  --fpl-pill-bg: #3D1A55;
+  --fpl-pill-name-ink: #FFFFFF;
+  --fpl-pill-pts-bg: #00FF87;
+  --fpl-pill-pts-ink: #170027;
+
+  /* ── typography ─────────────────────────────────────────────────── */
+  --fpl-font-display: 'Space Grotesk', -apple-system, system-ui, sans-serif;
+  --fpl-font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+
+  --fpl-fs-micro: 10px;
+  --fpl-fs-cap: 11px;
+  --fpl-fs-body-xs: 12px;
+  --fpl-fs-body-s: 13px;
+  --fpl-fs-body: 14px;
+  --fpl-fs-body-m: 15px;
+  --fpl-fs-body-l: 16px;
+  --fpl-fs-title: 17px;
+  --fpl-fs-title-l: 18px;
+  --fpl-fs-h3: 22px;
+  --fpl-fs-h2: 28px;
+  --fpl-fs-h1: 38px;
+  --fpl-fs-h1-l: 40px;
+
+  --fpl-fw-regular: 400;
+  --fpl-fw-medium: 500;
+  --fpl-fw-semibold: 600;
+  --fpl-fw-bold: 700;
+  --fpl-fw-heavy: 800;
+
+  --fpl-tr-head-xl: -0.035em;
+  --fpl-tr-head-l: -0.02em;
+  --fpl-tr-head-m: -0.015em;
+  --fpl-tr-head-s: -0.01em;
+  --fpl-tr-cap-s: 0.04em;
+  --fpl-tr-cap-m: 0.06em;
+  --fpl-tr-cap-l: 0.10em;
+  --fpl-tr-cap-xl: 0.12em;
+
+  /* ── spacing ────────────────────────────────────────────────────── */
+  --fpl-space-xs: 4px;
+  --fpl-space-s: 6px;
+  --fpl-space-sm: 8px;
+  --fpl-space-md: 10px;
+  --fpl-space-base: 12px;
+  --fpl-space-lg: 14px;
+  --fpl-space-xl: 16px;
+  --fpl-space-xl2: 18px;
+  --fpl-space-xl3: 20px;
+  --fpl-space-xl4: 24px;
+  --fpl-space-xl5: 28px;
+  --fpl-space-xl6: 32px;
+  --fpl-space-xl7: 40px;
+  --fpl-space-xl8: 48px;
+  --fpl-space-xl9: 56px;
+
+  /* ── radii ──────────────────────────────────────────────────────── */
+  --fpl-radius-xs: 4px;
+  --fpl-radius-s: 5px;
+  --fpl-radius-sm: 6px;
+  --fpl-radius-md: 8px;
+  --fpl-radius-lg: 10px;
+  --fpl-radius-xl: 12px;
+  --fpl-radius-xl2: 14px;
+  --fpl-radius-xl3: 18px;
+  --fpl-radius-pill: 9999px;
+
+  /* ── elevation ──────────────────────────────────────────────────── */
+  --fpl-shadow-pill-soft: 0 2px 6px rgba(0, 0, 0, 0.35);
+  --fpl-shadow-pill-firm: 0 2px 6px rgba(0, 0, 0, 0.45);
+  --fpl-shadow-status-dot: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --fpl-drop-shadow-shirt: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.45));
+}
+
+/* ── semantic role classes (optional) ───────────────────────────────── */
+.fpl-h1 {
+  font: var(--fpl-fw-bold) var(--fpl-fs-h1-l) / 1.02 var(--fpl-font-display);
+  letter-spacing: var(--fpl-tr-head-xl);
+  color: var(--fpl-text);
+  margin: 0;
+}
+
+.fpl-h2 {
+  font: var(--fpl-fw-semibold) var(--fpl-fs-h2) / 1.1 var(--fpl-font-display);
+  letter-spacing: var(--fpl-tr-head-l);
+  color: var(--fpl-text);
+  margin: 0;
+}
+
+.fpl-h3 {
+  font: var(--fpl-fw-bold) var(--fpl-fs-h3) / 1.2 var(--fpl-font-display);
+  letter-spacing: var(--fpl-tr-head-l);
+  color: var(--fpl-text);
+  margin: 0;
+}
+
+.fpl-body {
+  font: var(--fpl-fw-regular) var(--fpl-fs-body-m) / 1.5 var(--fpl-font-display);
+  color: var(--fpl-muted);
+}
+
+.fpl-overline {
+  font: var(--fpl-fw-bold) var(--fpl-fs-cap) / 1 var(--fpl-font-display);
+  letter-spacing: var(--fpl-tr-cap-l);
+  text-transform: uppercase;
+  color: var(--fpl-muted);
+}
+
+.fpl-mono {
+  font-family: var(--fpl-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── animations ─────────────────────────────────────────────────────── */
+@keyframes fplShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ── global styles ──────────────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--fpl-bg-deep);
+  color: var(--fpl-text);
+  font-family: var(--fpl-font-display);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Self-hosted fonts will be added in a separate @font-face section */

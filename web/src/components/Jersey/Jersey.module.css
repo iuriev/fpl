@@ -1,0 +1,28 @@
+/* Jersey component styles */
+
+.large,
+.medium {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: var(--fpl-radius-md);
+}
+
+.large {
+  width: var(--fpl-size-jersey-l);
+  height: var(--fpl-size-jersey-l);
+}
+
+.medium {
+  width: var(--fpl-size-jersey-m);
+  height: var(--fpl-size-jersey-m);
+}
+
+.shirt {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: var(--fpl-drop-shadow-shirt);
+  user-select: none;
+}

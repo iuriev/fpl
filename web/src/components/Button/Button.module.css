@@ -1,0 +1,98 @@
+/* Button base styles — all values via CSS variables */
+
+button {
+  border: none;
+  cursor: pointer;
+  font-family: var(--fpl-font-display);
+  font-weight: var(--fpl-fw-semibold);
+  transition: all 150ms cubic-bezier(0.2, 0.7, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--fpl-space-sm);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Variant: primary (accent fill) */
+.primary {
+  height: var(--fpl-size-input-h);
+  padding: 0 var(--fpl-space-xl4);
+  background: var(--fpl-accent);
+  color: var(--fpl-accent-ink);
+  font-size: var(--fpl-fs-body-l);
+  border-radius: var(--fpl-radius-xl);
+  box-shadow: var(--fpl-shadow-pill-soft);
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--fpl-accent-deep);
+  box-shadow: var(--fpl-shadow-pill-firm);
+}
+
+.primary:disabled {
+  background: var(--fpl-bg-soft);
+  color: var(--fpl-muted-soft);
+}
+
+/* Variant: secondary (soft bg) */
+.secondary {
+  height: var(--fpl-size-btn-h);
+  padding: 0 var(--fpl-space-xl);
+  background: var(--fpl-bg-soft);
+  color: var(--fpl-text);
+  font-size: var(--fpl-fs-body);
+  border-radius: var(--fpl-radius-md);
+}
+
+.secondary:hover:not(:disabled) {
+  background: var(--fpl-bg-hair);
+}
+
+.secondary:disabled {
+  background: var(--fpl-bg-soft);
+  color: var(--fpl-muted-soft);
+}
+
+/* Variant: link (accent text, no bg) */
+.link {
+  height: auto;
+  padding: 0;
+  background: transparent;
+  color: var(--fpl-accent);
+  font-size: var(--fpl-fs-body);
+  font-weight: var(--fpl-fw-bold);
+  text-decoration: none;
+}
+
+.link:hover:not(:disabled) {
+  color: var(--fpl-accent-deep);
+}
+
+.link:disabled {
+  color: var(--fpl-muted-soft);
+}
+
+/* Variant: pill (circle, accent) */
+.pill {
+  height: var(--fpl-size-btn-h);
+  width: var(--fpl-size-btn-h);
+  padding: 0;
+  background: var(--fpl-accent);
+  color: var(--fpl-accent-ink);
+  border-radius: var(--fpl-radius-pill);
+  box-shadow: var(--fpl-shadow-pill-soft);
+}
+
+.pill:hover:not(:disabled) {
+  background: var(--fpl-accent-deep);
+  box-shadow: var(--fpl-shadow-pill-firm);
+}
+
+.pill:disabled {
+  background: var(--fpl-bg-soft);
+  color: var(--fpl-muted-soft);
+}

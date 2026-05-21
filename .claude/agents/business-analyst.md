@@ -1,6 +1,7 @@
 ---
 name: business-analyst
 description: Use for product and requirements work — turning ideas into OpenSpec change proposals and specs (business requirements with scenarios), scoping the MVP, and writing or superseding ADRs. Drives the propose phase; does not write application code.
+model: opus
 tools: Read, Write, Edit, Bash, Glob, Grep, WebSearch, WebFetch
 ---
 

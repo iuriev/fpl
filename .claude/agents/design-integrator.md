@@ -1,6 +1,7 @@
 ---
 name: design-integrator
 description: Use to ingest a new Claude Design export, version it under design/exports/, diff it against the previous version, and produce a saved, assignable change plan (an OpenSpec change with tasks) for the developer agents. The user drops the export; this agent parses, analyzes, and plans — it does not implement the application changes itself.
+model: sonnet
 tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 

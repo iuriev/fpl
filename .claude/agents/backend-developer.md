@@ -1,6 +1,7 @@
 ---
 name: backend-developer
 description: Use to implement the Hono + TypeScript proxy for the FPL Squad Viewer — the /api endpoints, FPL client, caching, and tests, following the project's specs and the FPL API reference.
+model: haiku
 tools: Read, Write, Edit, Bash, Glob, Grep, WebSearch, WebFetch
 ---
 
