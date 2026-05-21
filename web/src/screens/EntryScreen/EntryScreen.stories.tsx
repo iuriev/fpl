@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { fn } from '@storybook/test';
-import { EntryScreen } from './EntryScreen';
+import { fn } from 'storybook/test';
+import { EntryScreen, type EntryScreenProps } from './EntryScreen';
 
 const meta = {
   title: 'Screens/Entry',
@@ -18,7 +18,7 @@ export const Idle: Story = {
   args: {
     onSubmit: fn(),
   },
-  render: (args) => (
+  render: (args: EntryScreenProps) => (
     <div style={{ display: 'flex', justifyContent: 'center', minHeight: '100vh' }}>
       <EntryScreen {...args} />
     </div>

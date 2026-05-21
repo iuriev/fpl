@@ -1,7 +1,7 @@
 {
   "name": "fpl",
   "version": "1.0.0",
-   "description": "Fantasy Premier League squad viewer (mobile-first)",
+  "description": "Fantasy Premier League squad viewer (mobile-first)",
   "private": true,
   "workspaces": [
     "web",
@@ -15,7 +15,8 @@
     "test": "npm run --workspaces test"
   },
   "devDependencies": {
-    "prettier": "^3.2.5",
-    "typescript": "^5.5.3"
+    "playwright": "^1.60.0",
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3"
   }
 }

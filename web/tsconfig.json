@@ -23,11 +23,11 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
+    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
     }
   },
-  "include": ["src", "src/**/*.ts", "src/**/*.tsx"],
-  "references": [{ "path": "./tsconfig.app.json" }]
+  "include": ["src", "src/**/*.ts", "src/**/*.tsx"]
 }
