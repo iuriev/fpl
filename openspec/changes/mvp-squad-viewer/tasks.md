@@ -12,6 +12,9 @@
 - [ ] 2.3 Initialize the Hono + TypeScript proxy in `proxy/`
 - [ ] 2.4 Set up local dev (run web + proxy together), env config, and finalize `.gitignore` (add `dist/`, `.env*`)
 - [ ] 2.5 Remove the placeholder `src/index.ts` stub and old single-package config
+- [ ] 2.6 Set up ESLint + Prettier (enforced) and Vitest + React Testing Library
+- [ ] 2.7 Port design tokens: `tokens.ts` + `colors_and_type.css` (global CSS variables); copy shirt assets to `web/public/shirts/`
+- [ ] 2.8 Port the design system into a base component kit (CSS Modules, values via CSS variables) with RTL tests
 
 ## 3. Proxy: FPL integration and endpoints
 
@@ -28,13 +31,14 @@
 
 - [ ] 4.1 Add an API client for the proxy endpoints
 - [ ] 4.2 Set up React Query for fetching, caching, and loading/error states
+- [ ] 4.3 Set up React Router with the team ID and gameweek as URL query parameters
 
 ## 5. Frontend: Entry screen (team-entry)
 
 - [ ] 5.1 Build the entry form: numeric team ID input, helper text, primary action
 - [ ] 5.2 Validate input: block empty and non-positive-integer values with inline messages
 - [ ] 5.3 On submit, validate via `/api/entry`; handle not-found and unreachable states with retry
-- [ ] 5.4 Remember the team ID for the session; restore on load (skip to Squad); allow changing it
+- [ ] 5.4 Carry the team ID in the URL query param; restore from URL on load (skip to Squad); allow changing the team
 
 ## 6. Frontend: Squad screen (squad-view)
 

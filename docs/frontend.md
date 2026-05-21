@@ -1,0 +1,46 @@
+# Frontend Conventions
+
+How the web SPA is written. Rationale lives in ADR 0006; this is the practical reference.
+
+## Styling
+- **Pure CSS via CSS Modules** (`*.module.css`). No CSS-in-JS, no utility framework.
+- **All visual values are design tokens exposed as CSS variables** (`--fpl-*`) from
+  `theme/colors_and_type.css`. Reference `var(--fpl-*)` — never literal colors, font sizes,
+  spacing, radii, or shadows.
+- A typed `theme/tokens.ts` mirrors the tokens for the rare cases JS needs a value (e.g. SVG
+  drawing). Keep it in sync with the CSS variables.
+
+## Design system -> base components
+- The design system (from `design/exports/<vN>/`) is ported into a **base component kit** under
+  `components/`: e.g. `Button`, `Input`, `Jersey`, `Pitch`, `PitchPlayer`, `PlayerPill`,
+  `CaptainBadge`, `AvailBadge`, `SummaryStrip`, and skeletons.
+- Screens **compose** base components. They do not re-style primitives or hold raw values.
+
+## Structure (plain modular, not feature-sliced)
+```
+web/src/
+  api/        # proxy client + React Query hooks
+  components/ # base UI kit
+  screens/    # EntryScreen, SquadScreen
+  theme/      # tokens.ts + colors_and_type.css (global)
+  lib/        # helpers
+  types/      # contract types, shared with the proxy
+```
+
+## State, routing, data
+- **React Router**; the team ID and gameweek live in **URL query parameters** — the URL is the
+  source of truth and makes any view shareable. No localStorage, no global state library.
+- Server data via **TanStack Query (React Query)** — caching, loading, error, retry.
+
+## Types
+- The proxy <-> web contract types live in a single **shared module**; do not duplicate.
+
+## Tooling and tests
+- **ESLint + Prettier** are enforced.
+- **Vitest + React Testing Library**. Minimum coverage: design-system components, helpers,
+  React Query queries, and custom hooks.
+
+## Responsiveness
+- **Mobile-first** (reference design 390x844). On desktop the app is a centered phone-width
+  container for now. A **dedicated desktop design is planned** for a future iteration
+  (`docs/backlog.md`).

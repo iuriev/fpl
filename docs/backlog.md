@@ -10,6 +10,8 @@ get promoted into an OpenSpec change when we decide to build them.
 
 ## Later
 
+- **Dedicated desktop design** — the MVP is mobile-first (centered phone-width on desktop);
+  a tailored desktop layout is planned. Decided alongside ADR 0006.
 - **Team of the Week** — the symbolic best XI of a gameweek (the official app links to it).
   Deferred in ADR 0005.
 - **Gameweek bonus breakdown** — bonus points detail per player.

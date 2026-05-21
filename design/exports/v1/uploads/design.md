@@ -23,8 +23,8 @@ step. It contains no application code; implementation follows in tasks.
 
 ## UX Specification
 
-The app has two screens: **Entry** and **Squad**. On load, if the URL contains a team ID the app
-shows Squad; otherwise it shows Entry. The team ID and gameweek are URL query parameters.
+The app has two screens: **Entry** and **Squad**. On load, if a team ID is remembered the app
+goes straight to Squad; otherwise it shows Entry.
 
 ### Screen 1 — Entry
 
@@ -44,7 +44,7 @@ States:
 - **Not found**: valid-looking ID that FPL does not recognize → inline error "We couldn't find
   a team with that ID", stay on Entry.
 - **Unreachable**: proxy/upstream error → error message with a "Try again" action.
-- **Success**: put the team ID in the URL and navigate to Squad (default gameweek = current).
+- **Success**: remember the ID and navigate to Squad (default gameweek = current).
 
 ### Screen 2 — Squad
 
@@ -54,13 +54,10 @@ Layout (mobile-first; centered with a max width on desktop):
 1. **Header bar**
    - Team name (from FPL) and a small "Change" affordance to return to Entry / enter a new ID.
    - Gameweek control: "‹  Gameweek N  ›" with previous/next buttons.
-2. **Gameweek summary strip** — stats for the selected gameweek: the team's total points
-   (emphasized in the centre), the gameweek average and highest scores, the team's gameweek
-   rank, and transfers made. Updates as the gameweek changes.
-3. **Pitch** — a football-pitch view like the official FPL app: the starting XI is placed on the
+2. **Pitch** — a football-pitch view like the official FPL app: the starting XI is placed on the
    pitch in rows by position (GK at the back, then DEF, then MID, then FWD toward the front).
    Each player is a token/card positioned on the pitch.
-4. **Bench** — a strip below the pitch with the 4 bench players in the order FPL returns.
+3. **Bench** — a strip below the pitch with the 4 bench players in the order FPL returns.
 
 Per-player entry content:
 - Player short name (e.g. "Saka").
@@ -69,17 +66,10 @@ Per-player entry content:
 - Gameweek points (number). This is the player's own gameweek score (captain doubling is not
   applied to the per-player figure — see Decisions).
 - Captain "C" / vice-captain "V" badge where applicable.
-- Availability indicator when the player is flagged (doubtful / injured / suspended /
-  unavailable); none when fully available.
-
-Selecting a flagged player reveals their availability details (the FPL news text and chance of
-playing when provided).
 
 States:
 - **Loading**: skeleton placeholders for header + player rows.
 - **Loaded**: squad rendered as above.
-- **Summary value unavailable**: a missing summary value (e.g. rank for an in-progress
-  gameweek) shows a placeholder dash, not an error.
 - **Empty (no picks for this gameweek)**: friendly message "No squad available for Gameweek N"
   (e.g. a gameweek before the team existed). Navigation remains usable.
 - **Error**: "Couldn't load this gameweek" with a "Try again" action.
@@ -100,15 +90,12 @@ States:
 The proxy exposes endpoints shaped for the UI rather than mirroring raw FPL endpoints:
 - `GET /api/gameweeks` → `{ current, gameweeks: [{ id, name, finished }] }` (drives navigation/default).
 - `GET /api/entry/:teamId` → `{ teamId, teamName, managerName }` (validates the ID, header text).
-- `GET /api/squad/:teamId/:gw` → composed squad: gameweek meta, a `summary` object, plus
-  `starters[]` and `bench[]` where each player is `{ name, position, club, points, isCaptain,
-  isViceCaptain, status, chanceOfPlaying, news }`. The `summary` is
-  `{ totalPoints, averagePoints, highestPoints, rank, transfers }`.
+- `GET /api/squad/:teamId/:gw` → composed squad: gameweek meta, plus `starters[]` and `bench[]`
+  where each player is `{ name, position, club, points, isCaptain, isViceCaptain }`.
 
-The proxy assembles `/api/squad` from FPL's `bootstrap-static` (player/team/position metadata,
-player availability status, and the gameweek average/highest scores),
-`entry/{id}/event/{gw}/picks` (picks + captain flags + the team's `entry_history` for
-total/rank/transfers), and `event/{gw}/live` (per-player points).
+The proxy assembles `/api/squad` from FPL's `bootstrap-static` (player/team/position metadata),
+`entry/{id}/event/{gw}/picks` (the picks + captain flags), and `event/{gw}/live` (per-player
+points).
 
 Rationale: keeps the frontend "dumb" (no FPL data-shape knowledge), fewer client round-trips,
 and isolates all FPL quirks in one place.
@@ -137,19 +124,6 @@ badge communicates captaincy.
 ### D5 — Library/framework specifics deferred
 Direction: React Query (or equivalent) for client-side fetching/caching/loading-error states.
 Proxy framework: **Hono** (see ADR 0003).
-
-### D6 — Gameweek summary values
-Total points is the team's net gameweek score (points minus any transfer-cost hit). Average and
-highest come from `bootstrap-static` events (`average_entry_score`, `highest_score`); rank and
-transfers come from the picks response's `entry_history` (`rank`, `event_transfers`). Any value
-the API has not yet produced is shown as a placeholder.
-
-### D7 — Frontend stack and state (see ADR 0006)
-React + Vite + TypeScript SPA. Styling is pure CSS via CSS Modules with all values as CSS
-variables (`--fpl-*`); no hardcoded values. The design system is ported into a base component
-kit. React Router holds the team ID and gameweek in URL query parameters (no localStorage, no
-global state library). Server data via TanStack Query. ESLint + Prettier enforced; Vitest +
-React Testing Library for unit tests.
 
 ## Risks / Trade-offs
 

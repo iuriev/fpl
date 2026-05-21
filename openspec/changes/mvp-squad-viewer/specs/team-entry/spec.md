@@ -26,13 +26,13 @@ The system SHALL verify that the entered team ID corresponds to a real FPL team 
 - **WHEN** FPL data cannot be reached (proxy or upstream error)
 - **THEN** the system shows an error message and offers the user a way to retry
 
-### Requirement: Remember the team ID for the session
-The system SHALL remember the most recently used team ID so the user does not have to re-enter it after a reload or when returning to the app.
+### Requirement: Carry the team ID in the URL
+The system SHALL keep the selected team ID in the URL as a query parameter, so that reloading or sharing the link reopens the same team's squad without re-entry.
 
-#### Scenario: Reopen after entering an ID
-- **WHEN** a user reloads or reopens the app after a successful entry
-- **THEN** the system reuses the remembered team ID and goes directly to the squad view
+#### Scenario: Reload or open a shared link
+- **WHEN** a user reloads, or opens a link, whose URL contains a team ID
+- **THEN** the system shows that team's squad directly, without the entry step
 
 #### Scenario: Switch to a different team
 - **WHEN** a user chooses to change the team ID
-- **THEN** the system lets them enter a different ID and replaces the remembered one
+- **THEN** the system updates the URL to the new team ID and shows that team's squad

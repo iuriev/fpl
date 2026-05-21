@@ -30,6 +30,10 @@ The design pipeline is:
 Fallback if Claude Design is unavailable: Claude Code authors an HTML/CSS prototype directly,
 which can be imported into Figma via a plugin.
 
+The concrete, repeatable steps for importing each design iteration (export -> versioned folder
+-> new OpenSpec change -> reconcile tokens/components -> commit) are documented in
+`docs/design-workflow.md`.
+
 ## Consequences
 
 - (+) Design and code stay connected — Claude Design emits code-like artifacts and hands them

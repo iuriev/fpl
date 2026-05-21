@@ -22,6 +22,7 @@ it behaves. Avoid duplicating: link between them instead.
 | [0003](0003-proxy-framework.md) | Proxy framework: Hono | Accepted |
 | [0004](0004-design-pipeline.md) | Design pipeline: Claude Design -> Claude Code | Accepted |
 | [0005](0005-mvp-scope-expansion.md) | Expand MVP scope: player statuses + gameweek summary | Accepted |
+| [0006](0006-frontend-architecture.md) | Frontend architecture and conventions | Accepted |
 
 ## Template
 

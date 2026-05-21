@@ -1,0 +1,61 @@
+<!doctype html>
+<html><head><meta charset="utf-8"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css"/>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #170027; font-family: var(--fpl-font-display); color: var(--fpl-text); }
+  body { padding: 20px; box-sizing: border-box; min-height: 320px; }
+  .grid { display: grid; gap: 16px 14px; align-items: stretch; }
+  .cell { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+  .lbl { font: 700 9px var(--fpl-font-display); letter-spacing: 0.10em; text-transform: uppercase; color: var(--fpl-muted); }
+  .note { font-family: var(--fpl-font-mono); font-size: 9px; color: var(--fpl-muted-soft); line-height: 1.5; }
+  /* spinner */
+  @keyframes fplSpin { to { transform: rotate(360deg); } }
+  .spinner { width:16px;height:16px;border-radius:999px;border:2px solid rgba(23,0,39,0.25);border-top-color:#170027;animation: fplSpin 0.8s linear infinite; }
+</style>
+</head><body>
+    <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 14px;">
+      
+        <div class="cell">
+          <div class="lbl">Idle (empty)</div>
+          <div style="height:56px;border-radius:12px;background:#220035;padding:0 18px;display:flex;align-items:center;font-family:var(--fpl-font-mono);font-size:18px;color:#7A6B8E;border:1.5px solid #3D1A55;">
+            e.g. 1234567
+          </div>
+        </div>
+      
+        <div class="cell">
+          <div class="lbl">Focus (empty)</div>
+          <div style="height:56px;border-radius:12px;background:#220035;padding:0 18px;display:flex;align-items:center;font-family:var(--fpl-font-mono);font-size:18px;color:#7A6B8E;border:1.5px solid #00FF87;box-shadow:0 0 0 3px rgba(0,255,135,0.20);">
+            e.g. 1234567
+          </div>
+        </div>
+      
+        <div class="cell">
+          <div class="lbl">Filled</div>
+          <div style="height:56px;border-radius:12px;background:#220035;padding:0 18px;display:flex;align-items:center;font-family:var(--fpl-font-mono);font-size:18px;color:#FFFFFF;border:1.5px solid #3D1A55;">
+            1234567<span style="display:inline-block;width:1.5px;height:20px;background:#00FF87;margin-left:2px;opacity:.8;vertical-align:middle;"></span>
+          </div>
+        </div>
+      
+        <div class="cell">
+          <div class="lbl">Filled · focus</div>
+          <div style="height:56px;border-radius:12px;background:#220035;padding:0 18px;display:flex;align-items:center;font-family:var(--fpl-font-mono);font-size:18px;color:#FFFFFF;border:1.5px solid #00FF87;box-shadow:0 0 0 3px rgba(0,255,135,0.20);">
+            1234567<span style="display:inline-block;width:1.5px;height:20px;background:#00FF87;margin-left:2px;opacity:.8;vertical-align:middle;"></span>
+          </div>
+        </div>
+      
+        <div class="cell">
+          <div class="lbl">Validation error</div>
+          <div style="height:56px;border-radius:12px;background:#220035;padding:0 18px;display:flex;align-items:center;font-family:var(--fpl-font-mono);font-size:18px;color:#FF4D6D;border:1.5px solid #FF4D6D;box-shadow:0 0 0 3px rgba(255,77,109,0.12);">
+            12abc34<span style="display:inline-block;width:1.5px;height:20px;background:#FF4D6D;margin-left:2px;opacity:.8;vertical-align:middle;"></span>
+          </div>
+        </div>
+      
+        <div class="cell">
+          <div class="lbl">Submitting (disabled)</div>
+          <div style="height:56px;border-radius:12px;background:#220035;padding:0 18px;display:flex;align-items:center;font-family:var(--fpl-font-mono);font-size:18px;color:#A89BBA;border:1.5px solid #3D1A55;background:#1A0028;opacity:0.7;">
+            1234567
+          </div>
+        </div>
+      
+    </div></body></html>
