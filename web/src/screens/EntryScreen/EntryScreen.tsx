@@ -12,13 +12,33 @@ import styles from './EntryScreen.module.css';
 
 export interface EntryScreenProps {
   onSubmit?: (teamId: number) => void;
+  /**
+   * Story demo only: pre-populate error state for visual testing.
+   * Not used in production.
+   */
+  _storyError?: string | null;
+  /**
+   * Story demo only: pre-populate input value for visual testing.
+   * Not used in production.
+   */
+  _storyInputValue?: string;
+  /**
+   * Story demo only: simulate submitting state for visual testing.
+   * Not used in production.
+   */
+  _storyIsSubmitting?: boolean;
 }
 
-export const EntryScreen: React.FC<EntryScreenProps> = ({ onSubmit }) => {
+export const EntryScreen: React.FC<EntryScreenProps> = ({
+  onSubmit,
+  _storyError,
+  _storyInputValue,
+  _storyIsSubmitting,
+}) => {
   const navigate = useNavigate();
-  const [teamId, setTeamId] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [teamId, setTeamId] = useState(_storyInputValue ?? '');
+  const [error, setError] = useState<string | null>(_storyError ?? null);
+  const [isSubmitting, setIsSubmitting] = useState(_storyIsSubmitting ?? false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -96,11 +116,7 @@ export const EntryScreen: React.FC<EntryScreenProps> = ({ onSubmit }) => {
             error={error || undefined}
           />
 
-          <Button
-            type="submit"
-            disabled={!teamId.trim() || isSubmitting}
-            loading={isSubmitting}
-          >
+          <Button type="submit" disabled={!teamId.trim() || isSubmitting} loading={isSubmitting}>
             {copy.entrySubmit}
           </Button>
         </form>

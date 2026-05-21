@@ -30,6 +30,11 @@ The project is built spec-first; application code comes last. Read these before 
   (`--fpl-*`) or base components — never literal colors, sizes, or spacing. See `docs/frontend.md`.
 - **Every base component and screen state has a Storybook story.** Stories use shared fixtures and
   are the source of QA screenshots. See `docs/testing.md` / ADR 0009.
+- **No descriptive comments.** Write no comments unless the WHY is non-obvious: a hidden
+  constraint, a workaround for a specific bug, or a deliberate exception to a convention. Never
+  write comments that restate what the code already says through its name and structure — no file
+  headers, no JSDoc that lists states or parameters the types already describe, no `// renders X`
+  above a function named `renderX`.
 
 ## Commands
 
