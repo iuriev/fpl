@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Input } from '@/components';
 import { copy } from '@/lib/copy';
+import { api, ApiError } from '@/api/client';
 import styles from './EntryScreen.module.css';
 
 export interface EntryScreenProps {
@@ -52,15 +53,25 @@ export const EntryScreen: React.FC<EntryScreenProps> = ({ onSubmit }) => {
     setIsSubmitting(true);
 
     try {
-      // TODO: validate with /api/entry endpoint
-      // For now, assume success and navigate
+      await api.getEntry(id);
+
       if (onSubmit) {
         onSubmit(id);
       } else {
         navigate(`/?teamId=${id}`);
       }
     } catch (err) {
-      setError(copy.entryErrorUnreachable);
+      if (err instanceof ApiError) {
+        if (err.statusCode === 'not-found') {
+          setError(copy.entryErrorNotFound);
+        } else if (err.statusCode === 'unreachable') {
+          setError(copy.entryErrorUnreachable);
+        } else {
+          setError(copy.entryErrorUnreachable);
+        }
+      } else {
+        setError(copy.entryErrorUnreachable);
+      }
     } finally {
       setIsSubmitting(false);
     }

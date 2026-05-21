@@ -7,28 +7,41 @@ import { GameweeksResponse, EntryResponse, SquadResponse } from '@/types';
 
 const API_BASE = '/api';
 
-async function request<T>(endpoint: string): Promise<T> {
-  const response = await fetch(`${API_BASE}${endpoint}`);
-
-  if (!response.ok) {
-    throw new Error(`API error: ${response.status}`);
+export class ApiError extends Error {
+  constructor(
+    public status: number,
+    public statusCode: 'not-found' | 'unreachable' | 'error',
+    message: string
+  ) {
+    super(message);
+    this.name = 'ApiError';
   }
+}
 
-  return response.json();
+async function request<T>(endpoint: string): Promise<T> {
+  try {
+    const response = await fetch(`${API_BASE}${endpoint}`);
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new ApiError(404, 'not-found', 'Not found');
+      }
+      throw new ApiError(response.status, 'error', `API error: ${response.status}`);
+    }
+
+    return response.json();
+  } catch (err) {
+    if (err instanceof ApiError) {
+      throw err;
+    }
+    throw new ApiError(0, 'unreachable', 'Network error');
+  }
 }
 
 export const api = {
   getGameweeks: () => request<GameweeksResponse>('/gameweeks'),
 
-  getEntry: (teamId: number) =>
-    request<EntryResponse>(`/entry/${teamId}`).catch((err) => {
-      // Return a structured error that the hook can handle
-      throw {
-        status: 'not-found' as const,
-        message: 'Team not found',
-        originalError: err,
-      };
-    }),
+  getEntry: (teamId: number) => request<EntryResponse>(`/entry/${teamId}`),
 
   getSquad: (teamId: number, gameweek: number) =>
     request<SquadResponse>(`/squad/${teamId}/${gameweek}`),

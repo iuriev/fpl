@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 import { EntryScreen } from './EntryScreen';
 
 const meta = {
@@ -13,6 +14,13 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  args: {},
+export const Idle: Story = {
+  args: {
+    onSubmit: fn(),
+  },
+  render: (args) => (
+    <div style={{ display: 'flex', justifyContent: 'center', minHeight: '100vh' }}>
+      <EntryScreen {...args} />
+    </div>
+  ),
 };
