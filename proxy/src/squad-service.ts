@@ -74,7 +74,7 @@ export async function getSquad(teamId: number, gameweek: number): Promise<SquadR
   const live = await getLiveWithCache(gameweek);
 
   // Build lookup maps for quick access
-  const teamMap = new Map(bootstrap.teams.map((t) => [t.id, t.name]));
+  const teamMap = new Map(bootstrap.teams.map((t) => [t.id, t.short_name]));
   const playerMap = new Map(bootstrap.elements.map((e) => [e.id, e]));
   const livePointsMap = new Map(live.elements.map((e) => [e.id, e.stats.total_points]));
   const pickPositionMap = new Map(picks.picks.map((p) => [p.element, p.position]));

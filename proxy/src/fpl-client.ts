@@ -18,6 +18,7 @@ export interface FPLBootstrapStatic {
   teams: Array<{
     id: number;
     name: string;
+    short_name: string;
     code: number;
   }>;
   elements: Array<{
