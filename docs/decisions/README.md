@@ -27,6 +27,7 @@ it behaves. Avoid duplicating: link between them instead.
 | [0008](0008-screen-validation.md) | Screen validation (QA gate) | Superseded by 0009 |
 | [0009](0009-screen-validation-storybook.md) | Screen validation via Storybook | Accepted |
 | [0010](0010-proxy-implementation.md) | Proxy implementation: service layer composition | Accepted |
+| [0011](0011-browser-support-policy.md) | Browser support policy: rolling last-N versions | Accepted |
 
 ## Template
 

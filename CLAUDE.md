@@ -37,15 +37,9 @@ The project is built spec-first; application code comes last. Read these before 
   above a function named `renderX`.
 - **Modern Web Guidance first.** Before implementing any HTML/CSS or client-side JS feature, run
   the `modern-web-guidance` skill to retrieve the current best-practice guide. After retrieving
-  guidance, cross-check every suggested API or feature against the project's minimum browser
-  support defined in `docs/frontend.md` (Chrome ≥ 105, Safari ≥ 16). Do not use APIs that fall
-  outside that matrix without explicit approval.
-
-## Commands
-
-```bash
-npm run build   # compiles the placeholder stub; will change once the SPA + proxy are scaffolded
-```
+  guidance, cross-check every suggested API or feature against the project's browser support policy
+  defined in `docs/frontend.md` (last 3 Chrome versions, last 2 Safari versions). Do not use APIs
+  that fall outside that matrix without explicit approval.
 
 ## Architecture
 

@@ -17,7 +17,8 @@ CSS target: modern mobile Chrome and mobile Safari. Use container queries (`@con
 `:has()` selectors, CSS Grid, and other modern CSS features freely. No polyfills or
 fallbacks needed for the MVP.
 
-Minimum browser support: Chrome ≥ 105, Safari ≥ 16. Both support:
+**Browser support policy: last 3 Chrome versions, last 2 Safari versions.** All supported
+versions cover:
 - Container queries (`@container`)
 - `:has()` pseudo-class selector
 - CSS Grid
