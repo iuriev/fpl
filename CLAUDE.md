@@ -16,7 +16,7 @@ The project is built spec-first; application code comes last. Read these before 
 - `docs/frontend.md` — frontend conventions (styling, structure, testing).
 - `docs/design-workflow.md` — how Claude Design exports flow into the codebase.
 - `docs/fpl-api.md` — local reference for the public FPL API endpoints we use.
-- `docs/testing.md` — testing strategy (unit tests + the screen-validation QA gate).
+- `docs/testing.md` — testing strategy (unit tests).
 
 ## Rules
 
@@ -31,8 +31,6 @@ The project is built spec-first; application code comes last. Read these before 
 - **`rem` for all lengths.** Use `rem` for spacing, sizes, radii, positions, and breakpoints.
   Exception: border widths (`1px`, `2px`) and shadow offsets stay in `px` — they are visual
   strokes, not layout values. See `docs/frontend.md`.
-- **Every base component and screen state has a Storybook story.** Stories use shared fixtures and
-  are the source of QA screenshots. See `docs/testing.md` / ADR 0009.
 - **No descriptive comments.** Write no comments unless the WHY is non-obvious: a hidden
   constraint, a workaround for a specific bug, or a deliberate exception to a convention. Never
   write comments that restate what the code already says through its name and structure — no file

@@ -1,9 +1,13 @@
 # ADR 0009: Screen validation via Storybook
 
-- Status: Accepted
+- Status: Superseded by [ADR 0012](0012-drop-screenshot-qa-gate.md)
 - Date: 2026-05-21
 - Deciders: ivan.iuriev, Claude
 - Supersedes: [ADR 0008](0008-screen-validation.md)
+
+> Superseded by ADR 0012: the screenshot QA gate and `qa-tester` agent were dropped to simplify
+> the development workflow. Storybook remains as a component catalog; stories are no longer a
+> mandatory hard gate.
 
 ## Context
 

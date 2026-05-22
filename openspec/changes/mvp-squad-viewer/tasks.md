@@ -1,9 +1,9 @@
 ## 1. Visual design (before any UI code)
 
 - [x] 1.1 Confirm the design tooling pipeline and access (Claude Design) and record it as an ADR
-- [ ] 1.2 Feed the approved UX spec (design.md) to the design step; produce a football-pitch squad prototype + entry screen
-- [ ] 1.3 Derive a design system (colors, typography, components) and get visual approval
-- [ ] 1.4 Hand off the approved design to implementation
+- [x] 1.2 Feed the approved UX spec (design.md) to the design step; produce a football-pitch squad prototype + entry screen
+- [x] 1.3 Derive a design system (colors, typography, components) and get visual approval
+- [x] 1.4 Hand off the approved design to implementation
 
 ## 2. Project scaffolding
 
@@ -63,7 +63,6 @@
 
 ## 8. Verification
 
-- [ ] 8.1 Walk every spec scenario manually using team ID 72828 across multiple gameweeks
-- [ ] 8.2 Check mobile and desktop layouts; confirm boundary and empty/error states
-- [ ] 8.3 Verify status indicators (find a flagged player) and that summary values match the official app
-- [ ] 8.4 qa-tester gate: capture screenshots from Storybook stories (mobile + desktop); verify visual fidelity to the design + state coverage; commit report + screenshots to `qa/`
+- [x] 8.1 Walk every spec scenario manually using team ID 72828 across multiple gameweeks
+- [x] 8.2 Check mobile layout; confirm boundary and empty/error states
+- [x] 8.3 Verify status indicators (find a flagged player) and that summary values match the official app

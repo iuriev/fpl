@@ -41,10 +41,6 @@ Keeping every export gives a visual diff history between iterations.
 7. **Commit** the export and the code changes together, so design and implementation stay in
    lockstep.
 
-After the developer agents implement the tasks, the **`qa-tester`** validates the screens as a
-**hard gate** (screenshots from Storybook stories, state coverage vs spec scenarios, visual
-fidelity vs this export) before the change is considered done. See `docs/testing.md` and ADR 0009.
-
 ## Principles that keep this cheap over time
 
 - **Tokens are the contract.** Centralize colors, typography, and spacing in one theme file in

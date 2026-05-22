@@ -25,9 +25,10 @@ it behaves. Avoid duplicating: link between them instead.
 | [0006](0006-frontend-architecture.md) | Frontend architecture and conventions | Accepted |
 | [0007](0007-frontend-impl-choices.md) | Frontend implementation choices (fonts, kits, copy, mocking, a11y) | Accepted |
 | [0008](0008-screen-validation.md) | Screen validation (QA gate) | Superseded by 0009 |
-| [0009](0009-screen-validation-storybook.md) | Screen validation via Storybook | Accepted |
+| [0009](0009-screen-validation-storybook.md) | Screen validation via Storybook | Superseded by 0012 |
 | [0010](0010-proxy-implementation.md) | Proxy implementation: service layer composition | Accepted |
 | [0011](0011-browser-support-policy.md) | Browser support policy: rolling last-N versions | Accepted |
+| [0012](0012-drop-screenshot-qa-gate.md) | Drop screenshot QA gate | Accepted |
 
 ## Template
 

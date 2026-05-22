@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { flushSync } from 'react-dom';
 import { useSearchParams } from 'react-router-dom';
 
 import { ApiError } from '@/api/client';
@@ -18,6 +19,14 @@ export interface SquadScreenProps {
 }
 
 const POSITION_ORDER: PlayerPosition[] = ['FWD', 'MID', 'DEF', 'GK'];
+
+function withTransition(update: () => void): void {
+  if (!document.startViewTransition) {
+    update();
+    return;
+  }
+  document.startViewTransition(() => flushSync(update));
+}
 
 function groupByPosition(players: SquadPlayer[]): Record<PlayerPosition, SquadPlayer[]> {
   const groups: Record<PlayerPosition, SquadPlayer[]> = { GK: [], DEF: [], MID: [], FWD: [] };
@@ -59,11 +68,13 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
 
   const jumpToCurrent = () => {
     if (currentGw === null) return;
-    setSearchParams((prev) => {
-      const p = new URLSearchParams(prev);
-      p.set('gw', String(currentGw));
-      return p;
-    });
+    withTransition(() =>
+      setSearchParams((prev) => {
+        const p = new URLSearchParams(prev);
+        p.set('gw', String(currentGw));
+        return p;
+      }),
+    );
   };
 
   const canGoPrev = selectedGw !== null && selectedGw > 1;
@@ -72,11 +83,13 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
   const navigate = (delta: number) => {
     if (selectedGw === null) return;
     const next = selectedGw + delta;
-    setSearchParams((prev) => {
-      const p = new URLSearchParams(prev);
-      p.set('gw', String(next));
-      return p;
-    });
+    withTransition(() =>
+      setSearchParams((prev) => {
+        const p = new URLSearchParams(prev);
+        p.set('gw', String(next));
+        return p;
+      }),
+    );
   };
 
   const handleChangeTeam = () => {
