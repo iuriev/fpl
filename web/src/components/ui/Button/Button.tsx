@@ -1,9 +1,3 @@
-/**
- * Button component.
- * Variants: primary (accent), secondary, link, pill.
- * All sizes and colors via CSS variables.
- */
-
 import React from 'react';
 
 import styles from './Button.module.css';

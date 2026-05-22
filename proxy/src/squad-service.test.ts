@@ -31,6 +31,7 @@ describe('Squad Service', () => {
             id: 1,
             web_name: 'Saka',
             team: 1,
+            team_code: 3,
             element_type: 3,
             status: 'a',
             chance_of_playing_this_round: null,
@@ -94,6 +95,7 @@ describe('Squad Service', () => {
       expect(result.starters[0].points).toBe(15);
       expect(result.starters[0].position).toBe('MID');
       expect(result.starters[0].club).toBe('Arsenal');
+      expect(result.starters[0].teamCode).toBe(3);
     });
 
     it('splits starters and bench correctly', async () => {
@@ -118,6 +120,7 @@ describe('Squad Service', () => {
             id: 1,
             web_name: 'Saka',
             team: 1,
+            team_code: 3,
             element_type: 3,
             status: 'a',
             chance_of_playing_this_round: null,
@@ -127,6 +130,7 @@ describe('Squad Service', () => {
             id: 2,
             web_name: 'Mount',
             team: 2,
+            team_code: 8,
             element_type: 3,
             status: 'a',
             chance_of_playing_this_round: null,

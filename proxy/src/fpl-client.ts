@@ -24,6 +24,7 @@ export interface FPLBootstrapStatic {
     id: number;
     web_name: string;
     team: number;
+    team_code: number;
     element_type: number;
     status: string;
     chance_of_playing_this_round: number | null;

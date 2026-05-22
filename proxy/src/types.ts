@@ -1,8 +1,4 @@
-/**
- * Shared contract types between proxy and web.
- * Single source of truth for API payloads.
- * (This is mirrored in web/src/types/index.ts)
- */
+export const MAX_GAMEWEEK = 38;
 
 export interface Gameweek {
   id: number;
@@ -30,6 +26,7 @@ export interface SquadPlayer {
   name: string;
   position: PlayerPosition;
   club: string;
+  teamCode: number;
   points: number;
   isCaptain: boolean;
   isViceCaptain: boolean;

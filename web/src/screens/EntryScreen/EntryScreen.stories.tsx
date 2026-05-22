@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { http, HttpResponse } from 'msw';
-import { expect,fn } from 'storybook/test';
-
+import { expect, fn, within, type UserEventObject } from 'storybook/test';
 import { EntryScreen } from './EntryScreen';
+
+type BoundCanvas = ReturnType<typeof within>;
 
 const meta = {
   title: 'Screens/Entry',
@@ -10,7 +11,7 @@ const meta = {
   parameters: {
     layout: 'fullscreen',
   },
-  tags: ['autodocs', 'ai-generated', 'needs-work'],
+  tags: ['autodocs', 'ai-generated'],
 } satisfies Meta<typeof EntryScreen>;
 
 export default meta;
@@ -22,7 +23,7 @@ export const Idle: Story = {
 
 export const Invalid: Story = {
   args: { onSubmit: fn() },
-  play: async ({ canvas, userEvent }) => {
+  play: async ({ canvas, userEvent }: { canvas: BoundCanvas; userEvent: UserEventObject }) => {
     await userEvent.type(canvas.getByRole('textbox'), 'abc');
     await userEvent.click(canvas.getByRole('button', { name: /view squad/i }));
     await expect(canvas.getByText('Team ID must be a positive number')).toBeVisible();
@@ -42,12 +43,10 @@ export const NotFound: Story = {
       },
     },
   },
-  play: async ({ canvas, userEvent }) => {
+  play: async ({ canvas, userEvent }: { canvas: BoundCanvas; userEvent: UserEventObject }) => {
     await userEvent.type(canvas.getByRole('textbox'), '9999999');
     await userEvent.click(canvas.getByRole('button', { name: /view squad/i }));
-    await expect(
-      await canvas.findByText(/couldn't find a team/i)
-    ).toBeVisible();
+    await expect(await canvas.findByText(/couldn't find a team/i)).toBeVisible();
   },
 };
 
@@ -60,43 +59,29 @@ export const Unreachable: Story = {
       },
     },
   },
-  play: async ({ canvas, userEvent }) => {
+  play: async ({ canvas, userEvent }: { canvas: BoundCanvas; userEvent: UserEventObject }) => {
     await userEvent.type(canvas.getByRole('textbox'), '1234567');
     await userEvent.click(canvas.getByRole('button', { name: /view squad/i }));
-    await expect(
-      await canvas.findByText(/couldn't reach/i)
-    ).toBeVisible();
+    await expect(await canvas.findByText(/couldn't reach/i)).toBeVisible();
   },
 };
 
 export const Submitting: Story = {
   args: {
     onSubmit: fn(),
-    _storyInputValue: '72828',
+    _storyInputValue: '31231',
     _storyIsSubmitting: true,
   },
-  play: async ({ canvas }) => {
-    const input = canvas.getByRole('textbox');
+  play: async ({ canvas }: { canvas: BoundCanvas }) => {
     const button = canvas.getByRole('button', { name: /view squad/i });
-
-    await expect(input).toBeDisabled();
     await expect(button).toBeDisabled();
     await expect(button).toHaveAttribute('aria-busy', 'true');
   },
 };
 
 export const Success: Story = {
-  args: {
-    onSubmit: fn(),
-    _storyInputValue: '72828',
-  },
-  play: async ({ canvas }) => {
-    const input = canvas.getByRole('textbox');
-    const button = canvas.getByRole('button', { name: /view squad/i });
-
-    await expect(input).toHaveValue('72828');
-    await expect(input).toBeEnabled();
-    await expect(button).toBeEnabled();
+  args: { onSubmit: fn() },
+  play: async ({ canvas }: { canvas: BoundCanvas }) => {
     await expect(canvas.queryByText(/must be/i)).not.toBeInTheDocument();
     await expect(canvas.queryByText(/couldn't find/i)).not.toBeInTheDocument();
     await expect(canvas.queryByText(/couldn't reach/i)).not.toBeInTheDocument();

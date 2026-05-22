@@ -92,6 +92,7 @@ export async function getSquad(teamId: number, gameweek: number): Promise<SquadR
       name: playerData.web_name,
       position: POSITION_MAP[playerData.element_type] || 'GK',
       club: teamName,
+      teamCode: playerData.team_code,
       points,
       isCaptain: pick.is_captain,
       isViceCaptain: pick.is_vice_captain,
