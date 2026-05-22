@@ -64,7 +64,7 @@
 }
 
 .teamId {
-  font-family: var(--fpl-font-mono);
+  font-family: var(--fpl-font-mono), serif;
   font-size: var(--fpl-fs-micro);
   color: var(--fpl-muted-soft);
   font-weight: var(--fpl-fw-medium);
@@ -196,7 +196,7 @@
 }
 
 .benchLabel {
-  font-family: var(--fpl-font-display);
+  font-family: var(--fpl-font-display), serif;
   font-size: var(--fpl-fs-micro);
   font-weight: var(--fpl-fw-semibold);
   color: var(--fpl-text-soft);

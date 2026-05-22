@@ -1,9 +1,9 @@
 import React from 'react';
 
+import { Jersey } from '@/components/ui/Jersey/Jersey';
 import { copy } from '@/lib/copy';
 import type { PlayerPosition, PlayerStatus, SquadPlayer } from '@/types';
 
-import { Jersey } from '@/components/ui/Jersey/Jersey';
 import styles from './SquadListView.module.css';
 
 interface SquadListViewProps {
