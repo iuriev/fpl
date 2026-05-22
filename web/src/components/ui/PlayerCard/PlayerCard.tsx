@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 
 import { copy } from '@/lib/copy';
 import type { PlayerStatus, SquadPlayer } from '@/types';
@@ -36,6 +36,7 @@ function statusLabel(status: PlayerStatus): string {
 export const PlayerCard: React.FC<PlayerCardProps> = ({ player, size = 'medium' }) => {
   const [showStatus, setShowStatus] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const popupId = useId();
   const badge = availBadge(player.status);
   const isFlagged = badge !== null;
 
@@ -45,13 +46,20 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({ player, size = 'medium' 
 
   useEffect(() => {
     if (!showStatus) return;
-    const handler = (e: MouseEvent) => {
+    const onPointer = (e: PointerEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setShowStatus(false);
       }
     };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowStatus(false);
+    };
+    document.addEventListener('pointerdown', onPointer);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('pointerdown', onPointer);
+      document.removeEventListener('keydown', onKey);
+    };
   }, [showStatus]);
 
   return (
@@ -62,14 +70,18 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({ player, size = 'medium' 
       role={isFlagged ? 'button' : undefined}
       tabIndex={isFlagged ? 0 : undefined}
       aria-expanded={isFlagged ? showStatus : undefined}
+      aria-controls={isFlagged ? popupId : undefined}
       onKeyDown={
         isFlagged
           ? (e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                toggle();
-              }
+              if (e.key === 'Enter') { e.preventDefault(); toggle(); }
+              if (e.key === ' ') { e.preventDefault(); }
             }
+          : undefined
+      }
+      onKeyUp={
+        isFlagged
+          ? (e) => { if (e.key === ' ') toggle(); }
           : undefined
       }
     >
@@ -99,7 +111,11 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({ player, size = 'medium' 
       </div>
 
       {showStatus && badge && (
-        <div className={styles.statusPopup} role="tooltip">
+        <div
+          id={popupId}
+          className={styles.statusPopup}
+          onClick={(e) => e.stopPropagation()}
+        >
           <span className={`${styles.statusLabel} ${styles[`statusLabel_${badge.variant}`]}`}>
             {statusLabel(player.status)}
           </span>

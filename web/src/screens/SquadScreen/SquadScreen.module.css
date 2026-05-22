@@ -193,7 +193,7 @@
 
 .benchLabel {
   font-family: var(--fpl-font-display);
-  font-size: 10px;
+  font-size: var(--fpl-fs-micro);
   font-weight: var(--fpl-fw-semibold);
   color: var(--fpl-text-soft);
   text-align: center;
@@ -296,6 +296,7 @@
   color: var(--fpl-text);
   text-align: center;
   margin: 0;
+  text-wrap: balance;
 }
 
 .stateText {
@@ -331,5 +332,13 @@
 
   .pitchWrap {
     padding: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .summaryPlaceholder,
+  .skeletonJersey,
+  .skeletonNameBar {
+    animation: none;
   }
 }

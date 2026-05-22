@@ -1,5 +1,3 @@
-/* Entry screen layout */
-
 .container {
   display: flex;
   flex-direction: column;
@@ -25,6 +23,7 @@
   color: var(--fpl-text);
   margin: 0;
   line-height: 1.1;
+  text-wrap: balance;
 }
 
 .subtitle {
@@ -47,7 +46,6 @@
   line-height: 1.5;
 }
 
-/* Mobile-first responsive */
 @media (min-width: 768px) {
   .headline {
     font-size: var(--fpl-fs-h1-l);

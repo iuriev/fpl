@@ -1,10 +1,3 @@
-/**
- * Input component.
- * Mono value, height 56, radius 12.
- * Error state: red border + soft red glow + tinted value.
- * All values via CSS variables.
- */
-
 import React from 'react';
 
 import styles from './Input.module.css';

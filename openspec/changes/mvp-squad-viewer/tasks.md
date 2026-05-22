@@ -14,8 +14,8 @@
 - [x] 2.5 Remove the placeholder `src/index.ts` stub and old single-package config
 - [x] 2.6 Set up ESLint + Prettier (enforced) and Vitest + React Testing Library
 - [x] 2.7 Port design tokens: `tokens.ts` + `colors_and_type.css` (global CSS variables); add placeholder shirt to `web/public/shirts/` as CDN fallback; render real team kit images from FPL CDN per player (`shirt_{teamCode}-66.png`, GK variant `shirt_{teamCode}_1-66.png`)
-- [ ] 2.8 Port the design system into a base component kit (CSS Modules, values via CSS variables) with RTL tests and a Storybook story per component state — Button/Input/Jersey/Pitch done; **PlayerCard and SummaryStrip still need stories**
-- [ ] 2.9 Add self-hosted fonts (Space Grotesk, JetBrains Mono as woff2) to the theme — CSS variables defined, woff2 files not yet added
+- [x] 2.8 Port the design system into a base component kit (CSS Modules, values via CSS variables) with RTL tests and a Storybook story per component state
+- [x] 2.9 Add self-hosted fonts (Space Grotesk, JetBrains Mono as woff2) to the theme
 - [x] 2.10 Add a centralized UI copy module (English, structured for future i18n)
 - [x] 2.11 Set up Storybook
 

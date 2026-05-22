@@ -45,7 +45,7 @@
 
 .label {
   font-family: var(--fpl-font-display);
-  font-size: 8px;
+  font-size: var(--fpl-fs-nano);
   font-weight: var(--fpl-fw-bold);
   color: var(--fpl-muted);
   letter-spacing: var(--fpl-tr-cap-m);
