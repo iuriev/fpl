@@ -230,21 +230,42 @@ SquadScreen.displayName = 'SquadScreen';
 
 function SquadSkeleton() {
   return (
-    <div className={styles.skeleton} aria-label={copy.loadingPlaceholder} aria-busy="true">
-      <div className={styles.skeletonPitch}>
-        {[4, 5, 4, 1].map((count, rowIdx) => (
-          <div key={rowIdx} className={styles.skeletonRow}>
-            {Array.from({ length: count }).map((_, i) => (
-              <div key={i} className={styles.skeletonCard} />
+    <div className={styles.pitchBench} aria-label={copy.loadingPlaceholder} aria-busy="true">
+      <div className={styles.pitchWrap}>
+        <Pitch className={styles.pitchFill}>
+          <div className={styles.skeletonVeil} />
+          <div className={styles.pitchRows}>
+            {[1, 4, 4, 2].map((count, rowIdx) => (
+              <div key={rowIdx} className={styles.playerRow}>
+                {Array.from({ length: count }).map((_, i) => (
+                  <PlayerSkeleton key={i} size="large" />
+                ))}
+              </div>
             ))}
           </div>
-        ))}
+        </Pitch>
       </div>
-      <div className={styles.skeletonBench}>
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className={styles.skeletonCard} />
-        ))}
+      <div className={styles.bench}>
+        <div className={styles.benchLabels}>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className={styles.skeletonLabel} />
+          ))}
+        </div>
+        <div className={styles.benchRow}>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <PlayerSkeleton key={i} size="medium" />
+          ))}
+        </div>
       </div>
+    </div>
+  );
+}
+
+function PlayerSkeleton({ size }: { size: 'large' | 'medium' }) {
+  return (
+    <div className={`${styles.skeletonPlayer} ${styles[`skeletonPlayer_${size}`]}`}>
+      <div className={styles.skeletonJersey} />
+      <div className={styles.skeletonNameBar} />
     </div>
   );
 }

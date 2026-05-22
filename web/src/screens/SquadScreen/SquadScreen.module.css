@@ -214,56 +214,70 @@
   padding: var(--fpl-space-sm) var(--fpl-space-xl3) var(--fpl-space-lg);
 }
 
-.skeleton {
-  flex: 1;
-  min-height: 0;
-  padding: 0 var(--fpl-space-xl);
+.skeletonVeil {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--fpl-radius-md);
+  background: rgba(0, 0, 0, 0.20);
+  pointer-events: none;
+}
+
+.skeletonPlayer {
   display: flex;
   flex-direction: column;
-  gap: var(--fpl-space-sm);
+  align-items: center;
+  gap: 4px;
+  flex: 1 1 0;
+  max-width: 80px;
+  min-width: 0;
 }
 
-.skeletonPitch {
-  flex: 1;
-  min-height: 0;
+.skeletonJersey {
   border-radius: var(--fpl-radius-md);
-  background: var(--fpl-bg-soft);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  padding: 4% 2%;
-  overflow: hidden;
-}
-
-.skeletonRow {
-  display: flex;
-  justify-content: center;
-  gap: var(--fpl-space-xs);
-}
-
-.skeletonCard {
-  width: 74px;
-  height: 88px;
-  border-radius: var(--fpl-radius-md);
-  background: linear-gradient(
+  background: rgba(255, 255, 255, 0.08);
+  background-image: linear-gradient(
     90deg,
-    var(--fpl-bg-hair) 25%,
-    var(--fpl-shimmer-hi) 50%,
-    var(--fpl-bg-hair) 75%
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.14) 50%,
+    rgba(255, 255, 255, 0.06) 100%
   );
   background-size: 200% 100%;
-  animation: fplShimmer 1.4s linear infinite;
+  animation: fplShimmer 1.6s ease-in-out infinite;
+  flex-shrink: 0;
 }
 
-.skeletonBench {
+.skeletonPlayer_large .skeletonJersey {
+  width: var(--fpl-size-jersey-l);
+  height: var(--fpl-size-jersey-l);
+}
+
+.skeletonPlayer_medium .skeletonJersey {
+  width: var(--fpl-size-jersey-m);
+  height: var(--fpl-size-jersey-m);
+}
+
+.skeletonNameBar {
+  width: 74px;
+  height: 32px;
+  border-radius: 5px;
+  margin-top: 2px;
+  background: rgba(255, 255, 255, 0.10);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.18) 50%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
+  background-size: 200% 100%;
+  animation: fplShimmer 1.6s ease-in-out infinite;
   flex-shrink: 0;
-  display: flex;
-  justify-content: center;
-  gap: var(--fpl-space-xl3);
-  background: rgba(0, 0, 0, 0.28);
-  border: 1px solid var(--fpl-bg-hair);
-  border-radius: var(--fpl-radius-lg);
-  padding: var(--fpl-space-sm) var(--fpl-space-xl3) var(--fpl-space-lg);
+}
+
+.skeletonLabel {
+  height: 12px;
+  margin: 0 18px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.10);
 }
 
 .stateCenter {
