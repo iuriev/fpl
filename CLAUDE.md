@@ -35,6 +35,11 @@ The project is built spec-first; application code comes last. Read these before 
   write comments that restate what the code already says through its name and structure — no file
   headers, no JSDoc that lists states or parameters the types already describe, no `// renders X`
   above a function named `renderX`.
+- **Modern Web Guidance first.** Before implementing any HTML/CSS or client-side JS feature, run
+  the `modern-web-guidance` skill to retrieve the current best-practice guide. After retrieving
+  guidance, cross-check every suggested API or feature against the project's minimum browser
+  support defined in `docs/frontend.md` (Chrome ≥ 105, Safari ≥ 16). Do not use APIs that fall
+  outside that matrix without explicit approval.
 
 ## Commands
 
