@@ -27,6 +27,13 @@ const preview: Preview = {
   loaders: [mswLoader],
   parameters: {
     layout: 'centered',
+    backgrounds: {
+      default: 'app',
+      values: [
+        { name: 'app', value: '#220035' },
+        { name: 'pitch', value: '#1a8a3e' },
+      ],
+    },
     viewport: {
       defaultViewport: 'mobile1',
       viewports: {
