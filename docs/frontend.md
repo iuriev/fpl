@@ -7,6 +7,10 @@ How the web SPA is written. Rationale lives in ADR 0006; this is the practical r
 - **All visual values are design tokens exposed as CSS variables** (`--fpl-*`) from
   `theme/colors_and_type.css`. Reference `var(--fpl-*)` — never literal colors, font sizes,
   spacing, radii, or shadows.
+- **Use `rem` for all length values** — spacing, sizes, radii, breakpoints, and positions. The
+  only exceptions are border widths (`1px`, `2px`) and shadow offsets, which stay in `px`
+  because they are visual strokes, not layout values, and should not scale with the user's
+  font-size preference.
 - A typed `theme/tokens.ts` mirrors the tokens for the rare cases JS needs a value (e.g. SVG
   drawing). Keep it in sync with the CSS variables.
 - **Fonts are self-hosted** (Space Grotesk, JetBrains Mono as woff2) — no third-party CDN.

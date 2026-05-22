@@ -28,6 +28,9 @@ The project is built spec-first; application code comes last. Read these before 
   mark it `Superseded by ADR-XXXX` and link it.
 - **No hardcoded design values.** Components reference design tokens via CSS variables
   (`--fpl-*`) or base components — never literal colors, sizes, or spacing. See `docs/frontend.md`.
+- **`rem` for all lengths.** Use `rem` for spacing, sizes, radii, positions, and breakpoints.
+  Exception: border widths (`1px`, `2px`) and shadow offsets stay in `px` — they are visual
+  strokes, not layout values. See `docs/frontend.md`.
 - **Every base component and screen state has a Storybook story.** Stories use shared fixtures and
   are the source of QA screenshots. See `docs/testing.md` / ADR 0009.
 - **No descriptive comments.** Write no comments unless the WHY is non-obvious: a hidden

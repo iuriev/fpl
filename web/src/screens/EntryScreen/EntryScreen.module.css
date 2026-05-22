@@ -10,7 +10,7 @@
 
 .content {
   width: 100%;
-  max-width: 390px;
+  max-width: 24.375rem;
   display: flex;
   flex-direction: column;
   gap: var(--fpl-space-xl5);
@@ -46,7 +46,7 @@
   line-height: 1.5;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 48rem) {
   .headline {
     font-size: var(--fpl-fs-h1-l);
   }

@@ -13,7 +13,7 @@
   padding: var(--fpl-space-md) var(--fpl-space-xl3) var(--fpl-space-sm);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0.25rem;
 }
 
 .headerMain {
@@ -49,7 +49,7 @@
 .teamInfo {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 0.0625rem;
   min-width: 0;
 }
 
@@ -75,10 +75,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4px var(--fpl-space-xs);
+  padding: 0.25rem var(--fpl-space-xs);
 }
 
 .gwLabel {
+  view-transition-name: gw-label;
   font-size: var(--fpl-fs-title);
   font-weight: var(--fpl-fw-bold);
   color: var(--fpl-text);
@@ -100,8 +101,8 @@
 }
 
 .navBtn svg {
-  width: 16px;
-  height: 16px;
+  width: 1rem;
+  height: 1rem;
 }
 
 .chevronRight {
@@ -120,13 +121,15 @@
 }
 
 .summaryWrap {
+  view-transition-name: squad-summary;
   flex-shrink: 0;
   padding: var(--fpl-space-xs) var(--fpl-space-xl);
 }
 
 .summaryPlaceholder {
+  view-transition-name: squad-summary;
   flex-shrink: 0;
-  height: 44px;
+  height: 2.75rem;
   margin: var(--fpl-space-xs) var(--fpl-space-xl);
   border-radius: var(--fpl-radius-xl);
   background: linear-gradient(
@@ -140,6 +143,7 @@
 }
 
 .pitchBench {
+  view-transition-name: squad-content;
   flex: 1;
   min-height: 0;
   display: flex;
@@ -200,7 +204,7 @@
   text-transform: uppercase;
   letter-spacing: var(--fpl-tr-cap-s);
   text-decoration: underline;
-  text-underline-offset: 3px;
+  text-underline-offset: 0.1875rem;
   text-decoration-color: rgba(255, 255, 255, 0.3);
 }
 
@@ -226,9 +230,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 0.25rem;
   flex: 1 1 0;
-  max-width: 80px;
+  max-width: 5rem;
   min-width: 0;
 }
 
@@ -257,10 +261,10 @@
 }
 
 .skeletonNameBar {
-  width: 74px;
-  height: 32px;
-  border-radius: 5px;
-  margin-top: 2px;
+  width: 4.625rem;
+  height: 2rem;
+  border-radius: 0.3125rem;
+  margin-top: 0.125rem;
   background: rgba(255, 255, 255, 0.10);
   background-image: linear-gradient(
     90deg,
@@ -274,9 +278,9 @@
 }
 
 .skeletonLabel {
-  height: 12px;
-  margin: 0 18px;
-  border-radius: 3px;
+  height: 0.75rem;
+  margin: 0 1.125rem;
+  border-radius: 0.1875rem;
   background: rgba(255, 255, 255, 0.10);
 }
 
@@ -307,7 +311,7 @@
 }
 
 .emptyPitchIcon {
-  width: 140px;
+  width: 8.75rem;
   position: relative;
 }
 
@@ -323,10 +327,10 @@
   pointer-events: none;
 }
 
-@media (min-width: 600px) {
+@media (min-width: 37.5rem) {
   .screen {
     height: 100vh;
-    max-width: 480px;
+    max-width: 30rem;
     margin: 0 auto;
   }
 

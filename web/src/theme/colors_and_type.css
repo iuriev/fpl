@@ -65,31 +65,31 @@
   --fpl-tr-cap-xl: 0.12em;
 
   /* ── spacing ────────────────────────────────────────────────────── */
-  --fpl-space-xs: 4px;
-  --fpl-space-s: 6px;
-  --fpl-space-sm: 8px;
-  --fpl-space-md: 10px;
-  --fpl-space-base: 12px;
-  --fpl-space-lg: 14px;
-  --fpl-space-xl: 16px;
-  --fpl-space-xl2: 18px;
-  --fpl-space-xl3: 20px;
-  --fpl-space-xl4: 24px;
-  --fpl-space-xl5: 28px;
-  --fpl-space-xl6: 32px;
-  --fpl-space-xl7: 40px;
-  --fpl-space-xl8: 48px;
-  --fpl-space-xl9: 56px;
+  --fpl-space-xs: 0.25rem;
+  --fpl-space-s: 0.375rem;
+  --fpl-space-sm: 0.5rem;
+  --fpl-space-md: 0.625rem;
+  --fpl-space-base: 0.75rem;
+  --fpl-space-lg: 0.875rem;
+  --fpl-space-xl: 1rem;
+  --fpl-space-xl2: 1.125rem;
+  --fpl-space-xl3: 1.25rem;
+  --fpl-space-xl4: 1.5rem;
+  --fpl-space-xl5: 1.75rem;
+  --fpl-space-xl6: 2rem;
+  --fpl-space-xl7: 2.5rem;
+  --fpl-space-xl8: 3rem;
+  --fpl-space-xl9: 3.5rem;
 
   /* ── radii ──────────────────────────────────────────────────────── */
-  --fpl-radius-xs: 4px;
-  --fpl-radius-s: 5px;
-  --fpl-radius-sm: 6px;
-  --fpl-radius-md: 8px;
-  --fpl-radius-lg: 10px;
-  --fpl-radius-xl: 12px;
-  --fpl-radius-xl2: 14px;
-  --fpl-radius-xl3: 18px;
+  --fpl-radius-xs: 0.25rem;
+  --fpl-radius-s: 0.3125rem;
+  --fpl-radius-sm: 0.375rem;
+  --fpl-radius-md: 0.5rem;
+  --fpl-radius-lg: 0.625rem;
+  --fpl-radius-xl: 0.75rem;
+  --fpl-radius-xl2: 0.875rem;
+  --fpl-radius-xl3: 1.125rem;
   --fpl-radius-pill: 9999px;
 
   /* ── elevation ──────────────────────────────────────────────────── */
@@ -99,15 +99,15 @@
   --fpl-drop-shadow-shirt: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.45));
 
   /* ── sizes ──────────────────────────────────────────────────────── */
-  --fpl-size-input-h: 56px;
-  --fpl-size-btn-h: 44px;
-  --fpl-size-arrow-btn: 36px;
-  --fpl-size-avatar: 28px;
-  --fpl-size-avatar-m: 32px;
-  --fpl-size-status-badge: 18px;
-  --fpl-size-jersey-l: 54px;
-  --fpl-size-jersey-m: 48px;
-  --fpl-popup-inset-b: 96px;
+  --fpl-size-input-h: 3.5rem;
+  --fpl-size-btn-h: 2.75rem;
+  --fpl-size-arrow-btn: 2.25rem;
+  --fpl-size-avatar: 1.75rem;
+  --fpl-size-avatar-m: 2rem;
+  --fpl-size-status-badge: 1.125rem;
+  --fpl-size-jersey-l: 3.375rem;
+  --fpl-size-jersey-m: 3rem;
+  --fpl-popup-inset-b: 6rem;
 }
 
 /* ── semantic role classes (optional) ───────────────────────────────── */
@@ -150,6 +150,14 @@
 }
 
 /* ── animations ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
 @keyframes fplShimmer {
   0% {
     background-position: 200% 0;

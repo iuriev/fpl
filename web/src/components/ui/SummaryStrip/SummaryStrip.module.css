@@ -13,7 +13,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 0.125rem;
   padding: var(--fpl-space-sm) var(--fpl-space-xs);
   border-right: 1px solid var(--fpl-bg-hair);
   overflow: hidden;
