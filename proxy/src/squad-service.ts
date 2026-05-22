@@ -76,7 +76,7 @@ export async function getSquad(teamId: number, gameweek: number): Promise<SquadR
   // Build lookup maps for quick access
   const teamMap = new Map(bootstrap.teams.map((t) => [t.id, t.short_name]));
   const playerMap = new Map(bootstrap.elements.map((e) => [e.id, e]));
-  const livePointsMap = new Map(live.elements.map((e) => [e.id, e.stats.total_points]));
+  const liveMap = new Map(live.elements.map((e) => [e.id, e.stats]));
   const pickPositionMap = new Map(picks.picks.map((p) => [p.element, p.position]));
 
   // Build players array
@@ -85,7 +85,22 @@ export async function getSquad(teamId: number, gameweek: number): Promise<SquadR
     if (!playerData) throw new Error(`Player ${pick.element} not found`);
 
     const teamName = teamMap.get(playerData.team) || 'Unknown';
-    const points = livePointsMap.get(pick.element) ?? 0;
+    const liveStats = liveMap.get(pick.element);
+    const stats = {
+      total_points: liveStats?.total_points ?? 0,
+      minutes: liveStats?.minutes ?? 0,
+      goals_scored: liveStats?.goals_scored ?? 0,
+      assists: liveStats?.assists ?? 0,
+      clean_sheets: liveStats?.clean_sheets ?? 0,
+      goals_conceded: liveStats?.goals_conceded ?? 0,
+      own_goals: liveStats?.own_goals ?? 0,
+      penalties_saved: liveStats?.penalties_saved ?? 0,
+      penalties_missed: liveStats?.penalties_missed ?? 0,
+      yellow_cards: liveStats?.yellow_cards ?? 0,
+      red_cards: liveStats?.red_cards ?? 0,
+      saves: liveStats?.saves ?? 0,
+      bonus: liveStats?.bonus ?? 0,
+    };
 
     return {
       id: pick.element,
@@ -93,12 +108,13 @@ export async function getSquad(teamId: number, gameweek: number): Promise<SquadR
       position: POSITION_MAP[playerData.element_type] || 'GK',
       club: teamName,
       teamCode: playerData.team_code,
-      points,
+      points: stats.total_points,
       isCaptain: pick.is_captain,
       isViceCaptain: pick.is_vice_captain,
       status: playerData.status as PlayerStatus,
       chanceOfPlaying: playerData.chance_of_playing_this_round,
       news: playerData.news || undefined,
+      stats,
     } as SquadPlayer;
   });
 

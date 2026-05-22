@@ -1,0 +1,64 @@
+<!doctype html>
+<html><head><meta charset="utf-8"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css"/>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #170027; font-family: var(--fpl-font-display); color: var(--fpl-text); }
+  body { padding: 20px; box-sizing: border-box; min-height: 380px; }
+  .grid { display: grid; gap: 16px 14px; align-items: stretch; }
+  .cell { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+  .lbl { font: 700 9px var(--fpl-font-display); letter-spacing: 0.10em; text-transform: uppercase; color: var(--fpl-muted); }
+  .note { font-family: var(--fpl-font-mono); font-size: 9px; color: var(--fpl-muted-soft); line-height: 1.5; }
+  /* spinner */
+  @keyframes fplSpin { to { transform: rotate(360deg); } }
+  .spinner { width:16px;height:16px;border-radius:999px;border:2px solid rgba(23,0,39,0.25);border-top-color:#170027;animation: fplSpin 0.8s linear infinite; }
+</style>
+</head><body>
+    <div class="grid" style="grid-template-columns: repeat(5, 1fr);">
+      <div class="cell">
+        <div class="lbl">Idle</div>
+        <button style="height: 52px; padding: 0 22px; border-radius: 12px; border: none; font: 700 15px var(--fpl-font-display); letter-spacing: -0.01em; display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; cursor: pointer; background:#00FF87;color:#170027;">View squad <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m-3-3l3 3-3 3" stroke="#170027" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="note">bg accent · ink dark</div>
+      </div>
+      <div class="cell">
+        <div class="lbl">Hover</div>
+        <button style="height: 52px; padding: 0 22px; border-radius: 12px; border: none; font: 700 15px var(--fpl-font-display); letter-spacing: -0.01em; display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; cursor: pointer; background:#04E36A;color:#170027;box-shadow:0 4px 14px rgba(0,255,135,0.30);">View squad <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m-3-3l3 3-3 3" stroke="#170027" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="note">bg accent-deep<br/>+ lift shadow</div>
+      </div>
+      <div class="cell">
+        <div class="lbl">Pressed</div>
+        <button style="height: 52px; padding: 0 22px; border-radius: 12px; border: none; font: 700 15px var(--fpl-font-display); letter-spacing: -0.01em; display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; cursor: pointer; background:#04E36A;color:#170027;transform:translateY(1px) scale(0.98);box-shadow:none;">View squad <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m-3-3l3 3-3 3" stroke="#170027" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="note">translateY 1px<br/>scale 0.98 · no shadow</div>
+      </div>
+      <div class="cell">
+        <div class="lbl">Focus (kb)</div>
+        <button style="height: 52px; padding: 0 22px; border-radius: 12px; border: none; font: 700 15px var(--fpl-font-display); letter-spacing: -0.01em; display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; cursor: pointer; background:#00FF87;color:#170027;box-shadow:0 0 0 3px rgba(0,255,135,0.35);">View squad <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m-3-3l3 3-3 3" stroke="#170027" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="note">3px accent-soft ring</div>
+      </div>
+      <div class="cell">
+        <div class="lbl">Disabled</div>
+        <button style="height: 52px; padding: 0 22px; border-radius: 12px; border: none; font: 700 15px var(--fpl-font-display); letter-spacing: -0.01em; display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; cursor: pointer; background:#2D0844;color:#7A6B8E;cursor:not-allowed;">View squad</button>
+        <div class="note">bg-soft / muted-soft</div>
+      </div>
+      <div class="cell">
+        <div class="lbl">Loading</div>
+        <button style="height: 52px; padding: 0 22px; border-radius: 12px; border: none; font: 700 15px var(--fpl-font-display); letter-spacing: -0.01em; display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; cursor: pointer; background:#00FF87;color:#170027;cursor:wait;"><span class="spinner"></span>Loading squad…</button>
+        <div class="note">spinner replaces arrow<br/>copy: "Loading squad…"</div>
+      </div>
+      <div class="cell" style="grid-column: span 2;">
+        <div class="lbl">Pill variant — Jump to current GW</div>
+        <div style="display:flex; gap: 10px; align-items: center;">
+          <button style="height: 52px; padding: 0 22px; border-radius: 12px; border: none; font: 700 15px var(--fpl-font-display); letter-spacing: -0.01em; display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; cursor: pointer; height: 44px; border-radius: 999px; background:#00FF87;color:#170027;font-size:14px;">Jump to current GW <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m-3-3l3 3-3 3" stroke="#170027" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button style="height: 52px; padding: 0 22px; border-radius: 12px; border: none; font: 700 15px var(--fpl-font-display); letter-spacing: -0.01em; display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; cursor: pointer; height: 44px; border-radius: 999px; background:#04E36A;color:#170027;font-size:14px;box-shadow:0 4px 14px rgba(0,255,135,0.30);">Jump to current GW <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m-3-3l3 3-3 3" stroke="#170027" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+        <div class="note">idle · hover</div>
+      </div>
+      <div class="cell" style="grid-column: span 2;">
+        <div class="lbl">Pill variant — Try again (error)</div>
+        <div style="display:flex; gap: 10px; align-items: center;">
+          <button style="height: 52px; padding: 0 22px; border-radius: 12px; border: none; font: 700 15px var(--fpl-font-display); letter-spacing: -0.01em; display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; cursor: pointer; height: 44px; border-radius: 999px; background:transparent;color:#FFFFFF;font-size:14px;border:1.5px solid #FFFFFF;">Try again</button>
+          <button style="height: 52px; padding: 0 22px; border-radius: 12px; border: none; font: 700 15px var(--fpl-font-display); letter-spacing: -0.01em; display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; cursor: pointer; height: 44px; border-radius: 999px; background:rgba(255,255,255,0.10);color:#FFFFFF;font-size:14px;border:1.5px solid #FFFFFF;">Try again</button>
+        </div>
+        <div class="note">idle · hover (used in error states)</div>
+      </div>
+    </div></body></html>

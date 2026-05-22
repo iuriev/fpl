@@ -1,0 +1,33 @@
+<!doctype html>
+<html><head><meta charset="utf-8"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css"/>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #170027; font-family: var(--fpl-font-display); color: var(--fpl-text); }
+  body { padding: 20px; box-sizing: border-box; min-height: 140px; }
+  .row { display: flex; gap: 14px; align-items: stretch; flex-wrap: wrap; }
+  .col { display: flex; flex-direction: column; }
+  .swatch { border-radius: 12px; border: 1px solid var(--fpl-bg-hair); padding: 12px; background: var(--fpl-bg); display: flex; gap: 12px; align-items: center; min-width: 0; }
+  .chip { width: 44px; height: 44px; border-radius: 8px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.08); }
+  .lbl { font-size: 11px; font-weight: 600; color: var(--fpl-text); letter-spacing: -0.01em; line-height: 1.2; }
+  .hex { font-family: var(--fpl-font-mono); font-size: 10px; color: var(--fpl-muted-soft); margin-top: 2px; letter-spacing: 0.03em; }
+  .name { font-family: var(--fpl-font-mono); font-size: 10px; color: var(--fpl-muted); margin-top: 1px; }
+</style>
+</head><body>
+    <div class="row">
+      <div class="swatch" style="flex:2; background: var(--fpl-bg-deep);">
+        <div class="chip" style="background:#00FF87; width:60px; height:60px;"></div>
+        <div>
+          <div class="lbl" style="font-size: 14px; font-weight: 700;">Accent · Brand green</div>
+          <div class="hex">#00FF87 · --fpl-accent</div>
+          <div style="margin-top:8px; display:inline-flex; gap:6px;">
+            <span style="background:#00FF87; color:#170027; font-weight:700; font-size:11px; padding:5px 10px; border-radius:6px;">PRIMARY</span>
+            <span style="background:transparent; color:#00FF87; font-weight:700; font-size:11px; padding:4px 10px; border-radius:6px; border:1px solid #00FF87;">LINK</span>
+          </div>
+        </div>
+      </div>
+      <div class="swatch" style="flex:1;">
+        <div class="chip" style="background:#04E36A"></div>
+        <div><div class="lbl">Accent deep</div><div class="hex">#04E36A</div><div class="name">--fpl-accent-deep</div></div>
+      </div>
+    </div></body></html>

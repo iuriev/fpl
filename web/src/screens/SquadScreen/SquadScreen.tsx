@@ -9,8 +9,8 @@ import { Pitch } from '@/components/ui/Pitch/Pitch';
 import { PlayerCard } from '@/components/ui/PlayerCard/PlayerCard';
 import { SummaryStrip } from '@/components/ui/SummaryStrip/SummaryStrip';
 import { copy, interpolate } from '@/lib/copy';
-import { MAX_GAMEWEEK } from '@/types';
 import type { PlayerPosition, SquadPlayer } from '@/types';
+import { MAX_GAMEWEEK } from '@/types';
 
 import styles from './SquadScreen.module.css';
 

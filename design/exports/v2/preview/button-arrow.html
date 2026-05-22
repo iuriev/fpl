@@ -1,0 +1,59 @@
+<!doctype html>
+<html><head><meta charset="utf-8"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css"/>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #170027; font-family: var(--fpl-font-display); color: var(--fpl-text); }
+  body { padding: 20px; box-sizing: border-box; min-height: 170px; }
+  .grid { display: grid; gap: 16px 14px; align-items: stretch; }
+  .cell { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+  .lbl { font: 700 9px var(--fpl-font-display); letter-spacing: 0.10em; text-transform: uppercase; color: var(--fpl-muted); }
+  .note { font-family: var(--fpl-font-mono); font-size: 9px; color: var(--fpl-muted-soft); line-height: 1.5; }
+  /* spinner */
+  @keyframes fplSpin { to { transform: rotate(360deg); } }
+  .spinner { width:16px;height:16px;border-radius:999px;border:2px solid rgba(23,0,39,0.25);border-top-color:#170027;animation: fplSpin 0.8s linear infinite; }
+</style>
+</head><body>
+    <div class="grid" style="grid-template-columns: repeat(5, 1fr);">
+      
+        <div class="cell" style="align-items: center;">
+          <div class="lbl">Idle</div>
+          <button style="width:36px;height:36px;border-radius:999px;display:grid;place-items:center;cursor:pointer;background:rgba(0,255,135,0.12);border:1px solid #00FF87;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4l-4 4 4 4" stroke="#00FF87" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="note" style="text-align: center;"> </div>
+        </div>
+      
+        <div class="cell" style="align-items: center;">
+          <div class="lbl">Hover</div>
+          <button style="width:36px;height:36px;border-radius:999px;display:grid;place-items:center;cursor:pointer;background:rgba(0,255,135,0.22);border:1px solid #00FF87;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4l-4 4 4 4" stroke="#00FF87" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="note" style="text-align: center;">bg → 22% alpha</div>
+        </div>
+      
+        <div class="cell" style="align-items: center;">
+          <div class="lbl">Pressed</div>
+          <button style="width:36px;height:36px;border-radius:999px;display:grid;place-items:center;cursor:pointer;background:rgba(4,227,106,0.28);border:1px solid #04E36A;transform:scale(0.94);">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4l-4 4 4 4" stroke="#04E36A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="note" style="text-align: center;">scale 0.94</div>
+        </div>
+      
+        <div class="cell" style="align-items: center;">
+          <div class="lbl">Focus</div>
+          <button style="width:36px;height:36px;border-radius:999px;display:grid;place-items:center;cursor:pointer;background:rgba(0,255,135,0.12);border:1px solid #00FF87;box-shadow:0 0 0 3px rgba(0,255,135,0.35);">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4l-4 4 4 4" stroke="#00FF87" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="note" style="text-align: center;">3px ring</div>
+        </div>
+      
+        <div class="cell" style="align-items: center;">
+          <div class="lbl">Disabled</div>
+          <button style="width:36px;height:36px;border-radius:999px;display:grid;place-items:center;cursor:pointer;background:rgba(255,255,255,0.04);border:1px solid #3D1A55;opacity:0.5;cursor:not-allowed;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4l-4 4 4 4" stroke="#7A6B8E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="note" style="text-align: center;">at GW bound</div>
+        </div>
+      
+    </div></body></html>

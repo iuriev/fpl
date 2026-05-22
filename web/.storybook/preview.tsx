@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
 import '../src/theme/colors_and_type.css';
 
 import type { Preview } from '@storybook/react-vite';

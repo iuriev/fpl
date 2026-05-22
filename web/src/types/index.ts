@@ -21,6 +21,22 @@ export type PlayerPosition = 'GK' | 'DEF' | 'MID' | 'FWD';
 
 export type PlayerStatus = 'a' | 'd' | 'i' | 's' | 'u' | 'n';
 
+export interface PlayerStats {
+  minutes: number;
+  goals_scored: number;
+  assists: number;
+  clean_sheets: number;
+  goals_conceded: number;
+  own_goals: number;
+  penalties_saved: number;
+  penalties_missed: number;
+  yellow_cards: number;
+  red_cards: number;
+  saves: number;
+  bonus: number;
+  total_points: number;
+}
+
 export interface SquadPlayer {
   id: number;
   name: string;
@@ -33,6 +49,7 @@ export interface SquadPlayer {
   status: PlayerStatus;
   chanceOfPlaying?: number | null;
   news?: string;
+  stats: PlayerStats;
 }
 
 export interface SquadSummary {

@@ -25,7 +25,7 @@ describe('Squad Service', () => {
             is_current: true,
           },
         ],
-        teams: [{ id: 1, name: 'Arsenal', code: 1 }],
+        teams: [{ id: 1, name: 'Arsenal', short_name: 'ARS', code: 1 }],
         elements: [
           {
             id: 1,
@@ -67,6 +67,18 @@ describe('Squad Service', () => {
             id: 1,
             stats: {
               total_points: 15,
+              minutes: 90,
+              goals_scored: 2,
+              assists: 1,
+              clean_sheets: 0,
+              goals_conceded: 1,
+              own_goals: 0,
+              penalties_saved: 0,
+              penalties_missed: 0,
+              yellow_cards: 1,
+              red_cards: 0,
+              saves: 0,
+              bonus: 3,
             },
           },
         ],
@@ -94,8 +106,13 @@ describe('Squad Service', () => {
       expect(result.starters[0].name).toBe('Saka');
       expect(result.starters[0].points).toBe(15);
       expect(result.starters[0].position).toBe('MID');
-      expect(result.starters[0].club).toBe('Arsenal');
+      expect(result.starters[0].club).toBe('ARS');
       expect(result.starters[0].teamCode).toBe(3);
+      expect(result.starters[0].stats.goals_scored).toBe(2);
+      expect(result.starters[0].stats.assists).toBe(1);
+      expect(result.starters[0].stats.minutes).toBe(90);
+      expect(result.starters[0].stats.bonus).toBe(3);
+      expect(result.starters[0].stats.yellow_cards).toBe(1);
     });
 
     it('splits starters and bench correctly', async () => {
@@ -112,8 +129,8 @@ describe('Squad Service', () => {
           },
         ],
         teams: [
-          { id: 1, name: 'Arsenal', code: 1 },
-          { id: 2, name: 'Chelsea', code: 2 },
+          { id: 1, name: 'Arsenal', short_name: 'ARS', code: 1 },
+          { id: 2, name: 'Chelsea', short_name: 'CHE', code: 2 },
         ],
         elements: [
           {
@@ -158,8 +175,8 @@ describe('Squad Service', () => {
 
       const mockLive = {
         elements: [
-          { id: 1, stats: { total_points: 10 } },
-          { id: 2, stats: { total_points: 5 } },
+          { id: 1, stats: { total_points: 10, minutes: 90, goals_scored: 0, assists: 0, clean_sheets: 0, goals_conceded: 0, own_goals: 0, penalties_saved: 0, penalties_missed: 0, yellow_cards: 0, red_cards: 0, saves: 0, bonus: 0 } },
+          { id: 2, stats: { total_points: 5, minutes: 45, goals_scored: 0, assists: 0, clean_sheets: 0, goals_conceded: 0, own_goals: 0, penalties_saved: 0, penalties_missed: 0, yellow_cards: 0, red_cards: 0, saves: 0, bonus: 0 } },
         ],
       };
 

@@ -60,6 +60,33 @@ export const copy = {
 
   // Common actions
   closeButton: 'Close',
+
+  // View toggle
+  viewPitch: 'Pitch',
+  viewList: 'List',
+  viewToggleLabel: 'View mode',
+
+  // List view section headers
+  listGroupGK: 'Goalkeeper',
+  listGroupDEF: 'Defenders',
+  listGroupMID: 'Midfielders',
+  listGroupFWD: 'Forwards',
+  listGroupBench: 'Bench',
+
+  // List view column headers
+  listColPts: 'Pts',
+  listColMP: 'MP',
+  listColGS: 'GS',
+  listColA: 'A',
+  listColCS: 'CS',
+  listColGC: 'GC',
+  listColOG: 'OG',
+  listColPS: 'PS',
+  listColPM: 'PM',
+  listColYC: 'YC',
+  listColRC: 'RC',
+  listColS: 'S',
+  listColBonus: 'Bonus',
 };
 
 /**
