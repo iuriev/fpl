@@ -9,6 +9,10 @@ Captured 2026-05 (season 2025/26). Verify against live data if something looks o
 
 ## Conventions
 
+- **Gameweeks**: a Premier League season always has exactly 38 gameweeks (`id` 1–38). This is a
+  league rule, not a FPL API contract — the constant `MAX_GAMEWEEK = 38` is the authoritative
+  cap used everywhere in this codebase. Proxy rejects `gw > 38` with 400; the frontend clamps
+  URL params to `[1, 38]`.
 - Player position (`element_type`): `1` = GK, `2` = DEF, `3` = MID, `4` = FWD (see `element_types`).
 - Player availability `status`: `a` available, `d` doubtful, `i` injured, `s` suspended,
   `u` unavailable, `n` not eligible. Detail in `news` and `chance_of_playing_this_round`.

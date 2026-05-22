@@ -131,9 +131,9 @@
   border-radius: var(--fpl-radius-xl);
   background: linear-gradient(
     90deg,
-    var(--fpl-bg-soft) 25%,
-    var(--fpl-bg-hair) 50%,
-    var(--fpl-bg-soft) 75%
+    var(--fpl-bg-hair) 25%,
+    var(--fpl-shimmer-hi) 50%,
+    var(--fpl-bg-hair) 75%
   );
   background-size: 200% 100%;
   animation: fplShimmer 1.4s linear infinite;
@@ -207,7 +207,7 @@
 .benchRow {
   display: flex;
   justify-content: center;
-  gap: var(--fpl-space-xl3);
+  gap: var(--fpl-space-sm);
   background: rgba(0, 0, 0, 0.28);
   border: 1px solid var(--fpl-bg-hair);
   border-radius: var(--fpl-radius-lg);
@@ -248,7 +248,7 @@
   background: linear-gradient(
     90deg,
     var(--fpl-bg-hair) 25%,
-    var(--fpl-bg-soft) 50%,
+    var(--fpl-shimmer-hi) 50%,
     var(--fpl-bg-hair) 75%
   );
   background-size: 200% 100%;

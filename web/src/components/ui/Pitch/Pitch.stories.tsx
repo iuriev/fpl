@@ -8,7 +8,7 @@ const meta = {
   parameters: {
     layout: 'centered',
   },
-  tags: ['autodocs', 'ai-generated', 'needs-work'],
+  tags: ['autodocs', 'ai-generated'],
 } satisfies Meta<typeof Pitch>;
 
 export default meta;

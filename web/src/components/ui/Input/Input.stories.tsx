@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect } from 'storybook/test';
+import { expect, within } from 'storybook/test';
 
 import { Input } from './Input';
+
+type BoundCanvas = ReturnType<typeof within>;
 
 const meta = {
   title: 'Components/Input',
@@ -9,7 +11,7 @@ const meta = {
   parameters: {
     layout: 'centered',
   },
-  tags: ['autodocs', 'ai-generated', 'needs-work'],
+  tags: ['autodocs', 'ai-generated'],
 } satisfies Meta<typeof Input>;
 
 export default meta;
@@ -40,7 +42,7 @@ export const WithError: Story = {
     value: '-123',
     onChange: () => {},
   },
-  play: async ({ canvas }) => {
+  play: async ({ canvas }: { canvas: BoundCanvas }) => {
     const input = canvas.getByRole('textbox');
     await expect(input).toHaveAttribute('aria-invalid', 'true');
     await expect(canvas.getByText('Team ID must be a positive number')).toBeVisible();

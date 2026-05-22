@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { api, ApiError } from '@/api/client';
-import { Button, Input } from '@/components';
+import { Button } from '@/components/ui/Button/Button';
+import { Input } from '@/components/ui/Input/Input';
 import { copy } from '@/lib/copy';
 
 import styles from './EntryScreen.module.css';

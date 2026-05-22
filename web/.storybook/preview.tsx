@@ -1,8 +1,10 @@
+import '../src/theme/colors_and_type.css';
+
 import type { Preview } from '@storybook/react-vite';
-import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { initialize, mswLoader } from 'msw-storybook-addon';
-import '../src/theme/colors_and_type.css';
+import { MemoryRouter } from 'react-router-dom';
+
 import { mswHandlers } from './msw-handlers';
 
 initialize({ onUnhandledRequest: 'bypass' });
@@ -33,6 +35,20 @@ const preview: Preview = {
           styles: {
             width: '390px',
             height: '844px',
+          },
+        },
+        tablet: {
+          name: 'Tablet (768x1024)',
+          styles: {
+            width: '768px',
+            height: '1024px',
+          },
+        },
+        desktop: {
+          name: 'Desktop (1440x900)',
+          styles: {
+            width: '1440px',
+            height: '900px',
           },
         },
       },

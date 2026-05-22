@@ -10,6 +10,7 @@
   --fpl-bg: #220035;
   --fpl-bg-soft: #2d0844;
   --fpl-bg-hair: #3d1a55;
+  --fpl-shimmer-hi: #6b3d8c;
 
   --fpl-pitch-a: #1fa64b;
   --fpl-pitch-b: #17933e;
@@ -23,6 +24,7 @@
   --fpl-accent: #00ff87;
   --fpl-accent-deep: #04e36a;
   --fpl-accent-ink: #170027;
+  --fpl-accent-faint: rgba(0, 255, 135, 0.12);
 
   --fpl-error: #ff4d6d;
   --fpl-error-soft: rgba(255, 77, 109, 0.12);
@@ -104,6 +106,12 @@
   /* ── sizes ──────────────────────────────────────────────────────── */
   --fpl-size-input-h: 56px;
   --fpl-size-btn-h: 44px;
+  --fpl-size-arrow-btn: 36px;
+  --fpl-size-avatar: 28px;
+  --fpl-size-avatar-m: 32px;
+  --fpl-size-status-badge: 18px;
+  --fpl-size-jersey-l: 54px;
+  --fpl-size-jersey-m: 48px;
 }
 
 /* ── semantic role classes (optional) ───────────────────────────────── */
@@ -174,6 +182,7 @@ body {
   font-family: var(--fpl-font-display);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 /* Self-hosted fonts will be added in a separate @font-face section */

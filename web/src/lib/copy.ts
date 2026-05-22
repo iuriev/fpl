@@ -28,6 +28,10 @@ export const copy = {
   squadLoadError: "Couldn't load this gameweek",
   squadRetry: 'Try again',
   squadEmpty: 'No squad available for Gameweek {GW}',
+  squadEmptyHeading: 'No squad yet',
+  squadEmptySubtext: 'No squad available for Gameweek {GW}. Use the arrows to jump to a later gameweek.',
+  squadJumpToCurrent: 'Jump to current GW →',
+  squadNotFound: "We couldn't find a team with that ID. Please check and try again.",
 
   // Summary strip
   summaryTotal: 'TOTAL',

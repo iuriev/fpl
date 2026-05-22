@@ -1,8 +1,3 @@
-/**
- * Main App component with routing.
- * Team ID and gameweek are URL query parameters.
- */
-
 import { QueryClient,QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Route, Routes, useSearchParams } from 'react-router-dom';
 

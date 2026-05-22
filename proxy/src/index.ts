@@ -1,13 +1,10 @@
-/**
- * FPL Proxy — Hono server fronting the public FPL API.
- * Phase 3 implementation: full endpoint suite with caching and composition.
- */
-
+import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import * as gameweeksService from './gameweeks-service';
 import * as entryService from './entry-service';
+import * as gameweeksService from './gameweeks-service';
 import * as squadService from './squad-service';
+import { MAX_GAMEWEEK } from './types';
 
 const app = new Hono();
 
@@ -68,7 +65,7 @@ app.get('/api/squad/:teamId/:gw', async (c) => {
     const teamId = parseInt(c.req.param('teamId'), 10);
     const gw = parseInt(c.req.param('gw'), 10);
 
-    if (isNaN(teamId) || teamId <= 0 || isNaN(gw) || gw <= 0) {
+    if (isNaN(teamId) || teamId <= 0 || isNaN(gw) || gw < 1 || gw > MAX_GAMEWEEK) {
       return c.json(
         { error: 'Invalid team ID or gameweek' },
         { status: 400 },
@@ -99,11 +96,8 @@ app.get('/api/squad/:teamId/:gw', async (c) => {
   }
 });
 
-const port = process.env.PORT || 3001;
+const port = Number(process.env.PORT ?? 3001);
 
-console.log(`Proxy server running on port ${port}`);
-
-export default {
-  port,
-  fetch: app.fetch,
-};
+serve({ fetch: app.fetch, port }, () => {
+  console.log(`Proxy server running on port ${port}`);
+});

@@ -1,10 +1,6 @@
-/**
- * React Query hooks for API endpoints.
- */
-
 import { useQuery } from '@tanstack/react-query';
 
-import { api } from './client';
+import { ApiError, api } from './client';
 
 export function useGameweeks() {
   return useQuery({
@@ -35,7 +31,10 @@ export function useSquad(teamId: number | null, gameweek: number | null) {
       return api.getSquad(teamId, gameweek);
     },
     enabled: !!teamId && gameweek !== null,
-    staleTime: 1000 * 60, // 1 minute for now; TODO: 24h for finished GW
-    retry: true,
+    staleTime: 1000 * 60,
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && error.status === 404) return false;
+      return failureCount < 3;
+    },
   });
 }

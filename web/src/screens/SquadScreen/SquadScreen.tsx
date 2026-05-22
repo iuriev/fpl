@@ -1,16 +1,250 @@
-/**
- * Squad screen — placeholder.
- * To be implemented in Phase 2.
- */
+import React, { useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
-import React from 'react';
+import { ApiError } from '@/api/client';
+import { useEntry, useGameweeks, useSquad } from '@/api/queries';
+import { Button } from '@/components/ui/Button/Button';
+import { Pitch } from '@/components/ui/Pitch/Pitch';
+import { PlayerCard } from '@/components/ui/PlayerCard/PlayerCard';
+import { SummaryStrip } from '@/components/ui/SummaryStrip/SummaryStrip';
+import { copy, interpolate } from '@/lib/copy';
+import { MAX_GAMEWEEK } from '@/types';
+import type { PlayerPosition, SquadPlayer } from '@/types';
+
+import styles from './SquadScreen.module.css';
 
 export interface SquadScreenProps {
   teamId: number;
 }
 
+const POSITION_ORDER: PlayerPosition[] = ['FWD', 'MID', 'DEF', 'GK'];
+
+function groupByPosition(players: SquadPlayer[]): Record<PlayerPosition, SquadPlayer[]> {
+  const groups: Record<PlayerPosition, SquadPlayer[]> = { GK: [], DEF: [], MID: [], FWD: [] };
+  for (const p of players) {
+    groups[p.position].push(p);
+  }
+  return groups;
+}
+
+function benchLabel(index: number, position: PlayerPosition): string {
+  return position === 'GK' ? 'GKP' : `${index}. ${position}`;
+}
+
 export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
-  return <div>Squad Screen (teamId: {teamId}) — to be implemented</div>;
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const { data: gameweeksData } = useGameweeks();
+  const { data: entry, isError: entryIsError } = useEntry(teamId);
+
+  const currentGw = gameweeksData?.current ?? null;
+  const maxGw = currentGw;
+
+  const gwParam = searchParams.get('gw');
+  const selectedGw = useMemo(() => {
+    if (gwParam) {
+      const n = Number(gwParam);
+      if (Number.isInteger(n) && n >= 1 && n <= MAX_GAMEWEEK) return n;
+    }
+    return currentGw;
+  }, [gwParam, currentGw]);
+
+  const { data: squad, isLoading, isError: squadIsError, error: squadError, refetch } = useSquad(
+    entryIsError ? null : teamId,
+    selectedGw,
+  );
+
+  const isNoSquad = squadIsError && squadError instanceof ApiError && squadError.status === 404;
+  const isSquadError = squadIsError && !isNoSquad;
+
+  const jumpToCurrent = () => {
+    if (currentGw === null) return;
+    setSearchParams((prev) => {
+      const p = new URLSearchParams(prev);
+      p.set('gw', String(currentGw));
+      return p;
+    });
+  };
+
+  const canGoPrev = selectedGw !== null && selectedGw > 1;
+  const canGoNext = selectedGw !== null && maxGw !== null && selectedGw < maxGw;
+
+  const navigate = (delta: number) => {
+    if (selectedGw === null) return;
+    const next = selectedGw + delta;
+    setSearchParams((prev) => {
+      const p = new URLSearchParams(prev);
+      p.set('gw', String(next));
+      return p;
+    });
+  };
+
+  const handleChangeTeam = () => {
+    setSearchParams({});
+  };
+
+  const positionGroups = useMemo(() => {
+    if (!squad) return null;
+    return groupByPosition(squad.starters);
+  }, [squad]);
+
+  const gwLabel =
+    selectedGw !== null
+      ? `${copy.squadGameweekLabel} ${selectedGw}`
+      : copy.squadGameweekLabel;
+
+  return (
+    <div className={styles.screen}>
+      <header className={styles.header}>
+        <div className={styles.headerMain}>
+          <div className={styles.headerLeft}>
+            <div className={styles.fplMark} aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none">
+                <path
+                  d="M3 17 L7 3 L11 3 L9 9 L13 9 L11 13 L15 13 L9 19 L11 13"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </div>
+            <div className={styles.teamInfo}>
+              <span className={styles.teamName}>{entry?.teamName ?? ' '}</span>
+              <span className={styles.teamId}>{'ID · ' + teamId}</span>
+            </div>
+          </div>
+          <Button variant="link" onClick={handleChangeTeam}>
+            {copy.squadChangeTeam}
+          </Button>
+        </div>
+
+        <div className={styles.gwNav}>
+          <button
+            className={styles.navBtn}
+            onClick={() => navigate(-1)}
+            disabled={!canGoPrev}
+            aria-label="Previous gameweek"
+          >
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M10 4l-4 4 4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          <span className={styles.gwLabel}>{gwLabel}</span>
+          <button
+            className={styles.navBtn}
+            onClick={() => navigate(1)}
+            disabled={!canGoNext}
+            aria-label="Next gameweek"
+          >
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" className={styles.chevronRight}>
+              <path d="M10 4l-4 4 4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      {squad && (
+        <div className={styles.summaryWrap}>
+          <SummaryStrip summary={squad.summary} />
+        </div>
+      )}
+      {isLoading && <div className={styles.summaryPlaceholder} aria-hidden="true" />}
+
+      {isLoading && <SquadSkeleton />}
+
+      {entryIsError && (
+        <div className={styles.stateCenter}>
+          <p className={styles.stateText}>{copy.squadNotFound}</p>
+          <Button variant="secondary" onClick={handleChangeTeam}>
+            {copy.squadChangeTeam}
+          </Button>
+        </div>
+      )}
+
+      {isSquadError && (
+        <div className={styles.stateCenter}>
+          <p className={styles.stateText}>{copy.squadLoadError}</p>
+          <Button variant="secondary" onClick={() => refetch()}>
+            {copy.squadRetry}
+          </Button>
+        </div>
+      )}
+
+      {isNoSquad && (
+        <div className={styles.stateCenter}>
+          <div className={styles.emptyPitchIcon}>
+            <Pitch>
+              <div className={styles.emptyPitchQ}>?</div>
+            </Pitch>
+          </div>
+          <p className={styles.stateHeading}>{copy.squadEmptyHeading}</p>
+          <p className={styles.stateText}>
+            {interpolate(copy.squadEmptySubtext, { GW: selectedGw ?? '' })}
+          </p>
+          {currentGw !== null && selectedGw !== currentGw && (
+            <Button variant="primary" onClick={jumpToCurrent}>
+              {copy.squadJumpToCurrent}
+            </Button>
+          )}
+        </div>
+      )}
+
+      {squad && squad.starters.length > 0 && positionGroups && (
+        <div className={styles.pitchBench}>
+          <div className={styles.pitchWrap}>
+            <Pitch className={styles.pitchFill}>
+              <div className={styles.pitchRows}>
+                {POSITION_ORDER.map((pos) => (
+                  <div key={pos} className={styles.playerRow}>
+                    {positionGroups[pos].map((player) => (
+                      <PlayerCard key={player.id} player={player} size="large" />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </Pitch>
+          </div>
+
+          <div className={styles.bench}>
+            <div className={styles.benchLabels}>
+              {squad.bench.map((player, i) => (
+                <span key={player.id} className={styles.benchLabel}>
+                  {benchLabel(i, player.position)}
+                </span>
+              ))}
+            </div>
+            <div className={styles.benchRow}>
+              {squad.bench.map((player) => (
+                <PlayerCard key={player.id} player={player} size="medium" />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 SquadScreen.displayName = 'SquadScreen';
+
+function SquadSkeleton() {
+  return (
+    <div className={styles.skeleton} aria-label={copy.loadingPlaceholder} aria-busy="true">
+      <div className={styles.skeletonPitch}>
+        {[4, 5, 4, 1].map((count, rowIdx) => (
+          <div key={rowIdx} className={styles.skeletonRow}>
+            {Array.from({ length: count }).map((_, i) => (
+              <div key={i} className={styles.skeletonCard} />
+            ))}
+          </div>
+        ))}
+      </div>
+      <div className={styles.skeletonBench}>
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className={styles.skeletonCard} />
+        ))}
+      </div>
+    </div>
+  );
+}
