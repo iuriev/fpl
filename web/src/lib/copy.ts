@@ -62,6 +62,15 @@ export const copy = {
   // Common actions
   closeButton: 'Close',
 
+  // Team info panel
+  teamInfoOverallPts: 'Overall pts',
+  teamInfoOverallRank: 'Overall rank',
+  teamInfoGwPts: 'GW pts',
+  teamInfoTotalPlayers: 'Total players',
+  teamInfoGwHistory: 'Gameweek History',
+  teamInfoDrawerLabel: 'Team information',
+  teamInfoOpenDrawer: 'Open team info',
+
   // View toggle
   viewPitch: 'Pitch',
   viewList: 'List',
