@@ -1,6 +1,7 @@
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import * as dreamTeamService from './dream-team-service';
 import * as entryService from './entry-service';
 import * as gameweeksService from './gameweeks-service';
 import * as historyService from './history-service';
@@ -133,6 +134,30 @@ app.get('/api/squad/:teamId/:gw', async (c) => {
       { error: 'Unable to fetch squad' },
       { status: 500 },
     );
+  }
+});
+
+// GET /api/dream-team/:gw
+app.get('/api/dream-team/:gw', async (c) => {
+  const gw = parseInt(c.req.param('gw'), 10);
+
+  if (isNaN(gw) || gw < 1 || gw > MAX_GAMEWEEK) {
+    return c.json({ error: 'Invalid gameweek' }, { status: 400 });
+  }
+
+  try {
+    const result = await dreamTeamService.getDreamTeam(gw);
+    return c.json(result);
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    if (errorMsg.includes('not yet finished')) {
+      return c.json({ error: `Dream Team is not yet available for gameweek ${gw}` }, { status: 400 });
+    }
+    if (errorMsg.includes('not found')) {
+      return c.json({ error: `Gameweek ${gw} not found` }, { status: 404 });
+    }
+    console.error('Error fetching dream team:', error);
+    return c.json({ error: 'Unable to fetch dream team' }, { status: 500 });
   }
 });
 

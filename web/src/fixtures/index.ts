@@ -1,4 +1,4 @@
-import type { EntryResponse, GameweeksResponse, PlayerStats, SquadResponse } from '@/types';
+import type { DreamTeamPlayer, DreamTeamResponse, EntryResponse, GameweeksResponse, PlayerStats, SquadResponse } from '@/types';
 
 function mkStats(overrides: Partial<PlayerStats> = {}): PlayerStats {
   return {
@@ -74,4 +74,30 @@ export const fixtureSquadEmpty: SquadResponse = {
   summary: { totalPoints: 0, transfers: 0 },
   starters: [],
   bench: [],
+};
+
+function mkDtPlayer(overrides: Partial<DreamTeamPlayer> & Pick<DreamTeamPlayer, 'id' | 'webName' | 'position' | 'pitchPosition'>): DreamTeamPlayer {
+  return {
+    teamCode: 3,
+    teamShortName: 'ARS',
+    points: 10,
+    ...overrides,
+  };
+}
+
+export const fixtureDreamTeam: DreamTeamResponse = {
+  gw: 36,
+  players: [
+    mkDtPlayer({ id: 101, webName: 'Raya', position: 'GK', pitchPosition: 1, points: 10 }),
+    mkDtPlayer({ id: 102, webName: 'Saliba', position: 'DEF', pitchPosition: 2, points: 12 }),
+    mkDtPlayer({ id: 103, webName: 'Gabriel', position: 'DEF', pitchPosition: 3, points: 11 }),
+    mkDtPlayer({ id: 104, webName: 'White', position: 'DEF', pitchPosition: 4, points: 9 }),
+    mkDtPlayer({ id: 105, webName: 'Saka', position: 'MID', pitchPosition: 5, points: 18 }),
+    mkDtPlayer({ id: 106, webName: 'Ødegaard', position: 'MID', pitchPosition: 6, points: 15 }),
+    mkDtPlayer({ id: 107, webName: 'Havertz', position: 'MID', pitchPosition: 7, points: 14, teamCode: 43, teamShortName: 'MCI' }),
+    mkDtPlayer({ id: 108, webName: 'Rice', position: 'MID', pitchPosition: 8, points: 13 }),
+    mkDtPlayer({ id: 109, webName: 'Haaland', position: 'FWD', pitchPosition: 9, points: 20, teamCode: 43, teamShortName: 'MCI' }),
+    mkDtPlayer({ id: 110, webName: 'Jesus', position: 'FWD', pitchPosition: 10, points: 16 }),
+    mkDtPlayer({ id: 111, webName: 'Trossard', position: 'FWD', pitchPosition: 11, points: 8 }),
+  ],
 };

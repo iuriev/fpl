@@ -92,6 +92,20 @@ export interface FPLHistory {
   }>;
 }
 
+export interface FPLDreamTeamEntry {
+  element: number;
+  points: number;
+  position: number;
+}
+
+export interface FPLDreamTeam {
+  team: FPLDreamTeamEntry[];
+  top_player: {
+    id: number;
+    points: number;
+  };
+}
+
 export interface FPLLive {
   elements: Array<{
     id: number;
@@ -140,4 +154,8 @@ export async function getLive(gameweek: number): Promise<FPLLive> {
 
 export async function getHistory(teamId: number): Promise<FPLHistory> {
   return fetchFPL(`/entry/${teamId}/history/`);
+}
+
+export async function getDreamTeam(gameweek: number): Promise<FPLDreamTeam> {
+  return fetchFPL(`/dream-team/${gameweek}/`);
 }

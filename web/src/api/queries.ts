@@ -55,6 +55,22 @@ export function useLeagues(teamId: number | null) {
   });
 }
 
+export function useDreamTeam(gameweek: number | null) {
+  return useQuery({
+    queryKey: ['dream-team', gameweek],
+    queryFn: () => {
+      if (gameweek === null) throw new Error('Gameweek required');
+      return api.getDreamTeam(gameweek);
+    },
+    enabled: gameweek !== null,
+    staleTime: 1000 * 60 * 60 * 24, // 24h — finished GW data is immutable
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && (error.status === 400 || error.status === 404)) return false;
+      return failureCount < 3;
+    },
+  });
+}
+
 export function useSquad(teamId: number | null, gameweek: number | null) {
   return useQuery({
     queryKey: ['squad', teamId, gameweek],

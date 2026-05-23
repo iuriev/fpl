@@ -98,6 +98,14 @@ export const copy = {
   statsRetry: 'Try again',
   statsMyStats: 'My Stats',
 
+  // Dream Team screen
+  dreamTeamTitle: 'Dream Team',
+  dreamTeamBack: 'Squad',
+  dreamTeamLoadError: "Couldn't load the Dream Team",
+  dreamTeamRetry: 'Try again',
+  dreamTeamNotAvailable: 'Dream Team not available yet for this gameweek',
+  dreamTeamNavLink: 'Dream Team',
+
   // View toggle
   viewPitch: 'Pitch',
   viewList: 'List',

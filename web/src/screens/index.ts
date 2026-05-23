@@ -1,3 +1,4 @@
+export { DreamTeamScreen } from './DreamTeamScreen/DreamTeamScreen';
 export type { EntryScreenProps } from './EntryScreen/EntryScreen';
 export { EntryScreen } from './EntryScreen/EntryScreen';
 export type { GameweekHistoryScreenProps } from './GameweekHistoryScreen/GameweekHistoryScreen';

@@ -1,7 +1,7 @@
 import { QueryClient,QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Route, Routes, useSearchParams } from 'react-router-dom';
 
-import { EntryScreen, GameweekHistoryScreen, LeaguesStatsScreen, SquadScreen } from '@/screens';
+import { DreamTeamScreen, EntryScreen, GameweekHistoryScreen, LeaguesStatsScreen, SquadScreen } from '@/screens';
 
 const queryClient = new QueryClient();
 
@@ -33,6 +33,7 @@ function AppContent() {
         path="/stats"
         element={teamId ? <LeaguesStatsScreen teamId={teamId} /> : <EntryScreen onSubmit={(id) => setSearchParams({ teamId: String(id) })} />}
       />
+      <Route path="/dream-team" element={<DreamTeamScreen />} />
     </Routes>
   );
 }

@@ -1,0 +1,213 @@
+.screen {
+  height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--fpl-bg-deep);
+}
+
+.header {
+  flex-shrink: 0;
+  padding: var(--fpl-space-md) var(--fpl-space-xl3) var(--fpl-space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--fpl-space-xs);
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-xs);
+  background: none;
+  border: none;
+  color: var(--fpl-accent);
+  font-size: var(--fpl-fs-body-m);
+  font-weight: var(--fpl-fw-semibold);
+  cursor: pointer;
+  padding: 0;
+  align-self: flex-start;
+}
+
+.backBtn svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.title {
+  font-size: var(--fpl-fs-h3);
+  font-weight: var(--fpl-fw-bold);
+  color: var(--fpl-text);
+  letter-spacing: var(--fpl-tr-head-s);
+}
+
+.gwNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.25rem var(--fpl-space-xs);
+}
+
+.gwLabel {
+  font-size: var(--fpl-fs-title);
+  font-weight: var(--fpl-fw-bold);
+  color: var(--fpl-text);
+  letter-spacing: var(--fpl-tr-head-s);
+}
+
+.navBtn {
+  width: var(--fpl-size-arrow-btn);
+  height: var(--fpl-size-arrow-btn);
+  border-radius: var(--fpl-radius-pill);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--fpl-bg-hair);
+  color: var(--fpl-muted-soft);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 120ms, border-color 120ms, color 120ms;
+  padding: 0;
+}
+
+.navBtn svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.chevronRight {
+  transform: rotate(180deg);
+}
+
+.navBtn:not(:disabled) {
+  background: var(--fpl-accent-faint);
+  border-color: var(--fpl-accent);
+  color: var(--fpl-accent);
+}
+
+.navBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.pitchWrap {
+  flex: 1;
+  min-height: 0;
+  padding: 0 var(--fpl-space-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pitchFill {
+  height: 100% !important;
+  width: auto !important;
+  max-width: 100%;
+}
+
+.pitchRows {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  padding: 4% 2%;
+}
+
+.playerRow {
+  display: flex;
+  justify-content: center;
+  gap: var(--fpl-space-xs);
+  flex-wrap: nowrap;
+}
+
+.skeletonVeil {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--fpl-radius-md);
+  background: rgba(0, 0, 0, 0.20);
+  pointer-events: none;
+}
+
+.skeletonPlayer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  flex: 1 1 0;
+  max-width: 5rem;
+  min-width: 0;
+}
+
+.skeletonJersey {
+  width: var(--fpl-size-jersey-l);
+  height: var(--fpl-size-jersey-l);
+  border-radius: var(--fpl-radius-md);
+  background: rgba(255, 255, 255, 0.08);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.14) 50%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  background-size: 200% 100%;
+  animation: fplShimmer 1.6s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.skeletonNameBar {
+  width: 4.625rem;
+  height: 2rem;
+  border-radius: 0.3125rem;
+  margin-top: 0.125rem;
+  background: rgba(255, 255, 255, 0.10);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.18) 50%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
+  background-size: 200% 100%;
+  animation: fplShimmer 1.6s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.stateCenter {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--fpl-space-xl7) var(--fpl-space-xl4);
+  gap: var(--fpl-space-xl3);
+}
+
+.stateText {
+  font-size: var(--fpl-fs-body-m);
+  color: var(--fpl-muted);
+  text-align: center;
+  margin: 0;
+}
+
+@media (min-width: 37.5rem) {
+  .screen {
+    height: 100vh;
+    max-width: 30rem;
+    margin: 0 auto;
+  }
+
+  .pitchWrap {
+    padding: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeletonJersey,
+  .skeletonNameBar {
+    animation: none;
+  }
+}

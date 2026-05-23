@@ -101,3 +101,18 @@ export interface SquadResponse {
   starters: SquadPlayer[];
   bench: SquadPlayer[];
 }
+
+export interface DreamTeamPlayer {
+  id: number;
+  webName: string;
+  position: PlayerPosition;
+  teamCode: number;
+  teamShortName: string;
+  points: number;
+  pitchPosition: number;
+}
+
+export interface DreamTeamResponse {
+  gw: number;
+  players: DreamTeamPlayer[];
+}
