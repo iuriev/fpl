@@ -66,13 +66,13 @@ describe('Drawer', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('calls onClose after swipe right past threshold (> 80px)', () => {
+  it('calls onClose after swipe left past threshold (> 80px)', () => {
     const onClose = vi.fn();
     renderDrawer(true, onClose);
     const panel = screen.getByRole('dialog');
-    fireEvent.touchStart(panel, { touches: [{ clientX: 0 }] });
-    fireEvent.touchMove(panel, { touches: [{ clientX: 100 }] });
-    fireEvent.touchEnd(panel, { changedTouches: [{ clientX: 100 }] });
+    fireEvent.touchStart(panel, { touches: [{ clientX: 100 }] });
+    fireEvent.touchMove(panel, { touches: [{ clientX: 0 }] });
+    fireEvent.touchEnd(panel, { changedTouches: [{ clientX: 0 }] });
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
@@ -80,9 +80,9 @@ describe('Drawer', () => {
     const onClose = vi.fn();
     renderDrawer(true, onClose);
     const panel = screen.getByRole('dialog');
-    fireEvent.touchStart(panel, { touches: [{ clientX: 0 }] });
-    fireEvent.touchMove(panel, { touches: [{ clientX: 30 }] });
-    fireEvent.touchEnd(panel, { changedTouches: [{ clientX: 30 }] });
+    fireEvent.touchStart(panel, { touches: [{ clientX: 100 }] });
+    fireEvent.touchMove(panel, { touches: [{ clientX: 70 }] });
+    fireEvent.touchEnd(panel, { changedTouches: [{ clientX: 70 }] });
     expect(onClose).not.toHaveBeenCalled();
   });
 });

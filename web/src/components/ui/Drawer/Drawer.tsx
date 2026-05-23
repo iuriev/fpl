@@ -42,21 +42,21 @@ export const Drawer: React.FC<DrawerProps> = ({ open, onClose, ariaLabel, header
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!draggingRef.current || !panelRef.current) return;
-    const deltaX = Math.max(0, e.touches[0].clientX - startXRef.current);
+    const deltaX = Math.min(0, e.touches[0].clientX - startXRef.current);
     panelRef.current.style.transform = `translateX(${deltaX}px)`;
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (!draggingRef.current || !panelRef.current) return;
     draggingRef.current = false;
-    const deltaX = Math.max(0, e.changedTouches[0].clientX - startXRef.current);
+    const deltaX = Math.min(0, e.changedTouches[0].clientX - startXRef.current);
     const drawerWidth = panelRef.current.offsetWidth;
     const threshold = Math.max(SWIPE_THRESHOLD_PX, drawerWidth * 0.35);
 
     panelRef.current.style.transition = '';
     panelRef.current.style.transform = '';
 
-    if (deltaX >= threshold) {
+    if (Math.abs(deltaX) >= threshold) {
       onClose();
     }
   };

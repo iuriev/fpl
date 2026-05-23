@@ -1,0 +1,309 @@
+<style>
+  .phone-row {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+  .phone-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .phone {
+    width: 160px;
+    height: 300px;
+    border-radius: 1.5rem;
+    border: 2px solid #333;
+    background: #0d1117;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    flex-shrink: 0;
+  }
+  .phone:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.6); }
+
+  /* phone header */
+  .ph-header {
+    height: 36px;
+    background: #161b22;
+    border-bottom: 1px solid #2a2f38;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    gap: 6px;
+  }
+  .ph-burger {
+    width: 18px;
+    height: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .ph-burger span {
+    display: block;
+    height: 2px;
+    background: #8892a4;
+    border-radius: 2px;
+  }
+  .ph-team {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .ph-teamname {
+    height: 7px;
+    width: 70px;
+    background: #e0e6f0;
+    border-radius: 3px;
+  }
+  .ph-teamid {
+    height: 5px;
+    width: 40px;
+    background: #3a4050;
+    border-radius: 3px;
+  }
+  .ph-btn {
+    height: 16px;
+    width: 36px;
+    background: #1a2340;
+    border: 1px solid #2a3a6a;
+    border-radius: 8px;
+  }
+
+  /* backdrop */
+  .ph-backdrop {
+    position: absolute;
+    top: 37px;
+    left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 1;
+  }
+
+  /* drawer */
+  .ph-drawer {
+    position: absolute;
+    top: 37px;
+    left: 0;
+    bottom: 0;
+    background: #161b22;
+    border-right: 1px solid #2a2f38;
+    z-index: 2;
+    padding: 12px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* drawer contents */
+  .ph-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #2a2f38;
+    align-self: center;
+    margin-bottom: 2px;
+  }
+  .ph-dname {
+    height: 8px;
+    background: #e0e6f0;
+    border-radius: 3px;
+  }
+  .ph-dmgr {
+    height: 6px;
+    width: 70%;
+    background: #3a4050;
+    border-radius: 3px;
+    align-self: center;
+  }
+  .ph-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+  }
+  .ph-stat {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid #2a2f38;
+    border-radius: 4px;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .ph-stat-val {
+    height: 8px;
+    background: #e0e6f0;
+    border-radius: 2px;
+  }
+  .ph-stat-lbl {
+    height: 5px;
+    width: 80%;
+    background: #3a4050;
+    border-radius: 2px;
+  }
+  .ph-link {
+    height: 20px;
+    border: 1px solid #2a2f38;
+    border-radius: 10px;
+    margin-top: auto;
+  }
+
+  /* pitch area peeking on right */
+  .ph-pitch-peek {
+    position: absolute;
+    top: 37px;
+    bottom: 0;
+    right: 0;
+    background: #0d1117;
+    z-index: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .ph-pitch-inner {
+    margin: 8px;
+    flex: 1;
+    border-radius: 6px;
+    background: linear-gradient(180deg, #1a3d1a 0%, #1f4d1f 100%);
+    border: 1px solid #2a5a2a;
+    opacity: 0.5;
+  }
+
+  .phone-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #c9d1d9;
+    text-align: center;
+  }
+  .phone-desc {
+    font-size: 0.75rem;
+    color: #8892a4;
+    text-align: center;
+    max-width: 160px;
+  }
+
+  .cards {
+    justify-content: center;
+  }
+
+  /* override card to wrap phones */
+  .card {
+    padding: 1.25rem;
+    cursor: pointer;
+  }
+  .card.selected .phone {
+    border-color: #58a6ff;
+    box-shadow: 0 0 0 3px rgba(88,166,255,0.25);
+  }
+</style>
+
+<h2>Ширина дровера</h2>
+<p class="subtitle">Насколько широко панель перекрывает контент?</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="ph-header">
+            <div class="ph-burger"><span></span><span></span><span></span></div>
+            <div class="ph-team"><div class="ph-teamname"></div><div class="ph-teamid"></div></div>
+            <div class="ph-btn"></div>
+          </div>
+          <!-- pitch peeking (wider peek = narrower drawer) -->
+          <div class="ph-pitch-peek" style="left:96px">
+            <div class="ph-pitch-inner"></div>
+          </div>
+          <div class="ph-backdrop" style="left:96px"></div>
+          <!-- 60% drawer -->
+          <div class="ph-drawer" style="width:96px">
+            <div class="ph-avatar"></div>
+            <div class="ph-dname"></div>
+            <div class="ph-dmgr"></div>
+            <div class="ph-grid">
+              <div class="ph-stat"><div class="ph-stat-val"></div><div class="ph-stat-lbl"></div></div>
+              <div class="ph-stat"><div class="ph-stat-val"></div><div class="ph-stat-lbl"></div></div>
+              <div class="ph-stat"><div class="ph-stat-val"></div><div class="ph-stat-lbl"></div></div>
+              <div class="ph-stat"><div class="ph-stat-val"></div><div class="ph-stat-lbl"></div></div>
+            </div>
+            <div class="ph-link"></div>
+          </div>
+        </div>
+      </div>
+      <h3>~60% ширины</h3>
+      <p>Контент пола виден за дровером — визуально понятно, что страница не ушла</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="ph-header">
+            <div class="ph-burger"><span></span><span></span><span></span></div>
+            <div class="ph-team"><div class="ph-teamname"></div><div class="ph-teamid"></div></div>
+            <div class="ph-btn"></div>
+          </div>
+          <div class="ph-pitch-peek" style="left:128px">
+            <div class="ph-pitch-inner"></div>
+          </div>
+          <div class="ph-backdrop" style="left:128px"></div>
+          <!-- 80% drawer -->
+          <div class="ph-drawer" style="width:128px">
+            <div class="ph-avatar"></div>
+            <div class="ph-dname"></div>
+            <div class="ph-dmgr"></div>
+            <div class="ph-grid">
+              <div class="ph-stat"><div class="ph-stat-val"></div><div class="ph-stat-lbl"></div></div>
+              <div class="ph-stat"><div class="ph-stat-val"></div><div class="ph-stat-lbl"></div></div>
+              <div class="ph-stat"><div class="ph-stat-val"></div><div class="ph-stat-lbl"></div></div>
+              <div class="ph-stat"><div class="ph-stat-val"></div><div class="ph-stat-lbl"></div></div>
+            </div>
+            <div class="ph-link"></div>
+          </div>
+        </div>
+      </div>
+      <h3>~80% ширины</h3>
+      <p>Больше места для контента панели, небольшой «хвост» справа напоминает о свайпе</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="ph-header">
+            <div class="ph-burger"><span></span><span></span><span></span></div>
+            <div class="ph-team"><div class="ph-teamname"></div><div class="ph-teamid"></div></div>
+            <div class="ph-btn"></div>
+          </div>
+          <div class="ph-backdrop"></div>
+          <!-- full width drawer -->
+          <div class="ph-drawer" style="width:156px">
+            <div class="ph-avatar"></div>
+            <div class="ph-dname"></div>
+            <div class="ph-dmgr"></div>
+            <div class="ph-grid">
+              <div class="ph-stat"><div class="ph-stat-val"></div><div class="ph-stat-lbl"></div></div>
+              <div class="ph-stat"><div class="ph-stat-val"></div><div class="ph-stat-lbl"></div></div>
+              <div class="ph-stat"><div class="ph-stat-val"></div><div class="ph-stat-lbl"></div></div>
+              <div class="ph-stat"><div class="ph-stat-val"></div><div class="ph-stat-lbl"></div></div>
+            </div>
+            <div class="ph-link"></div>
+          </div>
+        </div>
+      </div>
+      <h3>Почти полный экран</h3>
+      <p>Максимум места, но теряется ощущение «слоя поверх» — похоже на переход на новую страницу</p>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,165 @@
+<style>
+  .phone-row {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+  .phone {
+    width: 200px;
+    height: 72px;
+    border-radius: 0.75rem;
+    border: 2px solid #333;
+    background: #161b22;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  }
+  .ph-header {
+    height: 68px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+    border-bottom: 1px solid #2a2f38;
+  }
+
+  /* elements */
+  .el-burger {
+    width: 20px;
+    height: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .el-burger span {
+    display: block;
+    height: 2px;
+    background: #8892a4;
+    border-radius: 2px;
+  }
+
+  .el-mark {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: #4d78cc;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+  }
+  .el-mark svg {
+    width: 14px;
+    height: 14px;
+    color: white;
+  }
+
+  .el-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+  .el-teamname {
+    height: 8px;
+    width: 72px;
+    background: #e0e6f0;
+    border-radius: 3px;
+  }
+  .el-teamid {
+    height: 5px;
+    width: 38px;
+    background: #3a4050;
+    border-radius: 3px;
+  }
+
+  .el-change {
+    height: 20px;
+    width: 44px;
+    background: #1a2340;
+    border: 1px solid #2a3a6a;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .cards {
+    justify-content: center;
+  }
+  .card { padding: 1.25rem; }
+  .card.selected .phone {
+    border-color: #58a6ff;
+    box-shadow: 0 0 0 3px rgba(88,166,255,0.25);
+  }
+</style>
+
+<h2>Где бургер в хедере?</h2>
+<p class="subtitle">Хедер сейчас: молния-иконка → название команды → кнопка «Сменить команду»</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <div class="phone">
+        <div class="ph-header">
+          <div class="el-burger"><span></span><span></span><span></span></div>
+          <div class="el-info">
+            <div class="el-teamname"></div>
+            <div class="el-teamid"></div>
+          </div>
+          <div class="el-change"></div>
+        </div>
+      </div>
+      <h3>Бургер слева, иконка убрана</h3>
+      <p>Бургер заменяет молнию — лаконично, стандартный паттерн</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <div class="phone">
+        <div class="ph-header">
+          <div class="el-mark">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 17 L7 3 L11 3 L9 9 L13 9 L11 13 L15 13 L9 19 L11 13"/></svg>
+          </div>
+          <div class="el-info">
+            <div class="el-teamname"></div>
+            <div class="el-teamid"></div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
+            <div class="el-burger"><span></span><span></span><span></span></div>
+            <div class="el-change"></div>
+          </div>
+        </div>
+      </div>
+      <h3>Бургер справа рядом с кнопкой</h3>
+      <p>Иконка молнии остаётся, бургер добавляется справа — более насыщенный хедер</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <div class="phone">
+        <div class="ph-header">
+          <div class="el-burger" style="cursor:pointer"><span></span><span></span><span></span></div>
+          <div class="el-mark">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 17 L7 3 L11 3 L9 9 L13 9 L11 13 L15 13 L9 19 L11 13"/></svg>
+          </div>
+          <div class="el-info">
+            <div class="el-teamname"></div>
+            <div class="el-teamid"></div>
+          </div>
+          <div class="el-change"></div>
+        </div>
+      </div>
+      <h3>Бургер слева + иконка остаётся</h3>
+      <p>Оба элемента слева, визуально немного тесно, но FPL-знак присутствует</p>
+    </div>
+  </div>
+
+</div>

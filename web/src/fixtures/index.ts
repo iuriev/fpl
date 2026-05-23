@@ -32,6 +32,11 @@ export const fixtureEntry: EntryResponse = {
   teamId: 72828,
   teamName: 'Amorim_out',
   managerName: 'Ivan Iuriev',
+  overallPoints: 2156,
+  overallRank: 142857,
+  eventPoints: 67,
+  totalPlayers: 10500000,
+  regionIsoCode: 'UA',
 };
 
 export const fixtureSquad: SquadResponse = {

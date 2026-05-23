@@ -6,6 +6,7 @@
 const FPL_BASE_URL = 'https://fantasy.premierleague.com/api';
 
 export interface FPLBootstrapStatic {
+  total_players: number;
   events: Array<{
     id: number;
     name: string;
@@ -42,7 +43,10 @@ export interface FPLEntry {
   name: string;
   player_first_name: string;
   player_last_name: string;
+  summary_overall_points: number;
   summary_overall_rank: number;
+  summary_event_points: number;
+  player_region_iso_code_short: string | null;
 }
 
 export interface FPLPicks {

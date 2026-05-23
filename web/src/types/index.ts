@@ -15,6 +15,11 @@ export interface EntryResponse {
   teamId: number;
   teamName: string;
   managerName: string;
+  overallPoints: number;
+  overallRank: number;
+  eventPoints: number;
+  totalPlayers: number;
+  regionIsoCode?: string;
 }
 
 export type PlayerPosition = 'GK' | 'DEF' | 'MID' | 'FWD';

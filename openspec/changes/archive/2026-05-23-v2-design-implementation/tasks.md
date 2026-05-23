@@ -175,16 +175,16 @@ source before being referenced in components.
 
 ## 11. Verification  (frontend-developer)
 
-- [ ] 11.1 Smoke-test pitch view: FWD row appears at the top, GK row at the bottom.
+- [x] 11.1 Smoke-test pitch view: FWD row appears at the top, GK row at the bottom.
       Verify against team ID 72828, GW 37.
-- [ ] 11.2 Smoke-test list view: all five sections render (GK, DEF, MID, FWD, Bench) in
+- [x] 11.2 Smoke-test list view: all five sections render (GK, DEF, MID, FWD, Bench) in
       ascending order; horizontal scroll works on a 390px viewport; identity column stays
       sticky.
-- [ ] 11.3 Verify the `view` URL param persists across page refresh and that a shared URL
+- [x] 11.3 Verify the `view` URL param persists across page refresh and that a shared URL
       opens in the correct view.
-- [ ] 11.4 Verify the `ViewToggle` switches between views without a loading flash (data
+- [x] 11.4 Verify the `ViewToggle` switches between views without a loading flash (data
       already in cache).
-- [ ] 11.5 Verify the Entry screen "View squad" button shows in neon green (enabled) and
+- [x] 11.5 Verify the Entry screen "View squad" button shows in neon green (enabled) and
       grey (disabled).
 
 ---
