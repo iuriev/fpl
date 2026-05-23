@@ -7,6 +7,14 @@
   background: var(--fpl-bg-deep);
 }
 
+.squadCol {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .header {
   flex-shrink: 0;
   background: transparent;
@@ -28,6 +36,30 @@
   gap: var(--fpl-space-md);
   min-width: 0;
   flex: 1;
+}
+
+.burgerBtn {
+  width: var(--fpl-size-avatar);
+  height: var(--fpl-size-avatar);
+  border-radius: var(--fpl-radius-sm);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--fpl-bg-hair);
+  color: var(--fpl-muted-soft);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 120ms, color 120ms;
+}
+
+.burgerBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--fpl-text);
+}
+
+.burgerBtn svg {
+  width: 55%;
+  height: 55%;
 }
 
 .fplMark {
@@ -342,6 +374,24 @@
 
   .pitchWrap {
     padding: 0;
+  }
+}
+
+@media (min-width: 56.25rem) {
+  .screen {
+    display: grid;
+    grid-template-columns: 16rem 1fr;
+    max-width: none;
+    margin: 0;
+  }
+
+  .burgerBtn {
+    display: none;
+  }
+
+  .squadCol {
+    height: 100vh;
+    overflow: hidden;
   }
 }
 
