@@ -65,6 +65,23 @@ export interface SquadSummary {
   transfers: number;
 }
 
+export interface HistoryGameweek {
+  gw: number;
+  overallRank: number;
+  overallPoints: number;
+  gwRank: number;
+  gwPoints: number;
+  pointsOnBench: number;
+  transfers: number;
+  transferCost: number;
+  teamValue: number;
+}
+
+export interface HistoryResponse {
+  teamId: number;
+  gameweeks: HistoryGameweek[];
+}
+
 export interface SquadResponse {
   gameweek: number;
   summary: SquadSummary;

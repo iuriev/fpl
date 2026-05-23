@@ -67,6 +67,20 @@ export interface FPLPicks {
   }>;
 }
 
+export interface FPLHistory {
+  current: Array<{
+    event: number;
+    points: number;
+    total_points: number;
+    rank: number;
+    overall_rank: number;
+    value: number;
+    event_transfers: number;
+    event_transfers_cost: number;
+    points_on_bench: number;
+  }>;
+}
+
 export interface FPLLive {
   elements: Array<{
     id: number;
@@ -111,4 +125,8 @@ export async function getPicks(teamId: number, gameweek: number): Promise<FPLPic
 
 export async function getLive(gameweek: number): Promise<FPLLive> {
   return fetchFPL(`/event/${gameweek}/live/`);
+}
+
+export async function getHistory(teamId: number): Promise<FPLHistory> {
+  return fetchFPL(`/entry/${teamId}/history/`);
 }

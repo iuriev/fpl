@@ -71,6 +71,23 @@ export const copy = {
   teamInfoDrawerLabel: 'Team information',
   teamInfoOpenDrawer: 'Open team info',
 
+  // Gameweek history screen
+  historyTitle: 'Gameweek History',
+  historyThisSeason: 'This Season',
+  historyColGW: 'GW',
+  historyColOR: 'OR',
+  historyColOP: 'OP',
+  historyColGWR: 'GWR',
+  historyColGWP: 'GWP',
+  historyColPB: 'PB',
+  historyColTM: 'TM',
+  historyColTC: 'TC',
+  historyColValue: '£m',
+  historyEmpty: 'No gameweeks played yet',
+  historyLoadError: "Couldn't load gameweek history",
+  historyRetry: 'Try again',
+  historyBack: 'Squad',
+
   // View toggle
   viewPitch: 'Pitch',
   viewList: 'List',

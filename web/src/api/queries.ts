@@ -23,6 +23,22 @@ export function useEntry(teamId: number | null) {
   });
 }
 
+export function useHistory(teamId: number | null) {
+  return useQuery({
+    queryKey: ['history', teamId],
+    queryFn: () => {
+      if (!teamId) throw new Error('Team ID required');
+      return api.getHistory(teamId);
+    },
+    enabled: !!teamId,
+    staleTime: 1000 * 60,
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && error.status === 404) return false;
+      return failureCount < 3;
+    },
+  });
+}
+
 export function useSquad(teamId: number | null, gameweek: number | null) {
   return useQuery({
     queryKey: ['squad', teamId, gameweek],
