@@ -88,6 +88,16 @@ export const copy = {
   historyRetry: 'Try again',
   historyBack: 'Squad',
 
+  // Leagues stats screen
+  statsTitle: 'My Stats',
+  statsBack: 'Squad',
+  statsGeneralLeagues: 'General Leagues',
+  statsH2HLeagues: 'Head-to-Head Leagues',
+  statsNoLeagues: 'No leagues found',
+  statsLoadError: "Couldn't load league standings",
+  statsRetry: 'Try again',
+  statsMyStats: 'My Stats',
+
   // View toggle
   viewPitch: 'Pitch',
   viewList: 'List',

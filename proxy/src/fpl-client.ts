@@ -38,6 +38,13 @@ export interface FPLBootstrapStatic {
   }>;
 }
 
+export interface FPLLeagueEntry {
+  id: number;
+  name: string;
+  entry_rank: number;
+  entry_last_rank: number | null;
+}
+
 export interface FPLEntry {
   id: number;
   name: string;
@@ -47,6 +54,10 @@ export interface FPLEntry {
   summary_overall_rank: number;
   summary_event_points: number;
   player_region_iso_code_short: string | null;
+  leagues: {
+    classic: FPLLeagueEntry[];
+    h2h: FPLLeagueEntry[];
+  };
 }
 
 export interface FPLPicks {

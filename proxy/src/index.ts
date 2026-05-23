@@ -4,6 +4,7 @@ import { cors } from 'hono/cors';
 import * as entryService from './entry-service';
 import * as gameweeksService from './gameweeks-service';
 import * as historyService from './history-service';
+import * as leaguesService from './leagues-service';
 import * as squadService from './squad-service';
 import { MAX_GAMEWEEK } from './types';
 
@@ -57,6 +58,25 @@ app.get('/api/entry/:teamId', async (c) => {
       { error: 'Unable to fetch team information' },
       { status: 500 },
     );
+  }
+});
+
+// GET /api/entry/:teamId/leagues
+app.get('/api/entry/:teamId/leagues', async (c) => {
+  try {
+    const teamId = parseInt(c.req.param('teamId'), 10);
+    if (isNaN(teamId) || teamId <= 0) {
+      return c.json({ error: 'Invalid team ID' }, { status: 400 });
+    }
+    const result = await leaguesService.getLeagues(teamId);
+    return c.json(result);
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    if (errorMsg.includes('404')) {
+      return c.json({ error: 'Team not found' }, { status: 404 });
+    }
+    console.error('Error fetching leagues:', error);
+    return c.json({ error: 'Unable to fetch leagues' }, { status: 500 });
   }
 });
 

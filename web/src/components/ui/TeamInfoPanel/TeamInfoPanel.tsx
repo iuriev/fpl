@@ -57,9 +57,14 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({ entry, teamId }) =
         </div>
       </div>
 
-      <Link to={`/history?teamId=${teamId}`} className={styles.historyLink}>
-        {copy.teamInfoGwHistory}
-      </Link>
+      <div className={styles.navLinks}>
+        <Link to={`/history?teamId=${teamId}`} className={styles.navLink}>
+          {copy.teamInfoGwHistory}
+        </Link>
+        <Link to={`/stats?teamId=${teamId}`} className={styles.navLink}>
+          {copy.statsMyStats}
+        </Link>
+      </div>
     </aside>
   );
 };

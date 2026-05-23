@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { ApiError, api } from './client';
+import { api,ApiError } from './client';
 
 export function useGameweeks() {
   return useQuery({
@@ -32,6 +32,22 @@ export function useHistory(teamId: number | null) {
     },
     enabled: !!teamId,
     staleTime: 1000 * 60,
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && error.status === 404) return false;
+      return failureCount < 3;
+    },
+  });
+}
+
+export function useLeagues(teamId: number | null) {
+  return useQuery({
+    queryKey: ['leagues', teamId],
+    queryFn: () => {
+      if (!teamId) throw new Error('Team ID required');
+      return api.getLeagues(teamId);
+    },
+    enabled: !!teamId,
+    staleTime: 1000 * 60 * 60, // 1 hour
     retry: (failureCount, error) => {
       if (error instanceof ApiError && error.status === 404) return false;
       return failureCount < 3;

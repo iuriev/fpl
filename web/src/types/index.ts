@@ -88,3 +88,16 @@ export interface SquadResponse {
   starters: SquadPlayer[];
   bench: SquadPlayer[];
 }
+
+export interface LeagueEntry {
+  id: number;
+  name: string;
+  rank: number;
+  lastRank: number | null;
+}
+
+export interface LeaguesResponse {
+  teamId: number;
+  classic: LeagueEntry[];
+  h2h: LeagueEntry[];
+}

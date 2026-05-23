@@ -77,9 +77,15 @@
   text-align: center;
 }
 
-/* ── Gameweek History link ─────────────────────────────────── */
+/* ── Nav links ─────────────────────────────────────────────── */
 
-.historyLink {
+.navLinks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fpl-space-sm);
+}
+
+.navLink {
   display: block;
   text-align: center;
   padding: var(--fpl-space-sm) var(--fpl-space-md);
@@ -92,7 +98,7 @@
   transition: border-color 120ms, color 120ms;
 }
 
-.historyLink:hover {
+.navLink:hover {
   border-color: var(--fpl-accent);
   color: var(--fpl-accent);
 }
