@@ -1,0 +1,115 @@
+.panel {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--fpl-space-xl);
+  padding: var(--fpl-space-xl) var(--fpl-space-xl3);
+}
+
+/* ── Identity ──────────────────────────────────────────────── */
+
+.avatarWrap {
+  display: flex;
+  justify-content: center;
+}
+
+.avatar {
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--fpl-radius-pill);
+  background: var(--fpl-bg-hair);
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  text-align: center;
+}
+
+.teamName {
+  font-size: var(--fpl-fs-body-l);
+  font-weight: var(--fpl-fw-bold);
+  color: var(--fpl-text);
+  letter-spacing: var(--fpl-tr-head-m);
+}
+
+.manager {
+  font-size: var(--fpl-fs-body-s);
+  color: var(--fpl-muted);
+}
+
+/* ── Stats grid ────────────────────────────────────────────── */
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--fpl-space-sm);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--fpl-bg-hair);
+  border-radius: var(--fpl-radius-md);
+  padding: var(--fpl-space-sm);
+}
+
+.statValue {
+  font-family: var(--fpl-font-mono), serif;
+  font-size: var(--fpl-fs-title);
+  font-weight: var(--fpl-fw-bold);
+  color: var(--fpl-text);
+}
+
+.statLabel {
+  font-size: var(--fpl-fs-micro);
+  font-weight: var(--fpl-fw-medium);
+  color: var(--fpl-muted-soft);
+  text-transform: uppercase;
+  letter-spacing: var(--fpl-tr-cap-s);
+  text-align: center;
+}
+
+/* ── Gameweek History link ─────────────────────────────────── */
+
+.historyLink {
+  display: block;
+  text-align: center;
+  padding: var(--fpl-space-sm) var(--fpl-space-md);
+  border: 1px solid var(--fpl-bg-hair);
+  border-radius: var(--fpl-radius-pill);
+  font-size: var(--fpl-fs-body-s);
+  font-weight: var(--fpl-fw-semibold);
+  color: var(--fpl-text-soft);
+  text-decoration: none;
+  transition: border-color 120ms, color 120ms;
+}
+
+.historyLink:hover {
+  border-color: var(--fpl-accent);
+  color: var(--fpl-accent);
+}
+
+/* ── Desktop sidebar ───────────────────────────────────────── */
+
+@media (min-width: 56.25rem) {
+  .panel {
+    padding: var(--fpl-space-xl3);
+  }
+
+  .identity {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .avatarWrap {
+    justify-content: flex-start;
+  }
+}
