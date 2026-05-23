@@ -85,7 +85,10 @@ export const EntryScreen: React.FC<EntryScreenProps> = ({
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        <h1 className={styles.headline}>{copy.entryHeadline}</h1>
+        <h1 className={styles.headline}>
+          {copy.entryHeadlineLine1}{' '}
+          <span className={styles.headlineAccent}>{copy.entryHeadlineAccent}</span>
+        </h1>
         <p className={styles.subtitle}>{copy.appSubtitle}</p>
 
         <form className={styles.form} onSubmit={handleSubmit}>

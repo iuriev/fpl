@@ -49,6 +49,15 @@ window.FPL_TOKENS = (() => {
     pillPtsInk:   '#170027',
   };
 
+  // ─── POSITION COLORS ──────────────────────────────────────────────
+  // Used in PositionBadge. CSS-var form: --fpl-pos-{pos}-{bg|fg}.
+  const positionColor = {
+    gk:  { bg: '#FFE600', fg: '#241500' },
+    def: { bg: '#3DB1FF', fg: '#001F2E' },
+    mid: { bg: color.accent, fg: color.accentInk },
+    fwd: { bg: '#FF4D6D', fg: '#FFFFFF' },
+  };
+
   // ─── TYPOGRAPHY ────────────────────────────────────────────────────
   const font = {
     display: '"Space Grotesk", -apple-system, system-ui, sans-serif',
@@ -170,7 +179,7 @@ window.FPL_TOKENS = (() => {
   };
 
   return {
-    color, font, fontSize, fontWeight, lineHeight, tracking,
+    color, positionColor, font, fontSize, fontWeight, lineHeight, tracking,
     space, radius, shadow, dropShadow, size, motion,
   };
 })();

@@ -5,9 +5,11 @@ import { useSearchParams } from 'react-router-dom';
 import { ApiError } from '@/api/client';
 import { useEntry, useGameweeks, useSquad } from '@/api/queries';
 import { Button } from '@/components/ui/Button/Button';
+import { ListView, ListViewSkeleton } from '@/components/ui/ListView/ListView';
 import { Pitch } from '@/components/ui/Pitch/Pitch';
 import { PlayerCard } from '@/components/ui/PlayerCard/PlayerCard';
 import { SummaryStrip } from '@/components/ui/SummaryStrip/SummaryStrip';
+import { ViewToggle, type ViewMode } from '@/components/ui/ViewToggle/ViewToggle';
 import { copy, interpolate } from '@/lib/copy';
 import type { PlayerPosition, SquadPlayer } from '@/types';
 import { MAX_GAMEWEEK } from '@/types';
@@ -58,6 +60,9 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
     return currentGw;
   }, [gwParam, currentGw]);
 
+  const viewParam = searchParams.get('view');
+  const view: ViewMode = viewParam === 'list' ? 'list' : 'pitch';
+
   const { data: squad, isLoading, isError: squadIsError, error: squadError, refetch } = useSquad(
     entryIsError ? null : teamId,
     selectedGw,
@@ -80,13 +85,23 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
   const canGoPrev = selectedGw !== null && selectedGw > 1;
   const canGoNext = selectedGw !== null && maxGw !== null && selectedGw < maxGw;
 
-  const navigate = (delta: number) => {
+  const navigateGw = (delta: number) => {
     if (selectedGw === null) return;
     const next = selectedGw + delta;
     withTransition(() =>
       setSearchParams((prev) => {
         const p = new URLSearchParams(prev);
         p.set('gw', String(next));
+        return p;
+      }),
+    );
+  };
+
+  const handleViewChange = (mode: ViewMode) => {
+    withTransition(() =>
+      setSearchParams((prev) => {
+        const p = new URLSearchParams(prev);
+        p.set('view', mode);
         return p;
       }),
     );
@@ -132,10 +147,14 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
           </Button>
         </div>
 
+        <div className={styles.viewToggleWrap}>
+          <ViewToggle value={view} onChange={handleViewChange} />
+        </div>
+
         <div className={styles.gwNav}>
           <button
             className={styles.navBtn}
-            onClick={() => navigate(-1)}
+            onClick={() => navigateGw(-1)}
             disabled={!canGoPrev}
             aria-label="Previous gameweek"
           >
@@ -146,7 +165,7 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
           <span className={styles.gwLabel}>{gwLabel}</span>
           <button
             className={styles.navBtn}
-            onClick={() => navigate(1)}
+            onClick={() => navigateGw(1)}
             disabled={!canGoNext}
             aria-label="Next gameweek"
           >
@@ -164,7 +183,9 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
       )}
       {isLoading && <div className={styles.summaryPlaceholder} aria-hidden="true" />}
 
-      {isLoading && <SquadSkeleton />}
+      {isLoading && (
+        view === 'list' ? <ListViewSkeleton /> : <SquadSkeleton />
+      )}
 
       {entryIsError && (
         <div className={styles.stateCenter}>
@@ -203,37 +224,43 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
         </div>
       )}
 
-      {squad && squad.starters.length > 0 && positionGroups && (
-        <div className={styles.pitchBench}>
-          <div className={styles.pitchWrap}>
-            <Pitch className={styles.pitchFill}>
-              <div className={styles.pitchRows}>
-                {POSITION_ORDER.map((pos) => (
-                  <div key={pos} className={styles.playerRow}>
-                    {positionGroups[pos].map((player) => (
-                      <PlayerCard key={player.id} player={player} size="large" />
+      {squad && squad.starters.length > 0 && (
+        view === 'list' ? (
+          <ListView starters={squad.starters} bench={squad.bench} />
+        ) : (
+          positionGroups && (
+            <div className={styles.pitchBench}>
+              <div className={styles.pitchWrap}>
+                <Pitch className={styles.pitchFill}>
+                  <div className={styles.pitchRows}>
+                    {POSITION_ORDER.map((pos) => (
+                      <div key={pos} className={styles.playerRow}>
+                        {positionGroups[pos].map((player) => (
+                          <PlayerCard key={player.id} player={player} size="large" />
+                        ))}
+                      </div>
                     ))}
                   </div>
-                ))}
+                </Pitch>
               </div>
-            </Pitch>
-          </div>
 
-          <div className={styles.bench}>
-            <div className={styles.benchLabels}>
-              {squad.bench.map((player, i) => (
-                <span key={player.id} className={styles.benchLabel}>
-                  {benchLabel(i, player.position)}
-                </span>
-              ))}
+              <div className={styles.bench}>
+                <div className={styles.benchLabels}>
+                  {squad.bench.map((player, i) => (
+                    <span key={player.id} className={styles.benchLabel}>
+                      {benchLabel(i, player.position)}
+                    </span>
+                  ))}
+                </div>
+                <div className={styles.benchRow}>
+                  {squad.bench.map((player) => (
+                    <PlayerCard key={player.id} player={player} size="medium" />
+                  ))}
+                </div>
+              </div>
             </div>
-            <div className={styles.benchRow}>
-              {squad.bench.map((player) => (
-                <PlayerCard key={player.id} player={player} size="medium" />
-              ))}
-            </div>
-          </div>
-        </div>
+          )
+        )
       )}
     </div>
   );
@@ -248,7 +275,7 @@ function SquadSkeleton() {
         <Pitch className={styles.pitchFill}>
           <div className={styles.skeletonVeil} />
           <div className={styles.pitchRows}>
-            {[1, 4, 4, 2].map((count, rowIdx) => (
+            {[2, 4, 4, 1].map((count, rowIdx) => (
               <div key={rowIdx} className={styles.playerRow}>
                 {Array.from({ length: count }).map((_, i) => (
                   <PlayerSkeleton key={i} size="large" />

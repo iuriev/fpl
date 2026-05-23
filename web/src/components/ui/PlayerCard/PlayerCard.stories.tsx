@@ -26,6 +26,12 @@ const base: SquadPlayer = {
   isCaptain: false,
   isViceCaptain: false,
   status: 'a',
+  stats: {
+    minutes: 90, goals_scored: 1, assists: 1, clean_sheets: 0,
+    goals_conceded: 0, own_goals: 0, penalties_saved: 0,
+    penalties_missed: 0, yellow_cards: 0, red_cards: 0,
+    saves: 0, bonus: 3, total_points: 14,
+  },
 };
 
 export const Default: Story = {

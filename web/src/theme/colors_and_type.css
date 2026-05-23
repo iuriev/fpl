@@ -30,6 +30,16 @@
   --fpl-pill-pts-bg: #00ff87;
   --fpl-pill-pts-ink: #170027;
 
+  /* ── position colors ────────────────────────────────────────────── */
+  --fpl-pos-gk-bg: #ffe600;
+  --fpl-pos-gk-fg: #241500;
+  --fpl-pos-def-bg: #3db1ff;
+  --fpl-pos-def-fg: #001f2e;
+  --fpl-pos-mid-bg: var(--fpl-accent);
+  --fpl-pos-mid-fg: var(--fpl-accent-ink);
+  --fpl-pos-fwd-bg: #ff4d6d;
+  --fpl-pos-fwd-fg: #ffffff;
+
   /* ── typography ─────────────────────────────────────────────────── */
   --fpl-font-display: 'Space Grotesk', -apple-system, system-ui, sans-serif;
   --fpl-font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;

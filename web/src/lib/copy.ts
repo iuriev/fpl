@@ -10,7 +10,8 @@ export const copy = {
   appSubtitle: 'See your FPL squad and points - just enter your team ID',
 
   // Entry screen
-  entryHeadline: 'Your squad. Every gameweek.',
+  entryHeadlineLine1: 'Your squad.',
+  entryHeadlineAccent: 'Every gameweek.',
   entryHelper: 'Find your team ID in the FPL URL: fantasy.premierleague.com/entry/{ID}/event/{GW}',
   entryInputLabel: 'Team ID',
   entryInputPlaceholder: 'Enter your team ID',
@@ -87,6 +88,22 @@ export const copy = {
   listColRC: 'RC',
   listColS: 'S',
   listColBonus: 'Bonus',
+
+  // List view column legend (full names)
+  listLegendHeading: 'Key',
+  listLegendPts: 'Points',
+  listLegendMP: 'Minutes played',
+  listLegendGS: 'Goals scored',
+  listLegendA: 'Assists',
+  listLegendCS: 'Clean sheets',
+  listLegendGC: 'Goals conceded',
+  listLegendOG: 'Own goals',
+  listLegendPS: 'Penalties saved',
+  listLegendPM: 'Penalties missed',
+  listLegendYC: 'Yellow cards',
+  listLegendRC: 'Red cards',
+  listLegendS: 'Saves',
+  listLegendBonus: 'Bonus points',
 };
 
 /**

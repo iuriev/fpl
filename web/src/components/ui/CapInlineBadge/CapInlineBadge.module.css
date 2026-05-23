@@ -1,0 +1,22 @@
+.badge {
+  width: 1rem;
+  height: 1rem;
+  border-radius: var(--fpl-radius-pill);
+  font-size: var(--fpl-fs-nano);
+  font-weight: var(--fpl-fw-heavy);
+  display: inline-grid;
+  place-items: center;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.badge_captain {
+  background: var(--fpl-accent);
+  color: var(--fpl-accent-ink);
+}
+
+.badge_vice {
+  background: #ffffff;
+  color: var(--fpl-accent-ink);
+}

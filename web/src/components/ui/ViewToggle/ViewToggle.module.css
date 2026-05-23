@@ -1,36 +1,39 @@
 .toggle {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  background: var(--fpl-bg-soft);
+  background: rgba(0, 0, 0, 0.32);
   border: 1px solid var(--fpl-bg-hair);
   border-radius: var(--fpl-radius-pill);
   padding: 0.1875rem;
   gap: 0.125rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .option {
-  flex: 1;
-  padding: 0.25rem 0.75rem;
+  padding: 0.4375rem 1.375rem;
   border-radius: var(--fpl-radius-pill);
   border: none;
   background: transparent;
-  color: var(--fpl-muted);
+  color: var(--fpl-text-soft);
   font-family: var(--fpl-font-display);
   font-size: var(--fpl-fs-body-s);
-  font-weight: var(--fpl-fw-semibold);
-  letter-spacing: var(--fpl-tr-cap-s);
+  font-weight: var(--fpl-fw-bold);
+  letter-spacing: var(--fpl-tr-cap-m);
+  text-transform: uppercase;
   cursor: pointer;
-  transition: background 120ms, color 120ms;
+  transition: background 150ms, color 150ms;
   white-space: nowrap;
+  min-width: 4.75rem;
 }
 
 .option_active {
   background: var(--fpl-accent);
   color: var(--fpl-accent-ink);
+  box-shadow: var(--fpl-shadow-pill-soft);
 }
 
 .option:not(.option_active):hover {
-  color: var(--fpl-text-soft);
+  color: var(--fpl-text);
 }
 
 .option:focus-visible {

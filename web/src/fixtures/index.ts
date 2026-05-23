@@ -1,4 +1,23 @@
-import type { EntryResponse, GameweeksResponse, SquadResponse } from '@/types';
+import type { EntryResponse, GameweeksResponse, PlayerStats, SquadResponse } from '@/types';
+
+function mkStats(overrides: Partial<PlayerStats> = {}): PlayerStats {
+  return {
+    minutes: 90,
+    goals_scored: 0,
+    assists: 0,
+    clean_sheets: 0,
+    goals_conceded: 0,
+    own_goals: 0,
+    penalties_saved: 0,
+    penalties_missed: 0,
+    yellow_cards: 0,
+    red_cards: 0,
+    saves: 0,
+    bonus: 0,
+    total_points: 2,
+    ...overrides,
+  };
+}
 
 export const fixtureGameweeks: GameweeksResponse = {
   current: 37,
@@ -25,23 +44,23 @@ export const fixtureSquad: SquadResponse = {
     transfers: 1,
   },
   starters: [
-    { id: 1, name: 'Flekken', position: 'GK', club: 'BRE', teamCode: 94, points: 6, isCaptain: false, isViceCaptain: false, status: 'a' },
-    { id: 2, name: 'Alexander-Arnold', position: 'DEF', club: 'LIV', teamCode: 14, points: 8, isCaptain: false, isViceCaptain: false, status: 'a' },
-    { id: 3, name: 'Pedro Porro', position: 'DEF', club: 'TOT', teamCode: 6, points: 2, isCaptain: false, isViceCaptain: false, status: 'i', news: 'Hamstring injury. Doubt for next match.' },
-    { id: 4, name: 'Gabriel', position: 'DEF', club: 'ARS', teamCode: 3, points: 6, isCaptain: false, isViceCaptain: false, status: 'a' },
-    { id: 5, name: 'Mykolenko', position: 'DEF', club: 'EVE', teamCode: 11, points: 2, isCaptain: false, isViceCaptain: false, status: 'd', chanceOfPlaying: 75, news: '75% chance to play.' },
-    { id: 6, name: 'Salah', position: 'MID', club: 'LIV', teamCode: 14, points: 14, isCaptain: true, isViceCaptain: false, status: 'a' },
-    { id: 7, name: 'Saka', position: 'MID', club: 'ARS', teamCode: 3, points: 8, isCaptain: false, isViceCaptain: true, status: 'a' },
-    { id: 8, name: 'Palmer', position: 'MID', club: 'CHE', teamCode: 8, points: 7, isCaptain: false, isViceCaptain: false, status: 'a' },
-    { id: 9, name: 'Andreas', position: 'MID', club: 'FUL', teamCode: 54, points: 5, isCaptain: false, isViceCaptain: false, status: 'a' },
-    { id: 10, name: 'Isak', position: 'FWD', club: 'NEW', teamCode: 4, points: 4, isCaptain: false, isViceCaptain: false, status: 'a' },
-    { id: 11, name: 'Mbeumo', position: 'FWD', club: 'BRE', teamCode: 94, points: 5, isCaptain: false, isViceCaptain: false, status: 'a' },
+    { id: 1, name: 'Flekken', position: 'GK', club: 'BRE', teamCode: 94, points: 6, isCaptain: false, isViceCaptain: false, status: 'a', stats: mkStats({ clean_sheets: 1, saves: 5, total_points: 6 }) },
+    { id: 2, name: 'Alexander-Arnold', position: 'DEF', club: 'LIV', teamCode: 14, points: 8, isCaptain: false, isViceCaptain: false, status: 'a', stats: mkStats({ assists: 1, clean_sheets: 1, bonus: 2, total_points: 8 }) },
+    { id: 3, name: 'Pedro Porro', position: 'DEF', club: 'TOT', teamCode: 6, points: 2, isCaptain: false, isViceCaptain: false, status: 'i', news: 'Hamstring injury. Doubt for next match.', stats: mkStats({ minutes: 45, goals_conceded: 2, total_points: 2 }) },
+    { id: 4, name: 'Gabriel', position: 'DEF', club: 'ARS', teamCode: 3, points: 6, isCaptain: false, isViceCaptain: false, status: 'a', stats: mkStats({ clean_sheets: 1, total_points: 6 }) },
+    { id: 5, name: 'Mykolenko', position: 'DEF', club: 'EVE', teamCode: 11, points: 2, isCaptain: false, isViceCaptain: false, status: 'd', chanceOfPlaying: 75, news: '75% chance to play.', stats: mkStats({ goals_conceded: 2, total_points: 2 }) },
+    { id: 6, name: 'Salah', position: 'MID', club: 'LIV', teamCode: 14, points: 14, isCaptain: true, isViceCaptain: false, status: 'a', stats: mkStats({ goals_scored: 1, assists: 1, bonus: 3, total_points: 14 }) },
+    { id: 7, name: 'Saka', position: 'MID', club: 'ARS', teamCode: 3, points: 8, isCaptain: false, isViceCaptain: true, status: 'a', stats: mkStats({ assists: 1, bonus: 2, total_points: 8 }) },
+    { id: 8, name: 'Palmer', position: 'MID', club: 'CHE', teamCode: 8, points: 7, isCaptain: false, isViceCaptain: false, status: 'a', stats: mkStats({ goals_scored: 1, bonus: 1, total_points: 7 }) },
+    { id: 9, name: 'Andreas', position: 'MID', club: 'FUL', teamCode: 54, points: 5, isCaptain: false, isViceCaptain: false, status: 'a', stats: mkStats({ clean_sheets: 1, bonus: 1, total_points: 5 }) },
+    { id: 10, name: 'Isak', position: 'FWD', club: 'NEW', teamCode: 4, points: 4, isCaptain: false, isViceCaptain: false, status: 'a', stats: mkStats({ bonus: 2, total_points: 4 }) },
+    { id: 11, name: 'Mbeumo', position: 'FWD', club: 'BRE', teamCode: 94, points: 5, isCaptain: false, isViceCaptain: false, status: 'a', stats: mkStats({ goals_scored: 1, total_points: 5 }) },
   ],
   bench: [
-    { id: 12, name: 'Flaherty', position: 'GK', club: 'CRY', teamCode: 31, points: 2, isCaptain: false, isViceCaptain: false, status: 'a' },
-    { id: 13, name: 'Wan-Bissaka', position: 'DEF', club: 'WHU', teamCode: 21, points: 1, isCaptain: false, isViceCaptain: false, status: 'a' },
-    { id: 14, name: 'Mbete', position: 'MID', club: 'NOT', teamCode: 17, points: 0, isCaptain: false, isViceCaptain: false, status: 'a' },
-    { id: 15, name: 'Vardy', position: 'FWD', club: 'LEI', teamCode: 13, points: 0, isCaptain: false, isViceCaptain: false, status: 's', news: 'Suspended for 1 match.' },
+    { id: 12, name: 'Flaherty', position: 'GK', club: 'CRY', teamCode: 31, points: 2, isCaptain: false, isViceCaptain: false, status: 'a', stats: mkStats({ goals_conceded: 1, saves: 3, total_points: 2 }) },
+    { id: 13, name: 'Wan-Bissaka', position: 'DEF', club: 'WHU', teamCode: 21, points: 1, isCaptain: false, isViceCaptain: false, status: 'a', stats: mkStats({ minutes: 30, total_points: 1 }) },
+    { id: 14, name: 'Mbete', position: 'MID', club: 'NOT', teamCode: 17, points: 0, isCaptain: false, isViceCaptain: false, status: 'a', stats: mkStats({ minutes: 0, total_points: 0 }) },
+    { id: 15, name: 'Vardy', position: 'FWD', club: 'LEI', teamCode: 13, points: 0, isCaptain: false, isViceCaptain: false, status: 's', news: 'Suspended for 1 match.', stats: mkStats({ minutes: 0, total_points: 0 }) },
   ],
 };
 

@@ -26,6 +26,10 @@
   text-wrap: balance;
 }
 
+.headlineAccent {
+  color: var(--fpl-accent);
+}
+
 .subtitle {
   font-size: var(--fpl-fs-body-m);
   color: var(--fpl-muted);

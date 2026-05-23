@@ -66,14 +66,35 @@ Implement tasks from an OpenSpec change.
 
 6. **Implement tasks (loop until done or blocked)**
 
-   For each pending task:
-   - Show which task is being worked on
-   - Make the code changes required
-   - Keep changes minimal and focused
-   - Mark task complete in the tasks file: `- [ ]` → `- [x]`
-   - Continue to next task
+   **Agent routing:** Section headings may contain a parenthesized agent label:
+   `## N. Title  (frontend-developer)`. When present, dispatch that section's pending
+   tasks to the named specialized agent via the `Agent` tool instead of implementing directly.
 
-   **Pause if:**
+   **For each pending section:**
+
+   a) **Check for agent label** in the section heading (e.g., `(frontend-developer)`).
+
+   b) **If agent label present → dispatch to specialized agent:**
+      - Collect all unchecked tasks in this section.
+      - Read all context files (from `contextFiles` in apply instructions output).
+      - Call `Agent(subagent_type: "<agent-type>", prompt: "...")` with a self-contained prompt that includes:
+        - The project root path and change name.
+        - Full content (or file paths) of every context file: proposal, specs, design, tasks.
+        - The specific tasks to implement (copy them verbatim).
+        - Relevant CLAUDE.md rules (English only, no hardcoded design values, rem for lengths, no descriptive comments, modern-web-guidance skill required before HTML/CSS work).
+        - Instruction to mark each task complete (`- [ ]` → `- [x]`) in the tasks file as it finishes.
+        - Instruction to run `openspec-apply-change` (or equivalent) verification after all tasks.
+      - Wait for the agent to finish; check that tasks are marked done in the file.
+      - Report which tasks were completed.
+
+   c) **If no agent label → implement directly:**
+      - Show which task is being worked on.
+      - Make the code changes required.
+      - Keep changes minimal and focused.
+      - Mark task complete in the tasks file: `- [ ]` → `- [x]`.
+      - Continue to next task.
+
+   **Pause (any mode) if:**
    - Task is unclear → ask for clarification
    - Implementation reveals a design issue → suggest updating artifacts
    - Error or blocker encountered → report and wait for guidance
@@ -141,6 +162,8 @@ What would you like to do?
 **Guardrails**
 - Keep going through tasks until done or blocked
 - Always read context files before starting (from the apply instructions output)
+- **Dispatch to specialized agents** when a section heading has a parenthesized agent label — never implement those tasks yourself
+- Specialized agent prompts must be fully self-contained: the agent has no conversation context
 - If task is ambiguous, pause and ask before implementing
 - If implementation reveals issues, pause and suggest artifact updates
 - Keep code changes minimal and scoped to each task

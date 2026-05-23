@@ -1,0 +1,11 @@
+.dot {
+  display: block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--fpl-radius-pill);
+  box-shadow: 0 0 0 1.5px var(--fpl-bg);
+  flex-shrink: 0;
+}
+
+.dot_warn  { background: var(--fpl-warn); }
+.dot_error { background: var(--fpl-error); }

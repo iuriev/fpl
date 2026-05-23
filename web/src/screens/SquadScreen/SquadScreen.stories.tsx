@@ -3,6 +3,7 @@ import { http, HttpResponse } from 'msw';
 
 import { fixtureEntry, fixtureGameweeks, fixtureSquad, fixtureSquadEmpty } from '@/fixtures';
 
+
 import { SquadScreen } from './SquadScreen';
 
 const meta = {
@@ -79,6 +80,36 @@ export const Error: Story = {
           http.get('/api/squad/:teamId/:gw', () =>
             HttpResponse.json({ error: 'Upstream error' }, { status: 500 })
           ),
+        ],
+      },
+    },
+  },
+};
+
+export const ListViewLoaded: Story = {
+  parameters: {
+    initialEntries: ['/?teamId=72828&view=list'],
+    msw: {
+      handlers: {
+        ...baseHandlers,
+        squad: [
+          http.get('/api/squad/:teamId/:gw', () => HttpResponse.json(fixtureSquad)),
+        ],
+      },
+    },
+  },
+};
+
+export const ListViewLoading: Story = {
+  parameters: {
+    initialEntries: ['/?teamId=72828&view=list'],
+    msw: {
+      handlers: {
+        ...baseHandlers,
+        squad: [
+          http.get('/api/squad/:teamId/:gw', async () => {
+            await new Promise(() => {});
+          }),
         ],
       },
     },
