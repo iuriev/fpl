@@ -1,0 +1,105 @@
+/* ── Backdrop ──────────────────────────────────────────────── */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  pointer-events: none;
+  z-index: 299;
+  transition: background 300ms ease-out;
+}
+
+.backdropVisible {
+  background: rgba(0, 0, 0, 0.55);
+  pointer-events: auto;
+}
+
+/* ── Panel ─────────────────────────────────────────────────── */
+
+.panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100dvh;
+  width: calc(100% - 1.5rem);
+  background: var(--fpl-bg-deep);
+  border-right: 1px solid var(--fpl-bg-hair);
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(-100%);
+  transition: transform 300ms ease-out;
+  outline: none;
+  overflow: hidden;
+}
+
+.panelOpen {
+  transform: translateX(0);
+}
+
+/* ── Drawer header ─────────────────────────────────────────── */
+
+.drawerHeader {
+  flex-shrink: 0;
+  height: 3.25rem;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--fpl-space-xl3);
+  border-bottom: 1px solid var(--fpl-bg-hair);
+  gap: var(--fpl-space-md);
+}
+
+.drawerHeaderContent {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-md);
+  min-width: 0;
+}
+
+.closeBtn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--fpl-radius-pill);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--fpl-bg-hair);
+  color: var(--fpl-muted-soft);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 120ms, color 120ms;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--fpl-text);
+}
+
+.closeBtn svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+/* ── Desktop: transparent pass-through ────────────────────── */
+
+@media (min-width: 56.25rem) {
+  .backdrop {
+    display: none;
+  }
+
+  .panel {
+    position: static;
+    height: 100%;
+    width: 100%;
+    transform: none;
+    transition: none;
+    z-index: auto;
+    border-right: 1px solid var(--fpl-bg-hair);
+    overflow: hidden;
+  }
+
+  .drawerHeader {
+    display: none;
+  }
+}
