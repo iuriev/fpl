@@ -1,6 +1,6 @@
 # Team Info Drawer Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Replace the mobile inline-expand of `TeamInfoPanel` with a slide-in drawer that overlays squad content, opened by a burger button in the header.
 
@@ -32,7 +32,7 @@
 **Files:**
 - Modify: `web/src/lib/copy.ts`
 
-- [ ] **Step 1: Remove expand/collapse keys and add drawer keys**
+- [x] **Step 1: Remove expand/collapse keys and add drawer keys**
 
 In `web/src/lib/copy.ts`, replace the two `teamInfo*AriaLabel` keys and add two new ones:
 
@@ -49,7 +49,7 @@ In `web/src/lib/copy.ts`, replace the two `teamInfo*AriaLabel` keys and add two 
 
 (Delete the lines `teamInfoExpandAriaLabel` and `teamInfoCollapseAriaLabel` entirely.)
 
-- [ ] **Step 2: Run the full unit test suite to confirm no regressions**
+- [x] **Step 2: Run the full unit test suite to confirm no regressions**
 
 ```bash
 cd web && npx vitest run --reporter=verbose --project=unit
@@ -57,7 +57,7 @@ cd web && npx vitest run --reporter=verbose --project=unit
 
 Expected: all tests pass (the deleted copy keys are only used in `TeamInfoPanel.tsx` which we are about to update).
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add web/src/lib/copy.ts
@@ -75,7 +75,7 @@ Remove the mobile toggle button, chevron, and `expanded` React state. The panel 
 - Modify: `web/src/components/ui/TeamInfoPanel/TeamInfoPanel.tsx`
 - Modify: `web/src/components/ui/TeamInfoPanel/TeamInfoPanel.module.css`
 
-- [ ] **Step 1: Update the test file — remove toggle test, add no-toggle assertion**
+- [x] **Step 1: Update the test file — remove toggle test, add no-toggle assertion**
 
 Replace the entire `web/src/components/ui/TeamInfoPanel/TeamInfoPanel.test.tsx` with:
 
@@ -156,7 +156,7 @@ describe('TeamInfoPanel', () => {
 });
 ```
 
-- [ ] **Step 2: Run tests to confirm the new assertions fail**
+- [x] **Step 2: Run tests to confirm the new assertions fail**
 
 ```bash
 cd web && npx vitest run --reporter=verbose --project=unit src/components/ui/TeamInfoPanel
@@ -164,7 +164,7 @@ cd web && npx vitest run --reporter=verbose --project=unit src/components/ui/Tea
 
 Expected: `'does not render a toggle button'` FAILS (toggle button still present), `'renders team name'` also FAILS (`getAllByText` changed to `getByText` — the duplicate in `mobileTeamName` is gone once we simplify, but right now it's still there so `getByText` may throw "found more than one").
 
-- [ ] **Step 3: Replace TeamInfoPanel.tsx**
+- [x] **Step 3: Replace TeamInfoPanel.tsx**
 
 Replace the entire `web/src/components/ui/TeamInfoPanel/TeamInfoPanel.tsx` with:
 
@@ -238,7 +238,7 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({ entry, teamId }) =
 TeamInfoPanel.displayName = 'TeamInfoPanel';
 ```
 
-- [ ] **Step 4: Replace TeamInfoPanel.module.css**
+- [x] **Step 4: Replace TeamInfoPanel.module.css**
 
 Replace the entire `web/src/components/ui/TeamInfoPanel/TeamInfoPanel.module.css` with:
 
@@ -360,7 +360,7 @@ Replace the entire `web/src/components/ui/TeamInfoPanel/TeamInfoPanel.module.css
 }
 ```
 
-- [ ] **Step 5: Run tests and confirm all pass**
+- [x] **Step 5: Run tests and confirm all pass**
 
 ```bash
 cd web && npx vitest run --reporter=verbose --project=unit src/components/ui/TeamInfoPanel
@@ -368,7 +368,7 @@ cd web && npx vitest run --reporter=verbose --project=unit src/components/ui/Tea
 
 Expected: all 11 tests PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add web/src/components/ui/TeamInfoPanel/
@@ -384,7 +384,7 @@ git commit -m "refactor(TeamInfoPanel): remove mobile toggle — open/close now 
 - Create: `web/src/components/ui/Drawer/Drawer.tsx`
 - Create: `web/src/components/ui/Drawer/Drawer.module.css`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `web/src/components/ui/Drawer/Drawer.test.tsx`:
 
@@ -478,7 +478,7 @@ describe('Drawer', () => {
 });
 ```
 
-- [ ] **Step 2: Run tests to confirm they fail**
+- [x] **Step 2: Run tests to confirm they fail**
 
 ```bash
 cd web && npx vitest run --reporter=verbose --project=unit src/components/ui/Drawer
@@ -486,7 +486,7 @@ cd web && npx vitest run --reporter=verbose --project=unit src/components/ui/Dra
 
 Expected: FAIL — `Cannot find module './Drawer'`.
 
-- [ ] **Step 3: Create the Drawer component**
+- [x] **Step 3: Create the Drawer component**
 
 Create `web/src/components/ui/Drawer/Drawer.tsx`:
 
@@ -599,7 +599,7 @@ export const Drawer: React.FC<DrawerProps> = ({ open, onClose, ariaLabel, header
 Drawer.displayName = 'Drawer';
 ```
 
-- [ ] **Step 4: Create Drawer.module.css**
+- [x] **Step 4: Create Drawer.module.css**
 
 Create `web/src/components/ui/Drawer/Drawer.module.css`:
 
@@ -711,7 +711,7 @@ Create `web/src/components/ui/Drawer/Drawer.module.css`:
 }
 ```
 
-- [ ] **Step 5: Run tests and confirm all pass**
+- [x] **Step 5: Run tests and confirm all pass**
 
 ```bash
 cd web && npx vitest run --reporter=verbose --project=unit src/components/ui/Drawer
@@ -719,7 +719,7 @@ cd web && npx vitest run --reporter=verbose --project=unit src/components/ui/Dra
 
 Expected: all 10 tests PASS.
 
-- [ ] **Step 6: Run full test suite**
+- [x] **Step 6: Run full test suite**
 
 ```bash
 cd web && npx vitest run --reporter=verbose --project=unit
@@ -727,7 +727,7 @@ cd web && npx vitest run --reporter=verbose --project=unit
 
 Expected: all tests pass.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add web/src/components/ui/Drawer/
@@ -745,7 +745,7 @@ Add burger button to the header, `drawerOpen` state, and wrap `TeamInfoPanel` in
 - Modify: `web/src/screens/SquadScreen/SquadScreen.tsx`
 - Modify: `web/src/screens/SquadScreen/SquadScreen.module.css`
 
-- [ ] **Step 1: Write the failing SquadScreen tests**
+- [x] **Step 1: Write the failing SquadScreen tests**
 
 Create `web/src/screens/SquadScreen/SquadScreen.test.tsx`:
 
@@ -801,7 +801,7 @@ describe('SquadScreen drawer', () => {
 });
 ```
 
-- [ ] **Step 2: Run tests to confirm they fail**
+- [x] **Step 2: Run tests to confirm they fail**
 
 ```bash
 cd web && npx vitest run --reporter=verbose --project=unit src/screens/SquadScreen
@@ -809,7 +809,7 @@ cd web && npx vitest run --reporter=verbose --project=unit src/screens/SquadScre
 
 Expected: FAIL — `Cannot find module './SquadScreen'` (no test existed) or the burger button tests fail because the button does not exist yet.
 
-- [ ] **Step 3: Update SquadScreen.tsx**
+- [x] **Step 3: Update SquadScreen.tsx**
 
 Replace the `return (...)` block and the imports in `web/src/screens/SquadScreen/SquadScreen.tsx`. Add the `Drawer` import, `drawerOpen` state, burger button, and `Drawer` wrapper. The full file becomes:
 
@@ -1170,7 +1170,7 @@ function PlayerSkeleton({ size }: { size: 'large' | 'medium' }) {
 }
 ```
 
-- [ ] **Step 4: Add burger button styles to SquadScreen.module.css**
+- [x] **Step 4: Add burger button styles to SquadScreen.module.css**
 
 Add the `.burgerBtn` rule after the `.headerLeft` rule. Also hide the burger on desktop. Find this block in `SquadScreen.module.css`:
 
@@ -1246,7 +1246,7 @@ Add `.burgerBtn { display: none; }` inside that media query block:
 }
 ```
 
-- [ ] **Step 5: Run SquadScreen tests**
+- [x] **Step 5: Run SquadScreen tests**
 
 ```bash
 cd web && npx vitest run --reporter=verbose --project=unit src/screens/SquadScreen
@@ -1254,7 +1254,7 @@ cd web && npx vitest run --reporter=verbose --project=unit src/screens/SquadScre
 
 Expected: all 4 tests PASS.
 
-- [ ] **Step 6: Run full test suite**
+- [x] **Step 6: Run full test suite**
 
 ```bash
 cd web && npx vitest run --reporter=verbose --project=unit
@@ -1262,7 +1262,7 @@ cd web && npx vitest run --reporter=verbose --project=unit
 
 Expected: all tests pass.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add web/src/screens/SquadScreen/ web/src/components/ui/TeamInfoPanel/
