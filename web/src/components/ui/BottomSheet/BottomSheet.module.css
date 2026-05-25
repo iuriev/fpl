@@ -1,14 +1,15 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  background: transparent;
+  background: rgba(0, 0, 0, 0.6);
+  opacity: 0;
   pointer-events: none;
+  transition: opacity 0.3s;
   z-index: 299;
-  transition: background 300ms ease-out;
 }
 
 .backdropVisible {
-  background: rgba(0, 0, 0, 0.6);
+  opacity: 1;
   pointer-events: auto;
 }
 
@@ -48,15 +49,44 @@
 
 .header {
   flex-shrink: 0;
-  padding: 0 var(--fpl-space-xl3) var(--fpl-space-sm);
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--fpl-space-md) var(--fpl-space-sm);
+  border-bottom: 1px solid var(--fpl-bg-hair);
 }
 
 .title {
-  font: var(--fpl-fw-semibold) var(--fpl-fs-body-s) var(--fpl-font-display);
-  color: var(--fpl-muted);
+  font-size: var(--fpl-fs-body-s);
+  font-weight: var(--fpl-fw-semibold);
+  font-family: var(--fpl-font-display);
+  color: var(--fpl-text-primary);
   text-transform: uppercase;
   letter-spacing: 0.06em;
+  margin: 0;
+}
+
+.closeBtn {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: var(--fpl-muted-soft);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.closeBtn svg {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--fpl-text-primary);
 }
 
 .content {
