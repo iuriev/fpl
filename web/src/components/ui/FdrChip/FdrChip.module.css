@@ -1,0 +1,19 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+/* FPL official FDR colour scale */
+.chip_d1 { background: #375523; color: #b8e88a; }
+.chip_d2 { background: #00FF87; color: #002210; }
+.chip_d3 { background: #E8C347; color: #2a1e00; }
+.chip_d4 { background: #E8604C; color: #ffffff; }
+.chip_d5 { background: #730C18; color: #ffb8b8; }
