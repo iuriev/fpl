@@ -29,6 +29,7 @@ it behaves. Avoid duplicating: link between them instead.
 | [0010](0010-proxy-implementation.md) | Proxy implementation: service layer composition | Accepted |
 | [0011](0011-browser-support-policy.md) | Browser support policy: rolling last-N versions | Accepted |
 | [0012](0012-drop-screenshot-qa-gate.md) | Drop screenshot QA gate | Accepted |
+| [0013](0013-db-persistence-consideration.md) | Persistent storage to reduce FPL API request volume | Proposed |
 
 ## Template
 

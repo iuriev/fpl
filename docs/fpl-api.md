@@ -66,7 +66,9 @@ Used for: each player's points in the selected gameweek (`stats.total_points`).
 
 - `GET /entry/{teamId}/history/` — `current[]` per-gameweek history, `past[]`, `chips[]`.
 - `GET /element-summary/{elementId}/` — a player's per-fixture history.
-- `GET /fixtures/?event={gw}` — fixtures for a gameweek.
+- `GET /fixtures/?event={gw}` — fixtures for a gameweek. Each object: `id`, `event`,
+  `team_h`, `team_a`, `team_h_difficulty`, `team_a_difficulty` (integer 1–5),
+  `kickoff_time`, `finished`. Used for FDR chips in the Transfer Planner.
 
 ## Proxy mapping (see `openspec/changes/mvp-squad-viewer/design.md`, decision D1)
 
@@ -74,3 +76,10 @@ Used for: each player's points in the selected gameweek (`stats.total_points`).
 - `/api/entry/:teamId` ← entry summary
 - `/api/squad/:teamId/:gw` ← `bootstrap-static` (metadata, status, avg/high) + picks
   (`picks` + `entry_history`) + live (points)
+
+### Transfer Planner endpoints (planned)
+
+- `/api/fixtures/upcoming` ← `GET /fixtures/?event={gw}` × 3 (next 3 GWs), returns
+  per-team fixture list with `{ gw, opponent, home, difficulty }`. Cache: 1 hour.
+- `/api/player-pool` ← `bootstrap-static` `elements` + upcoming fixture data merged per
+  `team` id. Returns all players with `next_fixtures[]`. Cache: 10 min.

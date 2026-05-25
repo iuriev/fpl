@@ -41,6 +41,9 @@ The project is built spec-first; application code comes last. Read these before 
   guidance, cross-check every suggested API or feature against the project's browser support policy
   defined in `docs/frontend.md` (last 3 Chrome versions, last 2 Safari versions). Do not use APIs
   that fall outside that matrix without explicit approval.
+- **Never commit without explicit permission.** Do not run `git commit`, `git push`, `git amend`,
+  or any other git operation that modifies history or publishes changes unless the user explicitly
+  asks. After finishing work, show what changed and wait for approval.
 
 ## Architecture
 
