@@ -48,6 +48,8 @@ export interface SquadPlayer {
   position: PlayerPosition;
   club: string;
   teamCode: number;
+  teamId: number;
+  nowCost: number;
   points: number;
   isCaptain: boolean;
   isViceCaptain: boolean;
@@ -63,6 +65,7 @@ export interface SquadSummary {
   highestPoints?: number;
   rank?: number;
   transfers: number;
+  bank?: number;
 }
 
 export interface HistoryGameweek {
@@ -151,4 +154,51 @@ export interface TopPlayersGwResponse {
 
 export interface TopPlayersSeasonResponse {
   players: TopPlayersPlayer[];
+}
+
+export interface FixtureInfo {
+  gw: number;
+  opponent: string;
+  home: boolean;
+  difficulty: 1 | 2 | 3 | 4 | 5;
+}
+
+export interface PoolPlayer {
+  id: number;
+  webName: string;
+  firstName: string;
+  lastName: string;
+  team: number;
+  teamCode: number;
+  teamShortName: string;
+  position: PlayerPosition;
+  nowCost: number;
+  totalPoints: number;
+  eventPoints: number;
+  status: PlayerStatus;
+  chanceOfPlaying: number | null;
+  news: string;
+  selectedByPercent: string;
+  form: string;
+  nextFixtures: FixtureInfo[];
+}
+
+export interface PlayerPoolResponse {
+  players: PoolPlayer[];
+}
+
+export type TransferChip = 'none' | 'wildcard' | 'freehit';
+
+export interface TransferSwap {
+  outId: number;
+  inId: number;
+}
+
+export interface TransferDraft {
+  teamId: number;
+  targetGw: number;
+  savedAt: string;
+  freeTransfers: number;
+  chip: TransferChip;
+  swaps: TransferSwap[];
 }

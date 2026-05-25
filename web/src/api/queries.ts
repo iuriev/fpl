@@ -123,6 +123,18 @@ export function useTeamPlayers(teamCode: number | null) {
   });
 }
 
+export function usePlayerPool() {
+  return useQuery({
+    queryKey: ['player-pool'],
+    queryFn: () => api.getPlayerPool(),
+    staleTime: 1000 * 60 * 10,
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && error.status === 404) return false;
+      return failureCount < 3;
+    },
+  });
+}
+
 export function useSquad(teamId: number | null, gameweek: number | null) {
   return useQuery({
     queryKey: ['squad', teamId, gameweek],
