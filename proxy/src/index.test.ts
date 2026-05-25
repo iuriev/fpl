@@ -3,10 +3,14 @@ import { Hono } from 'hono';
 import * as gameweeksService from './gameweeks-service';
 import * as entryService from './entry-service';
 import * as squadService from './squad-service';
+import * as fixturesService from './fixtures-service';
+import * as playerPoolService from './player-pool-service';
 
 vi.mock('./gameweeks-service');
 vi.mock('./entry-service');
 vi.mock('./squad-service');
+vi.mock('./fixtures-service');
+vi.mock('./player-pool-service');
 
 describe('Proxy Endpoints', () => {
   let app: Hono;
@@ -38,6 +42,24 @@ describe('Proxy Endpoints', () => {
           return c.json({ error: 'Team not found' }, { status: 404 });
         }
         return c.json({ error: 'Unable to fetch team information' }, { status: 500 });
+      }
+    });
+
+    app.get('/api/fixtures/upcoming', async (c) => {
+      try {
+        const result = await fixturesService.getUpcomingFixtures();
+        return c.json(result);
+      } catch {
+        return c.json({ error: 'Unable to fetch fixtures' }, { status: 500 });
+      }
+    });
+
+    app.get('/api/player-pool', async (c) => {
+      try {
+        const result = await playerPoolService.getPlayerPool();
+        return c.json(result);
+      } catch {
+        return c.json({ error: 'Unable to fetch player pool' }, { status: 500 });
       }
     });
 
@@ -129,6 +151,46 @@ describe('Proxy Endpoints', () => {
       const res = await app.fetch(req);
 
       expect(res.status).toBe(404);
+    });
+  });
+
+  describe('GET /api/fixtures/upcoming', () => {
+    it('returns 200 with fixture data', async () => {
+      const mockData = { 1: [{ gw: 3, opponent: 'MCI', home: true, difficulty: 4 }] };
+      vi.mocked(fixturesService.getUpcomingFixtures).mockResolvedValue(mockData as any);
+
+      const res = await app.request('/api/fixtures/upcoming');
+
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual(mockData);
+    });
+
+    it('returns 500 on service error', async () => {
+      vi.mocked(fixturesService.getUpcomingFixtures).mockRejectedValue(new Error('fail'));
+
+      const res = await app.request('/api/fixtures/upcoming');
+
+      expect(res.status).toBe(500);
+    });
+  });
+
+  describe('GET /api/player-pool', () => {
+    it('returns 200 with player pool data', async () => {
+      const mockData = { players: [] };
+      vi.mocked(playerPoolService.getPlayerPool).mockResolvedValue(mockData);
+
+      const res = await app.request('/api/player-pool');
+
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual(mockData);
+    });
+
+    it('returns 500 on service error', async () => {
+      vi.mocked(playerPoolService.getPlayerPool).mockRejectedValue(new Error('fail'));
+
+      const res = await app.request('/api/player-pool');
+
+      expect(res.status).toBe(500);
     });
   });
 

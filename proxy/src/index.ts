@@ -3,9 +3,11 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import * as dreamTeamService from './dream-team-service';
 import * as entryService from './entry-service';
+import * as fixturesService from './fixtures-service';
 import * as gameweeksService from './gameweeks-service';
 import * as historyService from './history-service';
 import * as leaguesService from './leagues-service';
+import * as playerPoolService from './player-pool-service';
 import * as squadService from './squad-service';
 import * as teamService from './team-service';
 import * as topPlayersService from './top-players-service';
@@ -136,6 +138,28 @@ app.get('/api/squad/:teamId/:gw', async (c) => {
       { error: 'Unable to fetch squad' },
       { status: 500 },
     );
+  }
+});
+
+// GET /api/fixtures/upcoming
+app.get('/api/fixtures/upcoming', async (c) => {
+  try {
+    const result = await fixturesService.getUpcomingFixtures();
+    return c.json(result);
+  } catch (error) {
+    console.error('Error fetching upcoming fixtures:', error);
+    return c.json({ error: 'Unable to fetch fixtures' }, { status: 500 });
+  }
+});
+
+// GET /api/player-pool
+app.get('/api/player-pool', async (c) => {
+  try {
+    const result = await playerPoolService.getPlayerPool();
+    return c.json(result);
+  } catch (error) {
+    console.error('Error fetching player pool:', error);
+    return c.json({ error: 'Unable to fetch player pool' }, { status: 500 });
   }
 });
 
