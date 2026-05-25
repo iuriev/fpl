@@ -1,4 +1,7 @@
 {
+  "skillOverrides": {
+    "run": "off"
+  },
   "hooks": {
     "PostToolUse": [
       {
