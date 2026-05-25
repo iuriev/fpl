@@ -8,3 +8,5 @@ export { LeaguesStatsScreen } from './LeaguesStatsScreen/LeaguesStatsScreen';
 export type { SquadScreenProps } from './SquadScreen/SquadScreen';
 export { SquadScreen } from './SquadScreen/SquadScreen';
 export { TopPlayersScreen } from './TopPlayersScreen/TopPlayersScreen';
+export type { TransferScreenProps } from './TransferScreen/TransferScreen';
+export { TransferScreen } from './TransferScreen/TransferScreen';
