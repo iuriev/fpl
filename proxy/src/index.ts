@@ -7,6 +7,7 @@ import * as gameweeksService from './gameweeks-service';
 import * as historyService from './history-service';
 import * as leaguesService from './leagues-service';
 import * as squadService from './squad-service';
+import * as topPlayersService from './top-players-service';
 import { MAX_GAMEWEEK } from './types';
 
 const app = new Hono();
@@ -158,6 +159,38 @@ app.get('/api/dream-team/:gw', async (c) => {
     }
     console.error('Error fetching dream team:', error);
     return c.json({ error: 'Unable to fetch dream team' }, { status: 500 });
+  }
+});
+
+// GET /api/top-players/gameweek/:gw
+app.get('/api/top-players/gameweek/:gw', async (c) => {
+  const gw = parseInt(c.req.param('gw'), 10);
+
+  if (isNaN(gw) || gw < 1 || gw > MAX_GAMEWEEK) {
+    return c.json({ error: 'Invalid gameweek' }, { status: 400 });
+  }
+
+  try {
+    const result = await topPlayersService.getTopPlayersGameweek(gw);
+    return c.json(result);
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    if (errorMsg.includes('not found')) {
+      return c.json({ error: `Gameweek ${gw} not found` }, { status: 404 });
+    }
+    console.error('Error fetching top players for gameweek:', error);
+    return c.json({ error: 'Unable to fetch top players' }, { status: 500 });
+  }
+});
+
+// GET /api/top-players/season
+app.get('/api/top-players/season', async (c) => {
+  try {
+    const result = await topPlayersService.getTopPlayersSeason();
+    return c.json(result);
+  } catch (error) {
+    console.error('Error fetching top players for season:', error);
+    return c.json({ error: 'Unable to fetch top players' }, { status: 500 });
   }
 });
 

@@ -1,14 +1,14 @@
 ## 1. Proxy: top-players endpoints
 
-- [ ] 1.1 Implement `GET /api/top-players/gameweek/:gw`: merge `/event/{gw}/live/` stats with
+- [x] 1.1 Implement `GET /api/top-players/gameweek/:gw`: merge `/event/{gw}/live/` stats with
       `bootstrap-static` metadata; sort by `stats.total_points` desc; return top 20
-- [ ] 1.2 Implement `GET /api/top-players/season`: sort `bootstrap-static` `elements[]` by
+- [x] 1.2 Implement `GET /api/top-players/season`: sort `bootstrap-static` `elements[]` by
       `total_points` desc; return top 20 with name, position, club, total_points
-- [ ] 1.3 Both endpoints: shape each player as
+- [x] 1.3 Both endpoints: shape each player as
       `{ id, webName, position, teamCode, teamShortName, points }`
-- [ ] 1.4 Cache TTLs: GW endpoint inherits live-data TTL (60 s current GW, 24 h finished);
+- [x] 1.4 Cache TTLs: GW endpoint inherits live-data TTL (60 s current GW, 24 h finished);
       season endpoint inherits bootstrap TTL (1 h)
-- [ ] 1.5 Add proxy unit tests for both endpoints
+- [x] 1.5 Add proxy unit tests for both endpoints
 
 ## 2. Frontend: TopPlayers screen
 

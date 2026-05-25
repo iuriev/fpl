@@ -102,6 +102,24 @@ export interface SquadResponse {
   bench: SquadPlayer[];
 }
 
+export interface TopPlayer {
+  id: number;
+  webName: string;
+  position: PlayerPosition;
+  teamCode: number;
+  teamShortName: string;
+  points: number;
+}
+
+export interface TopPlayersGameweekResponse {
+  gw: number;
+  players: TopPlayer[];
+}
+
+export interface TopPlayersSeasonResponse {
+  players: TopPlayer[];
+}
+
 export interface DreamTeamPlayer {
   id: number;
   webName: string;

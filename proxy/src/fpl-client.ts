@@ -31,6 +31,7 @@ export interface FPLBootstrapStatic {
     status: string;
     chance_of_playing_this_round: number | null;
     news: string;
+    total_points: number;
   }>;
   element_types: Array<{
     id: number;
