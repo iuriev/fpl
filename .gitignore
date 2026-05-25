@@ -35,3 +35,6 @@ coverage/
 
 # Storybook
 storybook-static/
+
+# Claude Code worktrees (ephemeral)
+.claude/worktrees/

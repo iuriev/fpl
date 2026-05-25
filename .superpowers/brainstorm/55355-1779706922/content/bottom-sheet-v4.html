@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transfer Planner v4 – exact FPL FDR</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #100023;
+    color: #e6edf3;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 2rem 1rem 4rem;
+    gap: 3rem;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  h1 { width:100%; text-align:center; font-size:1rem; color:#8b949e; margin-bottom:0.2rem; font-weight:400; }
+  .page-sub { width:100%; text-align:center; font-size:0.75rem; color:#444; margin-bottom:1.5rem; }
+
+  .phone {
+    width: 360px;
+    background: #07001a;
+    border-radius: 1.75rem;
+    overflow: hidden;
+    border: 1px solid #2a0a50;
+    box-shadow: 0 8px 48px rgba(100,0,200,0.25);
+    position: relative;
+    min-height: 740px;
+    display: flex;
+    flex-direction: column;
+  }
+  .phone-label { text-align:center; color:#555; font-size:0.75rem; margin-top:0.6rem; }
+
+  .screen-header {
+    background: #14003a;
+    padding: 0.8rem 1rem 0.65rem;
+    border-bottom: 1px solid #2a0a50;
+  }
+  .header-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.55rem; }
+  .screen-title { font-size:1.05rem; font-weight:700; color:#fff; }
+  .chip-pill { background:#2a0a50; color:#bf84ff; font-size:0.68rem; font-weight:600; padding:0.22rem 0.65rem; border-radius:1rem; border:1px solid #4a1a80; }
+  .stats-row { display:flex; gap:1.25rem; }
+  .stat { display:flex; flex-direction:column; }
+  .stat-value { font-size:0.88rem; font-weight:700; color:#00FF87; }
+  .stat-value.warn { color:#ff9500; }
+  .stat-label { font-size:0.58rem; color:#7070a0; text-transform:uppercase; letter-spacing:0.05em; margin-top:0.1rem; }
+
+  .pitch {
+    flex:1;
+    background: linear-gradient(180deg, #1a5c28 0%, #0d3817 100%);
+    padding: 0.65rem 0.45rem;
+    display:flex; flex-direction:column; gap:0.45rem;
+  }
+  .pitch-row { display:flex; justify-content:center; gap:0.4rem; }
+  .player-slot {
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 0.6rem;
+    padding: 0.32rem 0.4rem;
+    text-align: center; min-width: 64px; cursor:pointer; position:relative;
+  }
+  .player-slot.out {
+    background: rgba(255,22,84,0.18);
+    border-color: #FF1654;
+    animation: pulse-out 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse-out {
+    0%,100% { border-color:#FF1654; }
+    50% { border-color:#ff5580; box-shadow:0 0 10px rgba(255,22,84,0.35); }
+  }
+  .jersey { width:30px; height:30px; margin:0 auto 0.15rem; display:flex; align-items:center; justify-content:center; font-size:1rem; }
+  .player-name { font-size:0.6rem; font-weight:600; color:#e6edf3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:64px; }
+  .player-price { font-size:0.56rem; color:#7070a0; }
+  .out-badge { position:absolute; top:-6px; right:-6px; background:#FF1654; color:white; font-size:0.48rem; font-weight:800; padding:0.1rem 0.28rem; border-radius:0.25rem; text-transform:uppercase; }
+  .bench-divider { border-top:1px dashed rgba(255,255,255,0.15); margin:0.05rem 0.5rem; display:flex; align-items:center; justify-content:center; padding:0.12rem 0; }
+  .bench-label { font-size:0.58rem; color:rgba(255,255,255,0.25); text-transform:uppercase; letter-spacing:0.08em; }
+
+  .bottom-sheet {
+    position:absolute; bottom:0; left:0; right:0;
+    background: #0d0028;
+    border-radius: 1.4rem 1.4rem 0 0;
+    border-top: 1px solid #2a0a50;
+    box-shadow: 0 -12px 40px rgba(100,0,200,0.2);
+    display:flex; flex-direction:column; max-height:68%;
+  }
+  .sheet-handle { width:2.5rem; height:0.22rem; background:#3a1060; border-radius:1rem; margin:0.65rem auto 0; }
+  .sheet-header { padding:0.55rem 1rem 0.45rem; }
+  .sheet-title-row { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.45rem; }
+  .sheet-title { font-size:0.85rem; font-weight:700; color:#fff; }
+  .sheet-subtitle { font-size:0.65rem; color:#7070a0; margin-top:0.12rem; }
+  .search-bar { background:#1a0042; border:1px solid #2a0a60; border-radius:0.55rem; padding:0.4rem 0.65rem; font-size:0.75rem; color:#7070a0; display:flex; align-items:center; gap:0.4rem; margin-bottom:0.38rem; }
+  .sort-row { display:flex; gap:0.3rem; overflow-x:auto; padding-bottom:0.2rem; }
+  .sort-pill { background:#1a0042; color:#7070a0; font-size:0.62rem; padding:0.18rem 0.48rem; border-radius:1rem; white-space:nowrap; cursor:pointer; border:1px solid transparent; }
+  .sort-pill.active { background:#2a0a60; color:#00FF87; border-color:#00FF87; }
+
+  .list-col-headers { display:flex; align-items:center; gap:0.6rem; padding:0.22rem 1rem; background:#08001e; border-bottom:1px solid rgba(255,255,255,0.04); font-size:0.58rem; color:#5a5a80; text-transform:uppercase; letter-spacing:0.05em; }
+  .col-player { flex:1; }
+  .col-fixtures { min-width:6.4rem; text-align:center; }
+  .col-price { min-width:2.6rem; text-align:right; }
+
+  .player-list { overflow-y:auto; flex:1; }
+  .player-row { display:flex; align-items:center; gap:0.65rem; padding:0.52rem 1rem; border-bottom:1px solid rgba(255,255,255,0.035); cursor:pointer; transition:background 0.1s; }
+  .player-row:hover { background:rgba(0,255,135,0.04); }
+  .player-row.over-budget { opacity:0.28; cursor:not-allowed; }
+
+  .mini-jersey { width:2.3rem; height:2.3rem; border-radius:0.4rem; display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; }
+  .player-info { flex:1; min-width:0; }
+  .player-row-name { font-size:0.8rem; font-weight:600; color:#e6edf3; }
+  .player-row-meta { font-size:0.63rem; color:#7070a0; display:flex; align-items:center; gap:0.3rem; margin-top:0.12rem; }
+  .avail-dot { width:0.38rem; height:0.38rem; border-radius:50%; display:inline-block; flex-shrink:0; }
+  .avail-a { background:#00FF87; }
+  .avail-d { background:#ff9500; }
+  .avail-i { background:#FF1654; }
+
+  .fixtures-col { display:flex; gap:0.2rem; align-items:center; flex-shrink:0; }
+
+  .fdr {
+    font-size:0.57rem; font-weight:700;
+    padding:0.2rem 0.28rem; border-radius:0.3rem;
+    text-align:center; min-width:1.7rem; line-height:1.4;
+  }
+
+  /*
+   * Official FPL FDR palette (2-6 scale → mapped to our 1-5):
+   *   FPL-2 → 1:  dark forest green  #375523  (official "very easy")
+   *   FPL-3 → 2:  FPL neon green     #00FF87  (official "easy")
+   *   FPL-4 → 3:  warm amber         #E8C347  (our substitute for their grey — more legible on dark)
+   *   FPL-5 → 4:  salmon/orange-red  #E8604C  (official "hard")
+   *   FPL-6 → 5:  dark crimson       #730C18  (official "very hard")
+   */
+  .fdr-1 { background:#375523; color:#b8e88a; }   /* dark forest green + light text */
+  .fdr-2 { background:#00FF87; color:#002210; }   /* FPL neon green — unmistakably different from #1 */
+  .fdr-3 { background:#E8C347; color:#2a1e00; }   /* warm amber */
+  .fdr-4 { background:#E8604C; color:#fff; }       /* FPL salmon-orange */
+  .fdr-5 { background:#730C18; color:#ffb8b8; }   /* FPL dark crimson */
+
+  .price-col { font-size:0.77rem; font-weight:700; color:#00FF87; flex-shrink:0; min-width:2.5rem; text-align:right; }
+  .price-col.red { color:#FF1654; }
+</style>
+</head>
+<body>
+
+<h1>Transfer Planner — Official FPL FDR Palette</h1>
+<p class="page-sub">FPL 2–6 scale mapped to 1–5 · dark forest green vs neon green — clearly different</p>
+
+<div>
+  <div class="phone">
+    <div class="screen-header">
+      <div class="header-row">
+        <span class="screen-title">Transfers</span>
+        <span class="chip-pill">🃏 Wildcard</span>
+      </div>
+      <div class="stats-row">
+        <div class="stat"><span class="stat-value">£4.2m</span><span class="stat-label">Bank</span></div>
+        <div class="stat"><span class="stat-value">1</span><span class="stat-label">Free transfers</span></div>
+        <div class="stat"><span class="stat-value warn">−4 pts</span><span class="stat-label">Extra cost</span></div>
+      </div>
+    </div>
+
+    <div class="pitch">
+      <div class="pitch-row">
+        <div class="player-slot"><div class="jersey">🧤</div><div class="player-name">Raya</div><div class="player-price">£6.0m</div></div>
+        <div class="player-slot"><div class="jersey">🧤</div><div class="player-name">Flekken</div><div class="player-price">£4.5m</div></div>
+      </div>
+      <div class="pitch-row">
+        <div class="player-slot"><div class="jersey">🟦</div><div class="player-name">Alexander-A.</div><div class="player-price">£7.1m</div></div>
+        <div class="player-slot"><div class="jersey">🟦</div><div class="player-name">Saliba</div><div class="player-price">£6.2m</div></div>
+        <div class="player-slot"><div class="jersey">🟦</div><div class="player-name">Pedro P.</div><div class="player-price">£5.1m</div></div>
+      </div>
+      <div class="pitch-row">
+        <div class="player-slot out">
+          <div class="out-badge">OUT</div>
+          <div class="jersey">🟨</div><div class="player-name">Semenyo</div><div class="player-price">£8.0m</div>
+        </div>
+        <div class="player-slot"><div class="jersey">🟨</div><div class="player-name">Rice</div><div class="player-price">£7.2m</div></div>
+        <div class="player-slot"><div class="jersey">🟨</div><div class="player-name">Mbeumo</div><div class="player-price">£8.2m</div></div>
+        <div class="player-slot"><div class="jersey">🟨</div><div class="player-name">Wilson</div><div class="player-price">£5.6m</div></div>
+      </div>
+      <div class="pitch-row">
+        <div class="player-slot"><div class="jersey">🔴</div><div class="player-name">Thiago</div><div class="player-price">£6.7m</div></div>
+        <div class="player-slot"><div class="jersey">🔴</div><div class="player-name">Haaland</div><div class="player-price">£14.7m</div></div>
+        <div class="player-slot"><div class="jersey">🔴</div><div class="player-name">Calvert-L.</div><div class="player-price">£5.7m</div></div>
+      </div>
+      <div class="bench-divider"><span class="bench-label">Bench</span></div>
+      <div class="pitch-row">
+        <div class="player-slot"><div class="jersey">🟦</div><div class="player-name">O'Brien</div><div class="player-price">£4.9m</div></div>
+        <div class="player-slot"><div class="jersey">🟦</div><div class="player-name">Struijk</div><div class="player-price">£4.2m</div></div>
+        <div class="player-slot"><div class="jersey">🟨</div><div class="player-name">O'Reilly</div><div class="player-price">£5.1m</div></div>
+        <div class="player-slot"><div class="jersey">🔴</div><div class="player-name">Cucurella</div><div class="player-price">£6.1m</div></div>
+      </div>
+    </div>
+
+    <div class="bottom-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <div class="sheet-title-row">
+          <div>
+            <div class="sheet-title">Replace Semenyo</div>
+            <div class="sheet-subtitle">Midfielder · £8.0m selling price</div>
+          </div>
+        </div>
+        <div class="search-bar">🔍 <span>Search player...</span></div>
+        <div class="sort-row">
+          <div class="sort-pill active">Pts ↓</div>
+          <div class="sort-pill">Price ↓</div>
+          <div class="sort-pill">Form ↓</div>
+          <div class="sort-pill">GW pts ↓</div>
+          <div class="sort-pill">Sel% ↓</div>
+        </div>
+      </div>
+
+      <div class="list-col-headers">
+        <span class="col-player">Player</span>
+        <span class="col-fixtures">Next 3 fixtures</span>
+        <span class="col-price">Price</span>
+      </div>
+
+      <div class="player-list">
+
+        <div class="player-row">
+          <div class="mini-jersey" style="background:#c8102e">👕</div>
+          <div class="player-info">
+            <div class="player-row-name">M. Salah</div>
+            <div class="player-row-meta"><span class="avail-dot avail-a"></span>Liverpool · 243 pts</div>
+          </div>
+          <div class="fixtures-col">
+            <div class="fdr fdr-2">MCI<br>H</div>
+            <div class="fdr fdr-1">CRY<br>A</div>
+            <div class="fdr fdr-3">CHE<br>H</div>
+          </div>
+          <div class="price-col">£12.1m</div>
+        </div>
+
+        <div class="player-row">
+          <div class="mini-jersey" style="background:#034694">👕</div>
+          <div class="player-info">
+            <div class="player-row-name">C. Palmer</div>
+            <div class="player-row-meta"><span class="avail-dot avail-a"></span>Chelsea · 198 pts</div>
+          </div>
+          <div class="fixtures-col">
+            <div class="fdr fdr-4">ARS<br>A</div>
+            <div class="fdr fdr-2">EVE<br>H</div>
+            <div class="fdr fdr-1">BOU<br>A</div>
+          </div>
+          <div class="price-col">£11.5m</div>
+        </div>
+
+        <div class="player-row">
+          <div class="mini-jersey" style="background:#da020e">👕</div>
+          <div class="player-info">
+            <div class="player-row-name">B. Fernandes</div>
+            <div class="player-row-meta"><span class="avail-dot avail-a"></span>Man Utd · 176 pts</div>
+          </div>
+          <div class="fixtures-col">
+            <div class="fdr fdr-3">TOT<br>H</div>
+            <div class="fdr fdr-2">WHU<br>A</div>
+            <div class="fdr fdr-4">LIV<br>H</div>
+          </div>
+          <div class="price-col">£10.0m</div>
+        </div>
+
+        <div class="player-row">
+          <div class="mini-jersey" style="background:#6c1d45">👕</div>
+          <div class="player-info">
+            <div class="player-row-name">A. Gündogan</div>
+            <div class="player-row-meta"><span class="avail-dot avail-d"></span>Man City · 75% fit</div>
+          </div>
+          <div class="fixtures-col">
+            <div class="fdr fdr-1">WOL<br>H</div>
+            <div class="fdr fdr-2">BRE<br>A</div>
+            <div class="fdr fdr-5">ARS<br>H</div>
+          </div>
+          <div class="price-col">£6.5m</div>
+        </div>
+
+        <div class="player-row">
+          <div class="mini-jersey" style="background:#cc0000">👕</div>
+          <div class="player-info">
+            <div class="player-row-name">D. Wissa</div>
+            <div class="player-row-meta"><span class="avail-dot avail-a"></span>Brentford · 142 pts</div>
+          </div>
+          <div class="fixtures-col">
+            <div class="fdr fdr-2">BHA<br>H</div>
+            <div class="fdr fdr-1">SOU<br>A</div>
+            <div class="fdr fdr-1">FUL<br>H</div>
+          </div>
+          <div class="price-col">£7.1m</div>
+        </div>
+
+        <div class="player-row over-budget">
+          <div class="mini-jersey" style="background:#1c3f6e">👕</div>
+          <div class="player-info">
+            <div class="player-row-name">P. Foden</div>
+            <div class="player-row-meta"><span class="avail-dot avail-a"></span>Man City · 155 pts</div>
+          </div>
+          <div class="fixtures-col">
+            <div class="fdr fdr-1">WOL<br>H</div>
+            <div class="fdr fdr-2">BRE<br>A</div>
+            <div class="fdr fdr-5">ARS<br>H</div>
+          </div>
+          <div class="price-col red">£13.5m</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="phone-label">v4 · FPL exact palette</div>
+</div>
+
+<!-- Legend -->
+<div style="max-width:280px;margin-top:2rem">
+
+  <h3 style="color:#e6edf3;font-size:0.9rem;margin-bottom:0.75rem">Шкала FDR — FPL оригинал</h3>
+  <p style="font-size:0.73rem;color:#7070a0;margin-bottom:0.9rem">
+    FPL использует шкалу 2–6. Мы маппим на 1–5 по той же логике.<br>
+    1 и 2 теперь принципиально разные: тёмный лес vs яркий неон.
+  </p>
+
+  <div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.75rem">
+    <div style="display:flex;align-items:center;gap:0.75rem">
+      <span style="padding:0.28rem 0.65rem;border-radius:0.3rem;background:#375523;color:#b8e88a;font-size:0.7rem;font-weight:800;min-width:1.8rem;text-align:center">1</span>
+      <div>
+        <div style="font-size:0.8rem;color:#ccc">Очень лёгкий</div>
+        <div style="font-size:0.65rem;color:#555">#375523 — тёмный лес (FPL FDR-2)</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.75rem">
+      <span style="padding:0.28rem 0.65rem;border-radius:0.3rem;background:#00FF87;color:#002210;font-size:0.7rem;font-weight:800;min-width:1.8rem;text-align:center">2</span>
+      <div>
+        <div style="font-size:0.8rem;color:#ccc">Лёгкий</div>
+        <div style="font-size:0.65rem;color:#555">#00FF87 — FPL neon green (FPL FDR-3)</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.75rem">
+      <span style="padding:0.28rem 0.65rem;border-radius:0.3rem;background:#E8C347;color:#2a1e00;font-size:0.7rem;font-weight:800;min-width:1.8rem;text-align:center">3</span>
+      <div>
+        <div style="font-size:0.8rem;color:#ccc">Средний</div>
+        <div style="font-size:0.65rem;color:#555">#E8C347 — amber (FPL FDR-4 grey → теплее)</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.75rem">
+      <span style="padding:0.28rem 0.65rem;border-radius:0.3rem;background:#E8604C;color:#fff;font-size:0.7rem;font-weight:800;min-width:1.8rem;text-align:center">4</span>
+      <div>
+        <div style="font-size:0.8rem;color:#ccc">Сложный</div>
+        <div style="font-size:0.65rem;color:#555">#E8604C — salmon-orange (FPL FDR-5)</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.75rem">
+      <span style="padding:0.28rem 0.65rem;border-radius:0.3rem;background:#730C18;color:#ffb8b8;font-size:0.7rem;font-weight:800;min-width:1.8rem;text-align:center">5</span>
+      <div>
+        <div style="font-size:0.8rem;color:#ccc">Очень сложный</div>
+        <div style="font-size:0.65rem;color:#555">#730C18 — тёмный крымзон (FPL FDR-6)</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:0.8rem;background:#0d0028;border-radius:0.75rem;border:1px solid #2a0a50;font-size:0.73rem;color:#7070a0;line-height:1.6">
+    FPL в оригинале использует <b style="color:#ccc">тёмный лес → нeon → серый → оранжевый → тёмно-красный</b>. Серый для среднего мы заменили янтарным — он лучше читается на тёмном фоне.
+  </div>
+</div>
+
+</body>
+</html>
