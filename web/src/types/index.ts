@@ -116,3 +116,39 @@ export interface DreamTeamResponse {
   gw: number;
   players: DreamTeamPlayer[];
 }
+
+export interface TeamInfo {
+  id: number;
+  code: number;
+  name: string;
+  shortName: string;
+}
+
+export interface TeamsResponse {
+  teams: TeamInfo[];
+}
+
+export interface TeamPlayersResponse {
+  teamCode: number;
+  teamName: string;
+  teamShortName: string;
+  players: TopPlayersPlayer[];
+}
+
+export interface TopPlayersPlayer {
+  id: number;
+  webName: string;
+  position: PlayerPosition;
+  teamCode: number;
+  teamShortName: string;
+  points: number;
+}
+
+export interface TopPlayersGwResponse {
+  gw: number;
+  players: TopPlayersPlayer[];
+}
+
+export interface TopPlayersSeasonResponse {
+  players: TopPlayersPlayer[];
+}

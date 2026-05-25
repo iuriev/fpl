@@ -7,3 +7,4 @@ export type { LeaguesStatsScreenProps } from './LeaguesStatsScreen/LeaguesStatsS
 export { LeaguesStatsScreen } from './LeaguesStatsScreen/LeaguesStatsScreen';
 export type { SquadScreenProps } from './SquadScreen/SquadScreen';
 export { SquadScreen } from './SquadScreen/SquadScreen';
+export { TopPlayersScreen } from './TopPlayersScreen/TopPlayersScreen';

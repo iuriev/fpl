@@ -144,8 +144,8 @@ describe('Top Players Service — gameweek', () => {
     await expect(topPlayersService.getTopPlayersGameweek(99)).rejects.toThrow('Gameweek 99 not found');
   });
 
-  it('limits result to top 20', async () => {
-    const manyElements = Array.from({ length: 50 }, (_, i) => ({
+  it('limits result to top 100', async () => {
+    const manyElements = Array.from({ length: 150 }, (_, i) => ({
       id: i + 1,
       web_name: `Player${i + 1}`,
       team: 1,
@@ -154,12 +154,12 @@ describe('Top Players Service — gameweek', () => {
       status: 'a',
       chance_of_playing_this_round: null,
       news: '',
-      total_points: 50 - i,
+      total_points: 150 - i,
     }));
     const manyLive = {
       elements: manyElements.map((e, i) => ({
         id: e.id,
-        stats: { total_points: 50 - i, minutes: 90, goals_scored: 0, assists: 0, clean_sheets: 0, goals_conceded: 0, own_goals: 0, penalties_saved: 0, penalties_missed: 0, yellow_cards: 0, red_cards: 0, saves: 0, bonus: 0 },
+        stats: { total_points: 150 - i, minutes: 90, goals_scored: 0, assists: 0, clean_sheets: 0, goals_conceded: 0, own_goals: 0, penalties_saved: 0, penalties_missed: 0, yellow_cards: 0, red_cards: 0, saves: 0, bonus: 0 },
       })),
     };
 
@@ -169,7 +169,7 @@ describe('Top Players Service — gameweek', () => {
 
     const result = await topPlayersService.getTopPlayersGameweek(1);
 
-    expect(result.players).toHaveLength(20);
+    expect(result.players).toHaveLength(100);
   });
 });
 
@@ -219,8 +219,8 @@ describe('Top Players Service — season', () => {
     expect(fplClient.getBootstrapStatic).not.toHaveBeenCalled();
   });
 
-  it('limits result to top 20', async () => {
-    const manyElements = Array.from({ length: 50 }, (_, i) => ({
+  it('limits result to top 100', async () => {
+    const manyElements = Array.from({ length: 150 }, (_, i) => ({
       id: i + 1,
       web_name: `Player${i + 1}`,
       team: 1,
@@ -237,7 +237,7 @@ describe('Top Players Service — season', () => {
 
     const result = await topPlayersService.getTopPlayersSeason();
 
-    expect(result.players).toHaveLength(20);
+    expect(result.players).toHaveLength(100);
   });
 
   it('top season player is first in list', async () => {

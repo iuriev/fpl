@@ -3,7 +3,7 @@ import * as fplClient from './fpl-client';
 import type { FPLBootstrapStatic } from './fpl-client';
 import type { PlayerPosition, TopPlayer, TopPlayersGameweekResponse, TopPlayersSeasonResponse } from './types';
 
-const TOP_N = 20;
+const TOP_N = 100;
 
 const POSITION_MAP: Record<number, PlayerPosition> = {
   1: 'GK',

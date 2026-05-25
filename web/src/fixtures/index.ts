@@ -1,4 +1,4 @@
-import type { DreamTeamPlayer, DreamTeamResponse, EntryResponse, GameweeksResponse, PlayerStats, SquadResponse } from '@/types';
+import type { DreamTeamPlayer, DreamTeamResponse, EntryResponse, GameweeksResponse, PlayerStats, SquadResponse, TeamPlayersResponse, TeamsResponse, TopPlayersGwResponse, TopPlayersSeasonResponse } from '@/types';
 
 function mkStats(overrides: Partial<PlayerStats> = {}): PlayerStats {
   return {
@@ -84,6 +84,60 @@ function mkDtPlayer(overrides: Partial<DreamTeamPlayer> & Pick<DreamTeamPlayer, 
     ...overrides,
   };
 }
+
+const POSITIONS: TopPlayersPlayer['position'][] = ['GK', 'DEF', 'MID', 'FWD'];
+
+function mkTopPlayer(i: number): TopPlayersPlayer {
+  return {
+    id: i + 1,
+    webName: `Player${i + 1}`,
+    position: POSITIONS[i % 4],
+    teamCode: 3,
+    teamShortName: 'ARS',
+    points: 100 - i,
+  };
+}
+
+export const fixtureTopPlayersGw: TopPlayersGwResponse = {
+  gw: 36,
+  players: [
+    { id: 1, webName: 'Haaland', position: 'FWD', teamCode: 43, teamShortName: 'MCI', points: 20 },
+    { id: 2, webName: 'Salah', position: 'MID', teamCode: 14, teamShortName: 'LIV', points: 18 },
+    { id: 3, webName: 'Saka', position: 'MID', teamCode: 3, teamShortName: 'ARS', points: 15 },
+    { id: 4, webName: 'Raya', position: 'GK', teamCode: 3, teamShortName: 'ARS', points: 12 },
+    { id: 5, webName: 'Saliba', position: 'DEF', teamCode: 3, teamShortName: 'ARS', points: 11 },
+    ...Array.from({ length: 95 }, (_, i) => mkTopPlayer(i + 5)),
+  ],
+};
+
+export const fixtureTopPlayersSeason: TopPlayersSeasonResponse = {
+  players: [
+    { id: 1, webName: 'Salah', position: 'MID', teamCode: 14, teamShortName: 'LIV', points: 280 },
+    { id: 2, webName: 'Haaland', position: 'FWD', teamCode: 43, teamShortName: 'MCI', points: 260 },
+    { id: 3, webName: 'Saka', position: 'MID', teamCode: 3, teamShortName: 'ARS', points: 210 },
+    ...Array.from({ length: 97 }, (_, i) => mkTopPlayer(i + 3)),
+  ],
+};
+
+export const fixtureTeams: TeamsResponse = {
+  teams: [
+    { id: 1, code: 3, name: 'Arsenal', shortName: 'ARS' },
+    { id: 8, code: 8, name: 'Chelsea', shortName: 'CHE' },
+    { id: 11, code: 43, name: 'Man City', shortName: 'MCI' },
+  ],
+};
+
+export const fixtureTeamPlayers: TeamPlayersResponse = {
+  teamCode: 3,
+  teamName: 'Arsenal',
+  teamShortName: 'ARS',
+  players: [
+    { id: 1, webName: 'Saka', position: 'MID', teamCode: 3, teamShortName: 'ARS', points: 210 },
+    { id: 2, webName: 'Saliba', position: 'DEF', teamCode: 3, teamShortName: 'ARS', points: 180 },
+    { id: 3, webName: 'Raya', position: 'GK', teamCode: 3, teamShortName: 'ARS', points: 150 },
+    { id: 4, webName: 'Havertz', position: 'MID', teamCode: 3, teamShortName: 'ARS', points: 120 },
+  ],
+};
 
 export const fixtureDreamTeam: DreamTeamResponse = {
   gw: 36,

@@ -71,6 +71,58 @@ export function useDreamTeam(gameweek: number | null) {
   });
 }
 
+export function useTopPlayersGw(gameweek: number | null) {
+  return useQuery({
+    queryKey: ['top-players-gw', gameweek],
+    queryFn: () => {
+      if (gameweek === null) throw new Error('Gameweek required');
+      return api.getTopPlayersGw(gameweek);
+    },
+    enabled: gameweek !== null,
+    staleTime: 1000 * 60,
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && (error.status === 400 || error.status === 404)) return false;
+      return failureCount < 3;
+    },
+  });
+}
+
+export function useTopPlayersSeason() {
+  return useQuery({
+    queryKey: ['top-players-season'],
+    queryFn: () => api.getTopPlayersSeason(),
+    staleTime: 1000 * 60 * 60,
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && (error.status === 400 || error.status === 404)) return false;
+      return failureCount < 3;
+    },
+  });
+}
+
+export function useTeams() {
+  return useQuery({
+    queryKey: ['teams'],
+    queryFn: () => api.getTeams(),
+    staleTime: 1000 * 60 * 60,
+  });
+}
+
+export function useTeamPlayers(teamCode: number | null) {
+  return useQuery({
+    queryKey: ['team-players', teamCode],
+    queryFn: () => {
+      if (teamCode === null) throw new Error('Team code required');
+      return api.getTeamPlayers(teamCode);
+    },
+    enabled: teamCode !== null,
+    staleTime: 1000 * 60 * 60,
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && error.status === 404) return false;
+      return failureCount < 3;
+    },
+  });
+}
+
 export function useSquad(teamId: number | null, gameweek: number | null) {
   return useQuery({
     queryKey: ['squad', teamId, gameweek],

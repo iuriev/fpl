@@ -106,6 +106,18 @@ export const copy = {
   dreamTeamNotAvailable: 'Dream Team not available yet for this gameweek',
   dreamTeamNavLink: 'Dream Team',
 
+  // Top Players screen
+  topPlayersTitle: 'Top Players',
+  topPlayersBack: 'Squad',
+  topPlayersTabGw: 'This GW',
+  topPlayersTabSeason: 'Season',
+  topPlayersLoadError: "Couldn't load top players",
+  topPlayersRetry: 'Try again',
+  topPlayersNavLink: 'Top Players',
+  topPlayersTabTeam: 'By Team',
+  topPlayersTeamSelectLabel: 'Select team',
+  topPlayersTeamLoadError: "Couldn't load team players",
+
   // View toggle
   viewPitch: 'Pitch',
   viewList: 'List',
