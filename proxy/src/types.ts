@@ -155,3 +155,34 @@ export interface DreamTeamResponse {
   gw: number;
   players: DreamTeamPlayer[];
 }
+
+export interface FixtureInfo {
+  gw: number;
+  opponent: string;
+  home: boolean;
+  difficulty: 1 | 2 | 3 | 4 | 5;
+}
+
+export interface PoolPlayer {
+  id: number;
+  webName: string;
+  firstName: string;
+  lastName: string;
+  team: number;
+  teamCode: number;
+  teamShortName: string;
+  position: PlayerPosition;
+  nowCost: number;
+  totalPoints: number;
+  eventPoints: number;
+  status: PlayerStatus;
+  chanceOfPlaying: number | null;
+  news: string;
+  selectedByPercent: string;
+  form: string;
+  nextFixtures: FixtureInfo[];
+}
+
+export interface PlayerPoolResponse {
+  players: PoolPlayer[];
+}
