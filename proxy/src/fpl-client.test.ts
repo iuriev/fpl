@@ -131,4 +131,33 @@ describe('FPL Client', () => {
       expect(global.fetch).toHaveBeenCalledWith('https://fantasy.premierleague.com/api/event/1/live/');
     });
   });
+
+  describe('getFixtures', () => {
+    it('calls /fixtures/?event={gw} and returns fixture array', async () => {
+      const mockData = [
+        {
+          id: 1,
+          event: 3,
+          team_h: 1,
+          team_a: 14,
+          team_h_difficulty: 3,
+          team_a_difficulty: 2,
+          kickoff_time: '2025-09-01T15:00:00Z',
+          finished: false,
+        },
+      ];
+
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockData,
+      });
+
+      const result = await fplClient.getFixtures(3);
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        'https://fantasy.premierleague.com/api/fixtures/?event=3'
+      );
+      expect(result).toEqual(mockData);
+    });
+  });
 });

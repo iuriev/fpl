@@ -12,6 +12,7 @@ export interface FPLBootstrapStatic {
     name: string;
     deadline_time: string;
     is_current: boolean;
+    is_next: boolean;
     finished: boolean;
     average_entry_score: number;
     highest_score: number;
@@ -32,6 +33,12 @@ export interface FPLBootstrapStatic {
     chance_of_playing_this_round: number | null;
     news: string;
     total_points: number;
+    first_name: string;
+    second_name: string;
+    now_cost: number;
+    event_points: number;
+    form: string;
+    selected_by_percent: string;
   }>;
   element_types: Array<{
     id: number;
@@ -70,6 +77,8 @@ export interface FPLPicks {
     event_transfers: number;
     event_transfers_cost: number;
     points_on_bench: number;
+    bank: number;
+    value: number;
   };
   picks: Array<{
     element: number;
@@ -128,6 +137,17 @@ export interface FPLLive {
   }>;
 }
 
+export interface FPLFixture {
+  id: number;
+  event: number;
+  team_h: number;
+  team_a: number;
+  team_h_difficulty: number;
+  team_a_difficulty: number;
+  kickoff_time: string | null;
+  finished: boolean;
+}
+
 async function fetchFPL<T>(path: string): Promise<T> {
   const url = `${FPL_BASE_URL}${path}`;
   const response = await fetch(url);
@@ -159,4 +179,8 @@ export async function getHistory(teamId: number): Promise<FPLHistory> {
 
 export async function getDreamTeam(gameweek: number): Promise<FPLDreamTeam> {
   return fetchFPL(`/dream-team/${gameweek}/`);
+}
+
+export async function getFixtures(gameweek: number): Promise<FPLFixture[]> {
+  return fetchFPL(`/fixtures/?event=${gameweek}`);
 }
