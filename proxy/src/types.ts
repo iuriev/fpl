@@ -120,6 +120,24 @@ export interface TopPlayersSeasonResponse {
   players: TopPlayer[];
 }
 
+export interface TeamInfo {
+  id: number;
+  code: number;
+  name: string;
+  shortName: string;
+}
+
+export interface TeamsResponse {
+  teams: TeamInfo[];
+}
+
+export interface TeamPlayersResponse {
+  teamCode: number;
+  teamName: string;
+  teamShortName: string;
+  players: TopPlayer[];
+}
+
 export interface DreamTeamPlayer {
   id: number;
   webName: string;

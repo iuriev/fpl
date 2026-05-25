@@ -7,6 +7,7 @@ import * as gameweeksService from './gameweeks-service';
 import * as historyService from './history-service';
 import * as leaguesService from './leagues-service';
 import * as squadService from './squad-service';
+import * as teamService from './team-service';
 import * as topPlayersService from './top-players-service';
 import { MAX_GAMEWEEK } from './types';
 
@@ -159,6 +160,38 @@ app.get('/api/dream-team/:gw', async (c) => {
     }
     console.error('Error fetching dream team:', error);
     return c.json({ error: 'Unable to fetch dream team' }, { status: 500 });
+  }
+});
+
+// GET /api/teams
+app.get('/api/teams', async (c) => {
+  try {
+    const result = await teamService.getTeams();
+    return c.json(result);
+  } catch (error) {
+    console.error('Error fetching teams:', error);
+    return c.json({ error: 'Unable to fetch teams' }, { status: 500 });
+  }
+});
+
+// GET /api/team-players/:teamCode
+app.get('/api/team-players/:teamCode', async (c) => {
+  const teamCode = parseInt(c.req.param('teamCode'), 10);
+
+  if (isNaN(teamCode) || teamCode < 1) {
+    return c.json({ error: 'Invalid team code' }, { status: 400 });
+  }
+
+  try {
+    const result = await teamService.getTeamPlayers(teamCode);
+    return c.json(result);
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    if (errorMsg.includes('not found')) {
+      return c.json({ error: `Team ${teamCode} not found` }, { status: 404 });
+    }
+    console.error('Error fetching team players:', error);
+    return c.json({ error: 'Unable to fetch team players' }, { status: 500 });
   }
 });
 
