@@ -48,6 +48,8 @@ export interface SquadPlayer {
   position: PlayerPosition;
   club: string;
   teamCode: number;
+  teamId: number;
+  nowCost: number;
   points: number;
   isCaptain: boolean;
   isViceCaptain: boolean;
@@ -63,6 +65,7 @@ export interface SquadSummary {
   highestPoints?: number;
   rank?: number;
   transfers: number;
+  bank?: number;
 }
 
 export interface HistoryGameweek {

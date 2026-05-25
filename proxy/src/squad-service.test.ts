@@ -30,12 +30,18 @@ describe('Squad Service', () => {
           {
             id: 1,
             web_name: 'Saka',
+            first_name: 'Bukayo',
+            second_name: 'Saka',
             team: 1,
             team_code: 3,
             element_type: 3,
             status: 'a',
             chance_of_playing_this_round: null,
             news: '',
+            now_cost: 85,
+            event_points: 15,
+            form: '6.7',
+            selected_by_percent: '44.5',
           },
         ],
         element_types: [{ id: 3, singular_name_short: 'MID' }],
@@ -50,6 +56,8 @@ describe('Squad Service', () => {
           event_transfers: 1,
           event_transfers_cost: 4,
           points_on_bench: 5,
+          bank: 15,
+          value: 1010,
         },
         picks: [
           {
@@ -113,6 +121,9 @@ describe('Squad Service', () => {
       expect(result.starters[0].stats.minutes).toBe(90);
       expect(result.starters[0].stats.bonus).toBe(3);
       expect(result.starters[0].stats.yellow_cards).toBe(1);
+      expect(result.summary.bank).toBe(15);
+      expect(result.starters[0].teamId).toBe(1);
+      expect(result.starters[0].nowCost).toBe(85);
     });
 
     it('splits starters and bench correctly', async () => {
