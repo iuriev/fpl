@@ -1,0 +1,99 @@
+.pitchBench {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.pitchWrap {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.pitchFill {
+  width: 100%;
+  height: 100%;
+}
+
+.pitchRows {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding: 0.5rem 0;
+}
+
+.playerRow {
+  display: flex;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.bench {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: var(--fpl-space-xs) var(--fpl-space-md);
+  background: rgba(0, 0, 0, 0.25);
+  border-top: 1px dashed var(--fpl-bg-hair);
+}
+
+.playerBtn {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  border-radius: var(--fpl-radius-sm);
+  outline-offset: 2px;
+}
+
+.playerBtn_out::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: var(--fpl-radius-sm);
+  border: 2px solid #E8604C;
+  pointer-events: none;
+  animation: pulse-out 1.2s ease-in-out infinite;
+}
+
+.playerBtn_in::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: var(--fpl-radius-sm);
+  border: 2px solid #00FF87;
+  pointer-events: none;
+}
+
+.variantBadge {
+  position: absolute;
+  top: -0.25rem;
+  right: -0.25rem;
+  font-size: 0.5rem;
+  font-weight: 800;
+  padding: 0.0625rem 0.1875rem;
+  border-radius: 0.125rem;
+  letter-spacing: 0.04em;
+}
+
+.variantBadge[data-variant='out'] {
+  background: #E8604C;
+  color: #fff;
+}
+
+.variantBadge[data-variant='in'] {
+  background: #00FF87;
+  color: #002210;
+}
+
+@keyframes pulse-out {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}

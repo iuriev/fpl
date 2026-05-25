@@ -1,0 +1,12 @@
+.bar {
+  flex-shrink: 0;
+  display: flex;
+  gap: var(--fpl-space-sm);
+  padding: var(--fpl-space-sm) var(--fpl-space-md);
+  background: var(--fpl-bg-deep);
+  border-top: 1px solid var(--fpl-bg-hair);
+}
+
+.bar > * {
+  flex: 1;
+}

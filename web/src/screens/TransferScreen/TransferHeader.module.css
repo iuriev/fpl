@@ -1,0 +1,98 @@
+.header {
+  flex-shrink: 0;
+  padding: var(--fpl-space-md) var(--fpl-space-md) var(--fpl-space-sm);
+  background: var(--fpl-bg-deep);
+  border-bottom: 1px solid var(--fpl-bg-hair);
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--fpl-space-sm);
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--fpl-text-primary);
+}
+
+.chips {
+  display: flex;
+  gap: 0.375rem;
+}
+
+.chipBtn {
+  padding: 0.25rem 0.625rem;
+  border-radius: 1rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--fpl-bg-hair);
+  color: var(--fpl-muted-soft);
+  cursor: pointer;
+  letter-spacing: 0.04em;
+}
+
+.chipBtn_active {
+  background: var(--fpl-success, #00FF87);
+  color: #002210;
+  border-color: transparent;
+}
+
+.statsBar {
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-sm);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  flex: 1;
+}
+
+.statValue {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--fpl-text-primary);
+}
+
+.statValue_amber { color: var(--fpl-warning, #E8C347); }
+.statValue_red   { color: var(--fpl-danger, #E8604C); }
+
+.statLabel {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--fpl-muted-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.freeBtn {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--fpl-text-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline dotted;
+}
+
+.divider {
+  width: 1px;
+  height: 1.75rem;
+  background: var(--fpl-bg-hair);
+  flex-shrink: 0;
+}
+
+.chipActiveLabel {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--fpl-success, #00FF87);
+  text-align: center;
+}
