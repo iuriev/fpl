@@ -12,7 +12,7 @@ Scope: two new proxy endpoints, new screen with tab navigation. Visual design de
 
 **Goals:**
 - Top Players screen with two tabs: **This GW** and **Season**.
-- Each tab shows top 20 players (rank 1–20).
+- Each tab shows top 100 players (rank 1–100), revealed progressively as the user scrolls.
 - **This GW tab:** ranked by `stats.total_points` from `/event/{gw}/live/`, for the gameweek
   selected by the user (prev/next navigation, bounded to finished gameweeks, defaults to current).
 - **Season tab:** ranked by `total_points` from `bootstrap-static` `elements[]`.
@@ -23,7 +23,7 @@ Scope: two new proxy endpoints, new screen with tab navigation. Visual design de
 
 **Non-Goals:**
 - Filtering by position or club (backlog).
-- More than top 20 / pagination (backlog).
+- More than top 100 / full pagination (backlog).
 - Points breakdown per player (deferred — would need `/element-summary/{id}/`).
 
 ## UX Specification
@@ -56,15 +56,17 @@ Static list for the current season. No gameweek selector.
 
 ## Decisions
 
-**D1 — Top 20 only.** Sufficient to scan for household names and to avoid very long lists on
-mobile. Can be extended later.
+**D1 — Top 100 with progressive rendering.** Returns the top 100 players from the proxy
+(a single API response). The frontend renders the first 20 rows immediately and reveals 20
+more on each scroll-to-bottom via IntersectionObserver, keeping initial paint fast on mobile
+without pagination complexity.
 
 **D2 — No new FPL API calls.** Both data sources (`/event/{gw}/live/` and `bootstrap-static`)
 are already fetched and cached by the proxy. The new endpoints are projections of existing
 cached data.
 
-**D3 — Proxy sorts and slices.** Sorting and slicing to top 20 happens in the proxy to keep
-payloads small. Frontend receives a ready-ranked array.
+**D3 — Proxy sorts and slices.** Sorting and slicing to top 100 happens in the proxy. Frontend
+receives a ready-ranked array and renders it progressively.
 
 **D4 — GW tab defaults to current GW.** The URL carries `?gw=N` so the selected gameweek is
 shareable. If no `gw` param is present, the proxy's current-gameweek logic is used.
