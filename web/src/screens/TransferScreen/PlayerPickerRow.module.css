@@ -1,0 +1,62 @@
+.row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: var(--fpl-space-sm);
+  padding: var(--fpl-space-sm) var(--fpl-space-md);
+  border-bottom: 1px solid var(--fpl-bg-hair);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.row:hover:not(.row_disabled) {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.row_disabled {
+  opacity: 0.28;
+  cursor: default;
+  pointer-events: none;
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--fpl-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  font-size: 0.6875rem;
+  color: var(--fpl-muted-soft);
+}
+
+.clubTag {
+  font-size: 0.625rem;
+  color: var(--fpl-warning, #E8C347);
+}
+
+.fixtures {
+  display: flex;
+  gap: 0.125rem;
+}
+
+.cost {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--fpl-text-primary);
+  white-space: nowrap;
+}
+
+.cost_over {
+  color: var(--fpl-danger, #E8604C);
+}
