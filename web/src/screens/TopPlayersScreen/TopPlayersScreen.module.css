@@ -1,0 +1,338 @@
+.screen {
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--fpl-bg-deep);
+  color: var(--fpl-text);
+}
+
+.header {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--fpl-space-md);
+  padding: var(--fpl-space-md) var(--fpl-space-xl3) 0;
+  border-bottom: 1px solid var(--fpl-bg-hair);
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-xs);
+  background: none;
+  border: none;
+  color: var(--fpl-muted);
+  font: var(--fpl-fw-medium) var(--fpl-fs-body) var(--fpl-font-display);
+  cursor: pointer;
+  padding: var(--fpl-space-xs) 0;
+  transition: color 120ms;
+  white-space: nowrap;
+  align-self: flex-start;
+}
+
+.backBtn:hover {
+  color: var(--fpl-text);
+}
+
+.backBtn svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+.title {
+  display: block;
+  font: var(--fpl-fw-bold) var(--fpl-fs-h3) / 1.1 var(--fpl-font-display);
+  letter-spacing: var(--fpl-tr-head-s);
+  color: var(--fpl-text);
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0;
+  align-self: flex-start;
+}
+
+.tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: var(--fpl-space-sm) var(--fpl-space-xl);
+  font: var(--fpl-fw-semibold) var(--fpl-fs-body-s) var(--fpl-font-display);
+  color: var(--fpl-muted);
+  cursor: pointer;
+  transition: color 120ms, border-color 120ms;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: var(--fpl-text-soft);
+}
+
+.tabActive {
+  color: var(--fpl-accent);
+  border-bottom-color: var(--fpl-accent);
+}
+
+/* GW navigator subheader */
+.gwNav {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--fpl-space-sm) var(--fpl-space-xl3);
+  border-bottom: 1px solid var(--fpl-bg-hair);
+}
+
+.gwLabel {
+  font: var(--fpl-fw-bold) var(--fpl-fs-title) / 1 var(--fpl-font-display);
+  color: var(--fpl-text);
+  letter-spacing: var(--fpl-tr-head-s);
+}
+
+.navBtn {
+  width: var(--fpl-size-arrow-btn);
+  height: var(--fpl-size-arrow-btn);
+  border-radius: var(--fpl-radius-pill);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--fpl-bg-hair);
+  color: var(--fpl-muted-soft);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 120ms, border-color 120ms, color 120ms;
+  padding: 0;
+}
+
+.navBtn svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.chevronRight {
+  transform: rotate(180deg);
+}
+
+.navBtn:not(:disabled) {
+  background: var(--fpl-accent-faint);
+  border-color: var(--fpl-accent);
+  color: var(--fpl-accent);
+}
+
+.navBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Team selector subheader */
+.teamNav {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-md);
+  padding: var(--fpl-space-sm) var(--fpl-space-xl3);
+  border-bottom: 1px solid var(--fpl-bg-hair);
+}
+
+.teamSelectLabel {
+  font: var(--fpl-fw-semibold) var(--fpl-fs-body-s) var(--fpl-font-display);
+  color: var(--fpl-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.teamPickerTrigger {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fpl-space-sm);
+  background: var(--fpl-bg-soft);
+  border: 1px solid var(--fpl-bg-hair);
+  border-radius: var(--fpl-radius-md);
+  color: var(--fpl-text);
+  padding: var(--fpl-space-xs) var(--fpl-space-md);
+  cursor: pointer;
+  transition: border-color 120ms;
+  text-align: left;
+}
+
+.teamPickerTrigger:focus-visible {
+  outline: 2px solid var(--fpl-accent);
+  outline-offset: 2px;
+}
+
+.teamPickerTrigger:hover {
+  border-color: var(--fpl-muted-soft);
+}
+
+.teamPickerValue {
+  font: var(--fpl-fw-medium) var(--fpl-fs-body-s) var(--fpl-font-display);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.teamPickerChevron {
+  width: 0.75rem;
+  height: 0.75rem;
+  color: var(--fpl-muted);
+  flex-shrink: 0;
+}
+
+/* Team picker bottom sheet list */
+.teamList {
+  display: flex;
+  flex-direction: column;
+  padding: var(--fpl-space-xs) 0 var(--fpl-space-xl4);
+}
+
+.teamOption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--fpl-space-base) var(--fpl-space-xl3);
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--fpl-bg-hair);
+  color: var(--fpl-text);
+  font: var(--fpl-fw-regular) var(--fpl-fs-body) var(--fpl-font-display);
+  cursor: pointer;
+  text-align: left;
+  transition: background 100ms;
+  min-height: 3rem;
+}
+
+.teamOption:last-child {
+  border-bottom: none;
+}
+
+.teamOption:active {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.teamOptionSelected {
+  color: var(--fpl-accent);
+  font-weight: var(--fpl-fw-semibold);
+}
+
+.teamOptionName {
+  flex: 1;
+}
+
+.teamOptionCheck {
+  width: 1rem;
+  height: 1rem;
+  color: var(--fpl-accent);
+  flex-shrink: 0;
+}
+
+/* Body / list */
+.body {
+  flex: 1;
+  overflow: auto;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* States */
+.stateCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--fpl-space-md);
+  padding: var(--fpl-space-xl7) var(--fpl-space-xl);
+  text-align: center;
+}
+
+.stateText {
+  color: var(--fpl-muted);
+  font-size: var(--fpl-fs-body);
+}
+
+/* Lazy-load sentinel (IntersectionObserver target) */
+.sentinel {
+  height: 1px;
+}
+
+/* Skeleton rows */
+.skeletonRow {
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-md);
+  padding: var(--fpl-space-sm) var(--fpl-space-xl3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.skeletonCell {
+  border-radius: var(--fpl-radius-xs);
+  background: var(--fpl-bg-hair);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.14) 50%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  background-size: 200% 100%;
+  animation: fplShimmer 1.6s ease-in-out infinite;
+}
+
+.skeletonRank {
+  width: 1.5rem;
+  height: 0.875rem;
+  flex-shrink: 0;
+}
+
+.skeletonJersey {
+  width: var(--fpl-size-jersey-m);
+  height: var(--fpl-size-jersey-m);
+  border-radius: var(--fpl-radius-sm);
+  flex-shrink: 0;
+}
+
+.skeletonInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.skeletonName {
+  height: 0.875rem;
+  width: 60%;
+  max-width: 8rem;
+}
+
+.skeletonMeta {
+  height: 0.75rem;
+  width: 40%;
+  max-width: 5rem;
+}
+
+.skeletonPoints {
+  width: 2rem;
+  height: 0.875rem;
+  flex-shrink: 0;
+}
+
+@media (min-width: 37.5rem) {
+  .screen {
+    max-width: 30rem;
+    margin: 0 auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeletonCell {
+    animation: none;
+  }
+}
