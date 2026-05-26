@@ -1,14 +1,17 @@
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 
 import { copy } from '@/lib/copy';
-import type { PlayerStatus, SquadPlayer } from '@/types';
+import type { FixtureInfo, PlayerStatus, SquadPlayer } from '@/types';
 
+import { FdrChip } from '../FdrChip/FdrChip';
 import { Jersey } from '../Jersey/Jersey';
 import styles from './PlayerCard.module.css';
 
 export interface PlayerCardProps {
   player: SquadPlayer;
   size?: 'large' | 'medium';
+  hidePoints?: boolean;
+  nextFixture?: FixtureInfo;
 }
 
 function availBadge(status: PlayerStatus): { char: string; variant: 'warn' | 'error' } | null {
@@ -33,7 +36,12 @@ function statusLabel(status: PlayerStatus): string {
   return labels[status] ?? '';
 }
 
-export const PlayerCard: React.FC<PlayerCardProps> = ({ player, size = 'medium' }) => {
+export const PlayerCard: React.FC<PlayerCardProps> = ({
+  player,
+  size = 'medium',
+  hidePoints = false,
+  nextFixture,
+}) => {
   const [showStatus, setShowStatus] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const popupId = useId();
@@ -107,8 +115,19 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({ player, size = 'medium' 
 
       <div className={styles.pill}>
         <span className={styles.name}>{player.name}</span>
-        <span className={styles.points}>{player.points}</span>
+        {!hidePoints && <span className={styles.points}>{player.points}</span>}
       </div>
+
+      {nextFixture && (
+        <div className={styles.fixtureRow}>
+          <span className={styles.teamAbbrev}>{player.club}</span>
+          <FdrChip
+            opponent={nextFixture.opponent}
+            home={nextFixture.home}
+            difficulty={nextFixture.difficulty}
+          />
+        </div>
+      )}
 
       {showStatus && badge && (
         <div
