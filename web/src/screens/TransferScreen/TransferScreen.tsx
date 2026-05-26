@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useGameweeks, usePlayerPool, useSquad } from '@/api/queries';
 import { Button } from '@/components/ui/Button/Button';
@@ -37,6 +37,7 @@ function makeDefaultDraft(teamId: number, targetGw: number): TransferDraft {
 }
 
 export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
+  const navigate = useNavigate();
   const [, setSearchParams] = useSearchParams();
   const { data: gameweeks } = useGameweeks();
   const currentGw = gameweeks?.current ?? null;
@@ -50,6 +51,12 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   const [selectedPlayerId, setSelectedPlayerId] = useState<number | null>(null);
   const [staleToast, setStaleToast] = useState<string | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => {
+    if (!staleToast) return;
+    const t = setTimeout(() => setStaleToast(null), 5000);
+    return () => clearTimeout(t);
+  }, [staleToast]);
 
   useEffect(() => {
     if (nextGw === null) return;
@@ -144,8 +151,17 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   }, [selectedPlayerId, allPoolPlayers, originalSquad]);
 
   const candidates = outPlayer
-    ? allPoolPlayers.filter((p) => p.position === outPlayer.position)
+    ? outPlayer.position === 'GK'
+      ? allPoolPlayers.filter((p) => p.position === 'GK')
+      : allPoolPlayers.filter((p) => p.position !== 'GK')
     : [];
+
+  const poolLookup = useMemo(
+    () => new Map(allPoolPlayers.map((p) => [p.id, p])),
+    [allPoolPlayers],
+  );
+
+  const isOutfield = outPlayer ? outPlayer.position !== 'GK' : false;
 
   const squadPlayerIds = useMemo(
     () => new Set(displaySquad.map((p) => p.id)),
@@ -160,9 +176,12 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
     return counts;
   }, [displaySquad]);
 
-  const availableBudget = outPlayer
-    ? currentBank + (originalSquad.find((s) => s.id === outPlayer.id)?.nowCost ?? 0)
-    : currentBank;
+  const availableBudget = useMemo(() => {
+    if (!outPlayer) return currentBank;
+    const chainSwap = draft?.swaps.find((s) => s.inId === outPlayer.id);
+    if (chainSwap) return currentBank + outPlayer.nowCost;
+    return currentBank + (originalSquad.find((s) => s.id === outPlayer.id)?.nowCost ?? 0);
+  }, [outPlayer, currentBank, draft, originalSquad]);
 
   const nameMap = useMemo(() => {
     const m = new Map<number, string>();
@@ -181,11 +200,22 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
 
   const handleSelectReplacement = (inPlayer: PoolPlayer) => {
     if (selectedPlayerId === null) return;
-    const newSwap: TransferSwap = { outId: selectedPlayerId, inId: inPlayer.id };
-    updateDraft((d) => ({
-      ...d,
-      swaps: [...d.swaps.filter((s) => s.outId !== selectedPlayerId), newSwap],
-    }));
+    updateDraft((d) => {
+      const chainSwap = d.swaps.find((s) => s.inId === selectedPlayerId);
+      let newSwaps: TransferSwap[];
+      if (chainSwap) {
+        if (inPlayer.id === chainSwap.outId) {
+          newSwaps = d.swaps.filter((s) => s.inId !== selectedPlayerId && s.outId !== selectedPlayerId);
+        } else {
+          newSwaps = d.swaps
+            .map((s) => (s.inId === selectedPlayerId ? { outId: s.outId, inId: inPlayer.id } : s))
+            .filter((s) => s.outId !== selectedPlayerId);
+        }
+      } else {
+        newSwaps = [...d.swaps.filter((s) => s.outId !== selectedPlayerId), { outId: selectedPlayerId, inId: inPlayer.id }];
+      }
+      return { ...d, swaps: newSwaps };
+    });
     setSelectedPlayerId(null);
   };
 
@@ -219,6 +249,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
           cost={transferCost}
           chip={draft.chip}
           nextGw={nextGw}
+          onBack={() => navigate(`/?teamId=${teamId}`)}
           onChipToggle={handleChipToggle}
           onFreeTransfersChange={handleFreeTransfersChange}
         />
@@ -256,6 +287,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
               outPlayerId={selectedPlayerId}
               inPlayerIds={inPlayerIds}
               onPlayerClick={handlePlayerClick}
+              poolLookup={poolLookup}
             />
           </div>
 
@@ -285,6 +317,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
           availableBudget={availableBudget}
           squadTeamCounts={squadTeamCounts}
           squadPlayerIds={squadPlayerIds}
+          isOutfield={isOutfield}
           onSelect={handleSelectReplacement}
           onClose={() => setSelectedPlayerId(null)}
         />
