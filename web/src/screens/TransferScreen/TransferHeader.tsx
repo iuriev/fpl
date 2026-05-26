@@ -102,7 +102,7 @@ export const TransferHeader: React.FC<TransferHeaderProps> = ({
               <span
                 className={`${styles.statValue} ${cost > 0 ? (cost >= 8 ? styles.statValue_red : styles.statValue_amber) : ''}`}
               >
-                -{cost} pts
+                {cost > 0 ? `-${cost}` : '0'} pts
               </span>
               <span className={styles.statLabel}>{copy.transfersCost}</span>
             </>

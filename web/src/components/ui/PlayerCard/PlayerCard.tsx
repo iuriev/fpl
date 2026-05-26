@@ -120,7 +120,6 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
 
       {nextFixture && (
         <div className={styles.fixtureRow}>
-          <span className={styles.teamAbbrev}>{player.club}</span>
           <FdrChip
             opponent={nextFixture.opponent}
             home={nextFixture.home}
