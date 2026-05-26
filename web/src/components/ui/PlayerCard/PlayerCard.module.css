@@ -32,7 +32,7 @@
 .capBadge {
   position: absolute;
   top: -0.1875rem;
-  left: 0.5rem;
+  right: 0.5rem;
   z-index: 2;
   width: var(--fpl-size-status-badge);
   height: var(--fpl-size-status-badge);
@@ -58,7 +58,7 @@
 .availBadge {
   position: absolute;
   top: -0.1875rem;
-  right: 0.5rem;
+  left: 0.5rem;
   z-index: 2;
   width: var(--fpl-size-status-badge);
   height: var(--fpl-size-status-badge);
@@ -163,4 +163,21 @@
   font-size: var(--fpl-fs-body-xs);
   color: var(--fpl-text-soft);
   line-height: 1.5;
+}
+
+.fixtureRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-top: 0.125rem;
+}
+
+.teamAbbrev {
+  font-family: var(--fpl-font-display);
+  font-size: var(--fpl-fs-cap);
+  font-weight: var(--fpl-fw-semibold);
+  color: var(--fpl-muted-soft);
+  letter-spacing: var(--fpl-tr-head-s);
+  line-height: 1;
 }
