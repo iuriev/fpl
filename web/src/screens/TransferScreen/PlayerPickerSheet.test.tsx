@@ -1,15 +1,29 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { PlayerPickerSheet } from './PlayerPickerSheet';
+
 import type { PoolPlayer } from '@/types';
 
+import { PlayerPickerSheet } from './PlayerPickerSheet';
+
 const makePoolPlayer = (id: number, overrides?: Partial<PoolPlayer>): PoolPlayer => ({
-  id, webName: `Player${id}`, firstName: 'A', lastName: 'B',
-  team: 1, teamCode: 3, teamShortName: 'ARS', position: 'MID',
-  nowCost: 80, totalPoints: 100, eventPoints: 10,
-  status: 'a', chanceOfPlaying: null, news: '',
-  selectedByPercent: '10.0', form: '5.0', nextFixtures: [],
+  id,
+  webName: `Player${id}`,
+  firstName: 'A',
+  lastName: 'B',
+  team: 1,
+  teamCode: 3,
+  teamShortName: 'ARS',
+  position: 'MID',
+  nowCost: 80,
+  totalPoints: 100,
+  eventPoints: 10,
+  status: 'a',
+  chanceOfPlaying: null,
+  news: '',
+  selectedByPercent: '10.0',
+  form: '5.0',
+  nextFixtures: [],
   ...overrides,
 });
 
@@ -21,6 +35,7 @@ describe('PlayerPickerSheet', () => {
     availableBudget: 150,
     squadTeamCounts: new Map<number, number>([[1, 1]]),
     squadPlayerIds: new Set([1]),
+    isOutfield: true,
     onSelect: vi.fn(),
     onClose: vi.fn(),
   };
@@ -66,9 +81,53 @@ describe('PlayerPickerSheet', () => {
         {...defaultProps}
         candidates={[makePoolPlayer(2, { webName: 'Expensive', nowCost: 200 })]}
         availableBudget={100}
-      />
+      />,
     );
     const row = screen.getByText('Expensive').closest('[data-over-budget]');
     expect(row?.getAttribute('data-over-budget')).toBe('true');
+  });
+
+  it('shows position tabs when isOutfield is true', () => {
+    render(<PlayerPickerSheet {...defaultProps} isOutfield={true} />);
+    expect(screen.getByText('ALL')).toBeInTheDocument();
+    expect(screen.getByText('DEF')).toBeInTheDocument();
+    expect(screen.getByText('MID')).toBeInTheDocument();
+    expect(screen.getByText('FWD')).toBeInTheDocument();
+  });
+
+  it('hides position tabs when isOutfield is false', () => {
+    render(<PlayerPickerSheet {...defaultProps} isOutfield={false} />);
+    expect(screen.queryByText('ALL')).not.toBeInTheDocument();
+    expect(screen.queryByText('DEF')).not.toBeInTheDocument();
+  });
+
+  it('shows Sort button', () => {
+    render(<PlayerPickerSheet {...defaultProps} />);
+    expect(screen.getByText('Sort')).toBeInTheDocument();
+  });
+
+  it('filters outfield candidates by position tab', async () => {
+    const user = userEvent.setup();
+    const candidates = [
+      makePoolPlayer(2, { webName: 'DefPlayer', position: 'DEF' }),
+      makePoolPlayer(3, { webName: 'MidPlayer', position: 'MID' }),
+    ];
+    render(<PlayerPickerSheet {...defaultProps} candidates={candidates} isOutfield={true} />);
+    await user.click(screen.getByText('DEF'));
+    expect(screen.getByText('DefPlayer')).toBeInTheDocument();
+    expect(screen.queryByText('MidPlayer')).not.toBeInTheDocument();
+  });
+
+  it('shows all candidates when ALL tab is active', async () => {
+    const user = userEvent.setup();
+    const candidates = [
+      makePoolPlayer(2, { webName: 'DefPlayer', position: 'DEF' }),
+      makePoolPlayer(3, { webName: 'MidPlayer', position: 'MID' }),
+    ];
+    render(<PlayerPickerSheet {...defaultProps} candidates={candidates} isOutfield={true} />);
+    await user.click(screen.getByText('DEF'));
+    await user.click(screen.getByText('ALL'));
+    expect(screen.getByText('DefPlayer')).toBeInTheDocument();
+    expect(screen.getByText('MidPlayer')).toBeInTheDocument();
   });
 });

@@ -35,27 +35,57 @@
   color: var(--fpl-muted-soft);
 }
 
-.sortPills {
+.filterRow {
   display: flex;
-  gap: 0.25rem;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--fpl-space-xs);
 }
 
-.sortPill {
+.posTabs {
+  display: flex;
+  flex: 1;
+  gap: 0.25rem;
+}
+
+.posTab {
   padding: 0.25rem 0.5rem;
   border-radius: 1rem;
   font-size: 0.6875rem;
   font-weight: 600;
+  font-family: var(--fpl-font-display);
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--fpl-bg-hair);
   color: var(--fpl-muted-soft);
   cursor: pointer;
+  letter-spacing: 0.04em;
 }
 
-.sortPill_active {
-  background: var(--fpl-accent, #00FF87);
+.posTab_active {
+  background: var(--fpl-accent);
   color: #002210;
   border-color: transparent;
+}
+
+.sortBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 1rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  font-family: var(--fpl-font-display);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--fpl-bg-hair);
+  color: var(--fpl-muted-soft);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.sortBtn_alone {
+  margin-left: auto;
 }
 
 .list {
