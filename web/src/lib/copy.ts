@@ -119,6 +119,7 @@ export const copy = {
   topPlayersTeamLoadError: "Couldn't load team players",
 
   // Transfer planner screen
+  transfersBack: 'Squad',
   transfersTitle: 'Transfers',
   transfersNavLink: 'Transfer Planner',
   transfersBank: 'Bank',
@@ -150,6 +151,8 @@ export const copy = {
   transfersNFree: '{n} of {m} free used',
   transfersSavedToast: 'Plan saved',
   transfersStaleToast: 'Your saved plan was for GW{n} which has passed. Starting fresh.',
+  transfersSortButton: 'Sort',
+  transfersPositionAll: 'ALL',
 
   // View toggle
   viewPitch: 'Pitch',
