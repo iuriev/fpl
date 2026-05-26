@@ -3,7 +3,7 @@ import { flushSync } from 'react-dom';
 import { useSearchParams } from 'react-router-dom';
 
 import { ApiError } from '@/api/client';
-import { useEntry, useGameweeks, useSquad } from '@/api/queries';
+import { useEntry, useGameweeks, usePlayerPool, useSquad } from '@/api/queries';
 import { Button } from '@/components/ui/Button/Button';
 import { Drawer } from '@/components/ui/Drawer/Drawer';
 import { ListView, ListViewSkeleton } from '@/components/ui/ListView/ListView';
@@ -52,7 +52,7 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
   const { data: entry, isError: entryIsError } = useEntry(teamId);
 
   const currentGw = gameweeksData?.current ?? null;
-  const maxGw = currentGw;
+  const maxGw = currentGw !== null ? currentGw + 1 : null;
 
   const gwParam = searchParams.get('gw');
   const selectedGw = useMemo(() => {
@@ -70,6 +70,15 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
     entryIsError ? null : teamId,
     selectedGw,
   );
+
+  const { data: poolData } = usePlayerPool();
+
+  const isNextGw = currentGw !== null && selectedGw !== null && selectedGw === currentGw + 1;
+
+  const poolLookup = useMemo(() => {
+    if (!isNextGw || !poolData) return null;
+    return new Map(poolData.players.map((p) => [p.id, p]));
+  }, [isNextGw, poolData]);
 
   const isNoSquad = squadIsError && squadError instanceof ApiError && squadError.status === 404;
   const isSquadError = squadIsError && !isNoSquad;
@@ -278,7 +287,12 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
                       {POSITION_ORDER.map((pos) => (
                         <div key={pos} className={styles.playerRow}>
                           {positionGroups[pos].map((player) => (
-                            <PlayerCard key={player.id} player={player} size="large" />
+                            <PlayerCard
+                              key={player.id}
+                              player={player}
+                              size="large"
+                              nextFixture={poolLookup?.get(player.id)?.nextFixtures[0]}
+                            />
                           ))}
                         </div>
                       ))}

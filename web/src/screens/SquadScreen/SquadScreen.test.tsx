@@ -9,6 +9,7 @@ vi.mock('@/api/queries', () => ({
   useEntry: () => ({ data: fixtureEntry, isError: false }),
   useGameweeks: () => ({ data: fixtureGameweeks }),
   useSquad: () => ({ data: null, isLoading: false, isError: false, error: null, refetch: vi.fn() }),
+  usePlayerPool: () => ({ data: null }),
 }));
 
 import { SquadScreen } from './SquadScreen';
