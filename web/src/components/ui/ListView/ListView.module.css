@@ -4,8 +4,9 @@
   min-height: 0;
   background: var(--fpl-bg);
   border-top: 1px solid var(--fpl-bg-hair);
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
   --scrollbar-thumb: rgba(255, 255, 255, 0.2);
   --scrollbar-track: transparent;
   scrollbar-width: thin;
@@ -15,7 +16,6 @@
 @supports not (scrollbar-color: auto) {
   .scrollWrap::-webkit-scrollbar {
     width: 0.3125rem;
-    height: 0.3125rem;
   }
   .scrollWrap::-webkit-scrollbar-thumb {
     background: var(--scrollbar-thumb);
@@ -24,7 +24,30 @@
   .scrollWrap::-webkit-scrollbar-track {
     background: var(--scrollbar-track);
   }
-  .scrollWrap::-webkit-scrollbar-corner {
+}
+
+.tableScrollArea {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: none;
+  will-change: scroll-position;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+@supports not (scrollbar-color: auto) {
+  .tableScrollArea::-webkit-scrollbar {
+    height: 0.3125rem;
+  }
+  .tableScrollArea::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 0.25rem;
+  }
+  .tableScrollArea::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
+  .tableScrollArea::-webkit-scrollbar-corner {
     background: var(--fpl-bg-deep);
   }
 }
@@ -85,6 +108,7 @@
   top: 0;
   left: 0;
   z-index: 4;
+  will-change: transform;
   background: var(--fpl-bg-deep);
   padding: 0 0.75rem;
   height: 2.125rem;
@@ -152,6 +176,7 @@
   position: sticky;
   left: 0;
   z-index: 1;
+  will-change: transform;
   background: var(--fpl-bg);
   padding: 0 0.875rem;
   vertical-align: middle;
@@ -189,6 +214,7 @@
   position: sticky;
   left: 0;
   z-index: 1;
+  will-change: transform;
   background: var(--fpl-bg);
   padding: 0.5rem 0.625rem 0.5rem 0.75rem;
   display: flex;
@@ -273,6 +299,7 @@
   position: sticky;
   left: 0;
   z-index: 1;
+  will-change: transform;
   background: var(--fpl-bg);
   padding: 0.625rem 0.625rem 0.625rem 0.75rem;
   display: flex;

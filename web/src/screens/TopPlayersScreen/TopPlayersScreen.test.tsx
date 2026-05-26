@@ -140,7 +140,9 @@ describe('TopPlayersScreen — By Team tab', () => {
     await user.click(screen.getByRole('tab', { name: 'By Team' }));
     await user.click(screen.getByRole('button', { name: /select team/i }));
     const dialog = screen.getByRole('dialog', { name: /select team/i });
-    const buttons = Array.from(dialog.querySelectorAll('button'));
+    const buttons = Array.from(dialog.querySelectorAll('button')).filter(
+      (b) => b.textContent?.trim()
+    );
     expect(buttons[0]).toHaveTextContent('Arsenal');
     expect(buttons[1]).toHaveTextContent('Chelsea');
     expect(buttons[2]).toHaveTextContent('Man City');

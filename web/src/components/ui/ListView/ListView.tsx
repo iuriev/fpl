@@ -217,24 +217,26 @@ export const ListView: React.FC<ListViewProps> = ({ starters, bench }) => {
 
   return (
     <div className={styles.scrollWrap}>
-      <table className={styles.table} style={{ minWidth: INNER_MIN_W }}>
-        <thead>
-          <ColHeader sort={sort} onSort={handleSort} />
-        </thead>
-        <tbody>
-          {sections.map(s => {
-            const sorted = sortSection(s.players);
-            return (
-              <React.Fragment key={s.id}>
-                <SectionRow label={s.label} count={s.players.length} />
-                {sorted.map((p, i) => (
-                  <PlayerRow key={p.id} player={p} isLast={i === sorted.length - 1} />
-                ))}
-              </React.Fragment>
-            );
-          })}
-        </tbody>
-      </table>
+      <div className={styles.tableScrollArea}>
+        <table className={styles.table} style={{ minWidth: INNER_MIN_W }}>
+          <thead>
+            <ColHeader sort={sort} onSort={handleSort} />
+          </thead>
+          <tbody>
+            {sections.map(s => {
+              const sorted = sortSection(s.players);
+              return (
+                <React.Fragment key={s.id}>
+                  <SectionRow label={s.label} count={s.players.length} />
+                  {sorted.map((p, i) => (
+                    <PlayerRow key={p.id} player={p} isLast={i === sorted.length - 1} />
+                  ))}
+                </React.Fragment>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
       <ColLegend />
     </div>
   );
@@ -245,16 +247,18 @@ ListView.displayName = 'ListView';
 export const ListViewSkeleton: React.FC = () => {
   return (
     <div className={styles.scrollWrap}>
-      <table className={styles.table} style={{ minWidth: INNER_MIN_W }}>
-        <thead>
-          <ColHeader sort={{ key: 'total_points', dir: 'desc' }} onSort={() => {}} />
-        </thead>
-        <tbody>
-          {Array.from({ length: 8 }).map((_, i) => (
-            <SkeletonRow key={i} />
-          ))}
-        </tbody>
-      </table>
+      <div className={styles.tableScrollArea}>
+        <table className={styles.table} style={{ minWidth: INNER_MIN_W }}>
+          <thead>
+            <ColHeader sort={{ key: 'total_points', dir: 'desc' }} onSort={() => {}} />
+          </thead>
+          <tbody>
+            {Array.from({ length: 8 }).map((_, i) => (
+              <SkeletonRow key={i} />
+            ))}
+          </tbody>
+        </table>
+      </div>
       <ColLegend />
     </div>
   );
