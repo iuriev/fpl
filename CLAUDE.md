@@ -44,6 +44,16 @@ The project is built spec-first; application code comes last. Read these before 
 - **Never commit without explicit permission.** Do not run `git commit`, `git push`, `git amend`,
   or any other git operation that modifies history or publishes changes unless the user explicitly
   asks. After finishing work, show what changed and wait for approval.
+- **Consult proactively.** When something is ambiguous or a meaningful decision has trade-offs,
+  ask — do not act silently. Favor short check-ins over autonomous choices.
+- **Domain names for components.** Name components after what they represent to the user, not
+  design-system jargon. Use `PlayerCard`, not `PlayerToken`; "Token", "Atom", "Molecule" belong
+  to the design vocabulary only.
+- **No barrel re-exports.** Do not create `index.ts` files inside component folders. Do not
+  create a global `components/index.ts` or `ui/index.ts` barrel. Import directly:
+  `import { Foo } from '@/components/ui/Foo/Foo'`.
+- **Spec-first workflow.** Work in this order: business requirements → task breakdown → design →
+  code. Do not write application code until requirements and design are approved.
 
 ## Architecture
 
