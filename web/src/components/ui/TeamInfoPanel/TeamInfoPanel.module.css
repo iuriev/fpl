@@ -103,6 +103,31 @@
   color: var(--fpl-accent);
 }
 
+.navLinkFeatured {
+  background: linear-gradient(
+    90deg,
+    var(--fpl-bg-hair) 25%,
+    var(--fpl-shimmer-hi) 50%,
+    var(--fpl-bg-hair) 75%
+  );
+  background-size: 200% 100%;
+  border-color: var(--fpl-shimmer-hi);
+  color: var(--fpl-text);
+  animation: fplShimmer 3s ease-in-out infinite;
+}
+
+.navLinkFeatured:hover {
+  border-color: var(--fpl-accent);
+  color: var(--fpl-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navLinkFeatured {
+    animation: none;
+    background: var(--fpl-bg-hair);
+  }
+}
+
 /* ── Desktop sidebar ───────────────────────────────────────── */
 
 @media (min-width: 56.25rem) {

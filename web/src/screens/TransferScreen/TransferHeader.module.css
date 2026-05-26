@@ -1,8 +1,29 @@
 .header {
   flex-shrink: 0;
-  padding: var(--fpl-space-md) var(--fpl-space-md) var(--fpl-space-sm);
+  padding: var(--fpl-space-sm) var(--fpl-space-md) var(--fpl-space-sm);
   background: var(--fpl-bg-deep);
   border-bottom: 1px solid var(--fpl-bg-hair);
+}
+
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--fpl-space-xs);
+  background: none;
+  border: none;
+  color: var(--fpl-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: var(--fpl-space-xs);
+  transition: color 120ms;
+}
+
+.backBtn svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
 }
 
 .topRow {
@@ -72,15 +93,40 @@
   letter-spacing: 0.06em;
 }
 
-.freeBtn {
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.stepperBtn {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: var(--fpl-radius-sm);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--fpl-bg-hair);
+  color: var(--fpl-text-primary);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+}
+
+.stepperBtn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.stepperValue {
   font-size: 0.875rem;
   font-weight: 700;
   color: var(--fpl-text-primary);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  text-decoration: underline dotted;
+  min-width: 0.75rem;
+  text-align: center;
 }
 
 .divider {

@@ -11,6 +11,8 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
   transition: opacity 0.2s;
 }
 
