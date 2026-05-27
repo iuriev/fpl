@@ -78,5 +78,12 @@ web/src/
 - **Shared `fixtures/`** (JSON) provide deterministic test data for stories and unit tests.
 - Deferred (backlog): real-app E2E with MSW + Playwright (routing, data fetching, navigation). See ADR 0012.
 
+## Gameweek navigation
+- Screens with prev/next gameweek controls **hide** (not just disable) a button when there is
+  nowhere to navigate in that direction.
+- The "next" button must never appear when the selected gameweek equals `MAX_GAMEWEEK` (38) — GW 38
+  is the final gameweek and a GW 39 does not exist.
+- `maxGw` in SquadScreen is capped at `MAX_GAMEWEEK`: `Math.min(currentGw + 1, MAX_GAMEWEEK)`.
+
 ## Accessibility
 - Deferred from the MVP (ADR 0007). A dedicated accessibility pass is planned post-MVP.

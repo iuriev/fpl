@@ -25,7 +25,7 @@ export const Pitch: React.FC<PitchProps> = ({ children, className }) => {
           />
         ))}
 
-        <rect x="1" y="1" width="98" height="154" fill="none" stroke="var(--fpl-pitch-line)" strokeWidth="0.6" />
+        <rect x="0" y="1" width="100" height="154" fill="none" stroke="var(--fpl-pitch-line)" strokeWidth="0.6" />
 
         <line x1="1" y1="78" x2="99" y2="78" stroke="var(--fpl-pitch-line)" strokeWidth="0.6" />
         <circle cx="50" cy="78" r="9.15" stroke="var(--fpl-pitch-line)" strokeWidth="0.5" fill="none" />

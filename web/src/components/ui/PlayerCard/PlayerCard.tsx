@@ -131,22 +131,28 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
         {!hidePoints && <span className={styles.points}>{player.points}</span>}
       </div>
 
-      {nextFixture && (
+      {(nextFixture || onSubClick) && (
         <div className={styles.fixtureRow}>
-          <FdrChip
-            opponent={nextFixture.opponent}
-            home={nextFixture.home}
-            difficulty={nextFixture.difficulty}
-          />
+          {nextFixture && (
+            <FdrChip
+              opponent={nextFixture.opponent}
+              home={nextFixture.home}
+              difficulty={nextFixture.difficulty}
+            />
+          )}
+          {onSubClick && (
+            <span
+              className={styles.subBtn}
+              onClick={(e) => { e.stopPropagation(); onSubClick(); }}
+              aria-hidden="true"
+            >
+              <svg width="8" height="10" viewBox="0 0 10 12" fill="none" aria-hidden="true">
+                <path d="M5 1L1 5H9L5 1Z" fill="currentColor"/>
+                <path d="M5 11L1 7H9L5 11Z" fill="currentColor"/>
+              </svg>
+            </span>
+          )}
         </div>
-      )}
-
-      {onSubClick && (
-        <span
-          className={styles.subBtn}
-          onClick={(e) => { e.stopPropagation(); onSubClick(); }}
-          aria-label="Substitute"
-        />
       )}
 
       {showStatus && badge && (

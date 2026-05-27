@@ -29,14 +29,14 @@
 .playerRow {
   display: flex;
   justify-content: center;
-  gap: 0.25rem;
+  gap: var(--fpl-space-sm);
 }
 
 .bench {
   flex-shrink: 0;
   display: flex;
   justify-content: center;
-  gap: 0.25rem;
+  gap: var(--fpl-space-sm);
   padding: var(--fpl-space-xs) var(--fpl-space-md);
   background: rgba(0, 0, 0, 0.25);
   border-top: 1px dashed var(--fpl-bg-hair);
@@ -73,15 +73,6 @@
 }
 
 
-.subIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--fpl-bg-deep);
-  border-radius: 50%;
-  padding: 0.1875rem;
-  box-shadow: 0 0 0 1.5px var(--fpl-bg-deep);
-}
 
 @keyframes pulse-out {
   0%, 100% { opacity: 1; }

@@ -52,7 +52,7 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
   const { data: entry, isError: entryIsError } = useEntry(teamId);
 
   const currentGw = gameweeksData?.current ?? null;
-  const maxGw = currentGw !== null ? currentGw + 1 : null;
+  const maxGw = currentGw !== null ? Math.min(currentGw + 1, MAX_GAMEWEEK) : null;
 
   const gwParam = searchParams.get('gw');
   const selectedGw = useMemo(() => {
@@ -214,16 +214,17 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
               </svg>
             </button>
             <span className={styles.gwLabel}>{gwLabel}</span>
-            <button
-              className={styles.navBtn}
-              onClick={() => navigateGw(1)}
-              disabled={!canGoNext}
-              aria-label="Next gameweek"
-            >
-              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" className={styles.chevronRight}>
-                <path d="M10 4l-4 4 4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
+            {canGoNext && (
+              <button
+                className={styles.navBtn}
+                onClick={() => navigateGw(1)}
+                aria-label="Next gameweek"
+              >
+                <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" className={styles.chevronRight}>
+                  <path d="M10 4l-4 4 4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            )}
           </div>
         </header>
 

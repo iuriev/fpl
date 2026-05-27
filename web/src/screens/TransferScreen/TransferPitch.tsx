@@ -8,17 +8,6 @@ import styles from './TransferPitch.module.css';
 
 const POSITION_ORDER: PlayerPosition[] = ['FWD', 'MID', 'DEF', 'GK'];
 
-function SubIcon() {
-  return (
-    <span className={styles.subIcon}>
-      <svg width="10" height="10" viewBox="0 0 22 22" fill="none" aria-hidden="true">
-        <path d="M3 4H7V11H10L5 18L0 11H3Z" fill="#E8604C"/>
-        <path d="M19 18H15V11H12L17 4L22 11H19Z" fill="#00FF87"/>
-      </svg>
-    </span>
-  );
-}
-
 export interface TransferPitchProps {
   starters: SquadPlayer[];
   bench: SquadPlayer[];
@@ -30,6 +19,7 @@ export interface TransferPitchProps {
   validSubTargets?: Set<number>;
   onSubIconClick?: (id: number) => void;
   onSubTargetClick?: (id: number) => void;
+  onSubCancel?: () => void;
 }
 
 function groupByPosition(players: SquadPlayer[]): Record<PlayerPosition, SquadPlayer[]> {
@@ -49,6 +39,7 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
   validSubTargets = new Set(),
   onSubIconClick,
   onSubTargetClick,
+  onSubCancel,
 }) => {
   const positionGroups = groupByPosition(starters);
 
@@ -94,16 +85,19 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
           size={size}
           hidePoints
           nextFixture={poolLookup?.get(player.id)?.nextFixtures[0]}
-          footBadge={isIn ? <SubIcon /> : undefined}
-          onSubClick={onSubIconClick ? () => onSubIconClick(player.id) : undefined}
+          onSubClick={!subModeActive && onSubIconClick ? () => onSubIconClick(player.id) : undefined}
         />
       </button>
     );
   }
 
+  function handlePitchBackgroundClick(e: React.MouseEvent<HTMLDivElement>) {
+    if (subModeActive && !(e.target as Element).closest('button')) onSubCancel?.();
+  }
+
   return (
     <div className={styles.pitchBench}>
-      <div className={styles.pitchWrap}>
+      <div className={styles.pitchWrap} onClick={handlePitchBackgroundClick}>
         <Pitch className={styles.pitchFill}>
           <div className={styles.pitchRows}>
             {POSITION_ORDER.map((pos) => (

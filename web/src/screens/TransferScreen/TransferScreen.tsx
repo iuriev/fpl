@@ -320,6 +320,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
               validSubTargets={validSubTargets}
               onSubIconClick={handleSubIconClick}
               onSubTargetClick={handleSubTargetClick}
+              onSubCancel={cancelSub}
             />
           </div>
 
