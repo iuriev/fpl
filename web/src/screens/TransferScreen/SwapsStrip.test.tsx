@@ -1,8 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { SwapsStrip } from './SwapsStrip';
+
 import type { TransferSwap } from '@/types';
+
+import { SwapsStrip } from './SwapsStrip';
 
 const makeSwap = (outId: number, inId: number): TransferSwap => ({ outId, inId });
 
@@ -35,7 +37,7 @@ describe('SwapsStrip', () => {
     );
     expect(screen.getByText('Saka')).toBeInTheDocument();
     expect(screen.getByText('Salah')).toBeInTheDocument();
-    expect(screen.getByText(/\+£4\.0m/)).toBeInTheDocument();
+    expect(screen.getByText('↓ £4.0m')).toBeInTheDocument();
   });
 
   it('calls onUndo with the swap outId when undo button clicked', async () => {

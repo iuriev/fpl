@@ -1,6 +1,8 @@
 import React from 'react';
+
 import { copy, interpolate } from '@/lib/copy';
 import type { TransferSwap } from '@/types';
+
 import styles from './SwapsStrip.module.css';
 
 export interface SwapsStripProps {
@@ -11,10 +13,13 @@ export interface SwapsStripProps {
   onUndo: (outId: number) => void;
 }
 
-function formatDelta(outCost: number, inCost: number): string {
+function formatDelta(outCost: number, inCost: number): { text: string; direction: 'up' | 'down' | 'neutral' } {
   const delta = inCost - outCost;
-  const sign = delta >= 0 ? '+' : '-';
-  return `${sign}£${(Math.abs(delta) / 10).toFixed(1)}m`;
+  if (delta === 0) return { text: '=', direction: 'neutral' };
+  const amount = `£${(Math.abs(delta) / 10).toFixed(1)}m`;
+  return delta > 0
+    ? { text: `↓ ${amount}`, direction: 'down' }
+    : { text: `↑ ${amount}`, direction: 'up' };
 }
 
 export const SwapsStrip: React.FC<SwapsStripProps> = ({
@@ -48,12 +53,13 @@ export const SwapsStrip: React.FC<SwapsStripProps> = ({
             const inName = nameMap.get(swap.inId) ?? '?';
             const outCost = costMap.get(swap.outId) ?? 0;
             const inCost = costMap.get(swap.inId) ?? 0;
+            const delta = formatDelta(outCost, inCost);
             return (
               <li key={swap.outId} className={styles.row}>
                 <span className={styles.outName}>{outName}</span>
                 <span className={styles.arrow} aria-hidden="true">→</span>
                 <span className={styles.inName}>{inName}</span>
-                <span className={styles.delta}>{formatDelta(outCost, inCost)}</span>
+                <span className={`${styles.delta} ${styles[`delta_${delta.direction}`]}`}>{delta.text}</span>
                 <button
                   className={styles.undoBtn}
                   onClick={() => onUndo(swap.outId)}

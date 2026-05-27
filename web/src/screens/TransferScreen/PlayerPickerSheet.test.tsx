@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { PoolPlayer } from '@/types';
+import type { PlayerPosition, PoolPlayer } from '@/types';
 
 import { PlayerPickerSheet } from './PlayerPickerSheet';
 
@@ -34,6 +34,7 @@ describe('PlayerPickerSheet', () => {
     candidates: [makePoolPlayer(2, { webName: 'Salah', nowCost: 130 })],
     availableBudget: 150,
     squadTeamCounts: new Map<number, number>([[1, 1]]),
+    squadPositionCounts: new Map<PlayerPosition, number>([['GK', 2], ['DEF', 4], ['MID', 4], ['FWD', 3]]),
     squadPlayerIds: new Set([1]),
     isOutfield: true,
     onSelect: vi.fn(),
@@ -129,5 +130,35 @@ describe('PlayerPickerSheet', () => {
     await user.click(screen.getByText('ALL'));
     expect(screen.getByText('DefPlayer')).toBeInTheDocument();
     expect(screen.getByText('MidPlayer')).toBeInTheDocument();
+  });
+
+  it('disables candidates whose position is already at the squad maximum', async () => {
+    const user = userEvent.setup();
+    // outPlayer is MID, squad already has 5 DEFs — picking a DEF would exceed the limit
+    const fullDefCounts = new Map<PlayerPosition, number>([['GK', 2], ['DEF', 5], ['MID', 4], ['FWD', 3]]);
+    render(
+      <PlayerPickerSheet
+        {...defaultProps}
+        squadPositionCounts={fullDefCounts}
+        candidates={[makePoolPlayer(2, { webName: 'DefPlayer', position: 'DEF' })]}
+      />,
+    );
+    await user.click(screen.getByText('ALL'));
+    const row = screen.getByText('DefPlayer').closest('[data-position-limit]');
+    expect(row?.getAttribute('data-position-limit')).toBe('true');
+  });
+
+  it('allows same-position replacement even when position count is at max', () => {
+    // outPlayer is MID, squad has 5 MIDs (including outPlayer) — transferring MID→MID is valid
+    const fullMidCounts = new Map<PlayerPosition, number>([['GK', 2], ['DEF', 5], ['MID', 5], ['FWD', 3]]);
+    render(
+      <PlayerPickerSheet
+        {...defaultProps}
+        squadPositionCounts={fullMidCounts}
+        candidates={[makePoolPlayer(2, { webName: 'MidPlayer', position: 'MID' })]}
+      />,
+    );
+    const row = screen.getByText('MidPlayer').closest('li');
+    expect(row?.getAttribute('data-position-limit')).toBeNull();
   });
 });

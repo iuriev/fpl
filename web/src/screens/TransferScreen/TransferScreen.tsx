@@ -12,7 +12,7 @@ import {
   poolPlayerToSquadPlayer,
   saveDraft,
 } from '@/lib/transfer-draft';
-import type { PoolPlayer, SquadPlayer, TransferChip, TransferDraft, TransferSwap } from '@/types';
+import type { PlayerPosition, PoolPlayer, SquadPlayer, TransferChip, TransferDraft, TransferSwap } from '@/types';
 
 import { PlayerPickerSheet } from './PlayerPickerSheet';
 import { SwapsStrip } from './SwapsStrip';
@@ -176,6 +176,14 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
     return counts;
   }, [displaySquad]);
 
+  const squadPositionCounts = useMemo(() => {
+    const counts = new Map<PlayerPosition, number>();
+    for (const p of displaySquad) {
+      counts.set(p.position, (counts.get(p.position) ?? 0) + 1);
+    }
+    return counts;
+  }, [displaySquad]);
+
   const availableBudget = useMemo(() => {
     if (!outPlayer) return currentBank;
     const chainSwap = draft?.swaps.find((s) => s.inId === outPlayer.id);
@@ -311,11 +319,13 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
 
       {outPlayer && (
         <PlayerPickerSheet
+          key={outPlayer.id}
           open={selectedPlayerId !== null}
           outPlayer={outPlayer}
           candidates={candidates}
           availableBudget={availableBudget}
           squadTeamCounts={squadTeamCounts}
+          squadPositionCounts={squadPositionCounts}
           squadPlayerIds={squadPlayerIds}
           isOutfield={isOutfield}
           onSelect={handleSelectReplacement}

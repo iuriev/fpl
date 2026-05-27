@@ -50,6 +50,7 @@
   padding: 0;
   border-radius: var(--fpl-radius-sm);
   outline-offset: 2px;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .playerBtn_out::after {

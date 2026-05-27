@@ -45,6 +45,9 @@
   display: flex;
   flex-direction: column;
   gap: 0.375rem;
+  max-height: 5.25rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .row {
@@ -61,8 +64,12 @@
 .delta {
   margin-left: auto;
   font-size: 0.6875rem;
-  color: var(--fpl-muted-soft);
+  font-weight: 600;
 }
+
+.delta_up { color: var(--fpl-success); }
+.delta_down { color: var(--fpl-danger, #E8604C); }
+.delta_neutral { color: var(--fpl-muted-soft); }
 
 .undoBtn {
   width: 1.25rem;

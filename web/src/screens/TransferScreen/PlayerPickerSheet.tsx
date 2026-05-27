@@ -2,12 +2,12 @@ import React, { useMemo, useState } from 'react';
 
 import { BottomSheet } from '@/components/ui/BottomSheet/BottomSheet';
 import { copy, interpolate } from '@/lib/copy';
-import type { PoolPlayer } from '@/types';
+import type { PlayerPosition, PoolPlayer } from '@/types';
 
 import { PlayerPickerRow } from './PlayerPickerRow';
-import { SORT_OPTIONS, SortPickerSheet } from './SortPickerSheet';
-import type { SortKey } from './SortPickerSheet';
 import styles from './PlayerPickerSheet.module.css';
+import type { SortKey } from './SortPickerSheet';
+import { SORT_OPTIONS, SortPickerSheet } from './SortPickerSheet';
 
 type PositionFilter = 'ALL' | 'DEF' | 'MID' | 'FWD';
 
@@ -20,12 +20,15 @@ const POS_LABELS: Record<PositionFilter, string> = {
 
 const POS_FILTERS: PositionFilter[] = ['ALL', 'DEF', 'MID', 'FWD'];
 
+const POSITION_MAX: Record<PlayerPosition, number> = { GK: 2, DEF: 5, MID: 5, FWD: 3 };
+
 export interface PlayerPickerSheetProps {
   open: boolean;
   outPlayer: PoolPlayer;
   candidates: PoolPlayer[];
   availableBudget: number;
   squadTeamCounts: Map<number, number>;
+  squadPositionCounts: Map<PlayerPosition, number>;
   squadPlayerIds: Set<number>;
   isOutfield: boolean;
   onSelect: (player: PoolPlayer) => void;
@@ -38,6 +41,7 @@ export const PlayerPickerSheet: React.FC<PlayerPickerSheetProps> = ({
   candidates,
   availableBudget,
   squadTeamCounts,
+  squadPositionCounts,
   squadPlayerIds,
   isOutfield,
   onSelect,
@@ -45,7 +49,8 @@ export const PlayerPickerSheet: React.FC<PlayerPickerSheetProps> = ({
 }) => {
   const [query, setQuery] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('totalPoints');
-  const [positionFilter, setPositionFilter] = useState<PositionFilter>('ALL');
+  const defaultPos = isOutfield ? (outPlayer.position as PositionFilter) : 'ALL';
+  const [positionFilter, setPositionFilter] = useState<PositionFilter>(defaultPos);
   const [showSort, setShowSort] = useState(false);
 
   const filtered = useMemo(() => {
@@ -120,12 +125,16 @@ export const PlayerPickerSheet: React.FC<PlayerPickerSheetProps> = ({
               const countFromTeam = (squadTeamCounts.get(player.team) ?? 0)
                 - (outPlayer.team === player.team ? 1 : 0);
               const clubLimit = countFromTeam >= 3;
+              const positionCount = (squadPositionCounts.get(player.position) ?? 0)
+                - (outPlayer.position === player.position ? 1 : 0);
+              const positionLimit = positionCount >= POSITION_MAX[player.position];
               return (
                 <PlayerPickerRow
                   key={player.id}
                   player={player}
                   overBudget={player.nowCost > availableBudget}
                   clubLimitReached={clubLimit}
+                  positionLimitReached={positionLimit}
                   onSelect={onSelect}
                 />
               );
