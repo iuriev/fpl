@@ -110,7 +110,10 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
     );
     return originalSquad.map((p) => {
       const replacement = swapMap.get(p.id);
-      if (replacement) return poolPlayerToSquadPlayer(replacement);
+       if (replacement) {
+        const newPlayer = poolPlayerToSquadPlayer(replacement);
+        return { ...newPlayer, isCaptain: p.isCaptain, isViceCaptain: p.isViceCaptain };
+      }
       return p;
     });
   }, [originalSquad, draft, allPoolPlayers]);

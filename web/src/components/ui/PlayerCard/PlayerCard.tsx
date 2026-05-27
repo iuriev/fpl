@@ -12,6 +12,7 @@ export interface PlayerCardProps {
   size?: 'large' | 'medium';
   hidePoints?: boolean;
   nextFixture?: FixtureInfo;
+  footBadge?: React.ReactNode;
 }
 
 function availBadge(status: PlayerStatus): { char: string; variant: 'warn' | 'error' } | null {
@@ -41,6 +42,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   size = 'medium',
   hidePoints = false,
   nextFixture,
+  footBadge,
 }) => {
   const [showStatus, setShowStatus] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -94,21 +96,30 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
       }
     >
       <div className={styles.jerseyWrap}>
-        {(player.isCaptain || player.isViceCaptain) && (
-          <span
-            className={`${styles.capBadge}${player.isViceCaptain ? ` ${styles.capBadge_vice}` : ''}`}
-            aria-label={player.isCaptain ? 'Captain' : 'Vice captain'}
-          >
-            {player.isCaptain ? copy.statusCaptain : copy.statusViceCaptain}
-          </span>
-        )}
-        {badge && (
-          <span
-            className={`${styles.availBadge} ${styles[`availBadge_${badge.variant}`]}`}
-            aria-hidden="true"
-          >
-            {badge.char}
-          </span>
+        {(footBadge || badge || player.isCaptain || player.isViceCaptain) && (
+          <div className={styles.badgeRow}>
+            <div className={styles.badgeRow_left}>
+              {footBadge && <span aria-hidden="true">{footBadge}</span>}
+              {badge && (
+                <span
+                  className={`${styles.availBadge} ${styles[`availBadge_${badge.variant}`]}`}
+                  aria-hidden="true"
+                >
+                  {badge.char}
+                </span>
+              )}
+            </div>
+            <div className={styles.badgeRow_right}>
+              {(player.isCaptain || player.isViceCaptain) && (
+                <span
+                  className={`${styles.capBadge}${player.isViceCaptain ? ` ${styles.capBadge_vice}` : ''}`}
+                  aria-label={player.isCaptain ? 'Captain' : 'Vice captain'}
+                >
+                  {player.isCaptain ? copy.statusCaptain : copy.statusViceCaptain}
+                </span>
+              )}
+            </div>
+          </div>
         )}
         <Jersey size={size} teamCode={player.teamCode} position={player.position} alt={player.name} />
       </div>

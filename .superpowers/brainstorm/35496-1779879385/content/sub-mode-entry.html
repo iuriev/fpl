@@ -1,0 +1,97 @@
+<h2>Как активировать режим замен?</h2>
+<p class="subtitle">Замены — это перестановка игроков между стартовым составом и скамейкой (без покупки/продажи). Как переключиться в этот режим?</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#1a1f2e;border-radius:0.5rem;padding:1rem;font-family:monospace;font-size:0.8rem;color:#fff">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;background:#252d3d;padding:0.5rem 0.75rem;border-radius:0.375rem">
+          <span style="color:#9ca3af">Bank £2.1m · GW36</span>
+          <div style="display:flex;gap:0.5rem;align-items:center">
+            <span style="background:#374151;border-radius:50%;width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:1rem">⇄</span>
+            <span style="color:#9ca3af;font-size:0.75rem">Transfers</span>
+            <span style="background:#374151;border-radius:50%;width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.8rem">↕</span>
+            <span style="color:#9ca3af;font-size:0.75rem">Subs</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:0.5rem;justify-content:center;margin-bottom:0.5rem">
+          <div style="background:#2d3748;border-radius:0.375rem;padding:0.4rem 0.6rem;width:3rem;text-align:center">
+            <div style="font-size:0.65rem;color:#6b7280">Salah</div>
+          </div>
+          <div style="background:#2d3748;border-radius:0.375rem;padding:0.4rem 0.6rem;width:3rem;text-align:center">
+            <div style="font-size:0.65rem;color:#6b7280">Haaland</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:0.5rem;justify-content:center">
+          <div style="background:#1f2937;border:1px dashed #4b5563;border-radius:0.375rem;padding:0.4rem 0.6rem;width:3rem;text-align:center;color:#4b5563;font-size:0.65rem">bench 1</div>
+          <div style="background:#1f2937;border:1px dashed #4b5563;border-radius:0.375rem;padding:0.4rem 0.6rem;width:3rem;text-align:center;color:#4b5563;font-size:0.65rem">bench 2</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Два режима в хедере</h3>
+      <p>В шапке экрана трансферов две иконки: ⇄ (трансферы) и ↕ (замены). Нажатие переключает весь экран в режим замен — player picker не открывается, вместо этого при тапе на игрока подсвечиваются допустимые цели.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#1a1f2e;border-radius:0.5rem;padding:1rem;font-family:monospace;font-size:0.8rem;color:#fff">
+        <div style="background:#252d3d;padding:0.5rem 0.75rem;border-radius:0.375rem;margin-bottom:0.75rem;color:#9ca3af">Bank £2.1m · GW36</div>
+        <div style="display:flex;gap:0.5rem;justify-content:center;margin-bottom:0.5rem">
+          <div style="background:#2d3748;border-radius:0.375rem;padding:0.4rem 0.6rem;width:3rem;text-align:center;position:relative">
+            <div style="font-size:0.65rem;color:#6b7280">Salah</div>
+            <div style="position:absolute;top:-0.4rem;right:-0.4rem;background:#6366f1;border-radius:50%;width:1rem;height:1rem;font-size:0.6rem;display:flex;align-items:center;justify-content:center">↕</div>
+          </div>
+          <div style="background:#2d3748;border-radius:0.375rem;padding:0.4rem 0.6rem;width:3rem;text-align:center;position:relative">
+            <div style="font-size:0.65rem;color:#6b7280">Haaland</div>
+            <div style="position:absolute;top:-0.4rem;right:-0.4rem;background:#6366f1;border-radius:50%;width:1rem;height:1rem;font-size:0.6rem;display:flex;align-items:center;justify-content:center">↕</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:0.5rem;justify-content:center">
+          <div style="background:#1f2937;border:1px dashed #4b5563;border-radius:0.375rem;padding:0.4rem 0.6rem;width:3rem;text-align:center;color:#4b5563;font-size:0.65rem;position:relative">
+            bench 1
+            <div style="position:absolute;top:-0.4rem;right:-0.4rem;background:#6366f1;border-radius:50%;width:1rem;height:1rem;font-size:0.6rem;display:flex;align-items:center;justify-content:center;color:#fff">↕</div>
+          </div>
+          <div style="background:#1f2937;border:1px dashed #4b5563;border-radius:0.375rem;padding:0.4rem 0.6rem;width:3rem;text-align:center;color:#4b5563;font-size:0.65rem;position:relative">
+            bench 2
+            <div style="position:absolute;top:-0.4rem;right:-0.4rem;background:#6366f1;border-radius:50%;width:1rem;height:1rem;font-size:0.6rem;display:flex;align-items:center;justify-content:center;color:#fff">↕</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Иконка ↕ на каждой карточке</h3>
+      <p>На каждой PlayerCard в углу постоянно видна маленькая иконка ↕. Нажатие именно на неё запускает режим замены для этого конкретного игрока — сразу подсвечивает допустимые цели, без переключения общего режима.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#1a1f2e;border-radius:0.5rem;padding:1rem;font-family:monospace;font-size:0.8rem;color:#fff">
+        <div style="background:#252d3d;padding:0.5rem 0.75rem;border-radius:0.375rem;margin-bottom:0.75rem;color:#9ca3af">Bank £2.1m · GW36</div>
+        <div style="display:flex;gap:0.5rem;justify-content:center;margin-bottom:0.5rem">
+          <div style="background:#2d3748;border-radius:0.375rem;padding:0.4rem 0.6rem;width:3rem;text-align:center">
+            <div style="font-size:0.65rem;color:#6b7280">Salah</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:0.5rem;justify-content:center">
+          <div style="background:#1f2937;border:1px dashed #4b5563;border-radius:0.375rem;padding:0.4rem 0.6rem;width:3rem;text-align:center;color:#4b5563;font-size:0.65rem">bench 1</div>
+        </div>
+        <div style="margin-top:0.75rem;background:#1e293b;border-radius:0.375rem;padding:0.5rem;text-align:center">
+          <div style="color:#9ca3af;font-size:0.7rem;margin-bottom:0.25rem">Long-press или свайп вверх на карточке</div>
+          <div style="background:#374151;border-radius:0.25rem;padding:0.25rem 0.5rem;display:inline-block;font-size:0.65rem">
+            <span style="margin-right:0.5rem">⇄ Transfer</span>
+            <span style="color:#818cf8">↕ Sub</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Контекстное меню по long-press</h3>
+      <p>Обычный тап открывает трансфер как сейчас. Long-press на карточке показывает мини-меню с двумя действиями: "Transfer" и "Sub". Пользователь выбирает нужное — режим замены начинается.</p>
+    </div>
+  </div>
+
+</div>

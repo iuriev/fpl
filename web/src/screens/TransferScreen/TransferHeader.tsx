@@ -95,7 +95,9 @@ export const TransferHeader: React.FC<TransferHeaderProps> = ({
             <span className={styles.chipActiveLabel}>
               {chip === 'wildcard'
                 ? copy.transfersWildcardActive
-                : interpolate(copy.transfersFreeHitActive, { n: nextGw ?? '?' })}
+                : nextGw !== null && nextGw <= 38
+                  ? interpolate(copy.transfersFreeHitActive, { n: nextGw })
+                  : copy.transfersFreeHitActiveFinal}
             </span>
           ) : (
             <>

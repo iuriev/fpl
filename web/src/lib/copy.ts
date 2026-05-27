@@ -129,6 +129,7 @@ export const copy = {
   transfersFreeHit: 'FH',
   transfersWildcardActive: 'Wildcard active',
   transfersFreeHitActive: 'Free Hit active — squad reverts after GW{n}',
+  transfersFreeHitActiveFinal: 'Free Hit active',
   transfersPendingTitle: 'Planned transfers',
   transfersPendingEmpty: 'Tap a player to start planning',
   transfersReset: 'Reset',

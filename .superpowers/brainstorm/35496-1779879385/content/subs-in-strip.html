@@ -1,0 +1,132 @@
+<h2>Как замены отображаются в SwapsStrip?</h2>
+<p class="subtitle">Сейчас в полоске внизу показаны трансферы: "Salah → Isak ↑ £1.5m [✕]". Замены не меняют бюджет. Как их отображать вместе с трансферами?</p>
+
+<style>
+  .strip-mock {
+    background: #1e2535;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    font-size: 0.75rem;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+  .strip-header {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .strip-header.green { background: #14532d; color: #86efac; }
+  .strip-header.amber { background: #78350f; color: #fde68a; }
+  .strip-body { padding: 0.5rem 0.75rem; display: flex; flex-direction: column; gap: 0.35rem; }
+  .row { display: flex; align-items: center; gap: 0.4rem; color: #e5e7eb; padding: 0.25rem 0; border-bottom: 1px solid #374151; }
+  .row:last-child { border-bottom: none; }
+  .out { color: #f87171; font-weight: 500; }
+  .arr { color: #6b7280; }
+  .inp { color: #86efac; font-weight: 500; }
+  .cost-up { color: #86efac; font-size: 0.65rem; margin-left: auto; }
+  .cost-down { color: #f87171; font-size: 0.65rem; margin-left: auto; }
+  .sub-badge { background: #6366f1; border-radius: 0.2rem; padding: 0.1rem 0.3rem; font-size: 0.6rem; color: #fff; font-weight: 600; }
+  .transfer-badge { background: #0ea5e9; border-radius: 0.2rem; padding: 0.1rem 0.3rem; font-size: 0.6rem; color: #fff; font-weight: 600; }
+  .undo { margin-left: 0.25rem; color: #6b7280; cursor: pointer; font-size: 0.7rem; }
+  .section-label { color: #6b7280; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.2rem 0; }
+  .swap-icon { color: #a78bfa; font-size: 0.8rem; }
+</style>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="strip-mock">
+        <div class="strip-header amber">
+          <span>Pending</span>
+          <span>2 of 1 free</span>
+        </div>
+        <div class="strip-body">
+          <div class="row">
+            <span class="transfer-badge">⇄</span>
+            <span class="out">Salah</span><span class="arr">→</span><span class="inp">Isak</span>
+            <span class="cost-down">↓ £1.5m</span>
+            <span class="undo">✕</span>
+          </div>
+          <div class="row">
+            <span class="sub-badge">↕</span>
+            <span class="out">Palmer</span><span class="arr">⇄</span><span class="inp">Trippier</span>
+            <span style="margin-left:auto;font-size:0.65rem;color:#a78bfa">sub</span>
+            <span class="undo">✕</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Смешанный список с бейджем</h3>
+      <p>Трансферы и замены в одном списке. У трансфера иконка ⇄ (голубая), у замены ↕ (фиолетовая). Стрелка → для трансфера, ⇄ для замены. Цена показывается только у трансферов.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="strip-mock">
+        <div class="strip-header amber">
+          <span>Pending</span>
+          <span>1 transfer · 1 sub</span>
+        </div>
+        <div class="strip-body">
+          <div class="section-label">Transfers</div>
+          <div class="row">
+            <span class="out">Salah</span><span class="arr">→</span><span class="inp">Isak</span>
+            <span class="cost-down">↓ £1.5m</span>
+            <span class="undo">✕</span>
+          </div>
+          <div class="section-label">Subs</div>
+          <div class="row">
+            <span class="swap-icon">⇄</span>
+            <span style="color:#e5e7eb">Palmer</span>
+            <span class="arr">↔</span>
+            <span style="color:#e5e7eb">Trippier</span>
+            <span style="margin-left:auto"></span>
+            <span class="undo">✕</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Разделённые секции</h3>
+      <p>Два раздела: "Transfers" и "Subs" со своими подзаголовками. Счётчик в хедере тоже разделён: "1 transfer · 1 sub". Структурно чище, но занимает больше места.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="strip-mock">
+        <div class="strip-header amber">
+          <span>Pending</span>
+          <span>2 of 1 free</span>
+        </div>
+        <div class="strip-body">
+          <div class="row">
+            <span class="out">Salah</span><span class="arr">→</span><span class="inp">Isak</span>
+            <span class="cost-down">↓ £1.5m</span>
+            <span class="undo">✕</span>
+          </div>
+          <div class="row" style="opacity:0.7;font-style:italic">
+            <span style="color:#e5e7eb">Palmer</span>
+            <span class="arr">↔</span>
+            <span style="color:#e5e7eb">Trippier</span>
+            <span style="margin-left:auto;font-size:0.65rem;color:#6b7280">sub (free)</span>
+            <span class="undo">✕</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Тот же список, замены курсивом</h3>
+      <p>Тот же дизайн что сейчас, замены добавляются в список но слегка приглушены (курсив, текст "sub (free)"). Минимум изменений UI.</p>
+    </div>
+  </div>
+
+</div>

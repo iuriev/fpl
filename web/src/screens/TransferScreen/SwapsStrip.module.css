@@ -30,6 +30,10 @@
 .header_red .count    { color: var(--fpl-danger, #E8604C); }
 .header_neutral .count { color: var(--fpl-muted-soft); }
 
+.body {
+  min-height: 5.25rem;
+}
+
 .empty {
   font-size: 0.75rem;
   color: var(--fpl-muted-soft);

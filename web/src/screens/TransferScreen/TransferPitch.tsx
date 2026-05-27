@@ -8,6 +8,17 @@ import styles from './TransferPitch.module.css';
 
 const POSITION_ORDER: PlayerPosition[] = ['FWD', 'MID', 'DEF', 'GK'];
 
+function SubIcon() {
+  return (
+    <span className={styles.subIcon}>
+      <svg width="10" height="10" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+        <path d="M3 4H7V11H10L5 18L0 11H3Z" fill="#E8604C"/>
+        <path d="M19 18H15V11H12L17 4L22 11H19Z" fill="#00FF87"/>
+      </svg>
+    </span>
+  );
+}
+
 export interface TransferPitchProps {
   starters: SquadPlayer[];
   bench: SquadPlayer[];
@@ -55,16 +66,8 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
                         size="large"
                         hidePoints
                         nextFixture={poolLookup?.get(player.id)?.nextFixtures[0]}
+                        footBadge={isIn ? <SubIcon /> : undefined}
                       />
-                      {isOut && <span className={styles.variantBadge} data-variant="out">OUT</span>}
-                      {isIn && (
-                        <span className={styles.variantBadge} data-variant="in" aria-label="Transfer in">
-                          <svg width="8" height="8" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                            <path d="M10.5 6A4.5 4.5 0 1 1 6 1.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-                            <path d="M4.5 0L6.5 1.5L4.5 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        </span>
-                      )}
                     </button>
                   );
                 })}
@@ -90,16 +93,8 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
                 size="medium"
                 hidePoints
                 nextFixture={poolLookup?.get(player.id)?.nextFixtures[0]}
+                footBadge={isIn ? <SubIcon /> : undefined}
               />
-              {isOut && <span className={styles.variantBadge} data-variant="out">OUT</span>}
-              {isIn && (
-                <span className={styles.variantBadge} data-variant="in" aria-label="Transfer in">
-                  <svg width="8" height="8" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                    <path d="M10.5 6A4.5 4.5 0 1 1 6 1.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-                    <path d="M4.5 0L6.5 1.5L4.5 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </span>
-              )}
             </button>
           );
         })}

@@ -44,6 +44,7 @@ export const SwapsStrip: React.FC<SwapsStripProps> = ({
         )}
       </div>
 
+      <div className={styles.body}>
       {swaps.length === 0 ? (
         <p className={styles.empty}>{copy.transfersPendingEmpty}</p>
       ) : (
@@ -72,6 +73,7 @@ export const SwapsStrip: React.FC<SwapsStripProps> = ({
           })}
         </ul>
       )}
+      </div>
     </div>
   );
 };

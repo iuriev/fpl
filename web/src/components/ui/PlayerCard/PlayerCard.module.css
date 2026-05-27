@@ -29,11 +29,31 @@
   justify-content: center;
 }
 
-.capBadge {
+.badgeRow {
   position: absolute;
   top: -0.1875rem;
-  right: 0.5rem;
+  left: 0;
+  right: 0;
   z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0.25rem;
+  pointer-events: none;
+}
+
+.badgeRow_left {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.badgeRow_right {
+  display: flex;
+  align-items: center;
+}
+
+.capBadge {
   width: var(--fpl-size-status-badge);
   height: var(--fpl-size-status-badge);
   border-radius: var(--fpl-radius-pill);
@@ -56,10 +76,6 @@
 }
 
 .availBadge {
-  position: absolute;
-  top: -0.1875rem;
-  left: 0.5rem;
-  z-index: 2;
   width: var(--fpl-size-status-badge);
   height: var(--fpl-size-status-badge);
   border-radius: var(--fpl-radius-pill);

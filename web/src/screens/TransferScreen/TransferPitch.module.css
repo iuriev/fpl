@@ -72,31 +72,15 @@
   pointer-events: none;
 }
 
-.variantBadge {
-  position: absolute;
-  top: -0.25rem;
-  right: -0.25rem;
-  font-size: 0.5rem;
-  font-weight: 800;
-  padding: 0.0625rem 0.1875rem;
-  border-radius: 0.125rem;
-  letter-spacing: 0.04em;
-}
 
-.variantBadge[data-variant='out'] {
-  background: #E8604C;
-  color: #fff;
-}
-
-.variantBadge[data-variant='in'] {
-  background: #00FF87;
-  color: #002210;
-  border-radius: 50%;
-  padding: 0.125rem;
-  font-size: 0;
+.subIcon {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--fpl-bg-deep);
+  border-radius: 50%;
+  padding: 0.1875rem;
+  box-shadow: 0 0 0 1.5px var(--fpl-bg-deep);
 }
 
 @keyframes pulse-out {
