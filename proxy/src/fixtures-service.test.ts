@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import * as fixturesService from './fixtures-service';
 import * as fplClient from './fpl-client';
+import type { FPLBootstrapStatic, FPLFixture } from './fpl-client';
 import * as cache from './cache';
 
 vi.mock('./fpl-client');
@@ -41,8 +42,8 @@ describe('fixtures-service', () => {
     it('fetches next 3 GWs and builds per-team fixture lookup', async () => {
       vi.mocked(cache.get).mockReturnValue(null);
       vi.mocked(cache.set).mockReturnValue(undefined);
-      vi.mocked(fplClient.getBootstrapStatic).mockResolvedValue(mockBootstrap as any);
-      vi.mocked(fplClient.getFixtures).mockResolvedValue(mockFixtures as any);
+      vi.mocked(fplClient.getBootstrapStatic).mockResolvedValue(mockBootstrap as unknown as FPLBootstrapStatic);
+      vi.mocked(fplClient.getFixtures).mockResolvedValue(mockFixtures as unknown as FPLFixture[]);
 
       const result = await fixturesService.getUpcomingFixtures();
 

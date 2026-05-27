@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/Button/Button';
 import { copy } from '@/lib/copy';
 import type { HistoryGameweek } from '@/types';
 
-import { formatNumber, formatValue, getRankDirection, type RankDirection } from './history-helpers';
 import styles from './GameweekHistoryScreen.module.css';
+import { formatNumber, formatValue, getRankDirection, type RankDirection } from './history-helpers';
 
 export interface GameweekHistoryScreenProps {
   teamId: number;

@@ -1,6 +1,8 @@
 import React from 'react';
+
 import { Button } from '@/components/ui/Button/Button';
 import { copy } from '@/lib/copy';
+
 import styles from './TransferActionBar.module.css';
 
 export interface TransferActionBarProps {

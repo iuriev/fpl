@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { useGameweeks, usePlayerPool, useSquad } from '@/api/queries';
 import { Button } from '@/components/ui/Button/Button';
@@ -7,7 +7,6 @@ import { copy, interpolate } from '@/lib/copy';
 import {
   calcBank,
   calcTransferCost,
-  clearDraft,
   loadDraft,
   poolPlayerToSquadPlayer,
   saveDraft,
@@ -40,7 +39,6 @@ function makeDefaultDraft(teamId: number, targetGw: number): TransferDraft {
 
 export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   const navigate = useNavigate();
-  const [, setSearchParams] = useSearchParams();
   const { data: gameweeks } = useGameweeks();
   const currentGw = gameweeks?.current ?? null;
   const nextGw = currentGw !== null ? currentGw + 1 : null;
@@ -52,32 +50,39 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   const [draft, setDraft] = useState<TransferDraft | null>(null);
   const [selectedPlayerId, setSelectedPlayerId] = useState<number | null>(null);
   const [staleToast, setStaleToast] = useState<string | null>(null);
-  const saveTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  // Sync draft with teamId/nextGw during render to avoid effect-based setState
+  const [prevId, setPrevId] = useState<number | null>(null);
+  const [prevGw, setPrevGw] = useState<number | null>(null);
+
+  if (teamId !== prevId || nextGw !== prevGw) {
+    setPrevId(teamId);
+    setPrevGw(nextGw);
+    if (nextGw !== null) {
+      const saved = loadDraft(teamId, nextGw);
+      if (saved) {
+        setDraft(saved);
+      } else {
+        const prevRaw = localStorage.getItem(`fpl-transfer-draft-${teamId}`);
+        if (prevRaw && typeof window !== 'undefined') {
+          try {
+            const prev = JSON.parse(prevRaw) as TransferDraft;
+            setStaleToast(interpolate(copy.transfersStaleToast, { n: prev.targetGw }));
+          } catch {
+            // ignore
+          }
+        }
+        setDraft(makeDefaultDraft(teamId, nextGw));
+      }
+    }
+  }
 
   useEffect(() => {
     if (!staleToast) return;
     const t = setTimeout(() => setStaleToast(null), 5000);
     return () => clearTimeout(t);
   }, [staleToast]);
-
-  useEffect(() => {
-    if (nextGw === null) return;
-    const saved = loadDraft(teamId, nextGw);
-    if (saved) {
-      setDraft(saved);
-    } else {
-      const prevRaw = localStorage.getItem(`fpl-transfer-draft-${teamId}`);
-      if (prevRaw) {
-        try {
-          const prev = JSON.parse(prevRaw) as TransferDraft;
-          setStaleToast(interpolate(copy.transfersStaleToast, { n: prev.targetGw }));
-        } catch {
-          // ignore malformed JSON
-        }
-      }
-      setDraft(makeDefaultDraft(teamId, nextGw));
-    }
-  }, [teamId, nextGw]);
 
   const persistDraft = useCallback((d: TransferDraft) => {
     clearTimeout(saveTimerRef.current);
@@ -100,7 +105,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
     return [...squadData.starters, ...squadData.bench];
   }, [squadData]);
 
-  const allPoolPlayers: PoolPlayer[] = poolData?.players ?? [];
+  const allPoolPlayers = useMemo(() => poolData?.players ?? [], [poolData]);
 
   const displaySquad = useMemo(() => {
     if (!draft) return originalSquad;

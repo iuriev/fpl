@@ -1,4 +1,4 @@
-import type { DreamTeamPlayer, DreamTeamResponse, EntryResponse, GameweeksResponse, PlayerStats, SquadResponse, TeamPlayersResponse, TeamsResponse, TopPlayersGwResponse, TopPlayersSeasonResponse } from '@/types';
+import type { DreamTeamPlayer, DreamTeamResponse, EntryResponse, GameweeksResponse, PlayerStats, SquadResponse, TeamPlayersResponse, TeamsResponse, TopPlayersGwResponse, TopPlayersPlayer, TopPlayersSeasonResponse } from '@/types';
 
 function mkStats(overrides: Partial<PlayerStats> = {}): PlayerStats {
   return {

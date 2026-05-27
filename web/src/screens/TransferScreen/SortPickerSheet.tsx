@@ -6,7 +6,7 @@ import styles from './SortPickerSheet.module.css';
 
 export type SortKey = 'totalPoints' | 'nowCost' | 'form' | 'eventPoints' | 'selectedByPercent';
 
-export const SORT_OPTIONS: Array<{ key: SortKey; label: string }> = [
+const SORT_OPTIONS: Array<{ key: SortKey; label: string }> = [
   { key: 'totalPoints',       label: copy.transfersSortPts },
   { key: 'nowCost',           label: copy.transfersSortPrice },
   { key: 'form',              label: copy.transfersSortForm },

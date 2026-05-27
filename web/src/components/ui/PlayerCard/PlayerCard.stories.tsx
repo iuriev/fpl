@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import type { SquadPlayer } from '@/types';
+
 import { PlayerCard } from './PlayerCard';
 
 const meta = {
@@ -22,6 +23,8 @@ const base: SquadPlayer = {
   position: 'MID',
   club: 'LIV',
   teamCode: 14,
+  teamId: 14,
+  nowCost: 135,
   points: 14,
   isCaptain: false,
   isViceCaptain: false,

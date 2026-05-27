@@ -20,9 +20,11 @@ yarn-error.log*
 /.pnp
 .pnp.js
 
+
 # IDE
 .vscode/*
 .idea/
+.junie/
 *.suo
 *.ntvs*
 *.njsproj

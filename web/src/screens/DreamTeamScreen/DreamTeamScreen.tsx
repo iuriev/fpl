@@ -30,6 +30,8 @@ function toSquadPlayer(p: DreamTeamPlayer): SquadPlayer {
     position: p.position,
     club: p.teamShortName,
     teamCode: p.teamCode,
+    teamId: p.teamCode,
+    nowCost: 0,
     points: p.points,
     isCaptain: false,
     isViceCaptain: false,

@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import * as playerPoolService from './player-pool-service';
 import * as fplClient from './fpl-client';
+import type { FPLBootstrapStatic } from './fpl-client';
 import * as cache from './cache';
 import * as fixturesService from './fixtures-service';
 
@@ -31,7 +32,7 @@ describe('player-pool-service', () => {
     it('composes pool players from bootstrap and fixture data', async () => {
       vi.mocked(cache.get).mockReturnValue(null);
       vi.mocked(cache.set).mockReturnValue(undefined);
-      vi.mocked(fplClient.getBootstrapStatic).mockResolvedValue(mockBootstrap as any);
+      vi.mocked(fplClient.getBootstrapStatic).mockResolvedValue(mockBootstrap as unknown as FPLBootstrapStatic);
       vi.mocked(fixturesService.getUpcomingFixtures).mockResolvedValue({
         1: [{ gw: 3, opponent: 'MCI', home: true, difficulty: 4 }],
       });

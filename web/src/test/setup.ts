@@ -7,7 +7,7 @@ class IntersectionObserverStub {
   observe = vi.fn();
   unobserve = vi.fn();
   disconnect = vi.fn();
-  constructor(_callback: IntersectionObserverCallback, _options?: IntersectionObserverInit) {}
+  constructor() {}
 }
 Object.defineProperty(window, 'IntersectionObserver', {
   writable: true,

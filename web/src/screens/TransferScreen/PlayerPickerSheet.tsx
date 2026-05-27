@@ -7,7 +7,7 @@ import type { PlayerPosition, PoolPlayer } from '@/types';
 import { PlayerPickerRow } from './PlayerPickerRow';
 import styles from './PlayerPickerSheet.module.css';
 import type { SortKey } from './SortPickerSheet';
-import { SORT_OPTIONS, SortPickerSheet } from './SortPickerSheet';
+import { SortPickerSheet } from './SortPickerSheet';
 
 type PositionFilter = 'ALL' | 'DEF' | 'MID' | 'FWD';
 

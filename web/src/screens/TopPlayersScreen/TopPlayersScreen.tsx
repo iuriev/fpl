@@ -28,9 +28,11 @@ function useProgressiveList(items: TopPlayersPlayer[]) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  const [prevItems, setPrevItems] = useState(items);
+  if (items !== prevItems) {
+    setPrevItems(items);
     setVisibleCount(PAGE_SIZE);
-  }, [items]);
+  }
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -86,7 +88,7 @@ export const TopPlayersScreen: React.FC = () => {
 
   // Teams query — loaded when "By Team" tab is active
   const { data: teamsData } = useTeams();
-  const teams = teamsData?.teams ?? [];
+  const teams = useMemo(() => teamsData?.teams ?? [], [teamsData]);
 
   const teamFilterParam = searchParams.get('teamFilter');
   const selectedTeamCode = useMemo(() => {

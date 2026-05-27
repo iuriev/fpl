@@ -3,7 +3,6 @@ import { http, HttpResponse } from 'msw';
 
 import { fixtureEntry, fixtureGameweeks, fixtureSquad, fixtureSquadEmpty } from '@/fixtures';
 
-
 import { SquadScreen } from './SquadScreen';
 
 const meta = {

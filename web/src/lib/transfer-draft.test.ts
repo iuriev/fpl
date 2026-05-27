@@ -23,8 +23,8 @@ const makeDraft = (overrides?: Partial<TransferDraft>): TransferDraft => ({
   ...overrides,
 });
 
-const makePlayer = (id: number, teamId: number, nowCost: number): Pick<SquadPlayer, 'id' | 'teamId' | 'nowCost'> =>
-  ({ id, teamId, nowCost } as any);
+const makePlayer = (id: number, teamId: number, nowCost: number): SquadPlayer =>
+  ({ id, teamId, nowCost } as unknown as SquadPlayer);
 
 const makePoolPlayer = (id: number, team: number, nowCost: number): PoolPlayer => ({
   id, webName: `P${id}`, firstName: 'A', lastName: 'B',
@@ -73,7 +73,7 @@ describe('transfer-draft', () => {
       const squadPlayers = [makePlayer(1, 1, 120)];
       const poolPlayers = [makePoolPlayer(2, 2, 80)];
       const swaps = [{ outId: 1, inId: 2 }];
-      expect(calcBank(50, swaps, [...squadPlayers as any, ...poolPlayers])).toBe(90);
+      expect(calcBank(50, swaps, [...squadPlayers, ...poolPlayers])).toBe(90);
     });
   });
 
@@ -95,19 +95,19 @@ describe('transfer-draft', () => {
     it('returns false when club has fewer than 3 players', () => {
       const squad = [makePlayer(1, 5, 80), makePlayer(2, 5, 75)];
       const newPlayer = makePoolPlayer(99, 5, 70);
-      expect(wouldExceedClubLimit(squad as any, newPlayer, 0)).toBe(false);
+      expect(wouldExceedClubLimit(squad, newPlayer, 0)).toBe(false);
     });
 
     it('returns true when adding would make 4 from same club', () => {
       const squad = [makePlayer(1, 5, 80), makePlayer(2, 5, 75), makePlayer(3, 5, 70)];
       const newPlayer = makePoolPlayer(99, 5, 65);
-      expect(wouldExceedClubLimit(squad as any, newPlayer, 0)).toBe(true);
+      expect(wouldExceedClubLimit(squad, newPlayer, 0)).toBe(true);
     });
 
     it('does not count the outgoing player towards the club limit', () => {
       const squad = [makePlayer(1, 5, 80), makePlayer(2, 5, 75), makePlayer(3, 5, 70)];
       const newPlayer = makePoolPlayer(99, 5, 65);
-      expect(wouldExceedClubLimit(squad as any, newPlayer, 3)).toBe(false);
+      expect(wouldExceedClubLimit(squad, newPlayer, 3)).toBe(false);
     });
   });
 

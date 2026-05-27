@@ -4,6 +4,7 @@ import * as gameweeksService from './gameweeks-service';
 import * as entryService from './entry-service';
 import * as squadService from './squad-service';
 import * as fixturesService from './fixtures-service';
+import type { FixtureInfo } from './types';
 import * as playerPoolService from './player-pool-service';
 
 vi.mock('./gameweeks-service');
@@ -157,7 +158,7 @@ describe('Proxy Endpoints', () => {
   describe('GET /api/fixtures/upcoming', () => {
     it('returns 200 with fixture data', async () => {
       const mockData = { 1: [{ gw: 3, opponent: 'MCI', home: true, difficulty: 4 }] };
-      vi.mocked(fixturesService.getUpcomingFixtures).mockResolvedValue(mockData as any);
+      vi.mocked(fixturesService.getUpcomingFixtures).mockResolvedValue(mockData as unknown as Record<number, FixtureInfo[]>);
 
       const res = await app.request('/api/fixtures/upcoming');
 

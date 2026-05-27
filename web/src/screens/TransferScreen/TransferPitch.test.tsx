@@ -50,7 +50,7 @@ function renderPitch(overrides: Partial<React.ComponentProps<typeof TransferPitc
 
 describe('TransferPitch sub mode', () => {
   it('valid target cards receive playerBtn_subTarget class when selectedSubId is set', () => {
-    const { container } = renderPitch({
+    renderPitch({
       selectedSubId: 6,
       validSubTargets: new Set([13, 14, 15]),
     });
