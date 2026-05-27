@@ -68,11 +68,12 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
   function renderCard(player: SquadPlayer, size: 'large' | 'medium') {
     const isOut = player.id === outPlayerId;
     const isIn = inPlayerIds.has(player.id);
-    const label = player.id === selectedSubId
-      ? `${player.name} (SUB OUT)`
-      : validSubTargets.has(player.id)
-        ? `${player.name} (SUB TARGET)`
-        : `${player.name}${isOut ? ' (OUT)' : isIn ? ' (IN)' : ''}`;
+    const label =
+      player.id === selectedSubId
+        ? `${player.name} (SUB OUT)`
+        : validSubTargets.has(player.id)
+          ? `${player.name} (SUB TARGET)`
+          : `${player.name}${isOut ? ' (OUT)' : isIn ? ' (IN)' : ''}`;
     return (
       <button
         key={player.id}
@@ -85,7 +86,9 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
           size={size}
           hidePoints
           nextFixture={poolLookup?.get(player.id)?.nextFixtures[0]}
-          onSubClick={!subModeActive && onSubIconClick ? () => onSubIconClick(player.id) : undefined}
+          onSubClick={
+            !subModeActive && onSubIconClick ? () => onSubIconClick(player.id) : undefined
+          }
         />
       </button>
     );
@@ -109,9 +112,7 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
         </Pitch>
       </div>
 
-      <div className={styles.bench}>
-        {bench.map((player) => renderCard(player, 'medium'))}
-      </div>
+      <div className={styles.bench}>{bench.map((player) => renderCard(player, 'medium'))}</div>
     </div>
   );
 };

@@ -20,16 +20,28 @@ const makePlayer = (overrides?: Partial<SquadPlayer>): SquadPlayer => ({
   chanceOfPlaying: null,
   news: '',
   stats: {
-    minutes: 90, goals_scored: 0, assists: 1, clean_sheets: 0,
-    goals_conceded: 0, own_goals: 0, penalties_saved: 0,
-    penalties_missed: 0, yellow_cards: 0, red_cards: 0,
-    saves: 0, bonus: 0, total_points: 6,
+    minutes: 90,
+    goals_scored: 0,
+    assists: 1,
+    clean_sheets: 0,
+    goals_conceded: 0,
+    own_goals: 0,
+    penalties_saved: 0,
+    penalties_missed: 0,
+    yellow_cards: 0,
+    red_cards: 0,
+    saves: 0,
+    bonus: 0,
+    total_points: 6,
   },
   ...overrides,
 });
 
 const makeFixture = (overrides?: Partial<FixtureInfo>): FixtureInfo => ({
-  gw: 38, opponent: 'LIV', home: true, difficulty: 4,
+  gw: 38,
+  opponent: 'LIV',
+  home: true,
+  difficulty: 4,
   ...overrides,
 });
 
@@ -50,7 +62,7 @@ describe('PlayerCard', () => {
       <PlayerCard
         player={makePlayer({ club: 'MCI' })}
         nextFixture={makeFixture({ opponent: 'CHE' })}
-      />,
+      />
     );
     expect(screen.getByText('MCI')).toBeInTheDocument();
     expect(screen.getByText(/CHE/)).toBeInTheDocument();

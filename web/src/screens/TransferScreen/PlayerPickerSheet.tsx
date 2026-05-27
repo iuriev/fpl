@@ -6,10 +6,10 @@ import type { PlayerPosition, PoolPlayer } from '@/types';
 
 import { PlayerPickerRow } from './PlayerPickerRow';
 import styles from './PlayerPickerSheet.module.css';
-import type { SortKey } from './SortPickerSheet';
-import { SortPickerSheet } from './SortPickerSheet';
 
 type PositionFilter = 'ALL' | 'DEF' | 'MID' | 'FWD';
+
+type SortKey = 'totalPoints' | 'nowCost' | 'selectedByPercent' | 'expectedPoints' | 'webName';
 
 const POS_LABELS: Record<PositionFilter, string> = {
   ALL: copy.transfersPositionAll,
@@ -31,6 +31,7 @@ export interface PlayerPickerSheetProps {
   squadPositionCounts: Map<PlayerPosition, number>;
   squadPlayerIds: Set<number>;
   isOutfield: boolean;
+  targetGw: number | null;
   onSelect: (player: PoolPlayer) => void;
   onClose: () => void;
 }
@@ -44,14 +45,24 @@ export const PlayerPickerSheet: React.FC<PlayerPickerSheetProps> = ({
   squadPositionCounts,
   squadPlayerIds,
   isOutfield,
+  targetGw,
   onSelect,
   onClose,
 }) => {
   const [query, setQuery] = useState('');
-  const [sortKey, setSortKey] = useState<SortKey>('totalPoints');
+  const [sortKey, setSortKey] = useState<SortKey>('selectedByPercent');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+
+  const handleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortKey(key);
+      setSortOrder(key === 'webName' ? 'asc' : 'desc');
+    }
+  };
   const defaultPos = isOutfield ? (outPlayer.position as PositionFilter) : 'ALL';
   const [positionFilter, setPositionFilter] = useState<PositionFilter>(defaultPos);
-  const [showSort, setShowSort] = useState(false);
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase();
@@ -63,14 +74,25 @@ export const PlayerPickerSheet: React.FC<PlayerPickerSheetProps> = ({
           q === '' ||
           p.webName.toLowerCase().includes(q) ||
           p.firstName.toLowerCase().includes(q) ||
-          p.lastName.toLowerCase().includes(q),
+          p.lastName.toLowerCase().includes(q)
       )
       .sort((a, b) => {
+        if (sortKey === 'webName') {
+          const res = a.webName.localeCompare(b.webName);
+          return sortOrder === 'asc' ? res : -res;
+        }
         const aVal = parseFloat(String(a[sortKey]));
         const bVal = parseFloat(String(b[sortKey]));
-        return bVal - aVal;
+        const res = bVal - aVal;
+        return sortOrder === 'desc' ? res : -res;
       });
-  }, [candidates, query, sortKey, squadPlayerIds, positionFilter]);
+  }, [candidates, query, sortKey, sortOrder, squadPlayerIds, positionFilter]);
+
+  const getLabelClass = (key: SortKey) => {
+    if (sortKey !== key) return styles.label;
+    const activeClass = sortOrder === 'desc' ? styles.label_active : styles.label_active_asc;
+    return `${styles.label} ${styles.label_sortable} ${activeClass}`;
+  };
 
   const title = interpolate(copy.transfersPickerTitle, { name: outPlayer.webName });
   const subtitle = interpolate(copy.transfersPickerSubtitle, {
@@ -108,25 +130,123 @@ export const PlayerPickerSheet: React.FC<PlayerPickerSheetProps> = ({
                   ))}
                 </div>
               )}
-              <button
-                className={`${styles.sortBtn} ${!isOutfield ? styles.sortBtn_alone : ''}`}
-                onClick={() => setShowSort(true)}
-              >
-                {copy.transfersSortButton}
-                <svg viewBox="0 0 14 14" fill="none" aria-hidden="true" width="12" height="12">
-                  <path d="M2 3.5h10M4 7h6M6 10.5h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-              </button>
             </div>
+          </div>
+
+          <div className={styles.listHeader} role="row">
+            <span
+              role="columnheader"
+              aria-sort={
+                sortKey === 'webName' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'
+              }
+              className={getLabelClass('webName')}
+              onClick={() => handleSort('webName')}
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleSort('webName');
+                }
+              }}
+            >
+              {copy.transfersColPlayer}
+            </span>
+            <span role="columnheader" className={styles.label}>
+              {targetGw
+                ? `GW${targetGw}${targetGw < 38 ? `-${Math.min(targetGw + 2, 38)}` : ''}`
+                : copy.transfersColFix}
+            </span>
+            <span
+              role="columnheader"
+              aria-sort={
+                sortKey === 'selectedByPercent'
+                  ? sortOrder === 'asc'
+                    ? 'ascending'
+                    : 'descending'
+                  : 'none'
+              }
+              className={getLabelClass('selectedByPercent')}
+              title={copy.transfersColOwnershipTitle}
+              onClick={() => handleSort('selectedByPercent')}
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleSort('selectedByPercent');
+                }
+              }}
+            >
+              {copy.transfersColOwnership}
+            </span>
+            <span
+              role="columnheader"
+              aria-sort={
+                sortKey === 'totalPoints'
+                  ? sortOrder === 'asc'
+                    ? 'ascending'
+                    : 'descending'
+                  : 'none'
+              }
+              className={getLabelClass('totalPoints')}
+              onClick={() => handleSort('totalPoints')}
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleSort('totalPoints');
+                }
+              }}
+            >
+              {copy.transfersColPts}
+            </span>
+            <span
+              role="columnheader"
+              aria-sort={
+                sortKey === 'expectedPoints'
+                  ? sortOrder === 'asc'
+                    ? 'ascending'
+                    : 'descending'
+                  : 'none'
+              }
+              className={getLabelClass('expectedPoints')}
+              onClick={() => handleSort('expectedPoints')}
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleSort('expectedPoints');
+                }
+              }}
+            >
+              {copy.transfersColXPts}
+            </span>
+            <span
+              role="columnheader"
+              aria-sort={
+                sortKey === 'nowCost' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'
+              }
+              className={getLabelClass('nowCost')}
+              onClick={() => handleSort('nowCost')}
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleSort('nowCost');
+                }
+              }}
+            >
+              {copy.transfersColCost}
+            </span>
           </div>
 
           <ul className={styles.list}>
             {filtered.map((player) => {
-              const countFromTeam = (squadTeamCounts.get(player.team) ?? 0)
-                - (outPlayer.team === player.team ? 1 : 0);
+              const countFromTeam =
+                (squadTeamCounts.get(player.team) ?? 0) - (outPlayer.team === player.team ? 1 : 0);
               const clubLimit = countFromTeam >= 3;
-              const positionCount = (squadPositionCounts.get(player.position) ?? 0)
-                - (outPlayer.position === player.position ? 1 : 0);
+              const positionCount =
+                (squadPositionCounts.get(player.position) ?? 0) -
+                (outPlayer.position === player.position ? 1 : 0);
               const positionLimit = positionCount >= POSITION_MAX[player.position];
               return (
                 <PlayerPickerRow
@@ -142,12 +262,6 @@ export const PlayerPickerSheet: React.FC<PlayerPickerSheetProps> = ({
           </ul>
         </div>
       </BottomSheet>
-      <SortPickerSheet
-        open={showSort}
-        sortKey={sortKey}
-        onSelect={(key) => { setSortKey(key); setShowSort(false); }}
-        onClose={() => setShowSort(false)}
-      />
     </>
   );
 };

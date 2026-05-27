@@ -72,7 +72,7 @@ export const DreamTeamScreen: React.FC = () => {
 
   const finishedGws = useMemo(
     () => gameweeksData?.gameweeks.filter((gw) => gw.finished) ?? [],
-    [gameweeksData],
+    [gameweeksData]
   );
 
   const latestFinishedGw = finishedGws.length > 0 ? finishedGws[finishedGws.length - 1].id : null;
@@ -88,18 +88,19 @@ export const DreamTeamScreen: React.FC = () => {
 
   const selectedGwFinished = useMemo(
     () => finishedGws.some((gw) => gw.id === selectedGw),
-    [finishedGws, selectedGw],
+    [finishedGws, selectedGw]
   );
 
   const { data, isLoading, isError, error, refetch } = useDreamTeam(
-    selectedGwFinished ? selectedGw : null,
+    selectedGwFinished ? selectedGw : null
   );
 
   const isNotAvailable = !selectedGwFinished && selectedGw !== null;
   const is400 = isError && error instanceof ApiError && error.status === 400;
   const isRealError = isError && !is400;
 
-  const canGoPrev = selectedGw !== null && selectedGw > 1 && finishedGws.some((gw) => gw.id === selectedGw - 1);
+  const canGoPrev =
+    selectedGw !== null && selectedGw > 1 && finishedGws.some((gw) => gw.id === selectedGw - 1);
   const canGoNext =
     selectedGw !== null &&
     latestFinishedGw !== null &&
@@ -114,14 +115,16 @@ export const DreamTeamScreen: React.FC = () => {
         const p = new URLSearchParams(prev);
         p.set('gw', String(next));
         return p;
-      }),
+      })
     );
   };
 
   const handleBack = () => {
     const teamIdParam = searchParams.get('teamId');
     const gwBackParam = searchParams.get('gw');
-    navigate(`/${teamIdParam ? `?teamId=${teamIdParam}` : ''}${gwBackParam && teamIdParam ? `&gw=${gwBackParam}` : ''}`);
+    navigate(
+      `/${teamIdParam ? `?teamId=${teamIdParam}` : ''}${gwBackParam && teamIdParam ? `&gw=${gwBackParam}` : ''}`
+    );
   };
 
   const positionGroups = useMemo(() => {
@@ -129,17 +132,20 @@ export const DreamTeamScreen: React.FC = () => {
     return groupByPosition(data.players);
   }, [data]);
 
-  const gwLabel =
-    selectedGw !== null
-      ? `GW ${selectedGw}`
-      : '';
+  const gwLabel = selectedGw !== null ? `GW ${selectedGw}` : '';
 
   return (
     <div className={styles.screen}>
       <header className={styles.header}>
         <button className={styles.backBtn} onClick={handleBack} aria-label={copy.dreamTeamBack}>
           <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M10 4l-4 4 4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+              d="M10 4l-4 4 4 4"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
           {copy.dreamTeamBack}
         </button>
@@ -156,7 +162,13 @@ export const DreamTeamScreen: React.FC = () => {
             aria-label="Previous gameweek"
           >
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M10 4l-4 4 4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M10 4l-4 4 4 4"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </button>
           <span className={styles.gwLabel}>{gwLabel}</span>
@@ -167,7 +179,13 @@ export const DreamTeamScreen: React.FC = () => {
             aria-label="Next gameweek"
           >
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" className={styles.chevronRight}>
-              <path d="M10 4l-4 4 4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M10 4l-4 4 4 4"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </button>
         </div>

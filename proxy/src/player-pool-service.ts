@@ -46,6 +46,7 @@ export async function getPlayerPool(): Promise<PlayerPoolResponse> {
     chanceOfPlaying: el.chance_of_playing_this_round,
     news: el.news,
     selectedByPercent: el.selected_by_percent,
+    expectedPoints: el.ep_next,
     form: el.form,
     nextFixtures: fixtures[el.team] ?? [],
   }));

@@ -53,6 +53,9 @@ export const PlayerPickerRow: React.FC<PlayerPickerRowProps> = ({
           <FdrChip key={i} opponent={f.opponent} home={f.home} difficulty={f.difficulty} />
         ))}
       </div>
+      <div className={styles.ownership}>{player.selectedByPercent}%</div>
+      <div className={styles.points}>{player.totalPoints}</div>
+      <div className={styles.xPts}>{player.expectedPoints}</div>
       <div className={`${styles.cost} ${overBudget ? styles.cost_over : ''}`}>
         £{(player.nowCost / 10).toFixed(1)}m
       </div>

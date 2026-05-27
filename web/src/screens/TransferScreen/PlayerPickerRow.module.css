@@ -1,8 +1,8 @@
 .row {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr 5.5rem 3.5rem 2.5rem 2.5rem 4rem;
   align-items: center;
-  gap: var(--fpl-space-sm);
+  gap: var(--fpl-space-xs);
   padding: var(--fpl-space-sm) var(--fpl-space-md);
   border-bottom: 1px solid var(--fpl-bg-hair);
   cursor: pointer;
@@ -42,12 +42,13 @@
 
 .clubTag {
   font-size: 0.625rem;
-  color: var(--fpl-warning, #E8C347);
+  color: var(--fpl-warning, #e8c347);
 }
 
 .fixtures {
   display: flex;
   gap: 0.125rem;
+  justify-content: center;
 }
 
 .cost {
@@ -55,8 +56,27 @@
   font-weight: 600;
   color: var(--fpl-text-primary);
   white-space: nowrap;
+  text-align: center;
 }
 
 .cost_over {
-  color: var(--fpl-danger, #E8604C);
+  color: var(--fpl-danger, #e8604c);
+}
+
+.ownership,
+.points,
+.xPts {
+  font-size: 0.75rem;
+  color: var(--fpl-text-primary);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.ownership {
+  color: var(--fpl-muted-soft);
+}
+
+.xPts {
+  color: var(--fpl-cyan, #00ff87);
+  font-weight: 600;
 }

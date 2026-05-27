@@ -68,7 +68,9 @@
   place-items: center;
   cursor: pointer;
   flex-shrink: 0;
-  transition: background 120ms, color 120ms;
+  transition:
+    background 120ms,
+    color 120ms;
 }
 
 .closeBtn:hover {

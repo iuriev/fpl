@@ -179,6 +179,7 @@ export interface PoolPlayer {
   chanceOfPlaying: number | null;
   news: string;
   selectedByPercent: string;
+  expectedPoints: string;
   form: string;
   nextFixtures: FixtureInfo[];
 }

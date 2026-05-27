@@ -11,7 +11,7 @@ import { Pitch } from '@/components/ui/Pitch/Pitch';
 import { PlayerCard } from '@/components/ui/PlayerCard/PlayerCard';
 import { SummaryStrip } from '@/components/ui/SummaryStrip/SummaryStrip';
 import { TeamInfoPanel } from '@/components/ui/TeamInfoPanel/TeamInfoPanel';
-import { type ViewMode,ViewToggle } from '@/components/ui/ViewToggle/ViewToggle';
+import { type ViewMode, ViewToggle } from '@/components/ui/ViewToggle/ViewToggle';
 import { copy, interpolate } from '@/lib/copy';
 import type { PlayerPosition, SquadPlayer } from '@/types';
 import { MAX_GAMEWEEK } from '@/types';
@@ -66,10 +66,13 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
   const viewParam = searchParams.get('view');
   const view: ViewMode = viewParam === 'list' ? 'list' : 'pitch';
 
-  const { data: squad, isLoading, isError: squadIsError, error: squadError, refetch } = useSquad(
-    entryIsError ? null : teamId,
-    selectedGw,
-  );
+  const {
+    data: squad,
+    isLoading,
+    isError: squadIsError,
+    error: squadError,
+    refetch,
+  } = useSquad(entryIsError ? null : teamId, selectedGw);
 
   const { data: poolData } = usePlayerPool();
 
@@ -90,7 +93,7 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
         const p = new URLSearchParams(prev);
         p.set('gw', String(currentGw));
         return p;
-      }),
+      })
     );
   };
 
@@ -105,7 +108,7 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
         const p = new URLSearchParams(prev);
         p.set('gw', String(next));
         return p;
-      }),
+      })
     );
   };
 
@@ -115,7 +118,7 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
         const p = new URLSearchParams(prev);
         p.set('view', mode);
         return p;
-      }),
+      })
     );
   };
 
@@ -129,9 +132,7 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
   }, [squad]);
 
   const gwLabel =
-    selectedGw !== null
-      ? `${copy.squadGameweekLabel} ${selectedGw}`
-      : copy.squadGameweekLabel;
+    selectedGw !== null ? `${copy.squadGameweekLabel} ${selectedGw}` : copy.squadGameweekLabel;
 
   const drawerHeader = entry ? (
     <>
@@ -174,7 +175,12 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
                 aria-label={copy.teamInfoOpenDrawer}
               >
                 <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                  <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                  <path
+                    d="M3 5h14M3 10h14M3 15h14"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
                 </svg>
               </button>
               <div className={styles.fplMark} aria-hidden="true">
@@ -210,7 +216,13 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
               aria-label="Previous gameweek"
             >
               <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M10 4l-4 4 4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path
+                  d="M10 4l-4 4 4 4"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </button>
             <span className={styles.gwLabel}>{gwLabel}</span>
@@ -220,8 +232,19 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
                 onClick={() => navigateGw(1)}
                 aria-label="Next gameweek"
               >
-                <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" className={styles.chevronRight}>
-                  <path d="M10 4l-4 4 4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <svg
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  aria-hidden="true"
+                  className={styles.chevronRight}
+                >
+                  <path
+                    d="M10 4l-4 4 4 4"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               </button>
             )}
@@ -235,9 +258,7 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
         )}
         {isLoading && <div className={styles.summaryPlaceholder} aria-hidden="true" />}
 
-        {isLoading && (
-          view === 'list' ? <ListViewSkeleton /> : <SquadSkeleton />
-        )}
+        {isLoading && (view === 'list' ? <ListViewSkeleton /> : <SquadSkeleton />)}
 
         {entryIsError && (
           <div className={styles.stateCenter}>
@@ -276,8 +297,9 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
           </div>
         )}
 
-        {squad && squad.starters.length > 0 && (
-          view === 'list' ? (
+        {squad &&
+          squad.starters.length > 0 &&
+          (view === 'list' ? (
             <ListView starters={squad.starters} bench={squad.bench} />
           ) : (
             positionGroups && (
@@ -317,8 +339,7 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
                 </div>
               </div>
             )
-          )
-        )}
+          ))}
       </div>
     </div>
   );

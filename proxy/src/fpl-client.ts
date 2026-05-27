@@ -39,6 +39,7 @@ export interface FPLBootstrapStatic {
     event_points: number;
     form: string;
     selected_by_percent: string;
+    ep_next: string;
   }>;
   element_types: Array<{
     id: number;

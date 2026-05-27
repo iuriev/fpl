@@ -17,8 +17,6 @@ These are already in production and break expected behaviour.
 
 | ID | Task | Effort | Why now |
 |----|------|--------|---------|
-| BUG-01 | Fix position limit validation in transfer planner (max 5 DEF, 5 MID, 3 FWD) | S | Breaks FPL rules. Any user who finds it loses trust immediately. |
-| BUG-02 | Replace ugly yellow swap highlight with green↑ / red↓ directional arrows | S | Visually broken. Every transfer shows this. |
 
 ---
 
@@ -166,7 +164,8 @@ For reference — features that are live in the codebase:
 - **Gameweek History Screen** — per-GW points history chart/table
 - **Leagues Stats Screen** — mini-league standings
 - **Top Players Screen** — top performers for a GW
-- **Transfer Planner** — pick players to transfer in/out, budget tracking, squad validation (partial — see BUG-01)
+- **Transfer Planner** — pick players to transfer in/out, budget tracking, squad validation
+- **Fix bugs** — BUG-01 (position limits), BUG-02 (transfer arrows)
 - **Proxy/BFF** — services for squad, entry, gameweeks, history, leagues, dream-team, fixtures, player pool, top players, team
 
 ---
@@ -175,8 +174,7 @@ For reference — features that are live in the codebase:
 
 The recommended order is:
 
-1. **Fix bugs** (BUG-01, BUG-02) — nothing else ships while these are live.
-2. **Finish Transfer screen polish** — the transfer planner is the app's deepest feature and the one users spend the most time with.
+1. **Finish Transfer screen polish** — the transfer planner is the app's deepest feature and the one users spend the most time with.
 3. **User accounts** (AUTH-01) — enables all personalized features. Build early.
 4. **Gameweek review + chip display + live rank** — creates weekly return habit before we build premium features.
 5. **xPts + predicted points + premium gate** — builds the monetisation foundation.

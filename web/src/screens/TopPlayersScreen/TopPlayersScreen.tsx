@@ -2,7 +2,13 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import { useGameweeks, useTeamPlayers, useTeams, useTopPlayersGw, useTopPlayersSeason } from '@/api/queries';
+import {
+  useGameweeks,
+  useTeamPlayers,
+  useTeams,
+  useTopPlayersGw,
+  useTopPlayersSeason,
+} from '@/api/queries';
 import { BottomSheet } from '@/components/ui/BottomSheet/BottomSheet';
 import { Button } from '@/components/ui/Button/Button';
 import { PlayerRankRow } from '@/components/ui/PlayerRankRow/PlayerRankRow';
@@ -44,7 +50,7 @@ function useProgressiveList(items: TopPlayersPlayer[]) {
           setVisibleCount((c) => Math.min(c + PAGE_SIZE, items.length));
         }
       },
-      { threshold: 0 },
+      { threshold: 0 }
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
@@ -65,7 +71,7 @@ export const TopPlayersScreen: React.FC = () => {
 
   const finishedGws = useMemo(
     () => gameweeksData?.gameweeks.filter((gw) => gw.finished) ?? [],
-    [gameweeksData],
+    [gameweeksData]
   );
   const latestFinishedGw = finishedGws.length > 0 ? finishedGws[finishedGws.length - 1].id : null;
 
@@ -83,7 +89,7 @@ export const TopPlayersScreen: React.FC = () => {
 
   const selectedGwFinished = useMemo(
     () => finishedGws.some((gw) => gw.id === selectedGw),
-    [finishedGws, selectedGw],
+    [finishedGws, selectedGw]
   );
 
   // Teams query — loaded when "By Team" tab is active
@@ -118,7 +124,7 @@ export const TopPlayersScreen: React.FC = () => {
         const p = new URLSearchParams(prev);
         p.set('gw', String(next));
         return p;
-      }),
+      })
     );
   };
 
@@ -154,7 +160,9 @@ export const TopPlayersScreen: React.FC = () => {
   const handleBack = () => {
     const teamIdParam = searchParams.get('teamId');
     const gwBackParam = searchParams.get('gw');
-    navigate(`/${teamIdParam ? `?teamId=${teamIdParam}` : ''}${gwBackParam && teamIdParam ? `&gw=${gwBackParam}` : ''}`);
+    navigate(
+      `/${teamIdParam ? `?teamId=${teamIdParam}` : ''}${gwBackParam && teamIdParam ? `&gw=${gwBackParam}` : ''}`
+    );
   };
 
   const gwLabel = selectedGw !== null ? `GW ${selectedGw}` : '';
@@ -185,7 +193,13 @@ export const TopPlayersScreen: React.FC = () => {
       <header className={styles.header}>
         <button className={styles.backBtn} onClick={handleBack} aria-label={copy.topPlayersBack}>
           <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M10 4l-4 4 4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+              d="M10 4l-4 4 4 4"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
           {copy.topPlayersBack}
         </button>
@@ -228,7 +242,13 @@ export const TopPlayersScreen: React.FC = () => {
             aria-label="Previous gameweek"
           >
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M10 4l-4 4 4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M10 4l-4 4 4 4"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </button>
           <span className={styles.gwLabel}>{gwLabel}</span>
@@ -239,7 +259,13 @@ export const TopPlayersScreen: React.FC = () => {
             aria-label="Next gameweek"
           >
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" className={styles.chevronRight}>
-              <path d="M10 4l-4 4 4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M10 4l-4 4 4 4"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </button>
         </div>
@@ -257,8 +283,19 @@ export const TopPlayersScreen: React.FC = () => {
               onClick={() => setTeamPickerOpen(true)}
             >
               <span className={styles.teamPickerValue}>{selectedTeamName}</span>
-              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" className={styles.teamPickerChevron}>
-                <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                aria-hidden="true"
+                className={styles.teamPickerChevron}
+              >
+                <path
+                  d="M4 6l4 4 4-4"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </button>
           </div>
@@ -280,8 +317,19 @@ export const TopPlayersScreen: React.FC = () => {
                 >
                   <span className={styles.teamOptionName}>{team.name}</span>
                   {team.code === selectedTeamCode && (
-                    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" className={styles.teamOptionCheck}>
-                      <path d="M3 8l4 4 6-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <svg
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      aria-hidden="true"
+                      className={styles.teamOptionCheck}
+                    >
+                      <path
+                        d="M3 8l4 4 6-7"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   )}
                 </button>

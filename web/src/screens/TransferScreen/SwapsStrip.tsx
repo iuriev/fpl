@@ -13,7 +13,10 @@ export interface SwapsStripProps {
   onUndo: (outId: number) => void;
 }
 
-function formatDelta(outCost: number, inCost: number): { text: string; direction: 'up' | 'down' | 'neutral' } {
+function formatDelta(
+  outCost: number,
+  inCost: number
+): { text: string; direction: 'up' | 'down' | 'neutral' } {
   const delta = inCost - outCost;
   if (delta === 0) return { text: '=', direction: 'neutral' };
   const amount = `£${(Math.abs(delta) / 10).toFixed(1)}m`;
@@ -45,34 +48,38 @@ export const SwapsStrip: React.FC<SwapsStripProps> = ({
       </div>
 
       <div className={styles.body}>
-      {swaps.length === 0 ? (
-        <p className={styles.empty}>{copy.transfersPendingEmpty}</p>
-      ) : (
-        <ul className={styles.list}>
-          {swaps.map((swap) => {
-            const outName = nameMap.get(swap.outId) ?? '?';
-            const inName = nameMap.get(swap.inId) ?? '?';
-            const outCost = costMap.get(swap.outId) ?? 0;
-            const inCost = costMap.get(swap.inId) ?? 0;
-            const delta = formatDelta(outCost, inCost);
-            return (
-              <li key={swap.outId} className={styles.row}>
-                <span className={styles.outName}>{outName}</span>
-                <span className={styles.arrow} aria-hidden="true">→</span>
-                <span className={styles.inName}>{inName}</span>
-                <span className={`${styles.delta} ${styles[`delta_${delta.direction}`]}`}>{delta.text}</span>
-                <button
-                  className={styles.undoBtn}
-                  onClick={() => onUndo(swap.outId)}
-                  aria-label={`${copy.transfersUndoSwap} ${outName} → ${inName}`}
-                >
-                  ✕
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+        {swaps.length === 0 ? (
+          <p className={styles.empty}>{copy.transfersPendingEmpty}</p>
+        ) : (
+          <ul className={styles.list}>
+            {swaps.map((swap) => {
+              const outName = nameMap.get(swap.outId) ?? '?';
+              const inName = nameMap.get(swap.inId) ?? '?';
+              const outCost = costMap.get(swap.outId) ?? 0;
+              const inCost = costMap.get(swap.inId) ?? 0;
+              const delta = formatDelta(outCost, inCost);
+              return (
+                <li key={swap.outId} className={styles.row}>
+                  <span className={styles.outName}>{outName}</span>
+                  <span className={styles.arrow} aria-hidden="true">
+                    →
+                  </span>
+                  <span className={styles.inName}>{inName}</span>
+                  <span className={`${styles.delta} ${styles[`delta_${delta.direction}`]}`}>
+                    {delta.text}
+                  </span>
+                  <button
+                    className={styles.undoBtn}
+                    onClick={() => onUndo(swap.outId)}
+                    aria-label={`${copy.transfersUndoSwap} ${outName} → ${inName}`}
+                  >
+                    ✕
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </div>
     </div>
   );

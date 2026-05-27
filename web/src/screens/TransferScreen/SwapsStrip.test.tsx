@@ -8,8 +8,7 @@ import { SwapsStrip } from './SwapsStrip';
 
 const makeSwap = (outId: number, inId: number): TransferSwap => ({ outId, inId });
 
-const makeNameMap = (entries: [number, string][]): Map<number, string> =>
-  new Map(entries);
+const makeNameMap = (entries: [number, string][]): Map<number, string> => new Map(entries);
 
 describe('SwapsStrip', () => {
   it('shows empty state when no swaps', () => {
@@ -29,8 +28,16 @@ describe('SwapsStrip', () => {
     render(
       <SwapsStrip
         swaps={[makeSwap(1, 2)]}
-        nameMap={makeNameMap([[1, 'Saka'], [2, 'Salah']])}
-        costMap={new Map([[1, 95], [2, 135]])}
+        nameMap={makeNameMap([
+          [1, 'Saka'],
+          [2, 'Salah'],
+        ])}
+        costMap={
+          new Map([
+            [1, 95],
+            [2, 135],
+          ])
+        }
         freeTransfers={1}
         onUndo={vi.fn()}
       />
@@ -46,8 +53,16 @@ describe('SwapsStrip', () => {
     render(
       <SwapsStrip
         swaps={[makeSwap(1, 2)]}
-        nameMap={makeNameMap([[1, 'Saka'], [2, 'Salah']])}
-        costMap={new Map([[1, 95], [2, 135]])}
+        nameMap={makeNameMap([
+          [1, 'Saka'],
+          [2, 'Salah'],
+        ])}
+        costMap={
+          new Map([
+            [1, 95],
+            [2, 135],
+          ])
+        }
         freeTransfers={1}
         onUndo={onUndo}
       />
@@ -60,8 +75,20 @@ describe('SwapsStrip', () => {
     render(
       <SwapsStrip
         swaps={[makeSwap(1, 2), makeSwap(3, 4)]}
-        nameMap={makeNameMap([[1, 'A'], [2, 'B'], [3, 'C'], [4, 'D']])}
-        costMap={new Map([[1, 80], [2, 80], [3, 90], [4, 90]])}
+        nameMap={makeNameMap([
+          [1, 'A'],
+          [2, 'B'],
+          [3, 'C'],
+          [4, 'D'],
+        ])}
+        costMap={
+          new Map([
+            [1, 80],
+            [2, 80],
+            [3, 90],
+            [4, 90],
+          ])
+        }
         freeTransfers={1}
         onUndo={vi.fn()}
       />

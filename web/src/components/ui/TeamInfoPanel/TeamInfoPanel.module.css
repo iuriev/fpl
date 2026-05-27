@@ -95,7 +95,9 @@
   font-weight: var(--fpl-fw-semibold);
   color: var(--fpl-text-soft);
   text-decoration: none;
-  transition: border-color 120ms, color 120ms;
+  transition:
+    border-color 120ms,
+    color 120ms;
 }
 
 .navLink:hover {

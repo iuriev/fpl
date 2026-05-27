@@ -4,7 +4,13 @@ import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as queries from '@/api/queries';
-import { fixtureGameweeks, fixtureTeamPlayers, fixtureTeams, fixtureTopPlayersGw, fixtureTopPlayersSeason } from '@/fixtures';
+import {
+  fixtureGameweeks,
+  fixtureTeamPlayers,
+  fixtureTeams,
+  fixtureTopPlayersGw,
+  fixtureTopPlayersSeason,
+} from '@/fixtures';
 
 vi.mock('@/api/queries', () => ({
   useGameweeks: vi.fn(),
@@ -17,11 +23,30 @@ vi.mock('@/api/queries', () => ({
 const mockQueries = vi.mocked(queries);
 
 function setupDefaultMocks() {
-  mockQueries.useGameweeks.mockReturnValue({ data: fixtureGameweeks } as ReturnType<typeof queries.useGameweeks>);
-  mockQueries.useTopPlayersGw.mockReturnValue({ data: fixtureTopPlayersGw, isLoading: false, isError: false, refetch: vi.fn() } as unknown as ReturnType<typeof queries.useTopPlayersGw>);
-  mockQueries.useTopPlayersSeason.mockReturnValue({ data: fixtureTopPlayersSeason, isLoading: false, isError: false, refetch: vi.fn() } as unknown as ReturnType<typeof queries.useTopPlayersSeason>);
-  mockQueries.useTeams.mockReturnValue({ data: fixtureTeams } as unknown as ReturnType<typeof queries.useTeams>);
-  mockQueries.useTeamPlayers.mockReturnValue({ data: fixtureTeamPlayers, isLoading: false, isError: false, refetch: vi.fn() } as unknown as ReturnType<typeof queries.useTeamPlayers>);
+  mockQueries.useGameweeks.mockReturnValue({ data: fixtureGameweeks } as ReturnType<
+    typeof queries.useGameweeks
+  >);
+  mockQueries.useTopPlayersGw.mockReturnValue({
+    data: fixtureTopPlayersGw,
+    isLoading: false,
+    isError: false,
+    refetch: vi.fn(),
+  } as unknown as ReturnType<typeof queries.useTopPlayersGw>);
+  mockQueries.useTopPlayersSeason.mockReturnValue({
+    data: fixtureTopPlayersSeason,
+    isLoading: false,
+    isError: false,
+    refetch: vi.fn(),
+  } as unknown as ReturnType<typeof queries.useTopPlayersSeason>);
+  mockQueries.useTeams.mockReturnValue({ data: fixtureTeams } as unknown as ReturnType<
+    typeof queries.useTeams
+  >);
+  mockQueries.useTeamPlayers.mockReturnValue({
+    data: fixtureTeamPlayers,
+    isLoading: false,
+    isError: false,
+    refetch: vi.fn(),
+  } as unknown as ReturnType<typeof queries.useTeamPlayers>);
 }
 
 import { TopPlayersScreen } from './TopPlayersScreen';
@@ -30,7 +55,7 @@ function renderScreen(path = '/top-players') {
   return render(
     <MemoryRouter initialEntries={[path]}>
       <TopPlayersScreen />
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 }
 
@@ -140,8 +165,8 @@ describe('TopPlayersScreen — By Team tab', () => {
     await user.click(screen.getByRole('tab', { name: 'By Team' }));
     await user.click(screen.getByRole('button', { name: /select team/i }));
     const dialog = screen.getByRole('dialog', { name: /select team/i });
-    const buttons = Array.from(dialog.querySelectorAll('button')).filter(
-      (b) => b.textContent?.trim()
+    const buttons = Array.from(dialog.querySelectorAll('button')).filter((b) =>
+      b.textContent?.trim()
     );
     expect(buttons[0]).toHaveTextContent('Arsenal');
     expect(buttons[1]).toHaveTextContent('Chelsea');
@@ -173,9 +198,21 @@ describe('TopPlayersScreen — By Team tab', () => {
 
 describe('TopPlayersScreen — loading state', () => {
   it('shows loading skeleton when GW data is loading', () => {
-    mockQueries.useGameweeks.mockReturnValue({ data: fixtureGameweeks } as ReturnType<typeof queries.useGameweeks>);
-    mockQueries.useTopPlayersGw.mockReturnValue({ data: undefined, isLoading: true, isError: false, refetch: vi.fn() } as unknown as ReturnType<typeof queries.useTopPlayersGw>);
-    mockQueries.useTopPlayersSeason.mockReturnValue({ data: undefined, isLoading: false, isError: false, refetch: vi.fn() } as unknown as ReturnType<typeof queries.useTopPlayersSeason>);
+    mockQueries.useGameweeks.mockReturnValue({ data: fixtureGameweeks } as ReturnType<
+      typeof queries.useGameweeks
+    >);
+    mockQueries.useTopPlayersGw.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      isError: false,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof queries.useTopPlayersGw>);
+    mockQueries.useTopPlayersSeason.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof queries.useTopPlayersSeason>);
     renderScreen();
     expect(screen.getByLabelText(/loading/i)).toBeInTheDocument();
   });
@@ -183,9 +220,21 @@ describe('TopPlayersScreen — loading state', () => {
 
 describe('TopPlayersScreen — error state', () => {
   it('shows error message and retry button when GW fetch fails', () => {
-    mockQueries.useGameweeks.mockReturnValue({ data: fixtureGameweeks } as ReturnType<typeof queries.useGameweeks>);
-    mockQueries.useTopPlayersGw.mockReturnValue({ data: undefined, isLoading: false, isError: true, refetch: vi.fn() } as unknown as ReturnType<typeof queries.useTopPlayersGw>);
-    mockQueries.useTopPlayersSeason.mockReturnValue({ data: undefined, isLoading: false, isError: false, refetch: vi.fn() } as unknown as ReturnType<typeof queries.useTopPlayersSeason>);
+    mockQueries.useGameweeks.mockReturnValue({ data: fixtureGameweeks } as ReturnType<
+      typeof queries.useGameweeks
+    >);
+    mockQueries.useTopPlayersGw.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof queries.useTopPlayersGw>);
+    mockQueries.useTopPlayersSeason.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof queries.useTopPlayersSeason>);
     renderScreen();
     expect(screen.getByText(/couldn't load top players/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument();

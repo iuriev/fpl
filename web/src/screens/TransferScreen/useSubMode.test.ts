@@ -6,26 +6,53 @@ import type { SquadPlayer, TransferDraft } from '@/types';
 import { useSubMode } from './useSubMode';
 
 const ZERO_STATS: SquadPlayer['stats'] = {
-  minutes: 0, goals_scored: 0, assists: 0, clean_sheets: 0,
-  goals_conceded: 0, own_goals: 0, penalties_saved: 0, penalties_missed: 0,
-  yellow_cards: 0, red_cards: 0, saves: 0, bonus: 0, total_points: 0,
+  minutes: 0,
+  goals_scored: 0,
+  assists: 0,
+  clean_sheets: 0,
+  goals_conceded: 0,
+  own_goals: 0,
+  penalties_saved: 0,
+  penalties_missed: 0,
+  yellow_cards: 0,
+  red_cards: 0,
+  saves: 0,
+  bonus: 0,
+  total_points: 0,
 };
 
 function makePlayer(id: number, position: SquadPlayer['position']): SquadPlayer {
   return {
-    id, name: `Player${id}`, position, club: 'TST', teamCode: 1, teamId: 1,
-    nowCost: 50, points: 0, isCaptain: false, isViceCaptain: false,
-    status: 'a', chanceOfPlaying: null, news: '', stats: ZERO_STATS,
+    id,
+    name: `Player${id}`,
+    position,
+    club: 'TST',
+    teamCode: 1,
+    teamId: 1,
+    nowCost: 50,
+    points: 0,
+    isCaptain: false,
+    isViceCaptain: false,
+    status: 'a',
+    chanceOfPlaying: null,
+    news: '',
+    stats: ZERO_STATS,
   };
 }
 
 // Formation 5-2-3: DEF×5, MID×2, FWD×3 — at MID minimum, so subbing MID out for non-MID is invalid
 const STARTERS_5_2_3: SquadPlayer[] = [
   makePlayer(1, 'GK'),
-  makePlayer(2, 'DEF'), makePlayer(3, 'DEF'), makePlayer(4, 'DEF'),
-  makePlayer(5, 'DEF'), makePlayer(6, 'DEF'),
-  makePlayer(7, 'MID'), makePlayer(8, 'MID'),
-  makePlayer(9, 'FWD'), makePlayer(10, 'FWD'), makePlayer(11, 'FWD'),
+  makePlayer(2, 'DEF'),
+  makePlayer(3, 'DEF'),
+  makePlayer(4, 'DEF'),
+  makePlayer(5, 'DEF'),
+  makePlayer(6, 'DEF'),
+  makePlayer(7, 'MID'),
+  makePlayer(8, 'MID'),
+  makePlayer(9, 'FWD'),
+  makePlayer(10, 'FWD'),
+  makePlayer(11, 'FWD'),
 ];
 
 const BENCH_MIXED: SquadPlayer[] = [
@@ -37,17 +64,21 @@ const BENCH_MIXED: SquadPlayer[] = [
 
 function makeDraft(overrides: Partial<TransferDraft> = {}): TransferDraft {
   return {
-    teamId: 1, targetGw: 6, savedAt: '', freeTransfers: 1,
-    chip: 'none', swaps: [], subs: [], ...overrides,
+    teamId: 1,
+    targetGw: 6,
+    savedAt: '',
+    freeTransfers: 1,
+    chip: 'none',
+    swaps: [],
+    subs: [],
+    ...overrides,
   };
 }
 
 describe('useSubMode', () => {
   it('selecting a field player populates validSubTargets with bench candidates only', () => {
     const updateDraft = vi.fn();
-    const { result } = renderHook(() =>
-      useSubMode(STARTERS_5_2_3, BENCH_MIXED, updateDraft),
-    );
+    const { result } = renderHook(() => useSubMode(STARTERS_5_2_3, BENCH_MIXED, updateDraft));
 
     act(() => result.current.handleSubIconClick(2));
 
@@ -64,9 +95,7 @@ describe('useSubMode', () => {
 
   it('selecting a bench player populates validSubTargets with field candidates only', () => {
     const updateDraft = vi.fn();
-    const { result } = renderHook(() =>
-      useSubMode(STARTERS_5_2_3, BENCH_MIXED, updateDraft),
-    );
+    const { result } = renderHook(() => useSubMode(STARTERS_5_2_3, BENCH_MIXED, updateDraft));
 
     act(() => result.current.handleSubIconClick(14));
 
@@ -78,9 +107,7 @@ describe('useSubMode', () => {
 
   it('GK on the field only targets a GK on the bench', () => {
     const updateDraft = vi.fn();
-    const { result } = renderHook(() =>
-      useSubMode(STARTERS_5_2_3, BENCH_MIXED, updateDraft),
-    );
+    const { result } = renderHook(() => useSubMode(STARTERS_5_2_3, BENCH_MIXED, updateDraft));
 
     act(() => result.current.handleSubIconClick(1));
 
@@ -90,9 +117,7 @@ describe('useSubMode', () => {
 
   it('GK on the bench only targets a GK on the field', () => {
     const updateDraft = vi.fn();
-    const { result } = renderHook(() =>
-      useSubMode(STARTERS_5_2_3, BENCH_MIXED, updateDraft),
-    );
+    const { result } = renderHook(() => useSubMode(STARTERS_5_2_3, BENCH_MIXED, updateDraft));
 
     act(() => result.current.handleSubIconClick(12));
 
@@ -102,9 +127,7 @@ describe('useSubMode', () => {
 
   it('excludes a bench player whose swap would leave MID < 2', () => {
     const updateDraft = vi.fn();
-    const { result } = renderHook(() =>
-      useSubMode(STARTERS_5_2_3, BENCH_MIXED, updateDraft),
-    );
+    const { result } = renderHook(() => useSubMode(STARTERS_5_2_3, BENCH_MIXED, updateDraft));
 
     // Select MID(7): replacing it with DEF(13) gives MID=1 — invalid
     act(() => result.current.handleSubIconClick(7));
@@ -120,13 +143,18 @@ describe('useSubMode', () => {
     // Formation 3-4-3
     const starters_3_4_3 = [
       makePlayer(1, 'GK'),
-      makePlayer(2, 'DEF'), makePlayer(3, 'DEF'), makePlayer(4, 'DEF'),
-      makePlayer(5, 'MID'), makePlayer(6, 'MID'), makePlayer(7, 'MID'), makePlayer(8, 'MID'),
-      makePlayer(9, 'FWD'), makePlayer(10, 'FWD'), makePlayer(11, 'FWD'),
+      makePlayer(2, 'DEF'),
+      makePlayer(3, 'DEF'),
+      makePlayer(4, 'DEF'),
+      makePlayer(5, 'MID'),
+      makePlayer(6, 'MID'),
+      makePlayer(7, 'MID'),
+      makePlayer(8, 'MID'),
+      makePlayer(9, 'FWD'),
+      makePlayer(10, 'FWD'),
+      makePlayer(11, 'FWD'),
     ];
-    const { result } = renderHook(() =>
-      useSubMode(starters_3_4_3, BENCH_MIXED, updateDraft),
-    );
+    const { result } = renderHook(() => useSubMode(starters_3_4_3, BENCH_MIXED, updateDraft));
 
     // Select DEF(2): replacing with MID(14) gives DEF=2 — invalid
     act(() => result.current.handleSubIconClick(2));
@@ -141,15 +169,20 @@ describe('useSubMode', () => {
     // Formation 5-4-1
     const starters_5_4_1 = [
       makePlayer(1, 'GK'),
-      makePlayer(2, 'DEF'), makePlayer(3, 'DEF'), makePlayer(4, 'DEF'), makePlayer(5, 'DEF'), makePlayer(6, 'DEF'),
-      makePlayer(7, 'MID'), makePlayer(8, 'MID'), makePlayer(9, 'MID'), makePlayer(10, 'MID'),
+      makePlayer(2, 'DEF'),
+      makePlayer(3, 'DEF'),
+      makePlayer(4, 'DEF'),
+      makePlayer(5, 'DEF'),
+      makePlayer(6, 'DEF'),
+      makePlayer(7, 'MID'),
+      makePlayer(8, 'MID'),
+      makePlayer(9, 'MID'),
+      makePlayer(10, 'MID'),
       makePlayer(11, 'FWD'),
     ];
-    const { result } = renderHook(() =>
-      useSubMode(starters_5_4_1, BENCH_MIXED, updateDraft),
-    );
+    const { result } = renderHook(() => useSubMode(starters_5_4_1, BENCH_MIXED, updateDraft));
 
-    // Select FWD(11) on field. Bench has DEF(13). 
+    // Select FWD(11) on field. Bench has DEF(13).
     // Replacing FWD(11) with DEF(13) gives 6 DEF — invalid
     act(() => result.current.handleSubIconClick(11));
     expect(result.current.validSubTargets.has(13)).toBe(false);
@@ -166,13 +199,18 @@ describe('useSubMode', () => {
     // Formation 3-5-2
     const starters_3_5_2 = [
       makePlayer(1, 'GK'),
-      makePlayer(2, 'DEF'), makePlayer(3, 'DEF'), makePlayer(4, 'DEF'),
-      makePlayer(5, 'MID'), makePlayer(6, 'MID'), makePlayer(7, 'MID'), makePlayer(8, 'MID'), makePlayer(9, 'MID'),
-      makePlayer(10, 'FWD'), makePlayer(11, 'FWD'),
+      makePlayer(2, 'DEF'),
+      makePlayer(3, 'DEF'),
+      makePlayer(4, 'DEF'),
+      makePlayer(5, 'MID'),
+      makePlayer(6, 'MID'),
+      makePlayer(7, 'MID'),
+      makePlayer(8, 'MID'),
+      makePlayer(9, 'MID'),
+      makePlayer(10, 'FWD'),
+      makePlayer(11, 'FWD'),
     ];
-    const { result } = renderHook(() =>
-      useSubMode(starters_3_5_2, BENCH_MIXED, updateDraft),
-    );
+    const { result } = renderHook(() => useSubMode(starters_3_5_2, BENCH_MIXED, updateDraft));
 
     // Select DEF(2) on field. Bench has MID(14).
     // Replacing DEF(2) with MID(14) gives 2 DEF, 6 MID — invalid
@@ -182,9 +220,7 @@ describe('useSubMode', () => {
 
   it('excludes starters from candidates when a starter is selected', () => {
     const updateDraft = vi.fn();
-    const { result } = renderHook(() =>
-      useSubMode(STARTERS_5_2_3, BENCH_MIXED, updateDraft),
-    );
+    const { result } = renderHook(() => useSubMode(STARTERS_5_2_3, BENCH_MIXED, updateDraft));
 
     act(() => result.current.handleSubIconClick(2)); // Select DEF(2) on field
 
@@ -196,9 +232,7 @@ describe('useSubMode', () => {
 
   it('excludes bench players from candidates when a bench player is selected', () => {
     const updateDraft = vi.fn();
-    const { result } = renderHook(() =>
-      useSubMode(STARTERS_5_2_3, BENCH_MIXED, updateDraft),
-    );
+    const { result } = renderHook(() => useSubMode(STARTERS_5_2_3, BENCH_MIXED, updateDraft));
 
     act(() => result.current.handleSubIconClick(13)); // Select DEF(13) on bench
 
@@ -213,9 +247,7 @@ describe('useSubMode', () => {
     const updateDraft = vi.fn((updater: (d: TransferDraft) => TransferDraft) => {
       capturedUpdater = updater;
     });
-    const { result } = renderHook(() =>
-      useSubMode(STARTERS_5_2_3, BENCH_MIXED, updateDraft),
-    );
+    const { result } = renderHook(() => useSubMode(STARTERS_5_2_3, BENCH_MIXED, updateDraft));
 
     act(() => result.current.handleSubIconClick(2));
     act(() => result.current.handleSubTargetClick(13));
@@ -233,16 +265,10 @@ describe('useSubMode', () => {
     });
 
     // After a previous swap, DEF(13) is now a starter and DEF(2) is on the bench
-    const postSwapStarters = STARTERS_5_2_3.map((p) =>
-      p.id === 2 ? makePlayer(13, 'DEF') : p,
-    );
-    const postSwapBench = BENCH_MIXED.map((p) =>
-      p.id === 13 ? makePlayer(2, 'DEF') : p,
-    );
+    const postSwapStarters = STARTERS_5_2_3.map((p) => (p.id === 2 ? makePlayer(13, 'DEF') : p));
+    const postSwapBench = BENCH_MIXED.map((p) => (p.id === 13 ? makePlayer(2, 'DEF') : p));
 
-    const { result } = renderHook(() =>
-      useSubMode(postSwapStarters, postSwapBench, updateDraft),
-    );
+    const { result } = renderHook(() => useSubMode(postSwapStarters, postSwapBench, updateDraft));
 
     // Undo: click ↕ on DEF(13) now on field, click DEF(2) now on bench
     act(() => result.current.handleSubIconClick(13));
@@ -256,9 +282,7 @@ describe('useSubMode', () => {
 
   it('re-selecting the same player cancels sub mode', () => {
     const updateDraft = vi.fn();
-    const { result } = renderHook(() =>
-      useSubMode(STARTERS_5_2_3, BENCH_MIXED, updateDraft),
-    );
+    const { result } = renderHook(() => useSubMode(STARTERS_5_2_3, BENCH_MIXED, updateDraft));
 
     act(() => result.current.handleSubIconClick(7));
     expect(result.current.selectedSubId).toBe(7);
@@ -269,9 +293,7 @@ describe('useSubMode', () => {
 
   it('cancelSub resets selectedSubId to null', () => {
     const updateDraft = vi.fn();
-    const { result } = renderHook(() =>
-      useSubMode(STARTERS_5_2_3, BENCH_MIXED, updateDraft),
-    );
+    const { result } = renderHook(() => useSubMode(STARTERS_5_2_3, BENCH_MIXED, updateDraft));
 
     act(() => result.current.handleSubIconClick(7));
     act(() => result.current.cancelSub());

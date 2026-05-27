@@ -1,6 +1,6 @@
-import { describe, expect,it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import { formatRank,getLeagueRankDirection } from './leagues-helpers';
+import { formatRank, getLeagueRankDirection } from './leagues-helpers';
 
 describe('getLeagueRankDirection', () => {
   it('returns neutral when lastRank is null (newly joined)', () => {

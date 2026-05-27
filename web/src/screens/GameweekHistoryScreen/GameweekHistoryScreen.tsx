@@ -46,7 +46,13 @@ export const GameweekHistoryScreen: React.FC<GameweekHistoryScreenProps> = ({ te
       <header className={styles.header}>
         <button className={styles.backBtn} onClick={handleBack} aria-label={copy.historyBack}>
           <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M10 4l-4 4 4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+              d="M10 4l-4 4 4 4"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
           {copy.historyBack}
         </button>
@@ -76,9 +82,7 @@ export const GameweekHistoryScreen: React.FC<GameweekHistoryScreenProps> = ({ te
           </div>
         )}
 
-        {data && data.gameweeks.length > 0 && (
-          <HistoryTable gameweeks={data.gameweeks} />
-        )}
+        {data && data.gameweeks.length > 0 && <HistoryTable gameweeks={data.gameweeks} />}
       </div>
     </div>
   );
@@ -142,7 +146,9 @@ function HistorySkeleton() {
             <tr key={r} className={styles.skeletonRow}>
               {Array.from({ length: SKELETON_COLS }).map((_, c) => (
                 <td key={c}>
-                  <div className={`${styles.skeletonCell} ${c === 0 ? styles.skeletonCellShort : styles.skeletonCellMed}`} />
+                  <div
+                    className={`${styles.skeletonCell} ${c === 0 ? styles.skeletonCellShort : styles.skeletonCellMed}`}
+                  />
                 </td>
               ))}
             </tr>

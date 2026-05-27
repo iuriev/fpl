@@ -3,7 +3,19 @@
  * Direct async functions; React Query hooks wrap these.
  */
 
-import { DreamTeamResponse, EntryResponse, GameweeksResponse, HistoryResponse, LeaguesResponse, PlayerPoolResponse, SquadResponse, TeamPlayersResponse, TeamsResponse, TopPlayersGwResponse, TopPlayersSeasonResponse } from '@/types';
+import {
+  DreamTeamResponse,
+  EntryResponse,
+  GameweeksResponse,
+  HistoryResponse,
+  LeaguesResponse,
+  PlayerPoolResponse,
+  SquadResponse,
+  TeamPlayersResponse,
+  TeamsResponse,
+  TopPlayersGwResponse,
+  TopPlayersSeasonResponse,
+} from '@/types';
 
 const API_BASE = '/api';
 

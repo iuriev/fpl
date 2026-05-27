@@ -9,11 +9,7 @@ export interface PositionBadgeProps {
 }
 
 export const PositionBadge: React.FC<PositionBadgeProps> = ({ position }) => {
-  return (
-    <span className={`${styles.badge} ${styles[`badge_${position}`]}`}>
-      {position}
-    </span>
-  );
+  return <span className={`${styles.badge} ${styles[`badge_${position}`]}`}>{position}</span>;
 };
 
 PositionBadge.displayName = 'PositionBadge';

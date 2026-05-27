@@ -24,7 +24,9 @@ describe('ListView', () => {
   });
 
   it('shows a status dot for an injured player', () => {
-    const { container } = render(<ListView starters={fixtureSquad.starters} bench={fixtureSquad.bench} />);
+    const { container } = render(
+      <ListView starters={fixtureSquad.starters} bench={fixtureSquad.bench} />
+    );
     expect(container.querySelector('[class*="dot_error"]')).toBeInTheDocument();
   });
 
@@ -34,7 +36,7 @@ describe('ListView', () => {
   });
 
   it('renders an em-dash for null stat values', () => {
-    const starters: SquadPlayer[] = fixtureSquad.starters.map(p => ({
+    const starters: SquadPlayer[] = fixtureSquad.starters.map((p) => ({
       ...p,
       stats: { ...p.stats, goals_scored: null as unknown as number },
     }));
@@ -43,7 +45,9 @@ describe('ListView', () => {
   });
 
   it('applies muted style to zero stat cells', () => {
-    const { container } = render(<ListView starters={fixtureSquad.starters} bench={fixtureSquad.bench} />);
+    const { container } = render(
+      <ListView starters={fixtureSquad.starters} bench={fixtureSquad.bench} />
+    );
     expect(container.querySelector('[class*="statCell_zero"]')).toBeInTheDocument();
   });
 });

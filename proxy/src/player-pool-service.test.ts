@@ -19,7 +19,7 @@ const mockBootstrap = {
       team: 1, team_code: 3, element_type: 3, status: 'a',
       chance_of_playing_this_round: null, news: '',
       total_points: 120, now_cost: 95, event_points: 12,
-      form: '7.2', selected_by_percent: '44.5',
+      form: '7.2', selected_by_percent: '44.5', ep_next: '5.5',
     },
   ],
   element_types: [],
@@ -55,6 +55,7 @@ describe('player-pool-service', () => {
         status: 'a',
         form: '7.2',
         selectedByPercent: '44.5',
+        expectedPoints: '5.5',
         nextFixtures: [{ gw: 3, opponent: 'MCI', home: true, difficulty: 4 }],
       });
       expect(cache.set).toHaveBeenCalledWith('player-pool', expect.any(Object), 600);

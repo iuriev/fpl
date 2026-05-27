@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
+import { copy } from '@/lib/copy';
 import type { PlayerPosition, PoolPlayer } from '@/types';
 
 import { PlayerPickerSheet } from './PlayerPickerSheet';
@@ -22,6 +23,7 @@ const makePoolPlayer = (id: number, overrides?: Partial<PoolPlayer>): PoolPlayer
   chanceOfPlaying: null,
   news: '',
   selectedByPercent: '10.0',
+  expectedPoints: '4.5',
   form: '5.0',
   nextFixtures: [],
   ...overrides,
@@ -34,9 +36,15 @@ describe('PlayerPickerSheet', () => {
     candidates: [makePoolPlayer(2, { webName: 'Salah', nowCost: 130 })],
     availableBudget: 150,
     squadTeamCounts: new Map<number, number>([[1, 1]]),
-    squadPositionCounts: new Map<PlayerPosition, number>([['GK', 2], ['DEF', 4], ['MID', 4], ['FWD', 3]]),
+    squadPositionCounts: new Map<PlayerPosition, number>([
+      ['GK', 2],
+      ['DEF', 4],
+      ['MID', 4],
+      ['FWD', 3],
+    ]),
     squadPlayerIds: new Set([1]),
     isOutfield: true,
+    targetGw: 34,
     onSelect: vi.fn(),
     onClose: vi.fn(),
   };
@@ -82,7 +90,7 @@ describe('PlayerPickerSheet', () => {
         {...defaultProps}
         candidates={[makePoolPlayer(2, { webName: 'Expensive', nowCost: 200 })]}
         availableBudget={100}
-      />,
+      />
     );
     const row = screen.getByText('Expensive').closest('[data-over-budget]');
     expect(row?.getAttribute('data-over-budget')).toBe('true');
@@ -100,11 +108,6 @@ describe('PlayerPickerSheet', () => {
     render(<PlayerPickerSheet {...defaultProps} isOutfield={false} />);
     expect(screen.queryByText('ALL')).not.toBeInTheDocument();
     expect(screen.queryByText('DEF')).not.toBeInTheDocument();
-  });
-
-  it('shows Sort button', () => {
-    render(<PlayerPickerSheet {...defaultProps} />);
-    expect(screen.getByText('Sort')).toBeInTheDocument();
   });
 
   it('filters outfield candidates by position tab', async () => {
@@ -135,13 +138,18 @@ describe('PlayerPickerSheet', () => {
   it('disables candidates whose position is already at the squad maximum', async () => {
     const user = userEvent.setup();
     // outPlayer is MID, squad already has 5 DEFs — picking a DEF would exceed the limit
-    const fullDefCounts = new Map<PlayerPosition, number>([['GK', 2], ['DEF', 5], ['MID', 4], ['FWD', 3]]);
+    const fullDefCounts = new Map<PlayerPosition, number>([
+      ['GK', 2],
+      ['DEF', 5],
+      ['MID', 4],
+      ['FWD', 3],
+    ]);
     render(
       <PlayerPickerSheet
         {...defaultProps}
         squadPositionCounts={fullDefCounts}
         candidates={[makePoolPlayer(2, { webName: 'DefPlayer', position: 'DEF' })]}
-      />,
+      />
     );
     await user.click(screen.getByText('ALL'));
     const row = screen.getByText('DefPlayer').closest('[data-position-limit]');
@@ -150,15 +158,87 @@ describe('PlayerPickerSheet', () => {
 
   it('allows same-position replacement even when position count is at max', () => {
     // outPlayer is MID, squad has 5 MIDs (including outPlayer) — transferring MID→MID is valid
-    const fullMidCounts = new Map<PlayerPosition, number>([['GK', 2], ['DEF', 5], ['MID', 5], ['FWD', 3]]);
+    const fullMidCounts = new Map<PlayerPosition, number>([
+      ['GK', 2],
+      ['DEF', 5],
+      ['MID', 5],
+      ['FWD', 3],
+    ]);
     render(
       <PlayerPickerSheet
         {...defaultProps}
         squadPositionCounts={fullMidCounts}
         candidates={[makePoolPlayer(2, { webName: 'MidPlayer', position: 'MID' })]}
-      />,
+      />
     );
     const row = screen.getByText('MidPlayer').closest('li');
     expect(row?.getAttribute('data-position-limit')).toBeNull();
+  });
+
+  it('changes sort when a header is clicked', async () => {
+    const user = userEvent.setup();
+    const candidates = [
+      makePoolPlayer(2, { webName: 'PointsPlayer', totalPoints: 200, selectedByPercent: '5.0' }),
+      makePoolPlayer(3, {
+        webName: 'OwnershipPlayer',
+        totalPoints: 100,
+        selectedByPercent: '50.0',
+      }),
+    ];
+    render(<PlayerPickerSheet {...defaultProps} candidates={candidates} />);
+
+    // Default sort is OWN% (OwnershipPlayer has 50.0, PointsPlayer has 5.0)
+    let rows = screen.getAllByRole('button').filter((r) => r.className.includes('row'));
+    expect(rows[0]).toHaveTextContent('OwnershipPlayer');
+
+    // Click Pts header
+    await user.click(screen.getByRole('columnheader', { name: copy.transfersColPts }));
+    rows = screen.getAllByRole('button').filter((r) => r.className.includes('row'));
+    expect(rows[0]).toHaveTextContent('PointsPlayer');
+  });
+
+  it('changes sort to webName when Player header is clicked', async () => {
+    const user = userEvent.setup();
+    const candidates = [
+      makePoolPlayer(2, { webName: 'B-Player' }),
+      makePoolPlayer(3, { webName: 'A-Player' }),
+    ];
+    render(<PlayerPickerSheet {...defaultProps} candidates={candidates} />);
+
+    // Click Player header
+    await user.click(screen.getByRole('columnheader', { name: copy.transfersColPlayer }));
+    const rows = screen.getAllByRole('button').filter((r) => r.className.includes('row'));
+    expect(rows[0]).toHaveTextContent('A-Player');
+    expect(rows[1]).toHaveTextContent('B-Player');
+  });
+
+  it('toggles sort direction when the same header is clicked', async () => {
+    const user = userEvent.setup();
+    const candidates = [
+      makePoolPlayer(2, { webName: 'LowPoints', totalPoints: 10 }),
+      makePoolPlayer(3, { webName: 'HighPoints', totalPoints: 100 }),
+    ];
+    render(<PlayerPickerSheet {...defaultProps} candidates={candidates} />);
+
+    // Click Pts header (first click: desc)
+    await user.click(screen.getByRole('columnheader', { name: copy.transfersColPts }));
+    let rows = screen.getAllByRole('button').filter((r) => r.className.includes('row'));
+    expect(rows[0]).toHaveTextContent('HighPoints');
+    expect(screen.getByRole('columnheader', { name: copy.transfersColPts }).className).toMatch(
+      /label_active(_\w+)?$/
+    );
+
+    // Click Pts header again (second click: asc)
+    await user.click(screen.getByRole('columnheader', { name: copy.transfersColPts }));
+    rows = screen.getAllByRole('button').filter((r) => r.className.includes('row'));
+    expect(rows[0]).toHaveTextContent('LowPoints');
+    expect(screen.getByRole('columnheader', { name: copy.transfersColPts }).className).toMatch(
+      /label_active_asc/
+    );
+  });
+
+  it('displays GW range in fixture header', () => {
+    render(<PlayerPickerSheet {...defaultProps} targetGw={36} />);
+    expect(screen.getByText('GW36-38')).toBeInTheDocument();
   });
 });

@@ -63,7 +63,9 @@
   font: var(--fpl-fw-semibold) var(--fpl-fs-body-s) var(--fpl-font-display);
   color: var(--fpl-muted);
   cursor: pointer;
-  transition: color 120ms, border-color 120ms;
+  transition:
+    color 120ms,
+    border-color 120ms;
   white-space: nowrap;
 }
 
@@ -102,7 +104,10 @@
   display: grid;
   place-items: center;
   cursor: pointer;
-  transition: background 120ms, border-color 120ms, color 120ms;
+  transition:
+    background 120ms,
+    border-color 120ms,
+    color 120ms;
   padding: 0;
 }
 

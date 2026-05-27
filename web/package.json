@@ -12,7 +12,8 @@
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build",
     "chromatic": "chromatic --exit-zero-on-changes",
-    "test": "vitest"
+    "test": "vitest",
+    "test:ui": "vitest -c vitest.storybook.config.ts"
   },
   "dependencies": {
     "@storybook/test": "^7.6.10",

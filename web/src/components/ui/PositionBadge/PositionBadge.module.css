@@ -9,7 +9,19 @@
   line-height: 1;
 }
 
-.badge_GK  { background: var(--fpl-pos-gk-bg);  color: var(--fpl-pos-gk-fg);  }
-.badge_DEF { background: var(--fpl-pos-def-bg); color: var(--fpl-pos-def-fg); }
-.badge_MID { background: var(--fpl-pos-mid-bg); color: var(--fpl-pos-mid-fg); }
-.badge_FWD { background: var(--fpl-pos-fwd-bg); color: var(--fpl-pos-fwd-fg); }
+.badge_GK {
+  background: var(--fpl-pos-gk-bg);
+  color: var(--fpl-pos-gk-fg);
+}
+.badge_DEF {
+  background: var(--fpl-pos-def-bg);
+  color: var(--fpl-pos-def-fg);
+}
+.badge_MID {
+  background: var(--fpl-pos-mid-bg);
+  color: var(--fpl-pos-mid-fg);
+}
+.badge_FWD {
+  background: var(--fpl-pos-fwd-bg);
+  color: var(--fpl-pos-fwd-fg);
+}

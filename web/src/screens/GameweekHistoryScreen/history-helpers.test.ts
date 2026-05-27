@@ -1,6 +1,6 @@
-import { describe, expect,it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import { formatNumber, formatValue,getRankDirection } from './history-helpers';
+import { formatNumber, formatValue, getRankDirection } from './history-helpers';
 
 describe('getRankDirection', () => {
   it('returns neutral when no previous rank', () => {

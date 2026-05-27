@@ -21,12 +21,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const baseHandlers = {
-  gameweeks: [
-    http.get('/api/gameweeks', () => HttpResponse.json(fixtureGameweeks)),
-  ],
-  entry: [
-    http.get('/api/entry/:teamId', () => HttpResponse.json(fixtureEntry)),
-  ],
+  gameweeks: [http.get('/api/gameweeks', () => HttpResponse.json(fixtureGameweeks))],
+  entry: [http.get('/api/entry/:teamId', () => HttpResponse.json(fixtureEntry))],
 };
 
 export const Loaded: Story = {
@@ -34,9 +30,7 @@ export const Loaded: Story = {
     msw: {
       handlers: {
         ...baseHandlers,
-        squad: [
-          http.get('/api/squad/:teamId/:gw', () => HttpResponse.json(fixtureSquad)),
-        ],
+        squad: [http.get('/api/squad/:teamId/:gw', () => HttpResponse.json(fixtureSquad))],
       },
     },
   },
@@ -62,9 +56,7 @@ export const Empty: Story = {
     msw: {
       handlers: {
         ...baseHandlers,
-        squad: [
-          http.get('/api/squad/:teamId/:gw', () => HttpResponse.json(fixtureSquadEmpty)),
-        ],
+        squad: [http.get('/api/squad/:teamId/:gw', () => HttpResponse.json(fixtureSquadEmpty))],
       },
     },
   },
@@ -91,9 +83,7 @@ export const ListViewLoaded: Story = {
     msw: {
       handlers: {
         ...baseHandlers,
-        squad: [
-          http.get('/api/squad/:teamId/:gw', () => HttpResponse.json(fixtureSquad)),
-        ],
+        squad: [http.get('/api/squad/:teamId/:gw', () => HttpResponse.json(fixtureSquad))],
       },
     },
   },

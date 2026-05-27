@@ -3,7 +3,9 @@ import { useMemo, useState } from 'react';
 import type { SquadPlayer, TransferDraft } from '@/types';
 
 function isFormationValid(starters: SquadPlayer[]): boolean {
-  let def = 0, mid = 0, fwd = 0;
+  let def = 0,
+    mid = 0,
+    fwd = 0;
   for (const p of starters) {
     if (p.position === 'DEF') def++;
     else if (p.position === 'MID') mid++;
@@ -15,7 +17,7 @@ function isFormationValid(starters: SquadPlayer[]): boolean {
 function computeValidTargets(
   selectedId: number,
   displayStarters: SquadPlayer[],
-  displayBench: SquadPlayer[],
+  displayBench: SquadPlayer[]
 ): Set<number> {
   const allPlayers = [...displayStarters, ...displayBench];
   const selected = allPlayers.find((p) => p.id === selectedId);
@@ -50,7 +52,7 @@ function computeValidTargets(
 export function useSubMode(
   displayStarters: SquadPlayer[],
   displayBench: SquadPlayer[],
-  updateDraft: (updater: (d: TransferDraft) => TransferDraft) => void,
+  updateDraft: (updater: (d: TransferDraft) => TransferDraft) => void
 ) {
   const [selectedSubId, setSelectedSubId] = useState<number | null>(null);
 
@@ -59,7 +61,7 @@ export function useSubMode(
       selectedSubId !== null
         ? computeValidTargets(selectedSubId, displayStarters, displayBench)
         : new Set<number>(),
-    [selectedSubId, displayStarters, displayBench],
+    [selectedSubId, displayStarters, displayBench]
   );
 
   const handleSubIconClick = (id: number) => {

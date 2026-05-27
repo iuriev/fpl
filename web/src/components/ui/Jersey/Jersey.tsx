@@ -25,7 +25,7 @@ export const Jersey: React.FC<JerseyProps> = ({
   alt = 'Player jersey',
 }) => {
   const [src, setSrc] = useState<string>(
-    teamCode ? shirtUrl(teamCode, position) : '/shirts/placeholder.svg',
+    teamCode ? shirtUrl(teamCode, position) : '/shirts/placeholder.svg'
   );
 
   const handleError = useCallback(() => {
@@ -34,13 +34,7 @@ export const Jersey: React.FC<JerseyProps> = ({
 
   return (
     <div className={styles[size]}>
-      <img
-        src={src}
-        alt={alt}
-        className={styles.shirt}
-        draggable={false}
-        onError={handleError}
-      />
+      <img src={src} alt={alt} className={styles.shirt} draggable={false} onError={handleError} />
     </div>
   );
 };

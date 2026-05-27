@@ -8,7 +8,7 @@ function renderSheet(open = true, onClose = vi.fn()) {
   return render(
     <BottomSheet open={open} onClose={onClose} title="Select team">
       <button>Arsenal</button>
-    </BottomSheet>,
+    </BottomSheet>
   );
 }
 

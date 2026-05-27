@@ -62,7 +62,7 @@
   position: absolute;
   inset: -2px;
   border-radius: var(--fpl-radius-sm);
-  border: 2px solid #E8604C;
+  border: 2px solid #e8604c;
   pointer-events: none;
   animation: pulse-out 1.2s ease-in-out infinite;
 }
@@ -72,15 +72,18 @@
   position: absolute;
   inset: -2px;
   border-radius: var(--fpl-radius-sm);
-  border: 2px solid #00FF87;
+  border: 2px solid #00ff87;
   pointer-events: none;
 }
 
-
-
 @keyframes pulse-out {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.4; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 .playerBtn_subTarget::after {
@@ -99,6 +102,11 @@
 }
 
 @keyframes pulse-sub-target {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.35; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
 }

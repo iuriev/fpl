@@ -18,19 +18,35 @@ const LIST_COLS: ReadonlyArray<{
   width: string;
   highlight?: boolean;
 }> = [
-  { key: 'total_points',     label: copy.listColPts,   fullLabel: copy.listLegendPts,   width: '2.75rem',  highlight: true },
-  { key: 'minutes',          label: copy.listColMP,    fullLabel: copy.listLegendMP,    width: '2.375rem' },
-  { key: 'goals_scored',     label: copy.listColGS,    fullLabel: copy.listLegendGS,    width: '2.375rem' },
-  { key: 'assists',          label: copy.listColA,     fullLabel: copy.listLegendA,     width: '2.25rem'  },
-  { key: 'clean_sheets',     label: copy.listColCS,    fullLabel: copy.listLegendCS,    width: '2.375rem' },
-  { key: 'goals_conceded',   label: copy.listColGC,    fullLabel: copy.listLegendGC,    width: '2.375rem' },
-  { key: 'own_goals',        label: copy.listColOG,    fullLabel: copy.listLegendOG,    width: '2.375rem' },
-  { key: 'penalties_saved',  label: copy.listColPS,    fullLabel: copy.listLegendPS,    width: '2.375rem' },
-  { key: 'penalties_missed', label: copy.listColPM,    fullLabel: copy.listLegendPM,    width: '2.375rem' },
-  { key: 'yellow_cards',     label: copy.listColYC,    fullLabel: copy.listLegendYC,    width: '2.375rem' },
-  { key: 'red_cards',        label: copy.listColRC,    fullLabel: copy.listLegendRC,    width: '2.375rem' },
-  { key: 'saves',            label: copy.listColS,     fullLabel: copy.listLegendS,     width: '2.25rem'  },
-  { key: 'bonus',            label: copy.listColBonus, fullLabel: copy.listLegendBonus, width: '2.625rem' },
+  {
+    key: 'total_points',
+    label: copy.listColPts,
+    fullLabel: copy.listLegendPts,
+    width: '2.75rem',
+    highlight: true,
+  },
+  { key: 'minutes', label: copy.listColMP, fullLabel: copy.listLegendMP, width: '2.375rem' },
+  { key: 'goals_scored', label: copy.listColGS, fullLabel: copy.listLegendGS, width: '2.375rem' },
+  { key: 'assists', label: copy.listColA, fullLabel: copy.listLegendA, width: '2.25rem' },
+  { key: 'clean_sheets', label: copy.listColCS, fullLabel: copy.listLegendCS, width: '2.375rem' },
+  { key: 'goals_conceded', label: copy.listColGC, fullLabel: copy.listLegendGC, width: '2.375rem' },
+  { key: 'own_goals', label: copy.listColOG, fullLabel: copy.listLegendOG, width: '2.375rem' },
+  {
+    key: 'penalties_saved',
+    label: copy.listColPS,
+    fullLabel: copy.listLegendPS,
+    width: '2.375rem',
+  },
+  {
+    key: 'penalties_missed',
+    label: copy.listColPM,
+    fullLabel: copy.listLegendPM,
+    width: '2.375rem',
+  },
+  { key: 'yellow_cards', label: copy.listColYC, fullLabel: copy.listLegendYC, width: '2.375rem' },
+  { key: 'red_cards', label: copy.listColRC, fullLabel: copy.listLegendRC, width: '2.375rem' },
+  { key: 'saves', label: copy.listColS, fullLabel: copy.listLegendS, width: '2.25rem' },
+  { key: 'bonus', label: copy.listColBonus, fullLabel: copy.listLegendBonus, width: '2.625rem' },
 ] as const;
 
 const INNER_MIN_W = '43.25rem';
@@ -38,10 +54,10 @@ const INNER_MIN_W = '43.25rem';
 const POSITION_ORDER: PlayerPosition[] = ['GK', 'DEF', 'MID', 'FWD'];
 
 const SECTION_LABELS: Record<PlayerPosition | 'bench', string> = {
-  GK:    copy.listGroupGK,
-  DEF:   copy.listGroupDEF,
-  MID:   copy.listGroupMID,
-  FWD:   copy.listGroupFWD,
+  GK: copy.listGroupGK,
+  DEF: copy.listGroupDEF,
+  MID: copy.listGroupMID,
+  FWD: copy.listGroupFWD,
   bench: copy.listGroupBench,
 };
 
@@ -64,21 +80,21 @@ function ColHeader({
       <th className={styles.colHeaderIdentity} style={{ width: IDENTITY_W }}>
         Player
       </th>
-      {LIST_COLS.map(c => (
+      {LIST_COLS.map((c) => (
         <th
           key={c.key}
           className={[
             styles.colHeaderCell,
             c.highlight || sort.key === c.key ? styles.colHeaderCell_hi : '',
-          ].filter(Boolean).join(' ')}
+          ]
+            .filter(Boolean)
+            .join(' ')}
           style={{ width: c.width }}
           onClick={() => onSort(c.key)}
         >
           {c.label}
           {sort.key === c.key && (
-            <span className={styles.sortArrow}>
-              {sort.dir === 'desc' ? '↓' : '↑'}
-            </span>
+            <span className={styles.sortArrow}>{sort.dir === 'desc' ? '↓' : '↑'}</span>
           )}
         </th>
       ))}
@@ -93,7 +109,9 @@ function SectionRow({ label, count }: { label: string; count: number }) {
         <span className={styles.sectionLabel}>{label}</span>
         <span className={styles.sectionCount}>{count}</span>
       </td>
-      {LIST_COLS.map(c => <td key={c.key} />)}
+      {LIST_COLS.map((c) => (
+        <td key={c.key} />
+      ))}
     </tr>
   );
 }
@@ -105,7 +123,12 @@ function PlayerRow({ player, isLast }: { player: SquadPlayer; isLast: boolean })
     <tr className={`${styles.playerRow}${isLast ? ` ${styles.playerRow_last}` : ''}`}>
       <td className={styles.identityCell}>
         <div className={styles.kitWrap}>
-          <Jersey size="medium" teamCode={player.teamCode} position={player.position} alt={player.name} />
+          <Jersey
+            size="medium"
+            teamCode={player.teamCode}
+            position={player.position}
+            alt={player.name}
+          />
           {player.status !== 'a' && (
             <span className={styles.statusDotOverlay}>
               <StatusDot status={player.status} />
@@ -124,7 +147,7 @@ function PlayerRow({ player, isLast }: { player: SquadPlayer; isLast: boolean })
         </div>
       </td>
 
-      {LIST_COLS.map(c => {
+      {LIST_COLS.map((c) => {
         const v = player.stats[c.key];
         const isNull = v === null || v === undefined;
         const isZero = !isNull && v === 0;
@@ -135,7 +158,9 @@ function PlayerRow({ player, isLast }: { player: SquadPlayer; isLast: boolean })
               styles.statCell,
               c.highlight ? styles.statCell_hi : '',
               !c.highlight && isZero ? styles.statCell_zero : '',
-            ].filter(Boolean).join(' ')}
+            ]
+              .filter(Boolean)
+              .join(' ')}
           >
             {isNull ? '—' : v}
           </td>
@@ -149,7 +174,7 @@ function ColLegend() {
   return (
     <div className={styles.legend}>
       <span className={styles.legendHeading}>{copy.listLegendHeading}</span>
-      {LIST_COLS.map(c => (
+      {LIST_COLS.map((c) => (
         <span key={c.key} className={styles.legendItem}>
           <span className={styles.legendAbbr}>{c.label}</span>
           <span className={styles.legendFull}>{c.fullLabel}</span>
@@ -169,7 +194,7 @@ function SkeletonRow() {
           <div className={`${styles.skeletonLine} ${styles.skeletonLine_meta}`} />
         </div>
       </td>
-      {LIST_COLS.map(c => (
+      {LIST_COLS.map((c) => (
         <td key={c.key} className={styles.skeletonStatCell}>
           <div className={styles.skeletonStat} style={{ width: `calc(${c.width} - 1.125rem)` }} />
         </td>
@@ -187,10 +212,8 @@ export const ListView: React.FC<ListViewProps> = ({ starters, bench }) => {
   const [sort, setSort] = useState<SortState>({ key: 'total_points', dir: 'desc' });
 
   const handleSort = (key: keyof PlayerStats) => {
-    setSort(prev =>
-      prev.key === key
-        ? { key, dir: prev.dir === 'desc' ? 'asc' : 'desc' }
-        : { key, dir: 'desc' }
+    setSort((prev) =>
+      prev.key === key ? { key, dir: prev.dir === 'desc' ? 'asc' : 'desc' } : { key, dir: 'desc' }
     );
   };
 
@@ -201,17 +224,17 @@ export const ListView: React.FC<ListViewProps> = ({ starters, bench }) => {
       return sort.dir === 'desc' ? bv - av : av - bv;
     });
 
-  const byPosition = new Map<PlayerPosition, SquadPlayer[]>(
-    POSITION_ORDER.map(pos => [pos, []]),
-  );
+  const byPosition = new Map<PlayerPosition, SquadPlayer[]>(POSITION_ORDER.map((pos) => [pos, []]));
   for (const p of starters) {
     byPosition.get(p.position)?.push(p);
   }
 
   const sections: Array<{ id: string; label: string; players: SquadPlayer[] }> = [
-    ...POSITION_ORDER
-      .filter(pos => (byPosition.get(pos)?.length ?? 0) > 0)
-      .map(pos => ({ id: pos, label: SECTION_LABELS[pos], players: byPosition.get(pos)! })),
+    ...POSITION_ORDER.filter((pos) => (byPosition.get(pos)?.length ?? 0) > 0).map((pos) => ({
+      id: pos,
+      label: SECTION_LABELS[pos],
+      players: byPosition.get(pos)!,
+    })),
     ...(bench.length > 0 ? [{ id: 'bench', label: SECTION_LABELS.bench, players: bench }] : []),
   ];
 
@@ -223,7 +246,7 @@ export const ListView: React.FC<ListViewProps> = ({ starters, bench }) => {
             <ColHeader sort={sort} onSort={handleSort} />
           </thead>
           <tbody>
-            {sections.map(s => {
+            {sections.map((s) => {
               const sorted = sortSection(s.players);
               return (
                 <React.Fragment key={s.id}>

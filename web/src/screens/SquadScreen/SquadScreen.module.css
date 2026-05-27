@@ -49,7 +49,9 @@
   place-items: center;
   cursor: pointer;
   flex-shrink: 0;
-  transition: background 120ms, color 120ms;
+  transition:
+    background 120ms,
+    color 120ms;
 }
 
 .burgerBtn:hover {
@@ -135,7 +137,10 @@
   display: grid;
   place-items: center;
   cursor: pointer;
-  transition: background 120ms, border-color 120ms, color 120ms;
+  transition:
+    background 120ms,
+    border-color 120ms,
+    color 120ms;
   padding: 0;
 }
 
@@ -263,7 +268,7 @@
   position: absolute;
   inset: 0;
   border-radius: var(--fpl-radius-md);
-  background: rgba(0, 0, 0, 0.20);
+  background: rgba(0, 0, 0, 0.2);
   pointer-events: none;
 }
 
@@ -306,7 +311,7 @@
   height: 2rem;
   border-radius: 0.3125rem;
   margin-top: 0.125rem;
-  background: rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.1);
   background-image: linear-gradient(
     90deg,
     rgba(255, 255, 255, 0.08) 0%,
@@ -322,7 +327,7 @@
   height: 0.75rem;
   margin: 0 1.125rem;
   border-radius: 0.1875rem;
-  background: rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .stateCenter {

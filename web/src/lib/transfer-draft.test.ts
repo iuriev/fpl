@@ -1,6 +1,6 @@
-import { afterEach,beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import type { PoolPlayer, SquadPlayer,TransferDraft } from '@/types';
+import type { PoolPlayer, SquadPlayer, TransferDraft } from '@/types';
 
 import {
   calcBank,
@@ -24,14 +24,26 @@ const makeDraft = (overrides?: Partial<TransferDraft>): TransferDraft => ({
 });
 
 const makePlayer = (id: number, teamId: number, nowCost: number): SquadPlayer =>
-  ({ id, teamId, nowCost } as unknown as SquadPlayer);
+  ({ id, teamId, nowCost }) as unknown as SquadPlayer;
 
 const makePoolPlayer = (id: number, team: number, nowCost: number): PoolPlayer => ({
-  id, webName: `P${id}`, firstName: 'A', lastName: 'B',
-  team, teamCode: team * 10, teamShortName: `T${team}`,
-  position: 'MID', nowCost, totalPoints: 50, eventPoints: 5,
-  status: 'a', chanceOfPlaying: null, news: '',
-  selectedByPercent: '10.0', form: '5.0', nextFixtures: [],
+  id,
+  webName: `P${id}`,
+  firstName: 'A',
+  lastName: 'B',
+  team,
+  teamCode: team * 10,
+  teamShortName: `T${team}`,
+  position: 'MID',
+  nowCost,
+  totalPoints: 50,
+  eventPoints: 5,
+  status: 'a',
+  chanceOfPlaying: null,
+  news: '',
+  selectedByPercent: '10.0',
+  form: '5.0',
+  nextFixtures: [],
 });
 
 describe('transfer-draft', () => {

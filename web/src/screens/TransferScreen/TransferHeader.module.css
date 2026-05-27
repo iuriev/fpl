@@ -57,7 +57,7 @@
 }
 
 .chipBtn_active {
-  background: var(--fpl-success, #00FF87);
+  background: var(--fpl-success, #00ff87);
   color: #002210;
   border-color: transparent;
 }
@@ -92,8 +92,12 @@
   color: var(--fpl-text-primary);
 }
 
-.statValue_amber { color: var(--fpl-warning, #E8C347); }
-.statValue_red   { color: var(--fpl-danger, #E8604C); }
+.statValue_amber {
+  color: var(--fpl-warning, #e8c347);
+}
+.statValue_red {
+  color: var(--fpl-danger, #e8604c);
+}
 
 .statLabel {
   font-size: 0.625rem;
@@ -149,6 +153,6 @@
 .chipActiveLabel {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: var(--fpl-success, #00FF87);
+  color: var(--fpl-success, #00ff87);
   text-align: center;
 }

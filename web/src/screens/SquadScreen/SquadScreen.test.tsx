@@ -18,7 +18,7 @@ function renderScreen() {
   return render(
     <MemoryRouter initialEntries={['/?teamId=72828']}>
       <SquadScreen teamId={72828} />
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 }
 

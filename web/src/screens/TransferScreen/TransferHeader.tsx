@@ -32,7 +32,13 @@ export const TransferHeader: React.FC<TransferHeaderProps> = ({
     <div className={styles.header}>
       <button className={styles.backBtn} onClick={onBack}>
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path d="M10 4l-4 4 4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <path
+            d="M10 4l-4 4 4 4"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
         {copy.transfersBack}
       </button>

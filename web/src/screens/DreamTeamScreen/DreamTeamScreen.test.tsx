@@ -6,7 +6,13 @@ import { fixtureDreamTeam, fixtureGameweeks } from '@/fixtures';
 
 vi.mock('@/api/queries', () => ({
   useGameweeks: () => ({ data: fixtureGameweeks }),
-  useDreamTeam: () => ({ data: fixtureDreamTeam, isLoading: false, isError: false, error: null, refetch: vi.fn() }),
+  useDreamTeam: () => ({
+    data: fixtureDreamTeam,
+    isLoading: false,
+    isError: false,
+    error: null,
+    refetch: vi.fn(),
+  }),
 }));
 
 import { DreamTeamScreen } from './DreamTeamScreen';
@@ -15,7 +21,7 @@ function renderScreen(path = '/dream-team?gw=36') {
   return render(
     <MemoryRouter initialEntries={[path]}>
       <DreamTeamScreen />
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 }
 
@@ -53,7 +59,6 @@ describe('DreamTeamScreen', () => {
     expect(screen.getByRole('button', { name: /previous gameweek/i })).toBeDisabled();
   });
 });
-
 
 describe('DreamTeamScreen not-available state', () => {
   it('shows not-available message for an unfinished gameweek', () => {

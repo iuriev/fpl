@@ -1,4 +1,4 @@
-import { fireEvent,render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -9,7 +9,7 @@ function renderDrawer(open = true, onClose = vi.fn(), header?: React.ReactNode) 
   return render(
     <Drawer open={open} onClose={onClose} header={header} ariaLabel="Team information">
       <p>panel content</p>
-    </Drawer>,
+    </Drawer>
   );
 }
 

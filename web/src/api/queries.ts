@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { api,ApiError } from './client';
+import { api, ApiError } from './client';
 
 export function useGameweeks() {
   return useQuery({

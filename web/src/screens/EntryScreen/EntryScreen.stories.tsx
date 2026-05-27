@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { http, HttpResponse } from 'msw';
-import { expect, fn, type UserEventObject,within } from 'storybook/test';
+import { expect, fn, type UserEventObject, within } from 'storybook/test';
 
 import { EntryScreen } from './EntryScreen';
 

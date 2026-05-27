@@ -11,7 +11,7 @@ function renderPanel(overrides: Partial<typeof fixtureEntry> = {}) {
   return render(
     <MemoryRouter>
       <TeamInfoPanel entry={entry} teamId={entry.teamId} />
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 }
 

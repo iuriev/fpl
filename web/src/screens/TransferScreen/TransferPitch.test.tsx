@@ -6,26 +6,52 @@ import type { SquadPlayer } from '@/types';
 import { TransferPitch } from './TransferPitch';
 
 const ZERO_STATS: SquadPlayer['stats'] = {
-  minutes: 0, goals_scored: 0, assists: 0, clean_sheets: 0,
-  goals_conceded: 0, own_goals: 0, penalties_saved: 0, penalties_missed: 0,
-  yellow_cards: 0, red_cards: 0, saves: 0, bonus: 0, total_points: 0,
+  minutes: 0,
+  goals_scored: 0,
+  assists: 0,
+  clean_sheets: 0,
+  goals_conceded: 0,
+  own_goals: 0,
+  penalties_saved: 0,
+  penalties_missed: 0,
+  yellow_cards: 0,
+  red_cards: 0,
+  saves: 0,
+  bonus: 0,
+  total_points: 0,
 };
 
 function makePlayer(id: number, name: string, position: SquadPlayer['position']): SquadPlayer {
   return {
-    id, name, position, club: 'TST', teamCode: 1, teamId: 1,
-    nowCost: 50, points: 0, isCaptain: false, isViceCaptain: false,
-    status: 'a', chanceOfPlaying: null, news: '', stats: ZERO_STATS,
+    id,
+    name,
+    position,
+    club: 'TST',
+    teamCode: 1,
+    teamId: 1,
+    nowCost: 50,
+    points: 0,
+    isCaptain: false,
+    isViceCaptain: false,
+    status: 'a',
+    chanceOfPlaying: null,
+    news: '',
+    stats: ZERO_STATS,
   };
 }
 
 const STARTERS: SquadPlayer[] = [
   makePlayer(1, 'Hart', 'GK'),
-  makePlayer(2, 'Walker', 'DEF'), makePlayer(3, 'Stones', 'DEF'),
-  makePlayer(4, 'Dias', 'DEF'), makePlayer(5, 'Cancelo', 'DEF'),
-  makePlayer(6, 'Foden', 'MID'), makePlayer(7, 'De Bruyne', 'MID'),
-  makePlayer(8, 'Silva', 'MID'), makePlayer(9, 'Salah', 'MID'),
-  makePlayer(10, 'Haaland', 'FWD'), makePlayer(11, 'Jesus', 'FWD'),
+  makePlayer(2, 'Walker', 'DEF'),
+  makePlayer(3, 'Stones', 'DEF'),
+  makePlayer(4, 'Dias', 'DEF'),
+  makePlayer(5, 'Cancelo', 'DEF'),
+  makePlayer(6, 'Foden', 'MID'),
+  makePlayer(7, 'De Bruyne', 'MID'),
+  makePlayer(8, 'Silva', 'MID'),
+  makePlayer(9, 'Salah', 'MID'),
+  makePlayer(10, 'Haaland', 'FWD'),
+  makePlayer(11, 'Jesus', 'FWD'),
 ];
 
 const BENCH: SquadPlayer[] = [
@@ -44,7 +70,7 @@ function renderPitch(overrides: Partial<React.ComponentProps<typeof TransferPitc
       inPlayerIds={new Set()}
       onPlayerClick={vi.fn()}
       {...overrides}
-    />,
+    />
   );
 }
 

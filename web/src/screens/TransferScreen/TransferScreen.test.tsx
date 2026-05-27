@@ -9,16 +9,37 @@ import type { PoolPlayer, SquadPlayer, SquadResponse } from '@/types';
 import { TransferScreen } from './TransferScreen';
 
 const ZERO_STATS: SquadPlayer['stats'] = {
-  minutes: 0, goals_scored: 0, assists: 0, clean_sheets: 0,
-  goals_conceded: 0, own_goals: 0, penalties_saved: 0, penalties_missed: 0,
-  yellow_cards: 0, red_cards: 0, saves: 0, bonus: 0, total_points: 0,
+  minutes: 0,
+  goals_scored: 0,
+  assists: 0,
+  clean_sheets: 0,
+  goals_conceded: 0,
+  own_goals: 0,
+  penalties_saved: 0,
+  penalties_missed: 0,
+  yellow_cards: 0,
+  red_cards: 0,
+  saves: 0,
+  bonus: 0,
+  total_points: 0,
 };
 
 function makePlayer(id: number, name: string, position: SquadPlayer['position']): SquadPlayer {
   return {
-    id, name, position, club: 'TST', teamCode: 1, teamId: 1,
-    nowCost: 50, points: 0, isCaptain: false, isViceCaptain: false,
-    status: 'a', chanceOfPlaying: null, news: '', stats: ZERO_STATS,
+    id,
+    name,
+    position,
+    club: 'TST',
+    teamCode: 1,
+    teamId: 1,
+    nowCost: 50,
+    points: 0,
+    isCaptain: false,
+    isViceCaptain: false,
+    status: 'a',
+    chanceOfPlaying: null,
+    news: '',
+    stats: ZERO_STATS,
   };
 }
 
@@ -27,11 +48,16 @@ const SQUAD_DATA: SquadResponse = {
   summary: { totalPoints: 60, transfers: 0, bank: 0 },
   starters: [
     makePlayer(1, 'Hart', 'GK'),
-    makePlayer(2, 'Walker', 'DEF'), makePlayer(3, 'Stones', 'DEF'),
-    makePlayer(4, 'Dias', 'DEF'), makePlayer(5, 'Cancelo', 'DEF'),
-    makePlayer(6, 'Foden', 'MID'), makePlayer(7, 'De Bruyne', 'MID'),
-    makePlayer(8, 'Silva', 'MID'), makePlayer(9, 'Salah', 'MID'),
-    makePlayer(10, 'Haaland', 'FWD'), makePlayer(11, 'Jesus', 'FWD'),
+    makePlayer(2, 'Walker', 'DEF'),
+    makePlayer(3, 'Stones', 'DEF'),
+    makePlayer(4, 'Dias', 'DEF'),
+    makePlayer(5, 'Cancelo', 'DEF'),
+    makePlayer(6, 'Foden', 'MID'),
+    makePlayer(7, 'De Bruyne', 'MID'),
+    makePlayer(8, 'Silva', 'MID'),
+    makePlayer(9, 'Salah', 'MID'),
+    makePlayer(10, 'Haaland', 'FWD'),
+    makePlayer(11, 'Jesus', 'FWD'),
   ],
   bench: [
     makePlayer(12, 'Ederson', 'GK'),
@@ -42,11 +68,23 @@ const SQUAD_DATA: SquadResponse = {
 };
 
 const POOL_PLAYERS: PoolPlayer[] = SQUAD_DATA.starters.concat(SQUAD_DATA.bench).map((p) => ({
-  id: p.id, webName: p.name, firstName: p.name, lastName: p.name,
-  team: p.teamId, teamCode: p.teamCode, teamShortName: p.club,
-  position: p.position, nowCost: p.nowCost, totalPoints: 0, eventPoints: 0,
-  status: p.status as PoolPlayer['status'], chanceOfPlaying: null, news: '',
-  selectedByPercent: '10', form: '5.0', nextFixtures: [],
+  id: p.id,
+  webName: p.name,
+  firstName: p.name,
+  lastName: p.name,
+  team: p.teamId,
+  teamCode: p.teamCode,
+  teamShortName: p.club,
+  position: p.position,
+  nowCost: p.nowCost,
+  totalPoints: 0,
+  eventPoints: 0,
+  status: p.status as PoolPlayer['status'],
+  chanceOfPlaying: null,
+  news: '',
+  selectedByPercent: '10',
+  form: '5.0',
+  nextFixtures: [],
 }));
 
 // Mutable refs so individual describes can swap mock responses.
@@ -72,7 +110,7 @@ function renderScreen() {
       <MemoryRouter>
         <TransferScreen teamId={123} />
       </MemoryRouter>
-    </QueryClientProvider>,
+    </QueryClientProvider>
   );
 }
 

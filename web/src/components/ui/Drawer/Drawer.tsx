@@ -82,11 +82,7 @@ export const Drawer: React.FC<DrawerProps> = ({ open, onClose, ariaLabel, header
       >
         <div className={styles.drawerHeader}>
           <div className={styles.drawerHeaderContent}>{header}</div>
-          <button
-            className={styles.closeBtn}
-            onClick={onClose}
-            aria-label={copy.closeButton}
-          >
+          <button className={styles.closeBtn} onClick={onClose} aria-label={copy.closeButton}>
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path
                 d="M4 4l8 8M12 4l-8 8"

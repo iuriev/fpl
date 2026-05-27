@@ -335,7 +335,7 @@
 
 .skeletonLine {
   border-radius: 0.1875rem;
-  background: rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.1);
   background-image: linear-gradient(
     90deg,
     rgba(255, 255, 255, 0.08) 0%,
@@ -346,8 +346,14 @@
   animation: fplShimmer 1.6s ease-in-out infinite;
 }
 
-.skeletonLine_name { height: 0.6875rem; width: 70%; }
-.skeletonLine_meta { height: 0.5625rem; width: 45%; }
+.skeletonLine_name {
+  height: 0.6875rem;
+  width: 70%;
+}
+.skeletonLine_meta {
+  height: 0.5625rem;
+  width: 45%;
+}
 
 .skeletonStatCell {
   padding: 0 0.375rem;

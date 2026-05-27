@@ -11,7 +11,14 @@ import {
   poolPlayerToSquadPlayer,
   saveDraft,
 } from '@/lib/transfer-draft';
-import type { PlayerPosition, PoolPlayer, SquadPlayer, TransferChip, TransferDraft, TransferSwap } from '@/types';
+import type {
+  PlayerPosition,
+  PoolPlayer,
+  SquadPlayer,
+  TransferChip,
+  TransferDraft,
+  TransferSwap,
+} from '@/types';
 
 import { PlayerPickerSheet } from './PlayerPickerSheet';
 import { SwapsStrip } from './SwapsStrip';
@@ -43,8 +50,12 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   const currentGw = gameweeks?.current ?? null;
   const nextGw = currentGw !== null ? currentGw + 1 : null;
 
-  const { data: squadData, isLoading: squadLoading, isError: squadError, refetch } =
-    useSquad(teamId, currentGw);
+  const {
+    data: squadData,
+    isLoading: squadLoading,
+    isError: squadError,
+    refetch,
+  } = useSquad(teamId, currentGw);
   const { data: poolData, isLoading: poolLoading } = usePlayerPool();
 
   const [draft, setDraft] = useState<TransferDraft | null>(null);
@@ -97,7 +108,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
         return next;
       });
     },
-    [teamId, nextGw, persistDraft],
+    [teamId, nextGw, persistDraft]
   );
 
   const originalSquad: SquadPlayer[] = useMemo(() => {
@@ -113,7 +124,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
       draft.swaps.map((s) => {
         const inPlayer = allPoolPlayers.find((p) => p.id === s.inId);
         return [s.outId, inPlayer] as const;
-      }),
+      })
     );
     let squad = originalSquad.map((p) => {
       const replacement = swapMap.get(p.id);
@@ -136,17 +147,14 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
 
   const displayStarters = useMemo(
     () => displaySquad.filter((_, i) => i < (squadData?.starters.length ?? 11)),
-    [displaySquad, squadData],
+    [displaySquad, squadData]
   );
   const displayBench = useMemo(
     () => displaySquad.slice(squadData?.starters.length ?? 11),
-    [displaySquad, squadData],
+    [displaySquad, squadData]
   );
 
-  const inPlayerIds = useMemo(
-    () => new Set(draft?.swaps.map((s) => s.inId) ?? []),
-    [draft],
-  );
+  const inPlayerIds = useMemo(() => new Set(draft?.swaps.map((s) => s.inId) ?? []), [draft]);
 
   const allPlayerCosts = useMemo(() => {
     const out = originalSquad.map((p) => ({ id: p.id, nowCost: p.nowCost }));
@@ -175,17 +183,11 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
       : allPoolPlayers.filter((p) => p.position !== 'GK')
     : [];
 
-  const poolLookup = useMemo(
-    () => new Map(allPoolPlayers.map((p) => [p.id, p])),
-    [allPoolPlayers],
-  );
+  const poolLookup = useMemo(() => new Map(allPoolPlayers.map((p) => [p.id, p])), [allPoolPlayers]);
 
   const isOutfield = outPlayer ? outPlayer.position !== 'GK' : false;
 
-  const squadPlayerIds = useMemo(
-    () => new Set(displaySquad.map((p) => p.id)),
-    [displaySquad],
-  );
+  const squadPlayerIds = useMemo(() => new Set(displaySquad.map((p) => p.id)), [displaySquad]);
 
   const squadTeamCounts = useMemo(() => {
     const counts = new Map<number, number>();
@@ -238,14 +240,19 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
       let newSwaps: TransferSwap[];
       if (chainSwap) {
         if (inPlayer.id === chainSwap.outId) {
-          newSwaps = d.swaps.filter((s) => s.inId !== selectedPlayerId && s.outId !== selectedPlayerId);
+          newSwaps = d.swaps.filter(
+            (s) => s.inId !== selectedPlayerId && s.outId !== selectedPlayerId
+          );
         } else {
           newSwaps = d.swaps
             .map((s) => (s.inId === selectedPlayerId ? { outId: s.outId, inId: inPlayer.id } : s))
             .filter((s) => s.outId !== selectedPlayerId);
         }
       } else {
-        newSwaps = [...d.swaps.filter((s) => s.outId !== selectedPlayerId), { outId: selectedPlayerId, inId: inPlayer.id }];
+        newSwaps = [
+          ...d.swaps.filter((s) => s.outId !== selectedPlayerId),
+          { outId: selectedPlayerId, inId: inPlayer.id },
+        ];
       }
       return { ...d, swaps: newSwaps };
     });
@@ -358,6 +365,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
           squadPositionCounts={squadPositionCounts}
           squadPlayerIds={squadPlayerIds}
           isOutfield={isOutfield}
+          targetGw={nextGw}
           onSelect={handleSelectReplacement}
           onClose={() => setSelectedPlayerId(null)}
         />

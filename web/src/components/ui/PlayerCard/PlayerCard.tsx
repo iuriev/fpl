@@ -86,14 +86,21 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
       onKeyDown={
         isFlagged
           ? (e) => {
-              if (e.key === 'Enter') { e.preventDefault(); toggle(); }
-              if (e.key === ' ') { e.preventDefault(); }
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                toggle();
+              }
+              if (e.key === ' ') {
+                e.preventDefault();
+              }
             }
           : undefined
       }
       onKeyUp={
         isFlagged
-          ? (e) => { if (e.key === ' ') toggle(); }
+          ? (e) => {
+              if (e.key === ' ') toggle();
+            }
           : undefined
       }
     >
@@ -123,7 +130,12 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
             </div>
           </div>
         )}
-        <Jersey size={size} teamCode={player.teamCode} position={player.position} alt={player.name} />
+        <Jersey
+          size={size}
+          teamCode={player.teamCode}
+          position={player.position}
+          alt={player.name}
+        />
       </div>
 
       <div className={styles.pill}>
@@ -133,6 +145,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
 
       {(nextFixture || onSubClick) && (
         <div className={styles.fixtureRow}>
+          <span className={styles.teamAbbrev}>{player.club}</span>
           {nextFixture && (
             <FdrChip
               opponent={nextFixture.opponent}
@@ -143,12 +156,16 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
           {onSubClick && (
             <span
               className={styles.subBtn}
-              onClick={(e) => { e.stopPropagation(); onSubClick(); }}
-              aria-hidden="true"
+              onClick={(e) => {
+                e.stopPropagation();
+                onSubClick();
+              }}
+              role="button"
+              aria-label="Substitute"
             >
               <svg width="8" height="10" viewBox="0 0 10 12" fill="none" aria-hidden="true">
-                <path d="M5 1L1 5H9L5 1Z" fill="currentColor"/>
-                <path d="M5 11L1 7H9L5 11Z" fill="currentColor"/>
+                <path d="M5 1L1 5H9L5 1Z" fill="currentColor" />
+                <path d="M5 11L1 7H9L5 11Z" fill="currentColor" />
               </svg>
             </span>
           )}
@@ -156,11 +173,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
       )}
 
       {showStatus && badge && (
-        <div
-          id={popupId}
-          className={styles.statusPopup}
-          onClick={(e) => e.stopPropagation()}
-        >
+        <div id={popupId} className={styles.statusPopup} onClick={(e) => e.stopPropagation()}>
           <span className={`${styles.statusLabel} ${styles[`statusLabel_${badge.variant}`]}`}>
             {statusLabel(player.status)}
           </span>

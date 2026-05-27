@@ -47,7 +47,8 @@ From the repo root:
 npm run dev      # proxy + web concurrently
 npm run build    # build all workspaces
 npm run lint     # lint all workspaces
-npm run test     # test all workspaces
+npm run test     # fast unit tests across all workspaces
+npm run test:ui  # Storybook component tests (web only)
 npm run format   # Prettier across the repo
 ```
 

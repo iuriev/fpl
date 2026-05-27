@@ -10,12 +10,12 @@
 
 ## 🐛 Bugs (fix immediately)
 
-### BUG-01: Transfer screen allows invalid squad composition
+### BUG-01: Transfer screen allows invalid squad composition [FIXED]
 The position validation in the transfer planner does not prevent selecting more than 5 defenders,
 5 midfielders, or 3 forwards — violating FPL squad rules.
 The limit is: GKP 1, DEF 3–5, MID 2–5, FWD 1–3 (15 players total, at least 1 of each outfield pos).
 
-### BUG-02: Swap highlight in transfer planner is visually broken
+### BUG-02: Swap highlight in transfer planner is visually broken [FIXED]
 The "player being replaced" yellow highlight is ugly. Needs a proper directional swap indicator:
 a green arrow pointing up (new player in) and a red arrow pointing down (player going out),
 matching FPL design conventions.
