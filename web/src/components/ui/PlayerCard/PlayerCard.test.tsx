@@ -68,3 +68,11 @@ describe('PlayerCard', () => {
     expect(screen.getByText(/CHE/)).toBeInTheDocument();
   });
 });
+
+describe('PlayerCard with hideClub', () => {
+  it('does not render club abbreviation when hideClub is true', () => {
+    render(<PlayerCard player={makePlayer()} nextFixture={makeFixture()} hideClub />);
+    expect(screen.queryByText('ARS')).not.toBeInTheDocument();
+    expect(screen.getByText(/LIV/)).toBeInTheDocument();
+  });
+});

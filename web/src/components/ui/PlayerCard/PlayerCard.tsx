@@ -12,6 +12,7 @@ export interface PlayerCardProps {
   size?: 'large' | 'medium';
   hidePoints?: boolean;
   nextFixture?: FixtureInfo;
+  hideClub?: boolean;
   footBadge?: React.ReactNode;
   onSubClick?: () => void;
 }
@@ -43,6 +44,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   size = 'medium',
   hidePoints = false,
   nextFixture,
+  hideClub = false,
   footBadge,
   onSubClick,
 }) => {
@@ -145,7 +147,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
 
       {(nextFixture || onSubClick) && (
         <div className={styles.fixtureRow}>
-          <span className={styles.teamAbbrev}>{player.club}</span>
+          {!hideClub && <span className={styles.teamAbbrev}>{player.club}</span>}
           {nextFixture && (
             <FdrChip
               opponent={nextFixture.opponent}

@@ -85,6 +85,7 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
           player={player}
           size={size}
           hidePoints
+          hideClub
           nextFixture={poolLookup?.get(player.id)?.nextFixtures[0]}
           onSubClick={
             !subModeActive && onSubIconClick ? () => onSubIconClick(player.id) : undefined
