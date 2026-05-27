@@ -17,7 +17,6 @@ body {
   --fpl-pitch-line: rgba(255, 255, 255, 0.7);
 
   --fpl-text: #ffffff;
-  --fpl-text-primary: #ffffff;
   --fpl-text-soft: #e8e0f0;
   --fpl-muted: #a89bba;
   --fpl-muted-soft: #7a6b8e;
@@ -27,12 +26,18 @@ body {
   --fpl-accent-ink: #170027;
   --fpl-accent-faint: rgba(0, 255, 135, 0.12);
 
+  --fpl-success: var(--fpl-accent);
+  --fpl-success-ink: var(--fpl-accent-ink);
+
   --fpl-sub-target: #22d3ee;
 
   --fpl-error: #ff4d6d;
   --fpl-error-soft: rgba(255, 77, 109, 0.12);
+  --fpl-danger: var(--fpl-error);
+
   --fpl-warn: #ffc000;
   --fpl-warn-ink: #241500;
+  --fpl-warning: var(--fpl-warn);
 
   --fpl-pill-bg: #3d1a55;
   --fpl-pill-name-ink: #ffffff;

@@ -46,7 +46,7 @@ describe('PlayerPickerSheet sorting colors', () => {
     render(<PlayerPickerSheet {...defaultProps} />);
     
     // By default PTS is not sorted (OWN% is default sortKey)
-    const ptsHeader = screen.getByRole('columnheader', { name: /pts/i });
+    const ptsHeader = screen.getByRole('columnheader', { name: /^Pts/ });
     
     // 1st click: sort PTS desc (green)
     fireEvent.click(ptsHeader);
