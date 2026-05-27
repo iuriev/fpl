@@ -20,6 +20,7 @@ import { TransferActionBar } from './TransferActionBar';
 import { TransferHeader } from './TransferHeader';
 import { TransferPitch } from './TransferPitch';
 import styles from './TransferScreen.module.css';
+import { useSubMode } from './useSubMode';
 
 export interface TransferScreenProps {
   teamId: number;
@@ -33,6 +34,7 @@ function makeDefaultDraft(teamId: number, targetGw: number): TransferDraft {
     freeTransfers: 1,
     chip: 'none',
     swaps: [],
+    subs: [],
   };
 }
 
@@ -108,14 +110,23 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
         return [s.outId, inPlayer] as const;
       }),
     );
-    return originalSquad.map((p) => {
+    let squad = originalSquad.map((p) => {
       const replacement = swapMap.get(p.id);
-       if (replacement) {
+      if (replacement) {
         const newPlayer = poolPlayerToSquadPlayer(replacement);
         return { ...newPlayer, isCaptain: p.isCaptain, isViceCaptain: p.isViceCaptain };
       }
       return p;
     });
+    for (const sub of draft.subs) {
+      const fieldIdx = squad.findIndex((p) => p.id === sub.fieldId);
+      const benchIdx = squad.findIndex((p) => p.id === sub.benchId);
+      if (fieldIdx !== -1 && benchIdx !== -1) {
+        squad = [...squad];
+        [squad[fieldIdx], squad[benchIdx]] = [squad[benchIdx], squad[fieldIdx]];
+      }
+    }
+    return squad;
   }, [originalSquad, draft, allPoolPlayers]);
 
   const displayStarters = useMemo(
@@ -207,7 +218,13 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
     return m;
   }, [allPlayerCosts]);
 
-  const handlePlayerClick = (id: number) => setSelectedPlayerId(id);
+  const { selectedSubId, validSubTargets, handleSubIconClick, handleSubTargetClick, cancelSub } =
+    useSubMode(displayStarters, displayBench, updateDraft);
+
+  const handlePlayerClick = (id: number) => {
+    if (selectedSubId !== null) return;
+    setSelectedPlayerId(id);
+  };
 
   const handleSelectReplacement = (inPlayer: PoolPlayer) => {
     if (selectedPlayerId === null) return;
@@ -299,6 +316,10 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
               inPlayerIds={inPlayerIds}
               onPlayerClick={handlePlayerClick}
               poolLookup={poolLookup}
+              selectedSubId={selectedSubId}
+              validSubTargets={validSubTargets}
+              onSubIconClick={handleSubIconClick}
+              onSubTargetClick={handleSubTargetClick}
             />
           </div>
 

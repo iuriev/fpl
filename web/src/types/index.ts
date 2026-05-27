@@ -194,6 +194,11 @@ export interface TransferSwap {
   inId: number;
 }
 
+export interface SubSwap {
+  fieldId: number;
+  benchId: number;
+}
+
 export interface TransferDraft {
   teamId: number;
   targetGw: number;
@@ -201,4 +206,5 @@ export interface TransferDraft {
   freeTransfers: number;
   chip: TransferChip;
   swaps: TransferSwap[];
+  subs: SubSwap[];
 }

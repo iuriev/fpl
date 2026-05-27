@@ -87,3 +87,23 @@
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.4; }
 }
+
+.playerBtn_subTarget::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: var(--fpl-radius-sm);
+  border: 2px solid var(--fpl-sub-target);
+  pointer-events: none;
+  animation: pulse-sub-target 1.5s ease-in-out infinite;
+}
+
+.playerBtn_dimmed {
+  opacity: 0.35;
+  filter: grayscale(0.5);
+}
+
+@keyframes pulse-sub-target {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}

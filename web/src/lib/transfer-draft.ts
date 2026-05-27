@@ -10,12 +10,12 @@ export function loadDraft(teamId: number, currentNextGw: number): TransferDraft 
   const raw = localStorage.getItem(DRAFT_KEY(teamId));
   if (!raw) return null;
   try {
-    const draft = JSON.parse(raw) as TransferDraft;
-    if (draft.targetGw !== currentNextGw) {
+    const parsed = JSON.parse(raw) as Partial<TransferDraft>;
+    if (parsed.targetGw !== currentNextGw) {
       localStorage.removeItem(DRAFT_KEY(teamId));
       return null;
     }
-    return draft;
+    return { ...(parsed as TransferDraft), subs: parsed.subs ?? [] };
   } catch {
     localStorage.removeItem(DRAFT_KEY(teamId));
     return null;

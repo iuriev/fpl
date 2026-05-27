@@ -1,14 +1,16 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { afterEach,beforeEach, describe, expect, it } from 'vitest';
+
+import type { PoolPlayer, SquadPlayer,TransferDraft } from '@/types';
+
 import {
-  saveDraft,
-  loadDraft,
-  clearDraft,
   calcBank,
   calcTransferCost,
-  wouldExceedClubLimit,
+  clearDraft,
+  loadDraft,
   poolPlayerToSquadPlayer,
+  saveDraft,
+  wouldExceedClubLimit,
 } from './transfer-draft';
-import type { TransferDraft, PoolPlayer, SquadPlayer } from '@/types';
 
 const makeDraft = (overrides?: Partial<TransferDraft>): TransferDraft => ({
   teamId: 123,
@@ -17,6 +19,7 @@ const makeDraft = (overrides?: Partial<TransferDraft>): TransferDraft => ({
   freeTransfers: 1,
   chip: 'none',
   swaps: [],
+  subs: [],
   ...overrides,
 });
 

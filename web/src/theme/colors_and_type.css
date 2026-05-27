@@ -26,6 +26,8 @@ body {
   --fpl-accent-ink: #170027;
   --fpl-accent-faint: rgba(0, 255, 135, 0.12);
 
+  --fpl-sub-target: #22d3ee;
+
   --fpl-error: #ff4d6d;
   --fpl-error-soft: rgba(255, 77, 109, 0.12);
   --fpl-warn: #ffc000;

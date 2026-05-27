@@ -26,6 +26,10 @@ export interface TransferPitchProps {
   inPlayerIds: Set<number>;
   onPlayerClick: (id: number) => void;
   poolLookup?: Map<number, PoolPlayer>;
+  selectedSubId?: number | null;
+  validSubTargets?: Set<number>;
+  onSubIconClick?: (id: number) => void;
+  onSubTargetClick?: (id: number) => void;
 }
 
 function groupByPosition(players: SquadPlayer[]): Record<PlayerPosition, SquadPlayer[]> {
@@ -41,8 +45,61 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
   inPlayerIds,
   onPlayerClick,
   poolLookup,
+  selectedSubId = null,
+  validSubTargets = new Set(),
+  onSubIconClick,
+  onSubTargetClick,
 }) => {
   const positionGroups = groupByPosition(starters);
+
+  const subModeActive = selectedSubId !== null;
+
+  function playerBtnClass(playerId: number, isOut: boolean, isIn: boolean): string {
+    const base = styles.playerBtn;
+    if (isOut || playerId === selectedSubId) return `${base} ${styles.playerBtn_out}`;
+    if (isIn) return `${base} ${styles.playerBtn_in}`;
+    if (subModeActive) {
+      return validSubTargets.has(playerId)
+        ? `${base} ${styles.playerBtn_subTarget}`
+        : `${base} ${styles.playerBtn_dimmed}`;
+    }
+    return base;
+  }
+
+  function handleCardClick(playerId: number) {
+    if (subModeActive) {
+      if (validSubTargets.has(playerId)) onSubTargetClick?.(playerId);
+    } else {
+      onPlayerClick(playerId);
+    }
+  }
+
+  function renderCard(player: SquadPlayer, size: 'large' | 'medium') {
+    const isOut = player.id === outPlayerId;
+    const isIn = inPlayerIds.has(player.id);
+    const label = player.id === selectedSubId
+      ? `${player.name} (SUB OUT)`
+      : validSubTargets.has(player.id)
+        ? `${player.name} (SUB TARGET)`
+        : `${player.name}${isOut ? ' (OUT)' : isIn ? ' (IN)' : ''}`;
+    return (
+      <button
+        key={player.id}
+        className={playerBtnClass(player.id, isOut, isIn)}
+        onClick={() => handleCardClick(player.id)}
+        aria-label={label}
+      >
+        <PlayerCard
+          player={player}
+          size={size}
+          hidePoints
+          nextFixture={poolLookup?.get(player.id)?.nextFixtures[0]}
+          footBadge={isIn ? <SubIcon /> : undefined}
+          onSubClick={onSubIconClick ? () => onSubIconClick(player.id) : undefined}
+        />
+      </button>
+    );
+  }
 
   return (
     <div className={styles.pitchBench}>
@@ -51,26 +108,7 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
           <div className={styles.pitchRows}>
             {POSITION_ORDER.map((pos) => (
               <div key={pos} className={styles.playerRow}>
-                {positionGroups[pos].map((player) => {
-                  const isOut = player.id === outPlayerId;
-                  const isIn = inPlayerIds.has(player.id);
-                  return (
-                    <button
-                      key={player.id}
-                      className={`${styles.playerBtn} ${isOut ? styles.playerBtn_out : ''} ${isIn ? styles.playerBtn_in : ''}`}
-                      onClick={() => onPlayerClick(player.id)}
-                      aria-label={`${player.name}${isOut ? ' (OUT)' : isIn ? ' (IN)' : ''}`}
-                    >
-                      <PlayerCard
-                        player={player}
-                        size="large"
-                        hidePoints
-                        nextFixture={poolLookup?.get(player.id)?.nextFixtures[0]}
-                        footBadge={isIn ? <SubIcon /> : undefined}
-                      />
-                    </button>
-                  );
-                })}
+                {positionGroups[pos].map((player) => renderCard(player, 'large'))}
               </div>
             ))}
           </div>
@@ -78,26 +116,7 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
       </div>
 
       <div className={styles.bench}>
-        {bench.map((player) => {
-          const isOut = player.id === outPlayerId;
-          const isIn = inPlayerIds.has(player.id);
-          return (
-            <button
-              key={player.id}
-              className={`${styles.playerBtn} ${isOut ? styles.playerBtn_out : ''} ${isIn ? styles.playerBtn_in : ''}`}
-              onClick={() => onPlayerClick(player.id)}
-              aria-label={`${player.name}${isOut ? ' (OUT)' : isIn ? ' (IN)' : ''}`}
-            >
-              <PlayerCard
-                player={player}
-                size="medium"
-                hidePoints
-                nextFixture={poolLookup?.get(player.id)?.nextFixtures[0]}
-                footBadge={isIn ? <SubIcon /> : undefined}
-              />
-            </button>
-          );
-        })}
+        {bench.map((player) => renderCard(player, 'medium'))}
       </div>
     </div>
   );

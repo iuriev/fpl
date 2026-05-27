@@ -13,6 +13,7 @@ export interface PlayerCardProps {
   hidePoints?: boolean;
   nextFixture?: FixtureInfo;
   footBadge?: React.ReactNode;
+  onSubClick?: () => void;
 }
 
 function availBadge(status: PlayerStatus): { char: string; variant: 'warn' | 'error' } | null {
@@ -43,6 +44,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   hidePoints = false,
   nextFixture,
   footBadge,
+  onSubClick,
 }) => {
   const [showStatus, setShowStatus] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -137,6 +139,14 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
             difficulty={nextFixture.difficulty}
           />
         </div>
+      )}
+
+      {onSubClick && (
+        <span
+          className={styles.subBtn}
+          onClick={(e) => { e.stopPropagation(); onSubClick(); }}
+          aria-label="Substitute"
+        />
       )}
 
       {showStatus && badge && (
