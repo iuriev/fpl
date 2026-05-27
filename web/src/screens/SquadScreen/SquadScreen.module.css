@@ -18,10 +18,10 @@
 .header {
   flex-shrink: 0;
   background: transparent;
-  padding: var(--fpl-space-md) var(--fpl-space-xl3) var(--fpl-space-sm);
+  padding: var(--fpl-space-sm) var(--fpl-space-xl3) var(--fpl-space-xs);
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.125rem;
 }
 
 .headerMain {
@@ -106,7 +106,7 @@
 .viewToggleWrap {
   display: flex;
   justify-content: center;
-  padding: 0.25rem var(--fpl-space-xl3) var(--fpl-space-sm);
+  padding: 0.125rem var(--fpl-space-xl3) var(--fpl-space-xs);
 }
 
 .gwNav {
@@ -162,7 +162,7 @@
 .summaryWrap {
   view-transition-name: squad-summary;
   flex-shrink: 0;
-  padding: var(--fpl-space-xs) var(--fpl-space-xl);
+  padding: var(--fpl-space-xs) var(--fpl-space-md);
 }
 
 .summaryPlaceholder {
@@ -203,6 +203,9 @@
 .pitchFill {
   width: 100% !important;
   height: auto !important;
+  max-height: 100%;
+  aspect-ratio: 100 / 156;
+  flex-shrink: 0;
 }
 
 .pitchRows {
@@ -223,7 +226,7 @@
 
 .bench {
   flex-shrink: 0;
-  padding: var(--fpl-space-xs) var(--fpl-space-xl) var(--fpl-space-sm);
+  padding: var(--fpl-space-xs) var(--fpl-space-xl) var(--fpl-space-xs);
 }
 
 .benchLabels {
@@ -253,7 +256,7 @@
   background: rgba(0, 0, 0, 0.28);
   border: 1px solid var(--fpl-bg-hair);
   border-radius: var(--fpl-radius-lg);
-  padding: var(--fpl-space-sm) var(--fpl-space-xl3) var(--fpl-space-lg);
+  padding: var(--fpl-space-sm) var(--fpl-space-xl3) var(--fpl-space-md);
 }
 
 .skeletonVeil {

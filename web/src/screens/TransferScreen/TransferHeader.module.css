@@ -1,6 +1,6 @@
 .header {
   flex-shrink: 0;
-  padding: var(--fpl-space-sm) var(--fpl-space-md) var(--fpl-space-sm);
+  padding: var(--fpl-space-xs) var(--fpl-space-md);
   background: var(--fpl-bg-deep);
   border-bottom: 1px solid var(--fpl-bg-hair);
 }
@@ -12,11 +12,11 @@
   background: none;
   border: none;
   color: var(--fpl-muted);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   cursor: pointer;
   padding: 0;
-  margin-bottom: var(--fpl-space-xs);
+  margin-bottom: 2px;
   transition: color 120ms;
 }
 
@@ -30,7 +30,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--fpl-space-sm);
+  margin-bottom: var(--fpl-space-xs);
 }
 
 .title {
@@ -74,6 +74,16 @@
   align-items: center;
   gap: 0.125rem;
   flex: 1;
+}
+
+.stat:last-child {
+  flex: 0 0 auto;
+  align-items: flex-end;
+  min-width: 3.5rem;
+}
+
+.divider:last-of-type {
+  margin-left: auto;
 }
 
 .statValue {

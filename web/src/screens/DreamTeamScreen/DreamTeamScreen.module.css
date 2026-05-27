@@ -97,16 +97,19 @@
 .pitchWrap {
   flex: 1;
   min-height: 0;
-  padding: 0 var(--fpl-space-xl);
+  overflow: hidden;
+  padding: 0 5px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
 }
 
 .pitchFill {
-  height: 100% !important;
-  width: auto !important;
-  max-width: 100%;
+  width: 100% !important;
+  height: auto !important;
+  max-height: 100%;
+  aspect-ratio: 100 / 156;
+  flex-shrink: 0;
 }
 
 .pitchRows {
@@ -115,13 +118,13 @@
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  padding: 4% 2%;
+  padding: 4% 1%;
 }
 
 .playerRow {
   display: flex;
   justify-content: center;
-  gap: var(--fpl-space-xs);
+  gap: var(--fpl-space-sm);
   flex-wrap: nowrap;
 }
 

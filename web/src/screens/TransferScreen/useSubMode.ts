@@ -9,7 +9,7 @@ function isFormationValid(starters: SquadPlayer[]): boolean {
     else if (p.position === 'MID') mid++;
     else if (p.position === 'FWD') fwd++;
   }
-  return def >= 3 && mid >= 2 && fwd >= 1;
+  return def >= 3 && def <= 5 && mid >= 2 && mid <= 5 && fwd >= 1 && fwd <= 3;
 }
 
 function computeValidTargets(

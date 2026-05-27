@@ -98,7 +98,7 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
   return (
     <div className={styles.pitchBench}>
       <div className={styles.pitchWrap} onClick={handlePitchBackgroundClick}>
-        <Pitch className={styles.pitchFill}>
+        <Pitch className={styles.pitchFill} preserveAspectRatio="none">
           <div className={styles.pitchRows}>
             {POSITION_ORDER.map((pos) => (
               <div key={pos} className={styles.playerRow}>

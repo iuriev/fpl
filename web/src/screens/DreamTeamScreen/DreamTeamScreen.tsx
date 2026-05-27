@@ -192,7 +192,7 @@ export const DreamTeamScreen: React.FC = () => {
 
       {data && positionGroups && (
         <div className={styles.pitchWrap}>
-          <Pitch className={styles.pitchFill}>
+          <Pitch className={styles.pitchFill} preserveAspectRatio="none">
             <div className={styles.pitchRows}>
               {POSITION_ORDER.map((pos) => (
                 <div key={pos} className={styles.playerRow}>
@@ -214,7 +214,7 @@ DreamTeamScreen.displayName = 'DreamTeamScreen';
 function PitchSkeleton() {
   return (
     <div className={styles.pitchWrap} aria-label={copy.loadingPlaceholder} aria-busy="true">
-      <Pitch className={styles.pitchFill}>
+      <Pitch className={styles.pitchFill} preserveAspectRatio="none">
         <div className={styles.skeletonVeil} />
         <div className={styles.pitchRows}>
           {[1, 3, 4, 3].map((count, rowIdx) => (
