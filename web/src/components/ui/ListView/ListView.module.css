@@ -150,11 +150,19 @@
   color: var(--fpl-muted);
 }
 
-.colHeaderCell_hi {
+.colHeaderCell_asc {
+  color: var(--fpl-error);
+}
+
+.colHeaderCell_asc:hover {
+  color: var(--fpl-error);
+}
+
+.colHeaderCell_desc {
   color: var(--fpl-accent);
 }
 
-.colHeaderCell_hi:hover {
+.colHeaderCell_desc:hover {
   color: var(--fpl-accent);
 }
 

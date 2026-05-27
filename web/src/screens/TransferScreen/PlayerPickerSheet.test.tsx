@@ -43,7 +43,6 @@ describe('PlayerPickerSheet', () => {
       ['FWD', 3],
     ]),
     squadPlayerIds: new Set([1]),
-    isOutfield: true,
     targetGw: 34,
     onSelect: vi.fn(),
     onClose: vi.fn(),
@@ -96,47 +95,8 @@ describe('PlayerPickerSheet', () => {
     expect(row?.getAttribute('data-over-budget')).toBe('true');
   });
 
-  it('shows position tabs when isOutfield is true', () => {
-    render(<PlayerPickerSheet {...defaultProps} isOutfield={true} />);
-    expect(screen.getByText('ALL')).toBeInTheDocument();
-    expect(screen.getByText('DEF')).toBeInTheDocument();
-    expect(screen.getByText('MID')).toBeInTheDocument();
-    expect(screen.getByText('FWD')).toBeInTheDocument();
-  });
-
-  it('hides position tabs when isOutfield is false', () => {
-    render(<PlayerPickerSheet {...defaultProps} isOutfield={false} />);
-    expect(screen.queryByText('ALL')).not.toBeInTheDocument();
-    expect(screen.queryByText('DEF')).not.toBeInTheDocument();
-  });
-
-  it('filters outfield candidates by position tab', async () => {
-    const user = userEvent.setup();
-    const candidates = [
-      makePoolPlayer(2, { webName: 'DefPlayer', position: 'DEF' }),
-      makePoolPlayer(3, { webName: 'MidPlayer', position: 'MID' }),
-    ];
-    render(<PlayerPickerSheet {...defaultProps} candidates={candidates} isOutfield={true} />);
-    await user.click(screen.getByText('DEF'));
-    expect(screen.getByText('DefPlayer')).toBeInTheDocument();
-    expect(screen.queryByText('MidPlayer')).not.toBeInTheDocument();
-  });
-
-  it('shows all candidates when ALL tab is active', async () => {
-    const user = userEvent.setup();
-    const candidates = [
-      makePoolPlayer(2, { webName: 'DefPlayer', position: 'DEF' }),
-      makePoolPlayer(3, { webName: 'MidPlayer', position: 'MID' }),
-    ];
-    render(<PlayerPickerSheet {...defaultProps} candidates={candidates} isOutfield={true} />);
-    await user.click(screen.getByText('DEF'));
-    await user.click(screen.getByText('ALL'));
-    expect(screen.getByText('DefPlayer')).toBeInTheDocument();
-    expect(screen.getByText('MidPlayer')).toBeInTheDocument();
-  });
 
   it('disables candidates whose position is already at the squad maximum', async () => {
-    const user = userEvent.setup();
     // outPlayer is MID, squad already has 5 DEFs — picking a DEF would exceed the limit
     const fullDefCounts = new Map<PlayerPosition, number>([
       ['GK', 2],
@@ -151,7 +111,6 @@ describe('PlayerPickerSheet', () => {
         candidates={[makePoolPlayer(2, { webName: 'DefPlayer', position: 'DEF' })]}
       />
     );
-    await user.click(screen.getByText('ALL'));
     const row = screen.getByText('DefPlayer').closest('[data-position-limit]');
     expect(row?.getAttribute('data-position-limit')).toBe('true');
   });

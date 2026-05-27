@@ -17,6 +17,7 @@ body {
   --fpl-pitch-line: rgba(255, 255, 255, 0.7);
 
   --fpl-text: #ffffff;
+  --fpl-text-primary: #ffffff;
   --fpl-text-soft: #e8e0f0;
   --fpl-muted: #a89bba;
   --fpl-muted-soft: #7a6b8e;

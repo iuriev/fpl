@@ -85,7 +85,13 @@ function ColHeader({
           key={c.key}
           className={[
             styles.colHeaderCell,
-            c.highlight || sort.key === c.key ? styles.colHeaderCell_hi : '',
+            sort.key === c.key
+              ? sort.dir === 'asc'
+                ? styles.colHeaderCell_asc
+                : styles.colHeaderCell_desc
+              : c.highlight
+                ? styles.colHeaderCell_desc
+                : '',
           ]
             .filter(Boolean)
             .join(' ')}

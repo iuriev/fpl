@@ -10,7 +10,8 @@
 
 .subtitle {
   font-size: 0.75rem;
-  color: var(--fpl-muted-soft);
+  font-weight: 500;
+  color: var(--fpl-muted);
 }
 
 .controls {
@@ -23,48 +24,27 @@
 
 .search {
   width: 100%;
-  padding: 0.5rem var(--fpl-space-sm);
+  padding: 0.625rem var(--fpl-space-sm);
   border-radius: var(--fpl-radius-sm);
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.08);
   border: 1px solid var(--fpl-bg-hair);
-  color: var(--fpl-text-primary);
+  color: var(--fpl-text);
   font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.search:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--fpl-accent);
+  box-shadow: 0 0 0 1px var(--fpl-accent);
 }
 
 .search::placeholder {
-  color: var(--fpl-muted-soft);
+  color: var(--fpl-muted);
+  opacity: 0.8;
 }
 
-.filterRow {
-  display: flex;
-  align-items: center;
-  gap: var(--fpl-space-xs);
-}
-
-.posTabs {
-  display: flex;
-  flex: 1;
-  gap: 0.25rem;
-}
-
-.posTab {
-  padding: 0.25rem 0.5rem;
-  border-radius: 1rem;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  font-family: var(--fpl-font-display);
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--fpl-bg-hair);
-  color: var(--fpl-muted-soft);
-  cursor: pointer;
-  letter-spacing: 0.04em;
-}
-
-.posTab_active {
-  background: var(--fpl-accent);
-  color: #002210;
-  border-color: transparent;
-}
 
 .list {
   flex: 1;
@@ -87,7 +67,7 @@
 .label {
   font-size: 0.625rem;
   font-weight: 600;
-  color: var(--fpl-muted-soft);
+  color: var(--fpl-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   text-align: center;
@@ -104,13 +84,27 @@
 }
 
 .label_sortable:hover {
-  color: var(--fpl-text-primary);
+  color: var(--fpl-text);
 }
 
-.label_active {
+.label_asc {
+  color: var(--fpl-error);
+}
+
+.label_asc:hover {
+  color: var(--fpl-error);
+}
+
+.label_desc {
   color: var(--fpl-accent);
 }
 
-.label_active_asc {
-  color: var(--fpl-error);
+.label_desc:hover {
+  color: var(--fpl-accent);
+}
+
+.sortArrow {
+  margin-left: 0.125rem;
+  font-size: 0.625rem;
+  opacity: 0.8;
 }

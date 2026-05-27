@@ -7,18 +7,7 @@ import type { PlayerPosition, PoolPlayer } from '@/types';
 import { PlayerPickerRow } from './PlayerPickerRow';
 import styles from './PlayerPickerSheet.module.css';
 
-type PositionFilter = 'ALL' | 'DEF' | 'MID' | 'FWD';
-
 type SortKey = 'totalPoints' | 'nowCost' | 'selectedByPercent' | 'expectedPoints' | 'webName';
-
-const POS_LABELS: Record<PositionFilter, string> = {
-  ALL: copy.transfersPositionAll,
-  DEF: copy.positionDEF,
-  MID: copy.positionMID,
-  FWD: copy.positionFWD,
-};
-
-const POS_FILTERS: PositionFilter[] = ['ALL', 'DEF', 'MID', 'FWD'];
 
 const POSITION_MAX: Record<PlayerPosition, number> = { GK: 2, DEF: 5, MID: 5, FWD: 3 };
 
@@ -30,7 +19,6 @@ export interface PlayerPickerSheetProps {
   squadTeamCounts: Map<number, number>;
   squadPositionCounts: Map<PlayerPosition, number>;
   squadPlayerIds: Set<number>;
-  isOutfield: boolean;
   targetGw: number | null;
   onSelect: (player: PoolPlayer) => void;
   onClose: () => void;
@@ -44,7 +32,6 @@ export const PlayerPickerSheet: React.FC<PlayerPickerSheetProps> = ({
   squadTeamCounts,
   squadPositionCounts,
   squadPlayerIds,
-  isOutfield,
   targetGw,
   onSelect,
   onClose,
@@ -61,14 +48,11 @@ export const PlayerPickerSheet: React.FC<PlayerPickerSheetProps> = ({
       setSortOrder(key === 'webName' ? 'asc' : 'desc');
     }
   };
-  const defaultPos = isOutfield ? (outPlayer.position as PositionFilter) : 'ALL';
-  const [positionFilter, setPositionFilter] = useState<PositionFilter>(defaultPos);
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase();
     return candidates
       .filter((p) => !squadPlayerIds.has(p.id))
-      .filter((p) => positionFilter === 'ALL' || p.position === positionFilter)
       .filter(
         (p) =>
           q === '' ||
@@ -86,11 +70,11 @@ export const PlayerPickerSheet: React.FC<PlayerPickerSheetProps> = ({
         const res = bVal - aVal;
         return sortOrder === 'desc' ? res : -res;
       });
-  }, [candidates, query, sortKey, sortOrder, squadPlayerIds, positionFilter]);
+  }, [candidates, query, sortKey, sortOrder, squadPlayerIds]);
 
   const getLabelClass = (key: SortKey) => {
     if (sortKey !== key) return styles.label;
-    const activeClass = sortOrder === 'desc' ? styles.label_active : styles.label_active_asc;
+    const activeClass = sortOrder === 'asc' ? styles.label_asc : styles.label_desc;
     return `${styles.label} ${styles.label_sortable} ${activeClass}`;
   };
 
@@ -116,21 +100,6 @@ export const PlayerPickerSheet: React.FC<PlayerPickerSheetProps> = ({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
-            <div className={styles.filterRow}>
-              {isOutfield && (
-                <div className={styles.posTabs} role="group" aria-label="Filter by position">
-                  {POS_FILTERS.map((pos) => (
-                    <button
-                      key={pos}
-                      className={`${styles.posTab} ${positionFilter === pos ? styles.posTab_active : ''}`}
-                      onClick={() => setPositionFilter(pos)}
-                    >
-                      {POS_LABELS[pos]}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
 
           <div className={styles.listHeader} role="row">
@@ -150,6 +119,9 @@ export const PlayerPickerSheet: React.FC<PlayerPickerSheetProps> = ({
               }}
             >
               {copy.transfersColPlayer}
+              {sortKey === 'webName' && (
+                <span className={styles.sortArrow}>{sortOrder === 'asc' ? '↑' : '↓'}</span>
+              )}
             </span>
             <span role="columnheader" className={styles.label}>
               {targetGw
@@ -177,6 +149,9 @@ export const PlayerPickerSheet: React.FC<PlayerPickerSheetProps> = ({
               }}
             >
               {copy.transfersColOwnership}
+              {sortKey === 'selectedByPercent' && (
+                <span className={styles.sortArrow}>{sortOrder === 'asc' ? '↑' : '↓'}</span>
+              )}
             </span>
             <span
               role="columnheader"
@@ -198,6 +173,9 @@ export const PlayerPickerSheet: React.FC<PlayerPickerSheetProps> = ({
               }}
             >
               {copy.transfersColPts}
+              {sortKey === 'totalPoints' && (
+                <span className={styles.sortArrow}>{sortOrder === 'asc' ? '↑' : '↓'}</span>
+              )}
             </span>
             <span
               role="columnheader"
@@ -219,6 +197,9 @@ export const PlayerPickerSheet: React.FC<PlayerPickerSheetProps> = ({
               }}
             >
               {copy.transfersColXPts}
+              {sortKey === 'expectedPoints' && (
+                <span className={styles.sortArrow}>{sortOrder === 'asc' ? '↑' : '↓'}</span>
+              )}
             </span>
             <span
               role="columnheader"
@@ -236,6 +217,9 @@ export const PlayerPickerSheet: React.FC<PlayerPickerSheetProps> = ({
               }}
             >
               {copy.transfersColCost}
+              {sortKey === 'nowCost' && (
+                <span className={styles.sortArrow}>{sortOrder === 'asc' ? '↑' : '↓'}</span>
+              )}
             </span>
           </div>
 

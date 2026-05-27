@@ -178,14 +178,10 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   }, [selectedPlayerId, allPoolPlayers, originalSquad]);
 
   const candidates = outPlayer
-    ? outPlayer.position === 'GK'
-      ? allPoolPlayers.filter((p) => p.position === 'GK')
-      : allPoolPlayers.filter((p) => p.position !== 'GK')
+    ? allPoolPlayers.filter((p) => p.position === outPlayer.position)
     : [];
 
   const poolLookup = useMemo(() => new Map(allPoolPlayers.map((p) => [p.id, p])), [allPoolPlayers]);
-
-  const isOutfield = outPlayer ? outPlayer.position !== 'GK' : false;
 
   const squadPlayerIds = useMemo(() => new Set(displaySquad.map((p) => p.id)), [displaySquad]);
 
@@ -364,7 +360,6 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
           squadTeamCounts={squadTeamCounts}
           squadPositionCounts={squadPositionCounts}
           squadPlayerIds={squadPlayerIds}
-          isOutfield={isOutfield}
           targetGw={nextGw}
           onSelect={handleSelectReplacement}
           onClose={() => setSelectedPlayerId(null)}

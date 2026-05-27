@@ -54,15 +54,16 @@
   justify-content: space-between;
   padding: 0 var(--fpl-space-md) var(--fpl-space-sm);
   border-bottom: 1px solid var(--fpl-bg-hair);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .title {
-  font-size: var(--fpl-fs-body-s);
-  font-weight: var(--fpl-fw-semibold);
+  font-size: var(--fpl-fs-body-l);
+  font-weight: var(--fpl-fw-bold);
   font-family: var(--fpl-font-display);
-  color: var(--fpl-text-primary);
+  color: var(--fpl-text);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
   margin: 0;
 }
 
