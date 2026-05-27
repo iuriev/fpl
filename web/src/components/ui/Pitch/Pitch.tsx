@@ -13,13 +13,13 @@ const STRIPE_H = 156 / STRIPE_COUNT;
 export const Pitch: React.FC<PitchProps> = ({ children, className }) => {
   return (
     <div className={`${styles.container}${className ? ` ${className}` : ''}`}>
-      <svg viewBox="0 0 100 156" preserveAspectRatio="xMidYMid meet" className={styles.svg}>
+      <svg viewBox="-0.3 0 100.6 156" preserveAspectRatio="xMidYMid meet" className={styles.svg}>
         {Array.from({ length: STRIPE_COUNT }, (_, i) => (
           <rect
             key={i}
-            x="0"
+            x="-0.3"
             y={i * STRIPE_H}
-            width="100"
+            width="100.6"
             height={STRIPE_H}
             fill={i % 2 === 0 ? 'var(--fpl-pitch-a)' : 'var(--fpl-pitch-b)'}
           />

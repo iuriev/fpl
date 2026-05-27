@@ -196,14 +196,13 @@
   overflow: hidden;
   padding: 0 5px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
 }
 
 .pitchFill {
-  height: 100% !important;
-  width: auto !important;
-  max-width: 100%;
+  width: 100% !important;
+  height: auto !important;
 }
 
 .pitchRows {

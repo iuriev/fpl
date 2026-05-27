@@ -13,6 +13,9 @@ design export under design/exports/ (tokens.js, colors_and_type.css, pitch.jsx, 
 README.md, SKILL.md).
 
 Conventions you must follow:
+- Native CSS primitives first (ADR 0014): Popover API for overlays, `:has()` for parent-aware
+  styling, `@starting-style` for enter transitions — before JS overlay libraries or React state
+  used only for CSS. See `docs/frontend.md`.
 - Pure CSS via CSS Modules. All visual values come from CSS variables (`--fpl-*`); never hardcode
   colors, sizes, spacing, radii, or shadows. A typed `theme/tokens.ts` mirrors the tokens.
 - Port the design system into a reusable base component kit under `components/`; screens compose

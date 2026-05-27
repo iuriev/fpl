@@ -1,6 +1,7 @@
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Cursor agents: see also `AGENTS.md` for repo-specific commands, skills, and workflows.
 
 ## Project
 
@@ -41,6 +42,10 @@ The project is built spec-first; application code comes last. Read these before 
   guidance, cross-check every suggested API or feature against the project's browser support policy
   defined in `docs/frontend.md` (last 3 Chrome versions, last 2 Safari versions). Do not use APIs
   that fall outside that matrix without explicit approval.
+- **Native CSS primitives first (ADR 0014).** When building overlays, disclosures, or
+  state-driven styling, prefer the **Popover API**, **`:has()`**, and **`@starting-style`** before
+  JS libraries or React state whose only job is presentation. See `docs/frontend.md` and ADR 0014
+  for patterns and exceptions.
 - **Never commit without explicit permission.** Do not run `git commit`, `git push`, `git amend`,
   or any other git operation that modifies history or publishes changes unless the user explicitly
   asks. After finishing work, show what changed and wait for approval.

@@ -26,8 +26,57 @@ versions cover:
 - Container queries (`@container`)
 - `:has()` pseudo-class selector
 - CSS Grid
+- Popover API (`popover`, `popovertarget`, `::backdrop`)
+- `@starting-style` (with `transition-behavior: allow-discrete` when entering from hidden)
 
 Leverage these features to write cleaner, more maintainable CSS without backwards-compatibility constraints.
+
+### Native CSS primitives (default)
+
+**ADR 0014.** Prefer platform HTML/CSS over JS overlay libraries and React state that exists
+only to drive presentation.
+
+| Need | Default approach | Avoid when unnecessary |
+| --- | --- | --- |
+| Dialog, menu, tooltip, sheet | Popover API + `::backdrop` | Portal + manual ESC / outside-click handlers |
+| Parent styles from child state | `:has()` on the wrapper | `useState` + class toggles for pure CSS |
+| Enter animation on show | `@starting-style` + transitions | JS measuring height or forcing reflow |
+
+**Popover sketch** (React: keep attributes on native elements; minimal JS only for programmatic open):
+
+```html
+<button popovertarget="help">Help</button>
+<div id="help" popover>…</div>
+```
+
+```css
+[popover]::backdrop {
+  background: var(--fpl-overlay-backdrop);
+}
+
+[popover] {
+  transition:
+    opacity var(--fpl-duration-fast) ease,
+    transform var(--fpl-duration-fast) ease;
+  transition-behavior: allow-discrete;
+}
+
+@starting-style {
+  [popover]:popover-open {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+```
+
+**`:has()` sketch** (tabs, toggles, grouped controls):
+
+```css
+.tablist:has(input:nth-child(1):checked) { /* indicator position */ }
+.tablist:has(input:nth-child(2):checked) { /* … */ }
+```
+
+Exceptions (complex widgets, strict focus traps, APIs outside policy): see ADR 0014.
 
 ## Design system -> base components
 - The design system (from `design/exports/<vN>/`) is ported into a **base component kit** under
