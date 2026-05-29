@@ -229,6 +229,11 @@
   flex-wrap: nowrap;
 }
 
+.playerRow:has(> :nth-child(5)) {
+  --_card-max-w: 4.25rem;
+  gap: var(--fpl-space-xs);
+}
+
 .bench {
   flex-shrink: 0;
   padding: var(--fpl-space-xs) var(--fpl-space-xl) var(--fpl-space-xs);

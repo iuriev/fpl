@@ -1,0 +1,77 @@
+.badgeFill {
+  fill: currentColor;
+  opacity: 0.18;
+}
+
+.badgeStroke {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+
+.icon {
+  fill: currentColor;
+}
+
+/* Slightly dimmed fill for secondary shapes (coin body, etc.) */
+.iconMid {
+  fill: currentColor;
+  opacity: 0.55;
+}
+
+/* "Punch" — a shape rendered in the parent background colour to create a cutout illusion */
+.badgePunch {
+  /* overridden per context with fill matching the parent background */
+  fill: var(--fpl-chip-punch, var(--fpl-bg-soft));
+}
+
+/* Stroke-only lines inside icons (FREE ticket lines, etc.) */
+.iconLines {
+  fill: none;
+  stroke: var(--fpl-chip-punch, var(--fpl-bg-soft));
+  stroke-width: 0.9;
+  stroke-linecap: round;
+}
+
+/* ── Standalone banner variant (used outside the SummaryStrip) ───── */
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-sm);
+  padding: var(--fpl-space-sm) var(--fpl-space-base);
+  border-radius: var(--fpl-radius-xl);
+  /* FPL teal-to-purple gradient — matches official chip card aesthetic */
+  background: linear-gradient(135deg, #00d0e4 0%, #5a3fd4 100%);
+  color: var(--fpl-bg-deep);
+}
+
+.iconWrap {
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconWrap svg {
+  width: 100%;
+  height: 100%;
+}
+
+.label {
+  font-family: var(--fpl-font-display);
+  font-size: var(--fpl-fs-body-s);
+  font-weight: var(--fpl-fw-bold);
+  letter-spacing: var(--fpl-tr-cap-s);
+  line-height: 1;
+}
+
+.suffix {
+  font-weight: var(--fpl-fw-medium);
+  opacity: 0.65;
+  text-transform: uppercase;
+  font-size: var(--fpl-fs-cap);
+  letter-spacing: var(--fpl-tr-cap-m);
+}

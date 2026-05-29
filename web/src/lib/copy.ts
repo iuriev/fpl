@@ -35,6 +35,13 @@ export const copy = {
   squadJumpToCurrent: 'Jump to current GW →',
   squadNotFound: "We couldn't find a team with that ID. Please check and try again.",
 
+  // Active chips
+  chipActiveSuffix:   'ACTIVE',
+  chipWildcard:       'Wildcard',
+  chipTripleCaptain:  'Triple Captain',
+  chipFreeHit:        'Free Hit',
+  chipBenchBoost:     'Bench Boost',
+
   // Summary strip
   summaryTotal: 'TOTAL',
   summaryAverage: 'AVERAGE',

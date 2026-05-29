@@ -70,6 +70,7 @@ export interface FPLEntry {
 }
 
 export interface FPLPicks {
+  active_chip: string | null;
   entry_history: {
     event: number;
     points: number;

@@ -6,6 +6,7 @@
 import * as fplClient from './fpl-client';
 import * as cacheLayer from './cache';
 import type {
+  ActiveChip,
   SquadPlayer,
   SquadResponse,
   PlayerPosition,
@@ -19,6 +20,13 @@ const POSITION_MAP: Record<number, PlayerPosition> = {
   3: 'MID',
   4: 'FWD',
 };
+
+const KNOWN_CHIPS = new Set<ActiveChip>(['wildcard', '3xc', 'freehit', 'bboost']);
+
+function toActiveChip(raw: string | null): ActiveChip {
+  if (raw !== null && KNOWN_CHIPS.has(raw as ActiveChip)) return raw as ActiveChip;
+  return null;
+}
 
 async function getBootstrapWithCache(): Promise<FPLBootstrapStatic> {
   const cached = cacheLayer.get<FPLBootstrapStatic>('bootstrap-static');
@@ -149,6 +157,7 @@ export async function getSquad(teamId: number, gameweek: number): Promise<SquadR
 
   return {
     gameweek,
+    activeChip: toActiveChip(picks.active_chip),
     summary: {
       totalPoints,
       averagePoints: gameweekEvent.average_entry_score,

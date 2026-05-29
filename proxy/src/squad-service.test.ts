@@ -48,6 +48,7 @@ describe('Squad Service', () => {
       };
 
       const mockPicks = {
+        active_chip: null,
         entry_history: {
           event: 1,
           points: 50,
@@ -124,6 +125,7 @@ describe('Squad Service', () => {
       expect(result.summary.bank).toBe(15);
       expect(result.starters[0].teamId).toBe(1);
       expect(result.starters[0].nowCost).toBe(85);
+      expect(result.activeChip).toBeNull();
     });
 
     it('splits starters and bench correctly', async () => {
@@ -169,6 +171,7 @@ describe('Squad Service', () => {
       };
 
       const mockPicks = {
+        active_chip: null,
         entry_history: {
           event: 1,
           points: 50,
@@ -255,6 +258,36 @@ describe('Squad Service', () => {
       await expect(squadService.getSquad(123, 1)).rejects.toThrow(
         'No picks available for gameweek 1',
       );
+    });
+
+    it.each([
+      ['wildcard', 'wildcard'],
+      ['3xc', '3xc'],
+      ['freehit', 'freehit'],
+      ['bboost', 'bboost'],
+      ['unknown_chip', null],
+      [null, null],
+    ] as const)('normalises active_chip "%s" → activeChip %s', async (raw, expected) => {
+      const bootstrap = {
+        events: [{ id: 1, name: 'Gameweek 1', finished: false, average_entry_score: 50, highest_score: 100, deadline_time: '2025-01-01T12:00:00Z', is_current: true }],
+        teams: [{ id: 1, name: 'Arsenal', short_name: 'ARS', code: 1 }],
+        elements: [{ id: 1, web_name: 'Saka', first_name: 'Bukayo', second_name: 'Saka', team: 1, team_code: 3, element_type: 3, status: 'a', chance_of_playing_this_round: null, news: '', now_cost: 85, event_points: 0, form: '0', selected_by_percent: '0' }],
+        element_types: [{ id: 3, singular_name_short: 'MID' }],
+      };
+      const picks = {
+        active_chip: raw as string | null,
+        entry_history: { event: 1, points: 0, total_points: 0, rank: 0, event_transfers: 0, event_transfers_cost: 0, points_on_bench: 0, bank: 0, value: 0 },
+        picks: [{ element: 1, position: 1, is_captain: false, is_vice_captain: false }],
+      };
+      const live = { elements: [{ id: 1, stats: { total_points: 0, minutes: 0, goals_scored: 0, assists: 0, clean_sheets: 0, goals_conceded: 0, own_goals: 0, penalties_saved: 0, penalties_missed: 0, yellow_cards: 0, red_cards: 0, saves: 0, bonus: 0 } }] };
+
+      (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
+      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(bootstrap);
+      (fplClient.getPicks as ReturnType<typeof vi.fn>).mockResolvedValueOnce(picks);
+      (fplClient.getLive as ReturnType<typeof vi.fn>).mockResolvedValueOnce(live);
+
+      const result = await squadService.getSquad(123, 1);
+      expect(result.activeChip).toBe(expected);
     });
 
     it('respects cache for bootstrap data', async () => {

@@ -253,7 +253,7 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
 
         {squad && (
           <div className={styles.summaryWrap}>
-            <SummaryStrip summary={squad.summary} />
+            <SummaryStrip summary={squad.summary} activeChip={squad.activeChip} />
           </div>
         )}
         {isLoading && <div className={styles.summaryPlaceholder} aria-hidden="true" />}
@@ -344,9 +344,25 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
                     ))}
                   </div>
                   <div className={styles.benchRow}>
-                    {squad.bench.map((player) => (
-                      <PlayerCard key={player.id} player={player} size="medium" />
-                    ))}
+                    {squad.bench.map((player) => {
+                      const pool = poolLookup?.get(player.id);
+                      return (
+                        <PlayerCard
+                          key={player.id}
+                          player={player}
+                          size="medium"
+                          playerInfo={
+                            pool
+                              ? {
+                                  ownership: pool.selectedByPercent,
+                                  currentPrice: pool.nowCost,
+                                  nextFixtures: pool.nextFixtures,
+                                }
+                              : undefined
+                          }
+                        />
+                      );
+                    })}
                   </div>
                 </div>
               </div>

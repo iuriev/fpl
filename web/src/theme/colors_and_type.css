@@ -56,6 +56,16 @@ body {
   --fpl-fdr-5-bg:  #730c18;
   --fpl-fdr-5-ink: #ffb8b8;
 
+  /* ── active chip palette ────────────────────────────────────────── */
+  --fpl-chip-wc-bg:  rgba(255, 192, 0, 0.14);
+  --fpl-chip-wc-ink: #ffc000;
+  --fpl-chip-tc-bg:  rgba(255, 77, 109, 0.14);
+  --fpl-chip-tc-ink: #ff4d6d;
+  --fpl-chip-fh-bg:  rgba(34, 211, 238, 0.14);
+  --fpl-chip-fh-ink: #22d3ee;
+  --fpl-chip-bb-bg:  rgba(0, 255, 135, 0.14);
+  --fpl-chip-bb-ink: #00ff87;
+
   /* ── position colors ────────────────────────────────────────────── */
   --fpl-pos-gk-bg: #ffe600;
   --fpl-pos-gk-fg: #241500;

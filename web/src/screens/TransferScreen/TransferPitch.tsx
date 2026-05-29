@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { Pitch } from '@/components/ui/Pitch/Pitch';
-import { PlayerCard } from '@/components/ui/PlayerCard/PlayerCard';
 import type { PlayerInfo } from '@/components/ui/PlayerCard/PlayerCard';
+import { PlayerCard } from '@/components/ui/PlayerCard/PlayerCard';
 import type { PlayerPosition, PoolPlayer, SquadPlayer } from '@/types';
 
 import styles from './TransferPitch.module.css';
@@ -93,6 +93,7 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
           player={player}
           size={size}
           hidePoints
+          hideStats
           hideClub
           nextFixture={poolLookup?.get(player.id)?.nextFixtures[0]}
           playerInfo={buildPlayerInfo(player, size)}

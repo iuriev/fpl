@@ -17,6 +17,7 @@ export interface PlayerCardProps {
   player: SquadPlayer;
   size?: 'large' | 'medium';
   hidePoints?: boolean;
+  hideStats?: boolean;
   nextFixture?: FixtureInfo;
   hideClub?: boolean;
   footBadge?: React.ReactNode;
@@ -50,6 +51,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   player,
   size = 'medium',
   hidePoints = false,
+  hideStats = false,
   nextFixture,
   hideClub = false,
   footBadge,
@@ -62,10 +64,16 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   const popupId = useId();
   const badge = availBadge(player.status);
   const isFlagged = badge !== null;
+  const isClickable = !!playerInfo || isFlagged;
 
   const toggle = useCallback(() => {
-    if (isFlagged) setShowStatus((v) => !v);
-  }, [isFlagged]);
+    if (playerInfo) {
+      setShowStatus(false);
+      setShowInfo((v) => !v);
+    } else if (isFlagged) {
+      setShowStatus((v) => !v);
+    }
+  }, [playerInfo, isFlagged]);
 
   useEffect(() => {
     if (!showStatus) return;
@@ -106,14 +114,14 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   return (
     <div
       ref={ref}
-      className={`${styles.card} ${isFlagged ? styles.flagged : ''}`}
+      className={`${styles.card} ${isClickable ? styles.flagged : ''}`}
       onClick={toggle}
-      role={isFlagged ? 'button' : undefined}
-      tabIndex={isFlagged ? 0 : undefined}
-      aria-expanded={isFlagged ? showStatus : undefined}
-      aria-controls={isFlagged ? popupId : undefined}
+      role={isClickable ? 'button' : undefined}
+      tabIndex={isClickable ? 0 : undefined}
+      aria-expanded={isClickable ? (showInfo || showStatus) : undefined}
+      aria-controls={isClickable ? popupId : undefined}
       onKeyDown={
-        isFlagged
+        isClickable
           ? (e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();
@@ -126,7 +134,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
           : undefined
       }
       onKeyUp={
-        isFlagged
+        isClickable
           ? (e) => {
               if (e.key === ' ') toggle();
             }
@@ -165,7 +173,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
           position={player.position}
           alt={player.name}
         />
-        {size === 'large' && (player.stats.goals_scored > 0 || player.stats.assists > 0) && (
+        {size === 'large' && !hideStats && (player.stats.goals_scored > 0 || player.stats.assists > 0) && (
           <div className={styles.statBadges}>
             {player.stats.goals_scored > 0 && (
               <span className={styles.goalBadge}>{player.stats.goals_scored} ⚽</span>
@@ -174,19 +182,6 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
               <span className={styles.assistBadge}>{player.stats.assists} A</span>
             )}
           </div>
-        )}
-        {playerInfo && (
-          <button
-            className={styles.infoBtn}
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowStatus(false);
-              setShowInfo((v) => !v);
-            }}
-            aria-label={copy.playerInfoOpen}
-          >
-            ⓘ
-          </button>
         )}
       </div>
 
@@ -225,7 +220,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
       )}
 
       {showInfo && playerInfo && (
-        <div className={styles.infoPopup} role="dialog" aria-label={copy.playerInfoOpen} onClick={(e) => e.stopPropagation()}>
+        <div id={popupId} className={styles.infoPopup} role="dialog" aria-label={copy.playerInfoOpen} onClick={(e) => e.stopPropagation()}>
           <div className={styles.infoHeader}>
             <div className={styles.infoHeaderText}>
               <span className={styles.infoName}>{player.name}</span>
@@ -249,7 +244,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
       )}
 
       {showStatus && badge && (
-        <div id={popupId} className={styles.statusPopup} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.statusPopup} onClick={(e) => e.stopPropagation()}>
           <span className={`${styles.statusLabel} ${styles[`statusLabel_${badge.variant}`]}`}>
             {statusLabel(player.status)}
           </span>

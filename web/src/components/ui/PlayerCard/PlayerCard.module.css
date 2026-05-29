@@ -4,7 +4,7 @@
   align-items: center;
   gap: 0.125rem;
   flex: 1 1 0;
-  max-width: 5rem;
+  max-width: var(--_card-max-w, 5rem);
   min-width: 0;
   position: relative;
   user-select: none;
@@ -227,25 +227,6 @@
   color: #a5f3fc;
 }
 
-.infoBtn {
-  position: absolute;
-  bottom: 0.1875rem;
-  right: 0.125rem;
-  z-index: 3;
-  width: 1rem;
-  height: 1rem;
-  background: rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: var(--fpl-radius-sm);
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  pointer-events: auto;
-}
 
 .infoPopup {
   position: fixed;
@@ -290,7 +271,7 @@
 
 .infoMeta {
   font-size: var(--fpl-fs-micro);
-  color: var(--fpl-muted-soft);
+  color: var(--fpl-text-soft);
 }
 
 .infoClose {
@@ -299,7 +280,7 @@
   border-radius: var(--fpl-radius-pill);
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid var(--fpl-bg-hair);
-  color: var(--fpl-muted-soft);
+  color: var(--fpl-muted);
   font-size: 0.625rem;
   display: grid;
   place-items: center;
@@ -317,7 +298,7 @@
 .infoSectionLabel {
   font-size: var(--fpl-fs-micro);
   font-weight: var(--fpl-fw-semibold);
-  color: var(--fpl-muted-soft);
+  color: var(--fpl-accent);
   text-transform: uppercase;
   letter-spacing: var(--fpl-tr-cap-s);
 }
@@ -331,14 +312,14 @@
 .infoGw {
   font-size: var(--fpl-fs-body-xs);
   font-weight: var(--fpl-fw-semibold);
-  color: var(--fpl-muted-soft);
+  color: var(--fpl-muted);
   width: 2.5rem;
   flex-shrink: 0;
 }
 
 .infoOpponent {
   font-size: var(--fpl-fs-body-xs);
-  color: var(--fpl-text-soft);
+  color: var(--fpl-text);
   flex: 1;
 }
 

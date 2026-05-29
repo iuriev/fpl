@@ -53,6 +53,7 @@ export const fixtureEntry: EntryResponse = {
 
 export const fixtureSquad: SquadResponse = {
   gameweek: 37,
+  activeChip: null,
   summary: {
     totalPoints: 67,
     averagePoints: 48,
@@ -282,6 +283,7 @@ export const fixtureSquad: SquadResponse = {
 
 export const fixtureSquadEmpty: SquadResponse = {
   gameweek: 1,
+  activeChip: null,
   summary: { totalPoints: 0, transfers: 0 },
   starters: [],
   bench: [],

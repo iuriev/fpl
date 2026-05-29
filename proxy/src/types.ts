@@ -98,8 +98,11 @@ export interface LeaguesResponse {
   h2h: LeagueEntry[];
 }
 
+export type ActiveChip = 'wildcard' | '3xc' | 'freehit' | 'bboost' | null;
+
 export interface SquadResponse {
   gameweek: number;
+  activeChip: ActiveChip;
   summary: SquadSummary;
   starters: SquadPlayer[];
   bench: SquadPlayer[];

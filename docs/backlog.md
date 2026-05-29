@@ -82,25 +82,6 @@ Reference: fpl.team B.Fernandes enhanced card style.
 
 ---
 
-## 🟠 P1 — User accounts (enabler for all personalization)
-
-Accounts unlock watchlists, saved plans, AI chat history, and manager following.
-Build early so personalised features have somewhere to store data.
-
-| ID | Task | Effort | Why |
-|----|------|--------|-----|
-| AUTH-01 | Login / password + Google OAuth, backend user profile | M | Required before watchlists, saved plans, or AI chat. |
-
-### Feature details
-
-#### AUTH-01: User accounts (login + Google OAuth)
-Add authentication so users can save preferences across sessions:
-- Login / password + "Sign in with Google"
-- Backend stores: selected teams, followed managers, watchlists, custom settings
-- Enables all personalised features (watchlist, custom plans, AI chat history)
-
----
-
 ## 🟡 P2 — Analytics & engagement (next after transfer polish)
 
 These features give the app reasons to return every gameweek — essential for growth.
@@ -113,7 +94,6 @@ These features give the app reasons to return every gameweek — essential for g
 | LIVE-01 | Live rank tracker — real-time points & rank during gameweek | M | "Watch your rank move live." High-stickiness during match days. |
 | LIVE-02 | Live mini-league standings | M | Real-time rival tracking. Complements LIVE-01. |
 | ANA-03 | Price change risers & fallers (global + mini-league) | M | Huge FPL meta driver. Users check this daily during the GW. |
-| PRED-01 | xPts badge on PlayerCard | S | Single number that lets users scan their whole squad at a glance. |
 | ANA-02 | Most popular players (ownership %) screen | S | TopPlayersScreen already exists — extend with ownership sort/filter. |
 | ANA-04 | Top-ranked managers → view their squads | M | Viral / social feature. Re-uses existing squad viewer. |
 | ANA-12 | League participants browser (click league on Stats to see all members) | S | Natural extension of existing leagues screen. |
@@ -206,11 +186,6 @@ Reference: fpl.team "Climb your mini-leagues faster".
 Ability to follow specific managers and track them in a table:
 Columns: Rank | Manager Name | Points | Rank Δ | Overall Rank | Transfers | Captain | Latest transfers | ✕
 Click a row to view their squad using the existing squad viewer.
-
-#### PRED-01: Predicted points (xPts) on player cards
-Show xPts (expected points) directly on the PlayerCard — a small numeric badge or sub-label
-below the player's current GW score. Makes it trivially easy to compare "how is this player
-expected to do next week" while viewing the squad.
 
 #### WATCH-01: Player Watchlist
 A screen where the user can add players they're interested in but not yet ready to transfer in.
@@ -454,6 +429,7 @@ Reference: Fantasy Football Scout Chief Scout feature.
 | ANA-05 | "Top 1% feature" (what makes the best managers different) | L | Viral potential. Needs data aggregation from FPL API + analysis layer. |
 | STAT-03 | Three Player Comparison Tool | M | Nice tool. Build after STAT-04 (needs same data source). |
 | STAT-04 | Player xG Data & Heatmaps | L | Requires StatsBomb / OPTA data integration. Research data sources first. |
+| AUTH-01 | Login / password + Google OAuth, backend user profile | M | Enables watchlists, saved plans, AI chat. Moved from P1 — build after core features are stable. |
 | AUTH-02 | FPL OAuth / transfer execution | XL | Complex. Needs FPL API capability research first (may not be possible). |
 | START-01 | GW1 draft assistant | L | Seasonal feature (once a year). High viral potential before season start. |
 | DES-03 | FDR screen | M | Good utility but fpl.team already does this well. Differentiate with AI angle instead. |
@@ -464,6 +440,12 @@ Reference: Fantasy Football Scout Chief Scout feature.
 | *(backlog)* | Team of the Week badge on squad screen | S | Polish feature. Simple once data source is confirmed. |
 
 ### Feature details
+
+#### AUTH-01: User accounts (login + Google OAuth)
+Add authentication so users can save preferences across sessions:
+- Login / password + "Sign in with Google"
+- Backend stores: selected teams, followed managers, watchlists, custom settings
+- Enables all personalised features (watchlist, custom plans, AI chat history)
 
 #### PRED-04: Full AI prediction engine (long-term research)
 Deep research + build a prediction model that scores players for the next GW using:
@@ -528,11 +510,11 @@ For reference — features that are live in the codebase:
 The recommended order is:
 
 1. **Finish Transfer screen polish** — the transfer planner is the app's deepest feature and the one users spend the most time with.
-2. **User accounts** (AUTH-01) — enables all personalized features. Build early.
-3. **Gameweek review + chip display + live rank** — creates weekly return habit before we build premium features.
-4. **xPts + predicted points + premium gate** — builds the monetisation foundation.
-5. **Watchlists + manager tracking + squad comparison** — social layer that drives virality.
-6. **Multi-GW planner + transfer solver** — advanced planning tools, partly monetised.
+2. **Gameweek review + chip display + live rank** — creates weekly return habit before we build premium features.
+3. **xPts + predicted points + premium gate** — builds the monetisation foundation.
+4. **Watchlists + manager tracking + squad comparison** — social layer that drives virality.
+5. **Multi-GW planner + transfer solver** — advanced planning tools, partly monetised.
+6. **User accounts** (AUTH-01) — enables all personalised features; build when personalisation becomes a bottleneck.
 7. **Full AI engine + chat assistant** — only after demand is validated and revenue is flowing.
 
 ---

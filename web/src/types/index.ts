@@ -85,8 +85,11 @@ export interface HistoryResponse {
   gameweeks: HistoryGameweek[];
 }
 
+export type ActiveChip = 'wildcard' | '3xc' | 'freehit' | 'bboost' | null;
+
 export interface SquadResponse {
   gameweek: number;
+  activeChip: ActiveChip;
   summary: SquadSummary;
   starters: SquadPlayer[];
   bench: SquadPlayer[];
