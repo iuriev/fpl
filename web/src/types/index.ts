@@ -89,11 +89,16 @@ export type ActiveChip = 'wildcard' | '3xc' | 'freehit' | 'bboost' | null;
 
 export type ChipStatus = 'available' | 'used' | 'active';
 
+export interface ChipInfo {
+  status: ChipStatus;
+  usedInGw?: number;
+}
+
 export interface ChipStatuses {
-  wildcard: ChipStatus;
-  freehit: ChipStatus;
-  bboost: ChipStatus;
-  '3xc': ChipStatus;
+  wildcard: ChipInfo;
+  freehit: ChipInfo;
+  bboost: ChipInfo;
+  '3xc': ChipInfo;
 }
 
 export interface SquadResponse {
