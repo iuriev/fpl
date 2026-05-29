@@ -45,40 +45,6 @@
   opacity: 0.8;
 }
 
-.filterRow {
-  display: flex;
-  align-items: center;
-  gap: var(--fpl-space-xs);
-  padding: 0.25rem 0;
-}
-
-.posTabs {
-  display: flex;
-  flex: 1;
-  gap: 0.25rem;
-}
-
-.posTab {
-  padding: 0.25rem 0.5rem;
-  border-radius: 1rem;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  font-family: var(--fpl-font-display);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--fpl-bg-hair);
-  color: var(--fpl-muted);
-  cursor: pointer;
-  letter-spacing: 0.04em;
-  transition: all 0.2s;
-}
-
-.posTab_active {
-  background: var(--fpl-accent);
-  color: var(--fpl-accent-ink);
-  border-color: transparent;
-}
-
-
 .list {
   flex: 1;
   overflow-y: auto;

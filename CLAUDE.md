@@ -12,6 +12,7 @@ availability statuses, and a per-gameweek summary, navigating between gameweeks.
 The project is built spec-first; application code comes last. Read these before working:
 
 - `openspec/` — OpenSpec specs and change proposals (the *what*). Workflow: propose -> apply -> archive.
+- `docs/backlog.md` — single source of truth for all ideas, features, and prioritised work. See the backlog workflow below.
 - `docs/architecture.md` — system overview.
 - `docs/decisions/` — Architecture Decision Records (the *why*); see the README index.
 - `docs/frontend.md` — frontend conventions (styling, structure, testing).
@@ -59,6 +60,15 @@ The project is built spec-first; application code comes last. Read these before 
   `import { Foo } from '@/components/ui/Foo/Foo'`.
 - **Spec-first workflow.** Work in this order: business requirements → task breakdown → design →
   code. Do not write application code until requirements and design are approved.
+- **Backlog workflow.** When the user dictates ideas, mentions features to remember, or asks to
+  note something, add it to `docs/backlog.md` immediately. The backlog is the single capture
+  point for everything not yet in an OpenSpec change. To promote an idea to active work: run
+  `/opsx:propose` to turn it into an OpenSpec change proposal, then implement from there.
+- **Single source of truth.** `docs/backlog.md` and `openspec/` are the only places where
+  tasks, ideas, specs, and plans may live. Do not create plan files, design specs, or task
+  lists anywhere else in the project (e.g. no `docs/superpowers/`, no ad-hoc markdown plans).
+  Superpowers skills may generate intermediate working documents during a session, but the
+  permanent record always goes into backlog or OpenSpec.
 
 ## Architecture
 

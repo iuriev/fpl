@@ -44,6 +44,18 @@ body {
   --fpl-pill-pts-bg: #00ff87;
   --fpl-pill-pts-ink: #170027;
 
+  /* ── FDR difficulty palette (fplukraine.com) ────────────────────── */
+  --fpl-fdr-1-bg:  #375523;
+  --fpl-fdr-1-ink: #b8e88a;
+  --fpl-fdr-2-bg:  #6ec25a;
+  --fpl-fdr-2-ink: #0e2408;
+  --fpl-fdr-3-bg:  #c8c8c8;
+  --fpl-fdr-3-ink: #1a1a1a;
+  --fpl-fdr-4-bg:  #e84040;
+  --fpl-fdr-4-ink: #ffffff;
+  --fpl-fdr-5-bg:  #730c18;
+  --fpl-fdr-5-ink: #ffb8b8;
+
   /* ── position colors ────────────────────────────────────────────── */
   --fpl-pos-gk-bg: #ffe600;
   --fpl-pos-gk-fg: #241500;

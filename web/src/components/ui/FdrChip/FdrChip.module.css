@@ -11,24 +11,8 @@
   line-height: 1.4;
 }
 
-/* FPL official FDR colour scale */
-.chip_d1 {
-  background: #375523;
-  color: #b8e88a;
-}
-.chip_d2 {
-  background: #00ff87;
-  color: #002210;
-}
-.chip_d3 {
-  background: #e8c347;
-  color: #2a1e00;
-}
-.chip_d4 {
-  background: #e8604c;
-  color: #ffffff;
-}
-.chip_d5 {
-  background: #730c18;
-  color: #ffb8b8;
-}
+.chip_d1 { background: var(--fpl-fdr-1-bg); color: var(--fpl-fdr-1-ink); }
+.chip_d2 { background: var(--fpl-fdr-2-bg); color: var(--fpl-fdr-2-ink); }
+.chip_d3 { background: var(--fpl-fdr-3-bg); color: var(--fpl-fdr-3-ink); }
+.chip_d4 { background: var(--fpl-fdr-4-bg); color: var(--fpl-fdr-4-ink); }
+.chip_d5 { background: var(--fpl-fdr-5-bg); color: var(--fpl-fdr-5-ink); }

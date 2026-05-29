@@ -165,6 +165,10 @@ export const copy = {
   transfersColXPts: 'xPts',
   transfersColCost: 'Cost',
 
+  // Player info popup
+  playerInfoOpen: 'Player info',
+  playerInfoUpcomingFixtures: 'Upcoming Fixtures',
+
   // View toggle
   viewPitch: 'Pitch',
   viewList: 'List',

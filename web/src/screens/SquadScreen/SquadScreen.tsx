@@ -79,9 +79,9 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
   const isNextGw = currentGw !== null && selectedGw !== null && selectedGw === currentGw + 1;
 
   const poolLookup = useMemo(() => {
-    if (!isNextGw || !poolData) return null;
+    if (!poolData) return null;
     return new Map(poolData.players.map((p) => [p.id, p]));
-  }, [isNextGw, poolData]);
+  }, [poolData]);
 
   const isNoSquad = squadIsError && squadError instanceof ApiError && squadError.status === 404;
   const isSquadError = squadIsError && !isNoSquad;
@@ -309,14 +309,26 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
                     <div className={styles.pitchRows}>
                       {POSITION_ORDER.map((pos) => (
                         <div key={pos} className={styles.playerRow}>
-                          {positionGroups[pos].map((player) => (
-                            <PlayerCard
-                              key={player.id}
-                              player={player}
-                              size="large"
-                              nextFixture={poolLookup?.get(player.id)?.nextFixtures[0]}
-                            />
-                          ))}
+                          {positionGroups[pos].map((player) => {
+                            const pool = poolLookup?.get(player.id);
+                            return (
+                              <PlayerCard
+                                key={player.id}
+                                player={player}
+                                size="large"
+                                nextFixture={isNextGw ? pool?.nextFixtures[0] : undefined}
+                                playerInfo={
+                                  pool
+                                    ? {
+                                        ownership: pool.selectedByPercent,
+                                        currentPrice: pool.nowCost,
+                                        nextFixtures: pool.nextFixtures,
+                                      }
+                                    : undefined
+                                }
+                              />
+                            );
+                          })}
                         </div>
                       ))}
                     </div>

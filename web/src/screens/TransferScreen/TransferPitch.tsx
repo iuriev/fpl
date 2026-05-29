@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Pitch } from '@/components/ui/Pitch/Pitch';
 import { PlayerCard } from '@/components/ui/PlayerCard/PlayerCard';
+import type { PlayerInfo } from '@/components/ui/PlayerCard/PlayerCard';
 import type { PlayerPosition, PoolPlayer, SquadPlayer } from '@/types';
 
 import styles from './TransferPitch.module.css';
@@ -65,6 +66,13 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
     }
   }
 
+  function buildPlayerInfo(player: SquadPlayer, size: 'large' | 'medium'): PlayerInfo | undefined {
+    if (size !== 'large') return undefined;
+    const p = poolLookup?.get(player.id);
+    if (!p) return undefined;
+    return { ownership: p.selectedByPercent, currentPrice: p.nowCost, nextFixtures: p.nextFixtures };
+  }
+
   function renderCard(player: SquadPlayer, size: 'large' | 'medium') {
     const isOut = player.id === outPlayerId;
     const isIn = inPlayerIds.has(player.id);
@@ -87,6 +95,7 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
           hidePoints
           hideClub
           nextFixture={poolLookup?.get(player.id)?.nextFixtures[0]}
+          playerInfo={buildPlayerInfo(player, size)}
           onSubClick={
             !subModeActive && onSubIconClick ? () => onSubIconClick(player.id) : undefined
           }

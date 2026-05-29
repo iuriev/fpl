@@ -7,6 +7,12 @@ import { FdrChip } from '../FdrChip/FdrChip';
 import { Jersey } from '../Jersey/Jersey';
 import styles from './PlayerCard.module.css';
 
+export interface PlayerInfo {
+  ownership: string;
+  currentPrice: number;
+  nextFixtures: FixtureInfo[];
+}
+
 export interface PlayerCardProps {
   player: SquadPlayer;
   size?: 'large' | 'medium';
@@ -15,6 +21,7 @@ export interface PlayerCardProps {
   hideClub?: boolean;
   footBadge?: React.ReactNode;
   onSubClick?: () => void;
+  playerInfo?: PlayerInfo;
 }
 
 function availBadge(status: PlayerStatus): { char: string; variant: 'warn' | 'error' } | null {
@@ -47,8 +54,10 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   hideClub = false,
   footBadge,
   onSubClick,
+  playerInfo,
 }) => {
   const [showStatus, setShowStatus] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const popupId = useId();
   const badge = availBadge(player.status);
@@ -75,6 +84,24 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
       document.removeEventListener('keydown', onKey);
     };
   }, [showStatus]);
+
+  useEffect(() => {
+    if (!showInfo) return;
+    const onPointer = (e: PointerEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setShowInfo(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowInfo(false);
+    };
+    document.addEventListener('pointerdown', onPointer);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('pointerdown', onPointer);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [showInfo]);
 
   return (
     <div
@@ -138,6 +165,29 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
           position={player.position}
           alt={player.name}
         />
+        {size === 'large' && (player.stats.goals_scored > 0 || player.stats.assists > 0) && (
+          <div className={styles.statBadges}>
+            {player.stats.goals_scored > 0 && (
+              <span className={styles.goalBadge}>{player.stats.goals_scored} ⚽</span>
+            )}
+            {player.stats.assists > 0 && (
+              <span className={styles.assistBadge}>{player.stats.assists} A</span>
+            )}
+          </div>
+        )}
+        {playerInfo && (
+          <button
+            className={styles.infoBtn}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowStatus(false);
+              setShowInfo((v) => !v);
+            }}
+            aria-label={copy.playerInfoOpen}
+          >
+            ⓘ
+          </button>
+        )}
       </div>
 
       <div className={styles.pill}>
@@ -171,6 +221,30 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
               </svg>
             </span>
           )}
+        </div>
+      )}
+
+      {showInfo && playerInfo && (
+        <div className={styles.infoPopup} role="dialog" aria-label={copy.playerInfoOpen} onClick={(e) => e.stopPropagation()}>
+          <div className={styles.infoHeader}>
+            <div className={styles.infoHeaderText}>
+              <span className={styles.infoName}>{player.name}</span>
+              <span className={styles.infoMeta}>
+                £{(playerInfo.currentPrice / 10).toFixed(1)}m · {playerInfo.ownership}% · {player.position} / {player.club}
+              </span>
+            </div>
+            <button className={styles.infoClose} onClick={() => setShowInfo(false)} aria-label="Close">✕</button>
+          </div>
+          <div className={styles.infoBody}>
+            <span className={styles.infoSectionLabel}>{copy.playerInfoUpcomingFixtures}</span>
+            {playerInfo.nextFixtures.slice(0, 5).map((f, i) => (
+              <div key={i} className={styles.infoFixtureRow}>
+                <span className={styles.infoGw}>GW{f.gw}</span>
+                <span className={styles.infoOpponent}>{f.opponent} ({f.home ? 'H' : 'A'})</span>
+                <FdrChip opponent={f.opponent} home={f.home} difficulty={f.difficulty} />
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
