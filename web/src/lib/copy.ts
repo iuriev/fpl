@@ -143,6 +143,8 @@ export const copy = {
   transfersBenchBoostActive: 'Bench Boost — transfers cost normally',
   transfersTripleCaptainActive: 'Triple Captain — transfers cost normally',
   chipUsedAriaLabel: 'Already played',
+  chipBlockedUsed:   '{name} already played in GW{gw}',
+  chipBlockedNoGw:   '{name} already played this season',
   transfersPendingTitle: 'Planned transfers',
   transfersPendingEmpty: 'Tap a player to start planning',
   transfersReset: 'Reset',
