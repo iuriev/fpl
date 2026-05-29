@@ -54,7 +54,12 @@ export const fixtureEntry: EntryResponse = {
 export const fixtureSquad: SquadResponse = {
   gameweek: 37,
   activeChip: null,
-  chipStatuses: { wildcard: 'available', freehit: 'available', bboost: 'available', '3xc': 'available' },
+  chipStatuses: {
+    wildcard: { status: 'available' },
+    freehit:  { status: 'available' },
+    bboost:   { status: 'available' },
+    '3xc':    { status: 'available' },
+  },
   summary: {
     totalPoints: 67,
     averagePoints: 48,
@@ -285,7 +290,12 @@ export const fixtureSquad: SquadResponse = {
 export const fixtureSquadEmpty: SquadResponse = {
   gameweek: 1,
   activeChip: null,
-  chipStatuses: { wildcard: 'available', freehit: 'available', bboost: 'available', '3xc': 'available' },
+  chipStatuses: {
+    wildcard: { status: 'available' },
+    freehit:  { status: 'available' },
+    bboost:   { status: 'available' },
+    '3xc':    { status: 'available' },
+  },
   summary: { totalPoints: 0, transfers: 0 },
   starters: [],
   bench: [],

@@ -48,10 +48,10 @@ function makeDefaultDraft(teamId: number, targetGw: number): TransferDraft {
 }
 
 const DEFAULT_CHIP_STATUSES: ChipStatuses = {
-  wildcard: 'available',
-  freehit: 'available',
-  bboost: 'available',
-  '3xc': 'available',
+  wildcard: { status: 'available' },
+  freehit:  { status: 'available' },
+  bboost:   { status: 'available' },
+  '3xc':    { status: 'available' },
 };
 
 export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
@@ -133,10 +133,10 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
     chipInitializedRef.current = true;
     const s = squadData.chipStatuses;
     const initial: PlanChip =
-      s.wildcard === 'active' ? 'wildcard' :
-      s.freehit  === 'active' ? 'freehit'  :
-      s.bboost   === 'active' ? 'bboost'   :
-      s['3xc']   === 'active' ? '3xc'      :
+      s.wildcard.status === 'active' ? 'wildcard' :
+      s.freehit.status  === 'active' ? 'freehit'  :
+      s.bboost.status   === 'active' ? 'bboost'   :
+      s['3xc'].status   === 'active' ? '3xc'      :
       'none';
     if (draftSourceRef.current === 'fresh') {
       setPlanChip(initial);

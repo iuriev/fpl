@@ -25,7 +25,12 @@ function makePlayer(id: number, name: string, position: SquadPlayer['position'])
 const SQUAD_DATA: SquadResponse = {
   gameweek: 5,
   activeChip: null,
-  chipStatuses: { wildcard: 'available', freehit: 'available', bboost: 'available', '3xc': 'available' },
+  chipStatuses: {
+    wildcard: { status: 'available' },
+    freehit:  { status: 'available' },
+    bboost:   { status: 'available' },
+    '3xc':    { status: 'available' },
+  },
   summary: { totalPoints: 60, transfers: 0, bank: 0 },
   starters: [
     makePlayer(1, 'Hart', 'GK'),
