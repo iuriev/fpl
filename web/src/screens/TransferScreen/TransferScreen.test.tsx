@@ -46,7 +46,12 @@ function makePlayer(id: number, name: string, position: SquadPlayer['position'])
 const SQUAD_DATA: SquadResponse = {
   gameweek: 5,
   activeChip: null,
-  chipStatuses: { wildcard: 'available', freehit: 'available', bboost: 'available', '3xc': 'available' },
+  chipStatuses: {
+    wildcard: { status: 'available' },
+    freehit:  { status: 'available' },
+    bboost:   { status: 'available' },
+    '3xc':    { status: 'available' },
+  },
   summary: { totalPoints: 60, transfers: 0, bank: 0 },
   starters: [
     makePlayer(1, 'Hart', 'GK'),
@@ -139,7 +144,12 @@ describe('TransferScreen chip statuses', () => {
     mockState.squad = {
       ...SQUAD_DATA,
       activeChip: 'wildcard',
-      chipStatuses: { wildcard: 'active', freehit: 'available', bboost: 'available', '3xc': 'available' },
+      chipStatuses: {
+        wildcard: { status: 'active' },
+        freehit:  { status: 'available' },
+        bboost:   { status: 'available' },
+        '3xc':    { status: 'available' },
+      },
     };
     mockState.pool = { players: POOL_PLAYERS };
     renderScreen();
@@ -147,15 +157,23 @@ describe('TransferScreen chip statuses', () => {
     expect(wcBtn).toHaveAttribute('aria-pressed', 'true');
   });
 
-  it('disables freehit button when chipStatuses.freehit === used', () => {
+  it('shows toast when a used chip button is tapped', async () => {
+    const user = userEvent.setup();
     mockState.squad = {
       ...SQUAD_DATA,
-      chipStatuses: { wildcard: 'available', freehit: 'used', bboost: 'available', '3xc': 'available' },
+      chipStatuses: {
+        wildcard: { status: 'available' },
+        freehit:  { status: 'used', usedInGw: 7 },
+        bboost:   { status: 'available' },
+        '3xc':    { status: 'available' },
+      },
     };
     mockState.pool = { players: POOL_PLAYERS };
     renderScreen();
-    const fhBtn = screen.getByRole('button', { name: /already played/i });
-    expect(fhBtn).toBeDisabled();
+    const fhBtn = screen.getByRole('button', { name: 'FH' });
+    expect(fhBtn).not.toBeDisabled();
+    await user.click(fhBtn);
+    expect(await screen.findByRole('status')).toHaveTextContent('Free Hit already played in GW7');
   });
 });
 
