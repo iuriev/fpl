@@ -7,12 +7,14 @@ import * as fplClient from './fpl-client';
 import * as cacheLayer from './cache';
 import type {
   ActiveChip,
+  ChipStatus,
+  ChipStatuses,
   SquadPlayer,
   SquadResponse,
   PlayerPosition,
   PlayerStatus,
 } from './types';
-import type { FPLBootstrapStatic, FPLPicks, FPLLive } from './fpl-client';
+import type { FPLBootstrapStatic, FPLHistory, FPLHistoryChip, FPLPicks, FPLLive } from './fpl-client';
 
 const POSITION_MAP: Record<number, PlayerPosition> = {
   1: 'GK',
@@ -62,6 +64,50 @@ async function getLiveWithCache(gameweek: number): Promise<FPLLive> {
   return live;
 }
 
+async function getHistoryWithCache(teamId: number): Promise<FPLHistory> {
+  const cacheKey = `squad-history:${teamId}`;
+  const cached = cacheLayer.get<FPLHistory>(cacheKey);
+  if (cached) return cached;
+
+  const history = await fplClient.getHistory(teamId);
+  cacheLayer.set(cacheKey, history, cacheLayer.ttl.SQUAD_CURRENT);
+  return history;
+}
+
+export function computeChipStatuses(
+  activeChip: ActiveChip,
+  playedChips: FPLHistoryChip[],
+  bootstrapChips: FPLBootstrapStatic['chips'],
+  currentGw: number,
+): ChipStatuses {
+  const chips = playedChips ?? [];
+  const windows = bootstrapChips ?? [];
+  const played = (name: string) => chips.filter((c) => c.name === name);
+
+  const wcWindows = windows.filter((c) => c.name === 'wildcard');
+  const currentWindow = wcWindows.find(
+    (w) => currentGw >= w.start_event && currentGw <= w.stop_event,
+  );
+  const wcUsedInCurrentWindow = currentWindow
+    ? played('wildcard').some(
+        (c) => c.event >= currentWindow.start_event && c.event <= currentWindow.stop_event,
+      )
+    : false;
+
+  function status(name: string, usedOverride?: boolean): ChipStatus {
+    if (activeChip === name) return 'active';
+    if (usedOverride ?? played(name).length > 0) return 'used';
+    return 'available';
+  }
+
+  return {
+    wildcard: status('wildcard', wcUsedInCurrentWindow),
+    freehit: status('freehit'),
+    bboost: status('bboost'),
+    '3xc': status('3xc'),
+  };
+}
+
 export async function getSquad(teamId: number, gameweek: number): Promise<SquadResponse> {
   const bootstrap = await getBootstrapWithCache();
   const gameweekEvent = bootstrap.events.find((e) => e.id === gameweek);
@@ -79,7 +125,10 @@ export async function getSquad(teamId: number, gameweek: number): Promise<SquadR
     throw error;
   }
 
-  const live = await getLiveWithCache(gameweek);
+  const [live, history] = await Promise.all([
+    getLiveWithCache(gameweek),
+    getHistoryWithCache(teamId),
+  ]);
 
   // Build lookup maps for quick access
   const teamMap = new Map(bootstrap.teams.map((t) => [t.id, t.short_name]));
@@ -155,9 +204,12 @@ export async function getSquad(teamId: number, gameweek: number): Promise<SquadR
   const entryHistory = picks.entry_history;
   const totalPoints = Math.max(0, entryHistory.points - entryHistory.event_transfers_cost);
 
+  const activeChip = toActiveChip(picks.active_chip);
+
   return {
     gameweek,
-    activeChip: toActiveChip(picks.active_chip),
+    activeChip,
+    chipStatuses: computeChipStatuses(activeChip, history.chips, bootstrap.chips, gameweek),
     summary: {
       totalPoints,
       averagePoints: gameweekEvent.average_entry_score,

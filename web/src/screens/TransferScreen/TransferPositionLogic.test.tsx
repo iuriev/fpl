@@ -25,6 +25,7 @@ function makePlayer(id: number, name: string, position: SquadPlayer['position'])
 const SQUAD_DATA: SquadResponse = {
   gameweek: 5,
   activeChip: null,
+  chipStatuses: { wildcard: 'available', freehit: 'available', bboost: 'available', '3xc': 'available' },
   summary: { totalPoints: 60, transfers: 0, bank: 0 },
   starters: [
     makePlayer(1, 'Hart', 'GK'),
@@ -35,11 +36,11 @@ const SQUAD_DATA: SquadResponse = {
 };
 
 const POOL_PLAYERS: PoolPlayer[] = [
-  { id: 1, webName: 'Hart', firstName: 'H', lastName: 'T', team: 1, teamCode: 1, teamShortName: 'TST', position: 'GK', nowCost: 50, totalPoints: 0, eventPoints: 0, status: 'a', chanceOfPlaying: null, news: '', selectedByPercent: '10', form: '5.0', nextFixtures: [] },
-  { id: 2, webName: 'Walker', firstName: 'K', lastName: 'W', team: 1, teamCode: 1, teamShortName: 'TST', position: 'DEF', nowCost: 50, totalPoints: 0, eventPoints: 0, status: 'a', chanceOfPlaying: null, news: '', selectedByPercent: '10', form: '5.0', nextFixtures: [] },
-  { id: 3, webName: 'Saka', firstName: 'B', lastName: 'S', team: 1, teamCode: 1, teamShortName: 'TST', position: 'MID', nowCost: 50, totalPoints: 0, eventPoints: 0, status: 'a', chanceOfPlaying: null, news: '', selectedByPercent: '10', form: '5.0', nextFixtures: [] },
-  { id: 4, webName: 'Gabriel', firstName: 'G', lastName: 'M', team: 1, teamCode: 1, teamShortName: 'TST', position: 'DEF', nowCost: 50, totalPoints: 0, eventPoints: 0, status: 'a', chanceOfPlaying: null, news: '', selectedByPercent: '10', form: '5.0', nextFixtures: [] },
-  { id: 5, webName: 'Salah', firstName: 'M', lastName: 'S', team: 1, teamCode: 1, teamShortName: 'TST', position: 'MID', nowCost: 50, totalPoints: 0, eventPoints: 0, status: 'a', chanceOfPlaying: null, news: '', selectedByPercent: '10', form: '5.0', nextFixtures: [] },
+  { id: 1, webName: 'Hart', firstName: 'H', lastName: 'T', team: 1, teamCode: 1, teamShortName: 'TST', position: 'GK', nowCost: 50, totalPoints: 0, eventPoints: 0, status: 'a', chanceOfPlaying: null, news: '', selectedByPercent: '10', expectedPoints: '5.0', form: '5.0', nextFixtures: [] },
+  { id: 2, webName: 'Walker', firstName: 'K', lastName: 'W', team: 1, teamCode: 1, teamShortName: 'TST', position: 'DEF', nowCost: 50, totalPoints: 0, eventPoints: 0, status: 'a', chanceOfPlaying: null, news: '', selectedByPercent: '10', expectedPoints: '5.0', form: '5.0', nextFixtures: [] },
+  { id: 3, webName: 'Saka', firstName: 'B', lastName: 'S', team: 1, teamCode: 1, teamShortName: 'TST', position: 'MID', nowCost: 50, totalPoints: 0, eventPoints: 0, status: 'a', chanceOfPlaying: null, news: '', selectedByPercent: '10', expectedPoints: '5.0', form: '5.0', nextFixtures: [] },
+  { id: 4, webName: 'Gabriel', firstName: 'G', lastName: 'M', team: 1, teamCode: 1, teamShortName: 'TST', position: 'DEF', nowCost: 50, totalPoints: 0, eventPoints: 0, status: 'a', chanceOfPlaying: null, news: '', selectedByPercent: '10', expectedPoints: '5.0', form: '5.0', nextFixtures: [] },
+  { id: 5, webName: 'Salah', firstName: 'M', lastName: 'S', team: 1, teamCode: 1, teamShortName: 'TST', position: 'MID', nowCost: 50, totalPoints: 0, eventPoints: 0, status: 'a', chanceOfPlaying: null, news: '', selectedByPercent: '10', expectedPoints: '5.0', form: '5.0', nextFixtures: [] },
 ];
 
 const mockState = {

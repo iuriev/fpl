@@ -100,9 +100,19 @@ export interface LeaguesResponse {
 
 export type ActiveChip = 'wildcard' | '3xc' | 'freehit' | 'bboost' | null;
 
+export type ChipStatus = 'available' | 'used' | 'active';
+
+export interface ChipStatuses {
+  wildcard: ChipStatus;
+  freehit: ChipStatus;
+  bboost: ChipStatus;
+  '3xc': ChipStatus;
+}
+
 export interface SquadResponse {
   gameweek: number;
   activeChip: ActiveChip;
+  chipStatuses: ChipStatuses;
   summary: SquadSummary;
   starters: SquadPlayer[];
   bench: SquadPlayer[];

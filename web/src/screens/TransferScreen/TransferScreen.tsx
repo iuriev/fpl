@@ -12,6 +12,7 @@ import {
   saveDraft,
 } from '@/lib/transfer-draft';
 import type {
+  ChipStatuses,
   PlayerPosition,
   PoolPlayer,
   SquadPlayer,
@@ -19,6 +20,8 @@ import type {
   TransferDraft,
   TransferSwap,
 } from '@/types';
+
+type PlanChip = TransferChip | 'bboost' | '3xc';
 
 import { PlayerPickerSheet } from './PlayerPickerSheet';
 import { SwapsStrip } from './SwapsStrip';
@@ -44,6 +47,13 @@ function makeDefaultDraft(teamId: number, targetGw: number): TransferDraft {
   };
 }
 
+const DEFAULT_CHIP_STATUSES: ChipStatuses = {
+  wildcard: 'available',
+  freehit: 'available',
+  bboost: 'available',
+  '3xc': 'available',
+};
+
 export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   const navigate = useNavigate();
   const { data: gameweeks } = useGameweeks();
@@ -59,9 +69,12 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   const { data: poolData, isLoading: poolLoading } = usePlayerPool();
 
   const [draft, setDraft] = useState<TransferDraft | null>(null);
+  const [planChip, setPlanChip] = useState<PlanChip>('none');
   const [selectedPlayerId, setSelectedPlayerId] = useState<number | null>(null);
   const [staleToast, setStaleToast] = useState<string | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const draftSourceRef = useRef<'storage' | 'fresh'>('fresh');
+  const chipInitializedRef = useRef(false);
 
   // Sync draft with teamId/nextGw during render to avoid effect-based setState
   const [prevId, setPrevId] = useState<number | null>(null);
@@ -70,11 +83,15 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   if (teamId !== prevId || nextGw !== prevGw) {
     setPrevId(teamId);
     setPrevGw(nextGw);
+    chipInitializedRef.current = false;
     if (nextGw !== null) {
       const saved = loadDraft(teamId, nextGw);
       if (saved) {
+        draftSourceRef.current = 'storage';
         setDraft(saved);
+        setPlanChip(saved.chip);
       } else {
+        draftSourceRef.current = 'fresh';
         const prevRaw = localStorage.getItem(`fpl-transfer-draft-${teamId}`);
         if (prevRaw && typeof window !== 'undefined') {
           try {
@@ -110,6 +127,24 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
     },
     [teamId, nextGw, persistDraft]
   );
+
+  useEffect(() => {
+    if (!squadData || chipInitializedRef.current) return;
+    chipInitializedRef.current = true;
+    const s = squadData.chipStatuses;
+    const initial: PlanChip =
+      s.wildcard === 'active' ? 'wildcard' :
+      s.freehit  === 'active' ? 'freehit'  :
+      s.bboost   === 'active' ? 'bboost'   :
+      s['3xc']   === 'active' ? '3xc'      :
+      'none';
+    if (draftSourceRef.current === 'fresh') {
+      setPlanChip(initial);
+      if (initial === 'wildcard' || initial === 'freehit') {
+        updateDraft((d) => ({ ...d, chip: initial as TransferChip }));
+      }
+    }
+  }, [squadData, updateDraft]);
 
   const originalSquad: SquadPlayer[] = useMemo(() => {
     if (!squadData) return [];
@@ -265,8 +300,16 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
     if (draft) saveDraft(draft);
   };
 
-  const handleChipToggle = (chip: 'wildcard' | 'freehit') => {
-    updateDraft((d) => ({ ...d, chip: d.chip === chip ? 'none' : (chip as TransferChip) }));
+  const handleChipToggle = (chip: PlanChip) => {
+    setPlanChip((prev) => {
+      const next = prev === chip ? 'none' : chip;
+      if (next === 'wildcard' || next === 'freehit' || next === 'none') {
+        updateDraft((d) => ({ ...d, chip: next as TransferChip }));
+      } else {
+        updateDraft((d) => ({ ...d, chip: 'none' }));
+      }
+      return next;
+    });
   };
 
   const handleFreeTransfersChange = (n: number) => {
@@ -283,7 +326,8 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
           bank={currentBank}
           freeTransfers={draft.freeTransfers}
           cost={transferCost}
-          chip={draft.chip}
+          planChip={planChip}
+          chipStatuses={squadData?.chipStatuses ?? DEFAULT_CHIP_STATUSES}
           nextGw={nextGw}
           onBack={() => navigate(`/?teamId=${teamId}`)}
           onChipToggle={handleChipToggle}

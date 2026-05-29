@@ -46,6 +46,7 @@ function makePlayer(id: number, name: string, position: SquadPlayer['position'])
 const SQUAD_DATA: SquadResponse = {
   gameweek: 5,
   activeChip: null,
+  chipStatuses: { wildcard: 'available', freehit: 'available', bboost: 'available', '3xc': 'available' },
   summary: { totalPoints: 60, transfers: 0, bank: 0 },
   starters: [
     makePlayer(1, 'Hart', 'GK'),
@@ -84,6 +85,7 @@ const POOL_PLAYERS: PoolPlayer[] = SQUAD_DATA.starters.concat(SQUAD_DATA.bench).
   chanceOfPlaying: null,
   news: '',
   selectedByPercent: '10',
+  expectedPoints: '5.0',
   form: '5.0',
   nextFixtures: [],
 }));
@@ -129,6 +131,31 @@ describe('TransferScreen', () => {
   it('shows empty state when squad is not available', () => {
     renderScreen();
     expect(screen.getByText(/No squad found/i)).toBeInTheDocument();
+  });
+});
+
+describe('TransferScreen chip statuses', () => {
+  it('pre-selects wildcard when chipStatuses.wildcard === active', async () => {
+    mockState.squad = {
+      ...SQUAD_DATA,
+      activeChip: 'wildcard',
+      chipStatuses: { wildcard: 'active', freehit: 'available', bboost: 'available', '3xc': 'available' },
+    };
+    mockState.pool = { players: POOL_PLAYERS };
+    renderScreen();
+    const wcBtn = screen.getByRole('button', { name: 'WC' });
+    expect(wcBtn).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('disables freehit button when chipStatuses.freehit === used', () => {
+    mockState.squad = {
+      ...SQUAD_DATA,
+      chipStatuses: { wildcard: 'available', freehit: 'used', bboost: 'available', '3xc': 'available' },
+    };
+    mockState.pool = { players: POOL_PLAYERS };
+    renderScreen();
+    const fhBtn = screen.getByRole('button', { name: /already played/i });
+    expect(fhBtn).toBeDisabled();
   });
 });
 

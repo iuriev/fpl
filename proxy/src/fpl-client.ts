@@ -23,6 +23,12 @@ export interface FPLBootstrapStatic {
     short_name: string;
     code: number;
   }>;
+  chips: Array<{
+    chip_type: string;
+    name: string;
+    start_event: number;
+    stop_event: number;
+  }>;
   elements: Array<{
     id: number;
     web_name: string;
@@ -90,6 +96,12 @@ export interface FPLPicks {
   }>;
 }
 
+export interface FPLHistoryChip {
+  name: string;
+  event: number;
+  time: string;
+}
+
 export interface FPLHistory {
   current: Array<{
     event: number;
@@ -102,6 +114,7 @@ export interface FPLHistory {
     event_transfers_cost: number;
     points_on_bench: number;
   }>;
+  chips: FPLHistoryChip[];
 }
 
 export interface FPLDreamTeamEntry {

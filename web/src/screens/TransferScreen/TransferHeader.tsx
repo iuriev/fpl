@@ -1,18 +1,21 @@
 import React from 'react';
 
 import { copy, interpolate } from '@/lib/copy';
-import type { TransferChip } from '@/types';
+import type { ChipStatuses } from '@/types';
 
 import styles from './TransferHeader.module.css';
+
+type PlanChip = 'none' | 'wildcard' | 'freehit' | 'bboost' | '3xc';
 
 export interface TransferHeaderProps {
   bank: number;
   freeTransfers: number;
   cost: number;
-  chip: TransferChip;
+  planChip: PlanChip;
+  chipStatuses: ChipStatuses;
   nextGw: number | null;
   onBack: () => void;
-  onChipToggle: (chip: 'wildcard' | 'freehit') => void;
+  onChipToggle: (chip: PlanChip) => void;
   onFreeTransfersChange: (n: number) => void;
 }
 
@@ -20,13 +23,39 @@ export const TransferHeader: React.FC<TransferHeaderProps> = ({
   bank,
   freeTransfers,
   cost,
-  chip,
+  planChip,
+  chipStatuses,
   nextGw,
   onBack,
   onChipToggle,
   onFreeTransfersChange,
 }) => {
-  const chipActive = chip !== 'none';
+  const transferChipActive = planChip === 'wildcard' || planChip === 'freehit';
+  const anyChipActive = planChip !== 'none';
+
+  function chipBtnClass(name: PlanChip): string {
+    const classes = [styles.chipBtn];
+    if (planChip === name) classes.push(styles.chipBtn_active);
+    const statusKey = name as keyof ChipStatuses;
+    if (name !== 'none' && chipStatuses[statusKey] === 'used') classes.push(styles.chipBtn_used);
+    return classes.join(' ');
+  }
+
+  function chipIsUsed(name: keyof ChipStatuses): boolean {
+    return chipStatuses[name] === 'used';
+  }
+
+  function chipActiveLabel(): React.ReactNode {
+    if (planChip === 'wildcard') return copy.transfersWildcardActive;
+    if (planChip === 'freehit') {
+      return nextGw !== null && nextGw <= 38
+        ? interpolate(copy.transfersFreeHitActive, { n: nextGw })
+        : copy.transfersFreeHitActiveFinal;
+    }
+    if (planChip === 'bboost') return copy.transfersBenchBoostActive;
+    if (planChip === '3xc') return copy.transfersTripleCaptainActive;
+    return null;
+  }
 
   return (
     <div className={styles.header}>
@@ -47,18 +76,40 @@ export const TransferHeader: React.FC<TransferHeaderProps> = ({
         <span className={styles.title}>{copy.transfersTitle}</span>
         <div className={styles.chips}>
           <button
-            className={`${styles.chipBtn} ${chip === 'wildcard' ? styles.chipBtn_active : ''}`}
+            className={chipBtnClass('wildcard')}
             onClick={() => onChipToggle('wildcard')}
-            aria-pressed={chip === 'wildcard'}
+            aria-pressed={planChip === 'wildcard'}
+            disabled={chipIsUsed('wildcard')}
+            aria-label={chipIsUsed('wildcard') ? copy.chipUsedAriaLabel : undefined}
           >
             {copy.transfersWildcard}
           </button>
           <button
-            className={`${styles.chipBtn} ${chip === 'freehit' ? styles.chipBtn_active : ''}`}
+            className={chipBtnClass('freehit')}
             onClick={() => onChipToggle('freehit')}
-            aria-pressed={chip === 'freehit'}
+            aria-pressed={planChip === 'freehit'}
+            disabled={chipIsUsed('freehit')}
+            aria-label={chipIsUsed('freehit') ? copy.chipUsedAriaLabel : undefined}
           >
             {copy.transfersFreeHit}
+          </button>
+          <button
+            className={chipBtnClass('bboost')}
+            onClick={() => onChipToggle('bboost')}
+            aria-pressed={planChip === 'bboost'}
+            disabled={chipIsUsed('bboost')}
+            aria-label={chipIsUsed('bboost') ? copy.chipUsedAriaLabel : undefined}
+          >
+            {copy.transfersBenchBoost}
+          </button>
+          <button
+            className={chipBtnClass('3xc')}
+            onClick={() => onChipToggle('3xc')}
+            aria-pressed={planChip === '3xc'}
+            disabled={chipIsUsed('3xc')}
+            aria-label={chipIsUsed('3xc') ? copy.chipUsedAriaLabel : undefined}
+          >
+            {copy.transfersTripleCaptain}
           </button>
         </div>
       </div>
@@ -68,7 +119,7 @@ export const TransferHeader: React.FC<TransferHeaderProps> = ({
           <span className={styles.statValue}>£{(bank / 10).toFixed(1)}m</span>
           <span className={styles.statLabel}>{copy.transfersBank}</span>
         </div>
-        {!chipActive && (
+        {!transferChipActive && (
           <>
             <div className={styles.divider} aria-hidden="true" />
             <div className={styles.stat}>
@@ -97,14 +148,8 @@ export const TransferHeader: React.FC<TransferHeaderProps> = ({
         )}
         <div className={styles.divider} aria-hidden="true" />
         <div className={styles.stat}>
-          {chipActive ? (
-            <span className={styles.chipActiveLabel}>
-              {chip === 'wildcard'
-                ? copy.transfersWildcardActive
-                : nextGw !== null && nextGw <= 38
-                  ? interpolate(copy.transfersFreeHitActive, { n: nextGw })
-                  : copy.transfersFreeHitActiveFinal}
-            </span>
+          {anyChipActive ? (
+            <span className={styles.chipActiveLabel}>{chipActiveLabel()}</span>
           ) : (
             <>
               <span

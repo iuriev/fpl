@@ -26,6 +26,7 @@ describe('Squad Service', () => {
           },
         ],
         teams: [{ id: 1, name: 'Arsenal', short_name: 'ARS', code: 1 }],
+        chips: [],
         elements: [
           {
             id: 1,
@@ -101,6 +102,8 @@ describe('Squad Service', () => {
       (fplClient.getPicks as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockPicks);
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValueOnce(null);
       (fplClient.getLive as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockLive);
+      (cache.get as ReturnType<typeof vi.fn>).mockReturnValueOnce(null);
+      (fplClient.getHistory as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ current: [], chips: [] });
 
       const result = await squadService.getSquad(123, 1);
 
@@ -145,6 +148,7 @@ describe('Squad Service', () => {
           { id: 1, name: 'Arsenal', short_name: 'ARS', code: 1 },
           { id: 2, name: 'Chelsea', short_name: 'CHE', code: 2 },
         ],
+        chips: [],
         elements: [
           {
             id: 1,
@@ -200,6 +204,7 @@ describe('Squad Service', () => {
       );
       (fplClient.getPicks as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockPicks);
       (fplClient.getLive as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockLive);
+      (fplClient.getHistory as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ current: [], chips: [] });
 
       const result = await squadService.getSquad(123, 1);
 
@@ -213,6 +218,7 @@ describe('Squad Service', () => {
       const mockBootstrap = {
         events: [],
         teams: [],
+        chips: [],
         elements: [],
         element_types: [],
       };
@@ -241,6 +247,7 @@ describe('Squad Service', () => {
           },
         ],
         teams: [],
+        chips: [],
         elements: [],
         element_types: [],
       };
@@ -271,6 +278,7 @@ describe('Squad Service', () => {
       const bootstrap = {
         events: [{ id: 1, name: 'Gameweek 1', finished: false, average_entry_score: 50, highest_score: 100, deadline_time: '2025-01-01T12:00:00Z', is_current: true }],
         teams: [{ id: 1, name: 'Arsenal', short_name: 'ARS', code: 1 }],
+        chips: [],
         elements: [{ id: 1, web_name: 'Saka', first_name: 'Bukayo', second_name: 'Saka', team: 1, team_code: 3, element_type: 3, status: 'a', chance_of_playing_this_round: null, news: '', now_cost: 85, event_points: 0, form: '0', selected_by_percent: '0' }],
         element_types: [{ id: 3, singular_name_short: 'MID' }],
       };
@@ -285,9 +293,41 @@ describe('Squad Service', () => {
       (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(bootstrap);
       (fplClient.getPicks as ReturnType<typeof vi.fn>).mockResolvedValueOnce(picks);
       (fplClient.getLive as ReturnType<typeof vi.fn>).mockResolvedValueOnce(live);
+      (fplClient.getHistory as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ current: [], chips: [] });
 
       const result = await squadService.getSquad(123, 1);
       expect(result.activeChip).toBe(expected);
+    });
+
+    it('includes chipStatuses in the response', async () => {
+      const bootstrap = {
+        events: [{ id: 5, name: 'Gameweek 5', finished: true, average_entry_score: 55, highest_score: 110, deadline_time: '2025-01-05T12:00:00Z', is_current: false }],
+        teams: [{ id: 1, name: 'Arsenal', short_name: 'ARS', code: 1 }],
+        chips: [
+          { chip_type: 'transfer', name: 'wildcard', start_event: 1, stop_event: 19 },
+          { chip_type: 'transfer', name: 'wildcard', start_event: 20, stop_event: 38 },
+        ],
+        elements: [{ id: 1, web_name: 'Saka', first_name: 'Bukayo', second_name: 'Saka', team: 1, team_code: 3, element_type: 3, status: 'a', chance_of_playing_this_round: null, news: '', now_cost: 85, event_points: 0, form: '0', selected_by_percent: '0', ep_next: '5' }],
+        element_types: [{ id: 3, singular_name_short: 'MID' }],
+      };
+      const picks = {
+        active_chip: 'wildcard',
+        entry_history: { event: 5, points: 60, total_points: 200, rank: 500, event_transfers: 0, event_transfers_cost: 0, points_on_bench: 3, bank: 10, value: 1005 },
+        picks: [{ element: 1, position: 1, is_captain: false, is_vice_captain: false }],
+      };
+      const live = { elements: [{ id: 1, stats: { total_points: 8, minutes: 90, goals_scored: 0, assists: 0, clean_sheets: 0, goals_conceded: 0, own_goals: 0, penalties_saved: 0, penalties_missed: 0, yellow_cards: 0, red_cards: 0, saves: 0, bonus: 0 } }] };
+
+      (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
+      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(bootstrap);
+      (fplClient.getPicks as ReturnType<typeof vi.fn>).mockResolvedValueOnce(picks);
+      (fplClient.getLive as ReturnType<typeof vi.fn>).mockResolvedValueOnce(live);
+      (fplClient.getHistory as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ current: [], chips: [] });
+
+      const result = await squadService.getSquad(123, 5);
+      expect(result.chipStatuses.wildcard).toBe('active');
+      expect(result.chipStatuses.freehit).toBe('available');
+      expect(result.chipStatuses.bboost).toBe('available');
+      expect(result.chipStatuses['3xc']).toBe('available');
     });
 
     it('respects cache for bootstrap data', async () => {
@@ -304,6 +344,7 @@ describe('Squad Service', () => {
           },
         ],
         teams: [],
+        chips: [],
         elements: [],
         element_types: [],
       };
@@ -312,6 +353,53 @@ describe('Squad Service', () => {
 
       await expect(squadService.getSquad(123, 1)).rejects.toThrow();
       expect(fplClient.getBootstrapStatic).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('computeChipStatuses', () => {
+    const wcWindows = [
+      { chip_type: 'transfer', name: 'wildcard', start_event: 1, stop_event: 19 },
+      { chip_type: 'transfer', name: 'wildcard', start_event: 20, stop_event: 38 },
+    ];
+
+    it('returns active for the current active chip', () => {
+      const result = squadService.computeChipStatuses('wildcard', [], wcWindows, 10);
+      expect(result.wildcard).toBe('active');
+      expect(result.freehit).toBe('available');
+      expect(result.bboost).toBe('available');
+      expect(result['3xc']).toBe('available');
+    });
+
+    it('returns used for a chip played this season (non-wildcard)', () => {
+      const played = [{ name: 'freehit', event: 5, time: '2025-01-05T12:00:00Z' }];
+      const result = squadService.computeChipStatuses(null, played, wcWindows, 10);
+      expect(result.freehit).toBe('used');
+      expect(result.bboost).toBe('available');
+    });
+
+    it('marks wildcard used when played in the current window', () => {
+      const played = [{ name: 'wildcard', event: 8, time: '2025-01-08T12:00:00Z' }];
+      // currentGw 10 is in window 1-19; wildcard played at GW8 is in same window
+      const result = squadService.computeChipStatuses(null, played, wcWindows, 10);
+      expect(result.wildcard).toBe('used');
+    });
+
+    it('keeps wildcard available in second window when only first was used', () => {
+      const played = [{ name: 'wildcard', event: 8, time: '2025-01-08T12:00:00Z' }];
+      // currentGw 25 is in window 20-38; wildcard at GW8 is in the other window
+      const result = squadService.computeChipStatuses(null, played, wcWindows, 25);
+      expect(result.wildcard).toBe('available');
+    });
+
+    it('returns available for all chips when nothing played and no active chip', () => {
+      const result = squadService.computeChipStatuses(null, [], wcWindows, 15);
+      expect(result).toEqual({ wildcard: 'available', freehit: 'available', bboost: 'available', '3xc': 'available' });
+    });
+
+    it('active takes precedence over used (chip replayed edge case)', () => {
+      const played = [{ name: 'bboost', event: 3, time: '2025-01-03T12:00:00Z' }];
+      const result = squadService.computeChipStatuses('bboost', played, wcWindows, 10);
+      expect(result.bboost).toBe('active');
     });
   });
 });

@@ -42,6 +42,7 @@ const makePoolPlayer = (id: number, team: number, nowCost: number): PoolPlayer =
   chanceOfPlaying: null,
   news: '',
   selectedByPercent: '10.0',
+  expectedPoints: '5.0',
   form: '5.0',
   nextFixtures: [],
 });
