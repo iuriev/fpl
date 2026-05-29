@@ -66,6 +66,7 @@ export interface SquadSummary {
   rank?: number;
   transfers: number;
   bank?: number;
+  freeTransfers: number;
 }
 
 export interface HistoryGameweek {

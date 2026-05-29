@@ -74,6 +74,14 @@ async function getHistoryWithCache(teamId: number): Promise<FPLHistory> {
   return history;
 }
 
+export function computeFreeTransfers(history: FPLHistory['current']): number {
+  let ft = 1;
+  for (const gw of history) {
+    ft = Math.min(2, Math.max(0, ft - gw.event_transfers) + 1);
+  }
+  return ft;
+}
+
 export function computeChipStatuses(
   activeChip: ActiveChip,
   playedChips: FPLHistoryChip[],
@@ -223,6 +231,7 @@ export async function getSquad(teamId: number, gameweek: number): Promise<SquadR
       rank: entryHistory.rank,
       transfers: entryHistory.event_transfers,
       bank: entryHistory.bank,
+      freeTransfers: computeFreeTransfers(history.current),
     },
     starters,
     bench,

@@ -149,9 +149,13 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
       'none';
     if (draftSourceRef.current === 'fresh') {
       setPlanChip(initial);
-      if (initial === 'wildcard' || initial === 'freehit') {
-        updateDraft((d) => ({ ...d, chip: initial as TransferChip }));
-      }
+      updateDraft((d) => ({
+        ...d,
+        freeTransfers: squadData.summary.freeTransfers,
+        ...(initial === 'wildcard' || initial === 'freehit' ? { chip: initial as TransferChip } : {}),
+      }));
+    } else {
+      updateDraft((d) => ({ ...d, freeTransfers: squadData.summary.freeTransfers }));
     }
   }, [squadData, updateDraft]);
 
@@ -321,10 +325,6 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
     });
   };
 
-  const handleFreeTransfersChange = (n: number) => {
-    updateDraft((d) => ({ ...d, freeTransfers: n }));
-  };
-
   const isLoading = squadLoading || poolLoading || !draft;
   const hasNoSquad = !squadLoading && !squadError && !squadData;
 
@@ -341,7 +341,6 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
           onBack={() => navigate(`/?teamId=${teamId}`)}
           onChipToggle={handleChipToggle}
           onChipBlocked={handleChipBlocked}
-          onFreeTransfersChange={handleFreeTransfersChange}
         />
       )}
 

@@ -66,6 +66,7 @@ export const fixtureSquad: SquadResponse = {
     highestPoints: 112,
     rank: 1234567,
     transfers: 1,
+    freeTransfers: 1,
   },
   starters: [
     {
@@ -296,7 +297,7 @@ export const fixtureSquadEmpty: SquadResponse = {
     bboost:   { status: 'available' },
     '3xc':    { status: 'available' },
   },
-  summary: { totalPoints: 0, transfers: 0 },
+  summary: { totalPoints: 0, transfers: 0, freeTransfers: 1 },
   starters: [],
   bench: [],
 };

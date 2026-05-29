@@ -17,7 +17,6 @@ export interface TransferHeaderProps {
   onBack: () => void;
   onChipToggle: (chip: PlanChip) => void;
   onChipBlocked: (chip: PlanChip, usedInGw?: number) => void;
-  onFreeTransfersChange: (n: number) => void;
 }
 
 export const TransferHeader: React.FC<TransferHeaderProps> = ({
@@ -30,7 +29,6 @@ export const TransferHeader: React.FC<TransferHeaderProps> = ({
   onBack,
   onChipToggle,
   onChipBlocked,
-  onFreeTransfersChange,
 }) => {
   const transferChipActive = planChip === 'wildcard' || planChip === 'freehit';
   const anyChipActive = planChip !== 'none';
@@ -122,25 +120,7 @@ export const TransferHeader: React.FC<TransferHeaderProps> = ({
           <>
             <div className={styles.divider} aria-hidden="true" />
             <div className={styles.stat}>
-              <div className={styles.stepper}>
-                <button
-                  className={styles.stepperBtn}
-                  onClick={() => onFreeTransfersChange(Math.max(1, freeTransfers - 1))}
-                  aria-label="Decrease free transfers"
-                  disabled={freeTransfers <= 1}
-                >
-                  −
-                </button>
-                <span className={styles.stepperValue}>{freeTransfers}</span>
-                <button
-                  className={styles.stepperBtn}
-                  onClick={() => onFreeTransfersChange(Math.min(5, freeTransfers + 1))}
-                  aria-label="Increase free transfers"
-                  disabled={freeTransfers >= 5}
-                >
-                  +
-                </button>
-              </div>
+              <span className={styles.statValue}>{freeTransfers}</span>
               <span className={styles.statLabel}>{copy.transfersFree}</span>
             </div>
           </>

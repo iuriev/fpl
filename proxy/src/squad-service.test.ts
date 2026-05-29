@@ -126,6 +126,7 @@ describe('Squad Service', () => {
       expect(result.starters[0].stats.bonus).toBe(3);
       expect(result.starters[0].stats.yellow_cards).toBe(1);
       expect(result.summary.bank).toBe(15);
+      expect(result.summary.freeTransfers).toBe(1);
       expect(result.starters[0].teamId).toBe(1);
       expect(result.starters[0].nowCost).toBe(85);
       expect(result.activeChip).toBeNull();
@@ -353,6 +354,41 @@ describe('Squad Service', () => {
 
       await expect(squadService.getSquad(123, 1)).rejects.toThrow();
       expect(fplClient.getBootstrapStatic).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('computeFreeTransfers', () => {
+    it('returns 1 for empty history (season start)', () => {
+      expect(squadService.computeFreeTransfers([])).toBe(1);
+    });
+
+    it('banks 1 when no transfer made last GW', () => {
+      const history = [{ event: 1, event_transfers: 0 } as Parameters<typeof squadService.computeFreeTransfers>[0][number]];
+      expect(squadService.computeFreeTransfers(history)).toBe(2);
+    });
+
+    it('caps at 2 even after multiple unused GWs', () => {
+      const history = [
+        { event: 1, event_transfers: 0 },
+        { event: 2, event_transfers: 0 },
+        { event: 3, event_transfers: 0 },
+      ] as Parameters<typeof squadService.computeFreeTransfers>[0];
+      expect(squadService.computeFreeTransfers(history)).toBe(2);
+    });
+
+    it('resets to 1 when a transfer is made with only 1 free', () => {
+      const history = [
+        { event: 1, event_transfers: 1 },
+      ] as Parameters<typeof squadService.computeFreeTransfers>[0];
+      expect(squadService.computeFreeTransfers(history)).toBe(1);
+    });
+
+    it('resets to 1 after using a banked free transfer', () => {
+      const history = [
+        { event: 1, event_transfers: 0 },
+        { event: 2, event_transfers: 2 },
+      ] as Parameters<typeof squadService.computeFreeTransfers>[0];
+      expect(squadService.computeFreeTransfers(history)).toBe(1);
     });
   });
 

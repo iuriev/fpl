@@ -31,7 +31,7 @@ const SQUAD_DATA: SquadResponse = {
     bboost:   { status: 'available' },
     '3xc':    { status: 'available' },
   },
-  summary: { totalPoints: 60, transfers: 0, bank: 0 },
+  summary: { totalPoints: 60, transfers: 0, bank: 0, freeTransfers: 1 },
   starters: [
     makePlayer(1, 'Hart', 'GK'),
     makePlayer(2, 'Walker', 'DEF'),
