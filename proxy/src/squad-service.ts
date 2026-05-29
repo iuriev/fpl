@@ -7,7 +7,7 @@ import * as fplClient from './fpl-client';
 import * as cacheLayer from './cache';
 import type {
   ActiveChip,
-  ChipStatus,
+  ChipInfo,
   ChipStatuses,
   SquadPlayer,
   SquadResponse,
@@ -88,23 +88,29 @@ export function computeChipStatuses(
   const currentWindow = wcWindows.find(
     (w) => currentGw >= w.start_event && currentGw <= w.stop_event,
   );
-  const wcUsedInCurrentWindow = currentWindow
-    ? played('wildcard').some(
+  const wcPlayInWindow = currentWindow
+    ? played('wildcard').find(
         (c) => c.event >= currentWindow.start_event && c.event <= currentWindow.stop_event,
       )
-    : false;
+    : undefined;
 
-  function status(name: string, usedOverride?: boolean): ChipStatus {
-    if (activeChip === name) return 'active';
-    if (usedOverride ?? played(name).length > 0) return 'used';
-    return 'available';
+  function chipInfo(name: string, windowOverride?: { used: boolean; event?: number }): ChipInfo {
+    if (activeChip === name) return { status: 'active' };
+    if (windowOverride !== undefined) {
+      return windowOverride.used
+        ? { status: 'used', usedInGw: windowOverride.event }
+        : { status: 'available' };
+    }
+    const plays = played(name);
+    if (plays.length > 0) return { status: 'used', usedInGw: plays[plays.length - 1].event };
+    return { status: 'available' };
   }
 
   return {
-    wildcard: status('wildcard', wcUsedInCurrentWindow),
-    freehit: status('freehit'),
-    bboost: status('bboost'),
-    '3xc': status('3xc'),
+    wildcard: chipInfo('wildcard', { used: !!wcPlayInWindow, event: wcPlayInWindow?.event }),
+    freehit:  chipInfo('freehit'),
+    bboost:   chipInfo('bboost'),
+    '3xc':    chipInfo('3xc'),
   };
 }
 

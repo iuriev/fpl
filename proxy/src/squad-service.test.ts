@@ -324,10 +324,10 @@ describe('Squad Service', () => {
       (fplClient.getHistory as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ current: [], chips: [] });
 
       const result = await squadService.getSquad(123, 5);
-      expect(result.chipStatuses.wildcard).toBe('active');
-      expect(result.chipStatuses.freehit).toBe('available');
-      expect(result.chipStatuses.bboost).toBe('available');
-      expect(result.chipStatuses['3xc']).toBe('available');
+      expect(result.chipStatuses.wildcard).toEqual({ status: 'active' });
+      expect(result.chipStatuses.freehit).toEqual({ status: 'available' });
+      expect(result.chipStatuses.bboost).toEqual({ status: 'available' });
+      expect(result.chipStatuses['3xc']).toEqual({ status: 'available' });
     });
 
     it('respects cache for bootstrap data', async () => {
@@ -364,42 +364,47 @@ describe('Squad Service', () => {
 
     it('returns active for the current active chip', () => {
       const result = squadService.computeChipStatuses('wildcard', [], wcWindows, 10);
-      expect(result.wildcard).toBe('active');
-      expect(result.freehit).toBe('available');
-      expect(result.bboost).toBe('available');
-      expect(result['3xc']).toBe('available');
+      expect(result.wildcard).toEqual({ status: 'active' });
+      expect(result.freehit).toEqual({ status: 'available' });
+      expect(result.bboost).toEqual({ status: 'available' });
+      expect(result['3xc']).toEqual({ status: 'available' });
     });
 
-    it('returns used for a chip played this season (non-wildcard)', () => {
+    it('returns used with usedInGw for a chip played this season (non-wildcard)', () => {
       const played = [{ name: 'freehit', event: 5, time: '2025-01-05T12:00:00Z' }];
       const result = squadService.computeChipStatuses(null, played, wcWindows, 10);
-      expect(result.freehit).toBe('used');
-      expect(result.bboost).toBe('available');
+      expect(result.freehit).toEqual({ status: 'used', usedInGw: 5 });
+      expect(result.bboost).toEqual({ status: 'available' });
     });
 
-    it('marks wildcard used when played in the current window', () => {
+    it('marks wildcard used with usedInGw when played in the current window', () => {
       const played = [{ name: 'wildcard', event: 8, time: '2025-01-08T12:00:00Z' }];
       // currentGw 10 is in window 1-19; wildcard played at GW8 is in same window
       const result = squadService.computeChipStatuses(null, played, wcWindows, 10);
-      expect(result.wildcard).toBe('used');
+      expect(result.wildcard).toEqual({ status: 'used', usedInGw: 8 });
     });
 
     it('keeps wildcard available in second window when only first was used', () => {
       const played = [{ name: 'wildcard', event: 8, time: '2025-01-08T12:00:00Z' }];
       // currentGw 25 is in window 20-38; wildcard at GW8 is in the other window
       const result = squadService.computeChipStatuses(null, played, wcWindows, 25);
-      expect(result.wildcard).toBe('available');
+      expect(result.wildcard).toEqual({ status: 'available' });
     });
 
     it('returns available for all chips when nothing played and no active chip', () => {
       const result = squadService.computeChipStatuses(null, [], wcWindows, 15);
-      expect(result).toEqual({ wildcard: 'available', freehit: 'available', bboost: 'available', '3xc': 'available' });
+      expect(result).toEqual({
+        wildcard: { status: 'available' },
+        freehit:  { status: 'available' },
+        bboost:   { status: 'available' },
+        '3xc':    { status: 'available' },
+      });
     });
 
     it('active takes precedence over used (chip replayed edge case)', () => {
       const played = [{ name: 'bboost', event: 3, time: '2025-01-03T12:00:00Z' }];
       const result = squadService.computeChipStatuses('bboost', played, wcWindows, 10);
-      expect(result.bboost).toBe('active');
+      expect(result.bboost).toEqual({ status: 'active' });
     });
   });
 });
