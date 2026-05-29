@@ -16,6 +16,7 @@ export interface TransferHeaderProps {
   nextGw: number | null;
   onBack: () => void;
   onChipToggle: (chip: PlanChip) => void;
+  onChipBlocked: (chip: PlanChip, usedInGw?: number) => void;
   onFreeTransfersChange: (n: number) => void;
 }
 
@@ -28,6 +29,7 @@ export const TransferHeader: React.FC<TransferHeaderProps> = ({
   nextGw,
   onBack,
   onChipToggle,
+  onChipBlocked,
   onFreeTransfersChange,
 }) => {
   const transferChipActive = planChip === 'wildcard' || planChip === 'freehit';
@@ -36,13 +38,18 @@ export const TransferHeader: React.FC<TransferHeaderProps> = ({
   function chipBtnClass(name: PlanChip): string {
     const classes = [styles.chipBtn];
     if (planChip === name) classes.push(styles.chipBtn_active);
-    const statusKey = name as keyof ChipStatuses;
-    if (name !== 'none' && chipStatuses[statusKey] === 'used') classes.push(styles.chipBtn_used);
+    const key = name as keyof ChipStatuses;
+    if (name !== 'none' && chipStatuses[key].status === 'used') classes.push(styles.chipBtn_used);
     return classes.join(' ');
   }
 
-  function chipIsUsed(name: keyof ChipStatuses): boolean {
-    return chipStatuses[name] === 'used';
+  function handleChipClick(chip: PlanChip) {
+    const key = chip as keyof ChipStatuses;
+    if (chipStatuses[key].status === 'used') {
+      onChipBlocked(chip, chipStatuses[key].usedInGw);
+    } else {
+      onChipToggle(chip);
+    }
   }
 
   function chipActiveLabel(): React.ReactNode {
@@ -77,37 +84,29 @@ export const TransferHeader: React.FC<TransferHeaderProps> = ({
         <div className={styles.chips}>
           <button
             className={chipBtnClass('wildcard')}
-            onClick={() => onChipToggle('wildcard')}
+            onClick={() => handleChipClick('wildcard')}
             aria-pressed={planChip === 'wildcard'}
-            disabled={chipIsUsed('wildcard')}
-            aria-label={chipIsUsed('wildcard') ? copy.chipUsedAriaLabel : undefined}
           >
             {copy.transfersWildcard}
           </button>
           <button
             className={chipBtnClass('freehit')}
-            onClick={() => onChipToggle('freehit')}
+            onClick={() => handleChipClick('freehit')}
             aria-pressed={planChip === 'freehit'}
-            disabled={chipIsUsed('freehit')}
-            aria-label={chipIsUsed('freehit') ? copy.chipUsedAriaLabel : undefined}
           >
             {copy.transfersFreeHit}
           </button>
           <button
             className={chipBtnClass('bboost')}
-            onClick={() => onChipToggle('bboost')}
+            onClick={() => handleChipClick('bboost')}
             aria-pressed={planChip === 'bboost'}
-            disabled={chipIsUsed('bboost')}
-            aria-label={chipIsUsed('bboost') ? copy.chipUsedAriaLabel : undefined}
           >
             {copy.transfersBenchBoost}
           </button>
           <button
             className={chipBtnClass('3xc')}
-            onClick={() => onChipToggle('3xc')}
+            onClick={() => handleChipClick('3xc')}
             aria-pressed={planChip === '3xc'}
-            disabled={chipIsUsed('3xc')}
-            aria-label={chipIsUsed('3xc') ? copy.chipUsedAriaLabel : undefined}
           >
             {copy.transfersTripleCaptain}
           </button>

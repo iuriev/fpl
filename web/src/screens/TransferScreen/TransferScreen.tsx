@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { useGameweeks, usePlayerPool, useSquad } from '@/api/queries';
 import { Button } from '@/components/ui/Button/Button';
+import { CHIP_LABELS } from '@/components/ui/ChipBadge/ChipBadge';
 import { copy, interpolate } from '@/lib/copy';
 import {
   calcBank,
@@ -71,7 +72,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   const [draft, setDraft] = useState<TransferDraft | null>(null);
   const [planChip, setPlanChip] = useState<PlanChip>('none');
   const [selectedPlayerId, setSelectedPlayerId] = useState<number | null>(null);
-  const [staleToast, setStaleToast] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const draftSourceRef = useRef<'storage' | 'fresh'>('fresh');
   const chipInitializedRef = useRef(false);
@@ -96,7 +97,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
         if (prevRaw && typeof window !== 'undefined') {
           try {
             const prev = JSON.parse(prevRaw) as TransferDraft;
-            setStaleToast(interpolate(copy.transfersStaleToast, { n: prev.targetGw }));
+            setToast(interpolate(copy.transfersStaleToast, { n: prev.targetGw }));
           } catch {
             // ignore
           }
@@ -107,10 +108,18 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   }
 
   useEffect(() => {
-    if (!staleToast) return;
-    const t = setTimeout(() => setStaleToast(null), 5000);
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 4000);
     return () => clearTimeout(t);
-  }, [staleToast]);
+  }, [toast]);
+
+  function handleChipBlocked(chip: PlanChip, usedInGw?: number) {
+    const name = chip !== 'none' ? CHIP_LABELS[chip as keyof typeof CHIP_LABELS] : chip;
+    const msg = usedInGw !== undefined
+      ? interpolate(copy.chipBlockedUsed, { name, gw: usedInGw })
+      : interpolate(copy.chipBlockedNoGw, { name });
+    setToast(msg);
+  }
 
   const persistDraft = useCallback((d: TransferDraft) => {
     clearTimeout(saveTimerRef.current);
@@ -331,6 +340,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
           nextGw={nextGw}
           onBack={() => navigate(`/?teamId=${teamId}`)}
           onChipToggle={handleChipToggle}
+          onChipBlocked={handleChipBlocked}
           onFreeTransfersChange={handleFreeTransfersChange}
         />
       )}
@@ -410,9 +420,9 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
         />
       )}
 
-      {staleToast && (
+      {toast && (
         <div className={styles.toast} role="status">
-          {staleToast}
+          {toast}
         </div>
       )}
     </div>
