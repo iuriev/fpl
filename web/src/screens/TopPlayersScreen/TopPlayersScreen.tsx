@@ -21,6 +21,7 @@ import styles from './TopPlayersScreen.module.css';
 type Tab = 'gw' | 'season' | 'team';
 
 const PAGE_SIZE = 20;
+const EMPTY: TopPlayersPlayer[] = [];
 
 function withTransition(update: () => void): void {
   if (!document.startViewTransition) {
@@ -148,9 +149,9 @@ export const TopPlayersScreen: React.FC = () => {
   const seasonQuery = useTopPlayersSeason();
   const teamPlayersQuery = useTeamPlayers(activeTab === 'team' ? selectedTeamCode : null);
 
-  const gwPlayers = gwQuery.data?.players ?? [];
-  const seasonPlayers = seasonQuery.data?.players ?? [];
-  const teamPlayers = teamPlayersQuery.data?.players ?? [];
+  const gwPlayers = gwQuery.data?.players ?? EMPTY;
+  const seasonPlayers = seasonQuery.data?.players ?? EMPTY;
+  const teamPlayers = teamPlayersQuery.data?.players ?? EMPTY;
 
   const activePlayers =
     activeTab === 'gw' ? gwPlayers : activeTab === 'season' ? seasonPlayers : teamPlayers;
