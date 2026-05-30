@@ -1,4 +1,5 @@
 import { serve } from '@hono/node-server';
+import { serveStatic } from '@hono/node-server/serve-static';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import * as dreamTeamService from './dream-team-service';
@@ -250,6 +251,9 @@ app.get('/api/top-players/season', async (c) => {
     return c.json({ error: 'Unable to fetch top players' }, { status: 500 });
   }
 });
+
+app.use('*', serveStatic({ root: './web/dist' }));
+app.get('*', serveStatic({ path: './web/dist/index.html' }));
 
 const port = Number(process.env.PORT ?? 3001);
 

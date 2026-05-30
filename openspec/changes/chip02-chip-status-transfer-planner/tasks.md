@@ -62,5 +62,5 @@
 - [ ] 8.1 Verify with a team that has played Wildcard: button shows as `active` / pre-selected
 - [ ] 8.2 Verify with a team that has played Free Hit: Free Hit button is disabled
 - [ ] 8.3 Verify Bench Boost and Triple Captain buttons appear and are enabled when available
-- [ ] 8.4 Verify transfer cost and free-transfers stepper remain correct for all four chip states
+- [ ] 8.4 Verify transfer cost and free-transfers count (from API) are correct for all four chip states
 - [ ] 8.5 Verify a saved draft is not overwritten by the auto-pre-select logic on reload

@@ -35,13 +35,37 @@ matching FPL design conventions.
 
 ---
 
+## 🟠 P1 — Deployment & API protection (before public launch)
+
+| ID | Task | Effort | Why |
+|----|------|--------|-----|
+| INF-03 | Deploy to Fly.io — single Hono service serving SPA + proxy | S | Makes the app publicly accessible; in-memory cache preserved (long-running process). OpenSpec change: `openspec/changes/fly-io-deployment/`. |
+| INF-01 | Raise current-GW squad/live TTL from 60s → 300s | XS | Cuts FPL API calls ~5× at no user-visible cost. Do before any traffic. |
+| INF-02 | Add proxy-level rate limiter toward FPL API (queue, max N req/sec) | S | Prevents ban when user count grows. Required before public launch. |
+
+### Feature details
+
+#### INF-01: Raise current-GW TTL to 300s
+In `proxy/src/cache.ts`, change `SQUAD_CURRENT` and `HISTORY_CURRENT` from `60` to `300`.
+Users won't notice a 5-minute lag for live scores during a GW — FPL itself updates points
+with a delay. Reduces FPL API traffic ~5× for the most-called endpoints.
+
+#### INF-02: Proxy rate limiter toward FPL API
+Add an outbound queue in the proxy so requests to `fantasy.premierleague.com` never exceed
+a safe rate (e.g. 10 req/sec). All incoming user requests wait in the queue rather than
+hitting FPL directly. Options: `bottleneck` npm package or a simple token-bucket in-process.
+Must also add retry-with-backoff on 429 responses from FPL.
+
+---
+
 ## 🟠 P1 — Transfer screen polish
 
 | ID | Task | Effort | Why |
 |----|------|--------|-----|
-| UX-04 | Player card ⓘ button → upcoming 5 fixtures + price popup | S | Great discoverability. Popup layout designed (see below). |
-| DES-04 | Standardize FDR difficulty colours app-wide (1–5 palette) | XS | Must-have consistency before adding more FDR-based features. |
-| VIS-01 | Goals/assists badge counters on PlayerCard | S | Visual clarity. Adds context without opening popup. |
+| ~~UX-04~~ | ~~Player card ⓘ button → upcoming 5 fixtures + price popup~~ | S | ✅ Done — popup implemented in PlayerCard; wired in SquadScreen + TransferPitch. |
+| ~~DES-04~~ | ~~Standardize FDR difficulty colours app-wide (1–5 palette)~~ | XS | ✅ Done — `--fpl-fdr-*` tokens in colors_and_type.css; FdrChip uses them everywhere. |
+| ~~VIS-01~~ | ~~Goals/assists badge counters on PlayerCard~~ | S | ✅ Done — goal/assist badges on all card sizes; ownership % pill bottom-right of jersey. |
+| UX-05 | Transfer screen help overlay — guided tour explaining every UI element | S | The Transfer screen has many non-obvious elements (chip badges, Bank/Free/Cost strip, FDR chips, C/V badges, ownership %, swap arrows). New users need a one-time walkthrough. |
 
 ### Feature details
 
@@ -70,6 +94,28 @@ Use these exact colours for all fixture difficulty indicators, FDR chips, and ca
 
 Reference: fplukraine.com Difficulties palette.
 
+#### UX-05: Transfer screen help overlay (guided tour)
+
+A "?" button (top-right of the Transfer screen header) that triggers a step-by-step highlight
+overlay explaining each key UI element to the user. Shows once automatically on first visit,
+then on demand via the button.
+
+**Elements to explain (in tour order):**
+1. **Chip badges (WC / FH / BB / TC)** — what each chip does and when it can be played.
+2. **Bank / Free / Cost strip** — current budget remaining, free transfer count, and point cost of planned transfers.
+3. **Captain (C) / Vice-captain (V) badges** — scoring multiplier and when the vice steps up.
+4. **Ownership % pill** — percentage of all FPL managers who own this player (global ownership).
+5. **FDR chip under player name** — opponent abbreviation + home/away indicator; colour = fixture difficulty (green easy → maroon hard).
+6. **Transfer swap arrows (↑↓)** — green up = player in, red down = player out; tap to undo.
+7. **Bench row** — the 4 bench players; auto-substitution order matters.
+8. **Planned Transfers section** — summary of staged moves before saving; tap a player on the pitch to start planning.
+9. **Reset / Save Plan buttons** — Reset clears all staged transfers; Save Plan commits the draft.
+
+**Implementation notes:**
+- Use a lightweight step-highlight overlay (Popover API or a simple positioned overlay + backdrop).
+- Store "tour seen" flag in `localStorage` so it auto-plays once per browser, then only on demand.
+- Tour should be dismissible at any step with an "✕ Skip" button.
+
 #### VIS-01: Player card goals/assists visual counter badges
 On PlayerCard, show visual counter badges for goals and assists:
 - Goals: circle with number + football icon, e.g. `3 ⚽` in bottom-left
@@ -89,8 +135,9 @@ These features give the app reasons to return every gameweek — essential for g
 | ID | Task | Effort | Why |
 |----|------|--------|-----|
 | ANA-01 | Gameweek review screen ("how did my week go?") | M | High stickiness: users come back to review after each GW deadline. |
-| CHIP-01 | Display active chip on squad screen + SummaryStrip | S | Many users don't know which chip is active. Data in API already. |
+| ~~CHIP-01~~ | ~~Display active chip on squad screen + SummaryStrip~~ | S | ✅ Done — chip cell replaces AVERAGE+HIGHEST in SummaryStrip. |
 | CHIP-02 | Consider active chip in transfer planner (Wildcard = unlimited free transfers) | S | Without this, the planner is wrong when a chip is active. |
+| CHIP-07 | Research + implement Assistant Manager chip (new in 2025/26) | S | New chip visible in FPL chip selection UI; rules and API value unknown — needs research before display/logic work. |
 | LIVE-01 | Live rank tracker — real-time points & rank during gameweek | M | "Watch your rank move live." High-stickiness during match days. |
 | LIVE-02 | Live mini-league standings | M | Real-time rival tracking. Complements LIVE-01. |
 | ANA-03 | Price change risers & fallers (global + mini-league) | M | Huge FPL meta driver. Users check this daily during the GW. |
@@ -160,6 +207,28 @@ Scroll the list; click a manager to view their squad using the existing squad vi
 When a user has an active chip (Wildcard, Free Hit, Triple Captain, Bench Boost), show a visible
 indicator on the SquadScreen / SummaryStrip. Learn the official FPL chip lifecycle rules and
 implement them correctly (when each chip can be played, once-per-season constraints, etc.).
+
+#### CHIP-07: Assistant Manager chip (research + implement)
+
+New chip introduced in FPL 2025/26 season. Visible in the official FPL chip selection UI
+alongside Wildcard, Triple Captain, Free Hit, and Bench Boost.
+
+**What needs to be researched before implementation:**
+- Official FPL API value for `active_chip` (likely `"assistant-manager"` or `"am"` — not yet confirmed)
+- Game rules: when can it be played, how many times per season, what does it actually do
+  (initial understanding: selects a real-world manager/coach who earns bonus points based on
+  their team's performance, but needs verification against FPL official rules)
+- Whether the proxy's `toActiveChip()` allowlist needs extending
+- Whether the chip affects squad composition or just scoring
+
+**Implementation path (once rules are known):**
+1. Add the new API string value to `ActiveChip` type and `toActiveChip()` allowlist.
+2. Add icon SVG (same octagonal badge shape — already established in ChipBadge).
+3. Add display name and CSS token to the existing chip palette.
+4. If it affects transfers: extend CHIP-02 logic.
+
+Reference: official FPL chip selection screen (image confirmed, icon shows person/silhouette
+inside the octagonal badge).
 
 #### CHIP-02: Consider chips in transfer planner
 The transfer planner should know whether a chip is active or can be played this GW:
@@ -424,6 +493,7 @@ Reference: Fantasy Football Scout Chief Scout feature.
 
 | ID | Task | Effort | Why / When |
 |----|------|--------|------------|
+| INF-03 | Redis cache + фонова prefetch-стратегія для масштабу 5000+ юзерів | L | Замінює in-memory кеш на Redis; фонові jobs тягнуть популярні squad IDs заздалегідь. Потрібно тільки після валідації попиту. |
 | PRED-04 | Full AI prediction engine | XL | The big bet. Do this after PRED-02/03 validate demand and after MON-01 is live. |
 | AI-01 | Personal FPL AI analyst chat (free 2-3 Qs, then paid) | XL | Build after AUTH-01 and PRED-04 are live. |
 | ANA-05 | "Top 1% feature" (what makes the best managers different) | L | Viral potential. Needs data aggregation from FPL API + analysis layer. |
@@ -440,6 +510,21 @@ Reference: Fantasy Football Scout Chief Scout feature.
 | *(backlog)* | Team of the Week badge on squad screen | S | Polish feature. Simple once data source is confirmed. |
 
 ### Feature details
+
+#### INF-03: Redis cache + background prefetch (5000+ users)
+Replace the current in-process `Map`-based cache with Redis so the cache survives restarts
+and is shared across multiple proxy instances (horizontal scaling).
+
+Additionally, introduce a background prefetch job:
+- Track which `teamId` values are requested most often
+- Pre-warm their squad/picks cache before the TTL expires
+- During a live GW, prefetch the top-N most-active teams on a short interval
+
+Stack suggestion: `ioredis` + a simple `node-cron` job. Consider moving to BullMQ for the
+queue if the rate limiter (INF-02) needs a persistent queue too.
+
+**Trigger:** only when INF-01 + INF-02 are insufficient (i.e. sustained 5000+ concurrent users).
+Do not build before demand is validated — premature complexity.
 
 #### AUTH-01: User accounts (login + Google OAuth)
 Add authentication so users can save preferences across sessions:
@@ -499,7 +584,8 @@ For reference — features that are live in the codebase:
 - **Leagues Stats Screen** — mini-league standings
 - **Top Players Screen** — top performers for a GW
 - **Transfer Planner** — pick players to transfer in/out, budget tracking, squad validation
-- **Transfer screen polish** — captain badge right, team abbrev + FDR chip under PlayerCard, outfield picker, position filter tabs, Sort button (UX-01 SwapsStrip scroll, UX-02 next 3 fixtures column, UX-03 %, pts, xPts columns)
+- **Transfer screen polish** — captain badge right, team abbrev + FDR chip under PlayerCard, outfield picker, position filter tabs, Sort button (UX-01 SwapsStrip scroll, UX-02 next 3 fixtures column, UX-03 %, pts, xPts columns); UX-04 player info popup (fixtures + price); DES-04 FDR colour tokens; VIS-01 goals/assists badges + ownership pill on all card sizes
+- **Active chip display (CHIP-01)** — chip cell replaces AVERAGE+HIGHEST in SummaryStrip when a chip is active; octagonal badge icon + chip name + ACTIVE label; per-chip accent colours (Wildcard gold, Triple Captain red, Free Hit cyan, Bench Boost green)
 - **Fix bugs** — BUG-01 (position limits), BUG-02 (transfer arrows)
 - **Proxy/BFF** — services for squad, entry, gameweeks, history, leagues, dream-team, fixtures, player pool, top players, team
 

@@ -173,7 +173,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
           position={player.position}
           alt={player.name}
         />
-        {size === 'large' && !hideStats && (player.stats.goals_scored > 0 || player.stats.assists > 0) && (
+        {!hideStats && (player.stats.goals_scored > 0 || player.stats.assists > 0) && (
           <div className={styles.statBadges}>
             {player.stats.goals_scored > 0 && (
               <span className={styles.goalBadge}>{player.stats.goals_scored} ⚽</span>
@@ -182,6 +182,9 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
               <span className={styles.assistBadge}>{player.stats.assists} A</span>
             )}
           </div>
+        )}
+        {playerInfo && (
+          <span className={styles.ownershipPill}>{playerInfo.ownership}%</span>
         )}
       </div>
 
@@ -235,7 +238,6 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
             {playerInfo.nextFixtures.slice(0, 5).map((f, i) => (
               <div key={i} className={styles.infoFixtureRow}>
                 <span className={styles.infoGw}>GW{f.gw}</span>
-                <span className={styles.infoOpponent}>{f.opponent} ({f.home ? 'H' : 'A'})</span>
                 <FdrChip opponent={f.opponent} home={f.home} difficulty={f.difficulty} />
               </div>
             ))}

@@ -4,7 +4,7 @@
 
 **File:** `proxy/src/fpl-client.ts`
 
-- [ ] Add `active_chip: string | null` field to `FPLPicks` interface.
+- [x] Add `active_chip: string | null` field to `FPLPicks` interface.
 
 ---
 
@@ -12,8 +12,8 @@
 
 **File:** `proxy/src/types.ts`
 
-- [ ] Add `export type ActiveChip = 'wildcard' | '3xc' | 'freehit' | 'bboost' | null;`
-- [ ] Add `activeChip: ActiveChip` to `SquadResponse`.
+- [x] Add `export type ActiveChip = 'wildcard' | '3xc' | 'freehit' | 'bboost' | null;`
+- [x] Add `activeChip: ActiveChip` to `SquadResponse`.
 
 ---
 
@@ -21,9 +21,9 @@
 
 **File:** `proxy/src/squad-service.ts`
 
-- [ ] Add `toActiveChip(raw: string | null): ActiveChip` helper that allowlists the four
+- [x] Add `toActiveChip(raw: string | null): ActiveChip` helper that allowlists the four
   known values and coerces anything else to `null`.
-- [ ] Pass `activeChip: toActiveChip(picks.active_chip)` in the returned `SquadResponse`.
+- [x] Pass `activeChip: toActiveChip(picks.active_chip)` in the returned `SquadResponse`.
 
 ---
 
@@ -31,8 +31,8 @@
 
 **File:** `proxy/src/squad-service.test.ts`
 
-- [ ] Add assertion that `activeChip` is propagated when `active_chip` is a known value.
-- [ ] Add assertion that an unknown `active_chip` string is coerced to `null`.
+- [x] Add assertion that `activeChip` is propagated when `active_chip` is a known value.
+- [x] Add assertion that an unknown `active_chip` string is coerced to `null`.
 
 ---
 
@@ -40,8 +40,8 @@
 
 **File:** `web/src/types/index.ts`
 
-- [ ] Add `export type ActiveChip = 'wildcard' | '3xc' | 'freehit' | 'bboost' | null;`
-- [ ] Add `activeChip: ActiveChip` to `SquadResponse`.
+- [x] Add `export type ActiveChip = 'wildcard' | '3xc' | 'freehit' | 'bboost' | null;`
+- [x] Add `activeChip: ActiveChip` to `SquadResponse`.
 
 ---
 
@@ -49,7 +49,7 @@
 
 **File:** `web/src/theme/colors_and_type.css`
 
-- [ ] Add inside `:root` after the FDR palette block:
+- [x] Add inside `:root` after the FDR palette block:
   ```css
   /* ── active chip palette ────────────────────────────────────────── */
   --fpl-chip-wc-bg:  rgba(255, 192, 0, 0.14);
@@ -68,7 +68,7 @@
 
 **File:** `web/src/lib/copy.ts`
 
-- [ ] Add to the `copy` object:
+- [x] Add to the `copy` object:
   ```ts
   chipActiveSuffix:   'ACTIVE',
   chipWildcard:       'Wildcard',
@@ -83,11 +83,11 @@
 
 **Files:** `web/src/components/ui/ChipBadge/ChipBadge.tsx` + `ChipBadge.module.css`
 
-- [ ] Create `ChipBadge.tsx` with:
+- [x] Create `ChipBadge.tsx` with:
   - Four inline SVG icon sub-components (WildcardIcon, TripleCaptainIcon, FreeHitIcon, BenchBoostIcon).
   - `CHIP_CONFIG` map keyed by `ActiveChip` value with `{ label, Icon, cssVar }`.
   - `ChipBadge` component: returns `null` for `chip === null`; otherwise renders banner.
-- [ ] Create `ChipBadge.module.css` with:
+- [x] Create `ChipBadge.module.css` with:
   - `.badge`: base banner layout (flex, padding, border-radius, border-left accent).
   - `.wildcard`, `.3xc`, `.freehit`, `.bboost` modifier classes using CSS token pairs.
   - `.icon`: icon wrapper sizing.
@@ -99,10 +99,10 @@
 
 **File:** `web/src/components/ui/ChipBadge/ChipBadge.test.tsx`
 
-- [ ] Returns null for `chip={null}`.
-- [ ] Renders correct label for each chip value (`wildcard`, `3xc`, `freehit`, `bboost`).
-- [ ] Each chip renders a modifier CSS class matching the chip value.
-- [ ] Run: `cd web && npx vitest run src/components/ui/ChipBadge --reporter=verbose`
+- [x] Returns null for `chip={null}`.
+- [x] Renders correct label for each chip value (`wildcard`, `3xc`, `freehit`, `bboost`).
+- [x] Each chip renders a modifier CSS class matching the chip value.
+- [x] Run: `cd web && npx vitest run src/components/ui/ChipBadge --reporter=verbose`
 
 ---
 
@@ -110,8 +110,8 @@
 
 **File:** `web/src/screens/SquadScreen/SquadScreen.tsx`
 
-- [ ] Import `ChipBadge`.
-- [ ] Inside the `summaryWrap` block, render `<ChipBadge chip={squad.activeChip} />` above
+- [x] Import `ChipBadge`.
+- [x] Inside the `summaryWrap` block, render `<ChipBadge chip={squad.activeChip} />` above
   `<SummaryStrip>`.
-- [ ] Verify TypeScript: `cd web && npx tsc --noEmit`
-- [ ] Run all tests: `cd web && npx vitest run --reporter=verbose`
+- [x] Verify TypeScript: `cd web && npx tsc --noEmit`
+- [x] Run all tests: `cd web && npx vitest run --reporter=verbose`

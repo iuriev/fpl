@@ -66,8 +66,7 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
     }
   }
 
-  function buildPlayerInfo(player: SquadPlayer, size: 'large' | 'medium'): PlayerInfo | undefined {
-    if (size !== 'large') return undefined;
+  function buildPlayerInfo(player: SquadPlayer): PlayerInfo | undefined {
     const p = poolLookup?.get(player.id);
     if (!p) return undefined;
     return { ownership: p.selectedByPercent, currentPrice: p.nowCost, nextFixtures: p.nextFixtures };
@@ -96,7 +95,7 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
           hideStats
           hideClub
           nextFixture={poolLookup?.get(player.id)?.nextFixtures[0]}
-          playerInfo={buildPlayerInfo(player, size)}
+          playerInfo={buildPlayerInfo(player)}
           onSubClick={
             !subModeActive && onSubIconClick ? () => onSubIconClick(player.id) : undefined
           }

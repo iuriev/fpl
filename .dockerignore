@@ -1,0 +1,7 @@
+node_modules
+web/node_modules
+proxy/node_modules
+web/dist
+proxy/dist
+.git
+design

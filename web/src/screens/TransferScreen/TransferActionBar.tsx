@@ -8,19 +8,19 @@ import styles from './TransferActionBar.module.css';
 export interface TransferActionBarProps {
   onReset: () => void;
   onSave: () => void;
-  hasSwaps: boolean;
+  hasChanges: boolean;
 }
 
 export const TransferActionBar: React.FC<TransferActionBarProps> = ({
   onReset,
   onSave,
-  hasSwaps,
+  hasChanges,
 }) => (
   <div className={styles.bar}>
-    <Button variant="secondary" onClick={onReset} disabled={!hasSwaps}>
+    <Button variant="secondary" onClick={onReset} disabled={!hasChanges}>
       {copy.transfersReset}
     </Button>
-    <Button variant="primary" onClick={onSave} disabled={!hasSwaps}>
+    <Button variant="primary" onClick={onSave} disabled={!hasChanges}>
       {copy.transfersSavePlan}
     </Button>
   </div>

@@ -398,7 +398,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
           <TransferActionBar
             onReset={handleReset}
             onSave={handleSave}
-            hasSwaps={(draft?.swaps.length ?? 0) > 0}
+            hasChanges={(draft?.swaps.length ?? 0) > 0 || (draft?.subs.length ?? 0) > 0}
           />
         </>
       )}
