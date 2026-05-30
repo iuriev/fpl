@@ -79,7 +79,7 @@ describe('Transfer Position Logic', () => {
     renderScreen();
 
     // Click Saka (MID)
-    const sakaBtn = screen.getByRole('button', { name: /Saka/ });
+    const sakaBtn = screen.getByLabelText(/^Saka/);
     await user.click(sakaBtn);
 
     // Expect to see the picker
@@ -94,7 +94,7 @@ describe('Transfer Position Logic', () => {
     const user = userEvent.setup();
     renderScreen();
 
-    const sakaBtn = screen.getByRole('button', { name: /Saka/ });
+    const sakaBtn = screen.getByLabelText(/^Saka/);
     await user.click(sakaBtn);
 
     expect(screen.queryByText('ALL')).not.toBeInTheDocument();

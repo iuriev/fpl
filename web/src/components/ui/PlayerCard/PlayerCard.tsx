@@ -117,6 +117,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
       className={`${styles.card} ${isClickable ? styles.flagged : ''}`}
       onClick={toggle}
       role={isClickable ? 'button' : undefined}
+      aria-label={isClickable ? copy.playerInfoOpen : undefined}
       tabIndex={isClickable ? 0 : undefined}
       aria-expanded={isClickable ? (showInfo || showStatus) : undefined}
       aria-controls={isClickable ? popupId : undefined}
@@ -173,7 +174,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
           position={player.position}
           alt={player.name}
         />
-        {!hideStats && (player.stats.goals_scored > 0 || player.stats.assists > 0) && (
+        {!hideStats && size === 'large' && (player.stats.goals_scored > 0 || player.stats.assists > 0) && (
           <div className={styles.statBadges}>
             {player.stats.goals_scored > 0 && (
               <span className={styles.goalBadge}>{player.stats.goals_scored} ⚽</span>

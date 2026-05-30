@@ -1,6 +1,6 @@
 import * as cacheLayer from './cache';
-import * as fplClient from './fpl-client';
 import type { FPLBootstrapStatic } from './fpl-client';
+import * as fplClient from './fpl-client';
 import type { FixtureInfo } from './types';
 import { MAX_GAMEWEEK } from './types';
 

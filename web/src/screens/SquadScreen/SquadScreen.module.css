@@ -42,21 +42,23 @@
   width: var(--fpl-size-avatar);
   height: var(--fpl-size-avatar);
   border-radius: var(--fpl-radius-sm);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--fpl-bg-hair);
-  color: var(--fpl-muted-soft);
+  background: var(--fpl-accent);
+  color: var(--fpl-accent-ink);
+  border: none;
   display: grid;
   place-items: center;
   cursor: pointer;
   flex-shrink: 0;
-  transition:
-    background 120ms,
-    color 120ms;
+  transition: transform 120ms ease-in-out;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .burgerBtn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--fpl-text);
+  transform: scale(1.05);
+}
+
+.burgerBtn:active {
+  transform: scale(0.95);
 }
 
 .burgerBtn svg {
@@ -64,21 +66,6 @@
   height: 55%;
 }
 
-.fplMark {
-  width: var(--fpl-size-avatar);
-  height: var(--fpl-size-avatar);
-  border-radius: var(--fpl-radius-sm);
-  background: var(--fpl-accent);
-  color: var(--fpl-accent-ink);
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-}
-
-.fplMark svg {
-  width: 55%;
-  height: 55%;
-}
 
 .teamInfo {
   display: flex;

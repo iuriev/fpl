@@ -151,7 +151,7 @@ describe('PlayerPickerSheet', () => {
     expect(rows[0]).toHaveTextContent('OwnershipPlayer');
 
     // Click Pts header
-    await user.click(screen.getByRole('columnheader', { name: copy.transfersColPts }));
+    await user.click(screen.getByRole('columnheader', { name: new RegExp(`^${copy.transfersColPts}`) }));
     rows = screen.getAllByRole('button').filter((r) => r.className.includes('row'));
     expect(rows[0]).toHaveTextContent('PointsPlayer');
   });
@@ -165,7 +165,7 @@ describe('PlayerPickerSheet', () => {
     render(<PlayerPickerSheet {...defaultProps} candidates={candidates} />);
 
     // Click Player header
-    await user.click(screen.getByRole('columnheader', { name: copy.transfersColPlayer }));
+    await user.click(screen.getByRole('columnheader', { name: new RegExp(`^${copy.transfersColPlayer}`) }));
     const rows = screen.getAllByRole('button').filter((r) => r.className.includes('row'));
     expect(rows[0]).toHaveTextContent('A-Player');
     expect(rows[1]).toHaveTextContent('B-Player');
@@ -180,19 +180,19 @@ describe('PlayerPickerSheet', () => {
     render(<PlayerPickerSheet {...defaultProps} candidates={candidates} />);
 
     // Click Pts header (first click: desc)
-    await user.click(screen.getByRole('columnheader', { name: copy.transfersColPts }));
+    await user.click(screen.getByRole('columnheader', { name: new RegExp(`^${copy.transfersColPts}`) }));
     let rows = screen.getAllByRole('button').filter((r) => r.className.includes('row'));
     expect(rows[0]).toHaveTextContent('HighPoints');
-    expect(screen.getByRole('columnheader', { name: copy.transfersColPts }).className).toMatch(
-      /label_active(_\w+)?$/
+    expect(screen.getByRole('columnheader', { name: new RegExp(`^${copy.transfersColPts}`) }).className).toMatch(
+      /label_(desc|asc)(_\w+)?$/
     );
 
     // Click Pts header again (second click: asc)
-    await user.click(screen.getByRole('columnheader', { name: copy.transfersColPts }));
+    await user.click(screen.getByRole('columnheader', { name: new RegExp(`^${copy.transfersColPts}`) }));
     rows = screen.getAllByRole('button').filter((r) => r.className.includes('row'));
     expect(rows[0]).toHaveTextContent('LowPoints');
-    expect(screen.getByRole('columnheader', { name: copy.transfersColPts }).className).toMatch(
-      /label_active_asc/
+    expect(screen.getByRole('columnheader', { name: new RegExp(`^${copy.transfersColPts}`) }).className).toMatch(
+      /label_asc(_\w+)?$/
     );
   });
 

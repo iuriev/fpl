@@ -3,10 +3,10 @@
  * Per D3: current = flagged current in bootstrap, or latest finished if off-season.
  */
 
-import * as fplClient from './fpl-client';
 import * as cacheLayer from './cache';
-import type { GameweeksResponse } from './types';
 import type { FPLBootstrapStatic } from './fpl-client';
+import * as fplClient from './fpl-client';
+import type { GameweeksResponse } from './types';
 
 async function getBootstrapWithCache(): Promise<FPLBootstrapStatic> {
   const cached = cacheLayer.get<FPLBootstrapStatic>('bootstrap-static');

@@ -1,9 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import * as playerPoolService from './player-pool-service';
-import * as fplClient from './fpl-client';
-import type { FPLBootstrapStatic } from './fpl-client';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import * as cache from './cache';
 import * as fixturesService from './fixtures-service';
+import type { FPLBootstrapStatic } from './fpl-client';
+import * as fplClient from './fpl-client';
+import * as playerPoolService from './player-pool-service';
 
 vi.mock('./fpl-client');
 vi.mock('./cache');

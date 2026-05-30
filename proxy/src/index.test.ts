@@ -1,11 +1,12 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Hono } from 'hono';
-import * as gameweeksService from './gameweeks-service';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import * as entryService from './entry-service';
-import * as squadService from './squad-service';
 import * as fixturesService from './fixtures-service';
-import type { FixtureInfo } from './types';
+import * as gameweeksService from './gameweeks-service';
 import * as playerPoolService from './player-pool-service';
+import * as squadService from './squad-service';
+import type { FixtureInfo } from './types';
 
 vi.mock('./gameweeks-service');
 vi.mock('./entry-service');

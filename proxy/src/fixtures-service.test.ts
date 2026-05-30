@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import * as fixturesService from './fixtures-service';
-import * as fplClient from './fpl-client';
-import type { FPLBootstrapStatic, FPLFixture } from './fpl-client';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import * as cache from './cache';
+import * as fixturesService from './fixtures-service';
+import type { FPLBootstrapStatic, FPLFixture } from './fpl-client';
+import * as fplClient from './fpl-client';
 
 vi.mock('./fpl-client');
 vi.mock('./cache');

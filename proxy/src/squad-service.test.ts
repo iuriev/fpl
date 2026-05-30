@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import * as squadService from './squad-service';
-import * as fplClient from './fpl-client';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import * as cache from './cache';
+import * as fplClient from './fpl-client';
+import * as squadService from './squad-service';
 
 vi.mock('./fpl-client');
 vi.mock('./cache');

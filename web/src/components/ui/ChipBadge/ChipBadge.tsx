@@ -83,7 +83,6 @@ export const CHIP_LABELS: Record<NonNullable<ActiveChip>, string> = {
   bboost:   copy.chipBenchBoost,
 };
 
-/** Renders just the octagonal chip icon SVG — for embedding in compact contexts. */
 export function ChipIconSvg({ chip }: { chip: NonNullable<ActiveChip> }) {
   const Icon = SVG_MAP[chip];
   return <Icon />;
@@ -93,7 +92,6 @@ export interface ChipBadgeProps {
   chip: ActiveChip;
 }
 
-/** Standalone full-width banner — shown above SummaryStrip in some contexts. */
 export const ChipBadge: React.FC<ChipBadgeProps> = ({ chip }) => {
   if (!chip) return null;
   const Icon = SVG_MAP[chip];

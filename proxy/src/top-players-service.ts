@@ -1,6 +1,6 @@
 import * as cacheLayer from './cache';
-import * as fplClient from './fpl-client';
 import type { FPLBootstrapStatic } from './fpl-client';
+import * as fplClient from './fpl-client';
 import type { PlayerPosition, TopPlayer, TopPlayersGameweekResponse, TopPlayersSeasonResponse } from './types';
 
 const TOP_N = 100;

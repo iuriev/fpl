@@ -1,6 +1,6 @@
-import * as fplClient from './fpl-client';
 import * as cacheLayer from './cache';
 import type { FPLBootstrapStatic } from './fpl-client';
+import * as fplClient from './fpl-client';
 import type { EntryResponse } from './types';
 
 async function getBootstrapWithCache(): Promise<FPLBootstrapStatic> {

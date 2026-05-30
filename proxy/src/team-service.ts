@@ -1,6 +1,6 @@
 import * as cacheLayer from './cache';
-import * as fplClient from './fpl-client';
 import type { FPLBootstrapStatic } from './fpl-client';
+import * as fplClient from './fpl-client';
 import type { PlayerPosition, TeamInfo, TeamPlayersResponse, TeamsResponse, TopPlayer } from './types';
 
 const POSITION_MAP: Record<number, PlayerPosition> = {

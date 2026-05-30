@@ -1,5 +1,5 @@
-import * as fplClient from './fpl-client';
 import * as cacheLayer from './cache';
+import * as fplClient from './fpl-client';
 import type { LeaguesResponse } from './types';
 
 export async function getLeagues(teamId: number): Promise<LeaguesResponse> {

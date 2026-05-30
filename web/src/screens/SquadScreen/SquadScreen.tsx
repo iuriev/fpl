@@ -136,17 +136,6 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
 
   const drawerHeader = entry ? (
     <>
-      <div className={styles.fplMark} aria-hidden="true">
-        <svg viewBox="0 0 20 20" fill="none">
-          <path
-            d="M3 17 L7 3 L11 3 L9 9 L13 9 L11 13 L15 13 L9 19 L11 13"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinejoin="round"
-            strokeLinecap="round"
-          />
-        </svg>
-      </div>
       <div className={styles.teamInfo}>
         <span className={styles.teamName}>{entry.teamName}</span>
         <span className={styles.teamId}>{'ID · ' + teamId}</span>
@@ -183,17 +172,6 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
                   />
                 </svg>
               </button>
-              <div className={styles.fplMark} aria-hidden="true">
-                <svg viewBox="0 0 20 20" fill="none">
-                  <path
-                    d="M3 17 L7 3 L11 3 L9 9 L13 9 L11 13 L15 13 L9 19 L11 13"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinejoin="round"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </div>
               <div className={styles.teamInfo}>
                 <span className={styles.teamName}>{entry?.teamName ?? ' '}</span>
                 <span className={styles.teamId}>{'ID · ' + teamId}</span>

@@ -191,7 +191,7 @@ describe('TransferScreen sub mode integration', () => {
     await user.click(subBtns[0]);
 
     // Click Walker's card button (not the sub icon) — should not open the picker
-    const walkerBtn = screen.getAllByRole('button', { name: /Walker/ })[0];
+    const walkerBtn = screen.getByLabelText(/^Walker/);
     await user.click(walkerBtn);
 
     expect(screen.queryByText(/Replace/i)).not.toBeInTheDocument();
@@ -203,16 +203,16 @@ describe('TransferScreen sub mode integration', () => {
     renderScreen();
 
     // Scope the sub-icon click to Hart's card button
-    const hartCardBtn = screen.getByRole('button', { name: /Hart/ });
+    const hartCardBtn = screen.getByLabelText(/^Hart/);
     const hartSubBtn = within(hartCardBtn).getByLabelText('Substitute');
     await user.click(hartSubBtn);
 
     // Ederson should now be a valid target
-    const edersonBtn = screen.getByRole('button', { name: /Ederson.*SUB TARGET/ });
+    const edersonBtn = screen.getByLabelText(/Ederson.*SUB TARGET/);
     await user.click(edersonBtn);
 
     // Both players still rendered after the swap
-    expect(screen.getByRole('button', { name: /Ederson/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Hart/ })).toBeInTheDocument();
+    expect(screen.getByLabelText(/^Ederson/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^Hart/)).toBeInTheDocument();
   });
 });

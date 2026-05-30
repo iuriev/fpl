@@ -77,22 +77,19 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   const draftSourceRef = useRef<'storage' | 'fresh'>('fresh');
   const chipInitializedRef = useRef(false);
 
-  // Sync draft with teamId/nextGw during render to avoid effect-based setState
+  // Reset state when team/gw changes
   const [prevId, setPrevId] = useState<number | null>(null);
   const [prevGw, setPrevGw] = useState<number | null>(null);
 
   if (teamId !== prevId || nextGw !== prevGw) {
     setPrevId(teamId);
     setPrevGw(nextGw);
-    chipInitializedRef.current = false;
     if (nextGw !== null) {
       const saved = loadDraft(teamId, nextGw);
       if (saved) {
-        draftSourceRef.current = 'storage';
         setDraft(saved);
         setPlanChip(saved.chip);
       } else {
-        draftSourceRef.current = 'fresh';
         const prevRaw = localStorage.getItem(`fpl-transfer-draft-${teamId}`);
         if (prevRaw && typeof window !== 'undefined') {
           try {
@@ -106,6 +103,11 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
       }
     }
   }
+
+  useEffect(() => {
+    chipInitializedRef.current = false;
+    draftSourceRef.current = (nextGw !== null && loadDraft(teamId, nextGw)) ? 'storage' : 'fresh';
+  }, [teamId, nextGw]);
 
   useEffect(() => {
     if (!toast) return;
