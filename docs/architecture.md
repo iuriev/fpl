@@ -50,6 +50,14 @@ docs/       # architecture overview + decision records (ADRs)
   choice. When a decision changes, the old ADR is marked `Superseded by ADR-XXXX` (never deleted)
   so the history of *why it changed* is preserved.
 
+## Production
+
+Live at **https://fpl-squad-viewer.fly.dev/** — single Hono service on Fly.io (London, `shared-cpu-1x`, 256 MB RAM, 1 machine, always-on).
+
+The proxy serves both the built SPA (`web/dist/`) and all `/api/*` routes from one process, preserving the in-memory cache across requests.
+
+Deploy: `fly deploy` from repo root.
+
 ## Status
 
 Early scaffolding. Stack and MVP scope decided (ADR 0001, 0002). Design tooling pipeline and

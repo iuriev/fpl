@@ -1,8 +1,3 @@
-# fly.toml app configuration file generated for fpl-squad-viewer on 2026-05-30T13:47:43+03:00
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
-
 app = 'fpl-squad-viewer'
 primary_region = 'lhr'
 
@@ -14,7 +9,6 @@ primary_region = 'lhr'
   auto_stop_machines = 'off'
   auto_start_machines = true
   min_machines_running = 1
-  max_machines_running = 1
 
 [[vm]]
   size = 'shared-cpu-1x'

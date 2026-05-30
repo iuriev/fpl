@@ -127,7 +127,7 @@ describe('Squad Service', () => {
       expect(result.starters[0].stats.bonus).toBe(3);
       expect(result.starters[0].stats.yellow_cards).toBe(1);
       expect(result.summary.bank).toBe(15);
-      expect(result.summary.freeTransfers).toBe(1);
+      expect(result.summary.freeTransfers).toBe(0);
       expect(result.starters[0].teamId).toBe(1);
       expect(result.starters[0].nowCost).toBe(85);
       expect(result.activeChip).toBeNull();

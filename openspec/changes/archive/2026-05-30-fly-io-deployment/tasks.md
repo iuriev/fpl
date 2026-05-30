@@ -27,15 +27,15 @@
 
 ## 5. Deploy
 
-- [ ] 5.1 Install Fly CLI: `brew install flyctl` (or `curl -L https://fly.io/install.sh | sh`)
-- [ ] 5.2 Authenticate: `fly auth login`
-- [ ] 5.3 Register the app: `fly launch --no-deploy` (confirm it picks up `fly.toml`)
-- [ ] 5.4 Deploy: `fly deploy`
-- [ ] 5.5 Verify the live URL (`https://fpl-squad-viewer.fly.dev`) loads the SPA and
+- [x] 5.1 Install Fly CLI: `brew install flyctl` (or `curl -L https://fly.io/install.sh | sh`)
+- [x] 5.2 Authenticate: `fly auth login`
+- [x] 5.3 Register the app: `fly launch --no-deploy` (confirm it picks up `fly.toml`)
+- [x] 5.4 Deploy: `fly deploy`
+- [x] 5.5 Verify the live URL (`https://fpl-squad-viewer.fly.dev`) loads the SPA and
       the app works end-to-end
 
 ## 6. Post-deploy
 
-- [ ] 6.1 Record the live URL in `docs/architecture.md` under a new "Production" section
-- [ ] 6.2 Add `INF-01` and `INF-02` (TTL raise + rate limiter) as P0 in `docs/backlog.md`
+- [x] 6.1 Record the live URL in `docs/architecture.md` under a new "Production" section
+- [x] 6.2 Add `INF-01` and `INF-02` (TTL raise + rate limiter) as P0 in `docs/backlog.md`
       now that the app is publicly accessible

@@ -13,7 +13,8 @@
     "lint": "npm run --workspaces lint",
     "format": "prettier --write \"**/*.{ts,tsx,json,css,md}\" --ignore-path .gitignore",
     "test": "npm run --workspaces test",
-    "test:ui": "npm run --workspaces --if-present test:ui"
+    "test:ui": "npm run --workspaces --if-present test:ui",
+    "deploy": "fly deploy"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",

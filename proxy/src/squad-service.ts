@@ -231,7 +231,7 @@ export async function getSquad(teamId: number, gameweek: number): Promise<SquadR
       rank: entryHistory.rank,
       transfers: entryHistory.event_transfers,
       bank: entryHistory.bank,
-      freeTransfers: computeFreeTransfers(history.current),
+      freeTransfers: Math.max(0, computeFreeTransfers(history.current) - entryHistory.event_transfers),
     },
     starters,
     bench,

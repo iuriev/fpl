@@ -14,12 +14,12 @@
 
 ---
 
-## 🔴 P0 — Fix first (bugs in shipped features)
-
-These are already in production and break expected behaviour.
+## 🔴 P0 — Fix first
 
 | ID | Task | Effort | Why now |
 |----|------|--------|---------|
+| INF-01 | Raise current-GW squad/live TTL from 60s → 300s | XS | App is now publicly accessible — cuts FPL API calls ~5× before any traffic arrives. |
+| INF-02 | Add proxy-level rate limiter toward FPL API (queue, max N req/sec) | S | Required before public launch — prevents FPL banning our IP as user count grows. |
 
 ### Fixed bugs
 
@@ -32,29 +32,6 @@ The limit is: GKP 1, DEF 3–5, MID 2–5, FWD 1–3 (15 players total, at least
 The "player being replaced" yellow highlight was ugly. Needs a proper directional swap indicator:
 a green arrow pointing up (new player in) and a red arrow pointing down (player going out),
 matching FPL design conventions.
-
----
-
-## 🟠 P1 — Deployment & API protection (before public launch)
-
-| ID | Task | Effort | Why |
-|----|------|--------|-----|
-| INF-03 | Deploy to Fly.io — single Hono service serving SPA + proxy | S | Makes the app publicly accessible; in-memory cache preserved (long-running process). OpenSpec change: `openspec/changes/fly-io-deployment/`. |
-| INF-01 | Raise current-GW squad/live TTL from 60s → 300s | XS | Cuts FPL API calls ~5× at no user-visible cost. Do before any traffic. |
-| INF-02 | Add proxy-level rate limiter toward FPL API (queue, max N req/sec) | S | Prevents ban when user count grows. Required before public launch. |
-
-### Feature details
-
-#### INF-01: Raise current-GW TTL to 300s
-In `proxy/src/cache.ts`, change `SQUAD_CURRENT` and `HISTORY_CURRENT` from `60` to `300`.
-Users won't notice a 5-minute lag for live scores during a GW — FPL itself updates points
-with a delay. Reduces FPL API traffic ~5× for the most-called endpoints.
-
-#### INF-02: Proxy rate limiter toward FPL API
-Add an outbound queue in the proxy so requests to `fantasy.premierleague.com` never exceed
-a safe rate (e.g. 10 req/sec). All incoming user requests wait in the queue rather than
-hitting FPL directly. Options: `bottleneck` npm package or a simple token-bucket in-process.
-Must also add retry-with-backoff on 429 responses from FPL.
 
 ---
 
@@ -585,6 +562,7 @@ For reference — features that are live in the codebase:
 - **Top Players Screen** — top performers for a GW
 - **Transfer Planner** — pick players to transfer in/out, budget tracking, squad validation
 - **Transfer screen polish** — captain badge right, team abbrev + FDR chip under PlayerCard, outfield picker, position filter tabs, Sort button (UX-01 SwapsStrip scroll, UX-02 next 3 fixtures column, UX-03 %, pts, xPts columns); UX-04 player info popup (fixtures + price); DES-04 FDR colour tokens; VIS-01 goals/assists badges + ownership pill on all card sizes
+- **Fly.io deployment (INF-03)** — single Hono service on `fpl-squad-viewer.fly.dev`; serves SPA + proxy from one Docker image; in-memory cache preserved
 - **Active chip display (CHIP-01)** — chip cell replaces AVERAGE+HIGHEST in SummaryStrip when a chip is active; octagonal badge icon + chip name + ACTIVE label; per-chip accent colours (Wildcard gold, Triple Captain red, Free Hit cyan, Bench Boost green)
 - **Fix bugs** — BUG-01 (position limits), BUG-02 (transfer arrows)
 - **Proxy/BFF** — services for squad, entry, gameweeks, history, leagues, dream-team, fixtures, player pool, top players, team
