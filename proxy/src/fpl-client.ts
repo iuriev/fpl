@@ -163,7 +163,23 @@ export interface FPLFixture {
   finished: boolean;
 }
 
+let lastRequestTime = 0;
+const MAX_REQ_PER_SECOND = 10;
+const MIN_INTERVAL = 1000 / MAX_REQ_PER_SECOND;
+
+export function resetRateLimiter(): void {
+  lastRequestTime = 0;
+}
+
 async function fetchFPL<T>(path: string): Promise<T> {
+  const now = Date.now();
+  const waitTime = Math.max(0, lastRequestTime + MIN_INTERVAL - now);
+  lastRequestTime = Math.max(now, lastRequestTime + MIN_INTERVAL);
+
+  if (waitTime > 0) {
+    await new Promise((resolve) => setTimeout(resolve, waitTime));
+  }
+
   const url = `${FPL_BASE_URL}${path}`;
   const response = await fetch(url);
   if (!response.ok) {

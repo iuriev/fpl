@@ -228,18 +228,16 @@
 }
 
 .ownershipPill {
-  position: absolute;
-  bottom: 0.125rem;
-  right: 0.125rem;
   font-size: var(--fpl-fs-nano);
   font-weight: var(--fpl-fw-bold);
-  padding: 0.125rem 0.1875rem;
+  padding: 0.125rem 0.25rem;
   border-radius: var(--fpl-radius-xs);
   background: rgba(139, 92, 246, 0.75);
   color: #ede9fe;
   line-height: 1;
   pointer-events: none;
-  z-index: 3;
+  text-align: center;
+  width: 100%;
 }
 
 

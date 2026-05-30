@@ -184,15 +184,15 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
             )}
           </div>
         )}
-        {playerInfo && (
-          <span className={styles.ownershipPill}>{playerInfo.ownership}%</span>
-        )}
       </div>
 
       <div className={styles.pill}>
         <span className={styles.name}>{player.name}</span>
         {!hidePoints && <span className={styles.points}>{player.points}</span>}
       </div>
+      {playerInfo && (
+        <span className={styles.ownershipPill}>{playerInfo.ownership}%</span>
+      )}
 
       {(nextFixture || onSubClick) && (
         <div className={styles.fixtureRow}>

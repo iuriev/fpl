@@ -5,6 +5,7 @@ import * as fplClient from './fpl-client';
 describe('FPL Client', () => {
   beforeEach(() => {
     global.fetch = vi.fn();
+    fplClient.resetRateLimiter();
   });
 
   afterEach(() => {
@@ -159,6 +160,45 @@ describe('FPL Client', () => {
         'https://fantasy.premierleague.com/api/fixtures/?event=3'
       );
       expect(result).toEqual(mockData);
+    });
+  });
+
+  describe('rate limiting', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('limits request rate to 10 per second', async () => {
+      const mockData = { ok: true };
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: true,
+        json: async () => mockData,
+      });
+
+      // Send 3 requests
+      const p1 = fplClient.getBootstrapStatic();
+      const p2 = fplClient.getBootstrapStatic();
+      const p3 = fplClient.getBootstrapStatic();
+
+      // First request should proceed immediately
+      await vi.advanceTimersByTimeAsync(0);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+
+      // Second request should wait 100ms
+      await vi.advanceTimersByTimeAsync(50);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      await vi.advanceTimersByTimeAsync(50);
+      expect(global.fetch).toHaveBeenCalledTimes(2);
+
+      // Third request should wait another 100ms
+      await vi.advanceTimersByTimeAsync(100);
+      expect(global.fetch).toHaveBeenCalledTimes(3);
+
+      await Promise.all([p1, p2, p3]);
     });
   });
 });
