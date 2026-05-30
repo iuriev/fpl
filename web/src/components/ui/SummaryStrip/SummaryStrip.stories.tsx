@@ -22,6 +22,7 @@ export const Full: Story = {
       highestPoints: 112,
       rank: 1234567,
       transfers: 1,
+      freeTransfers: 1,
     },
   },
 };
@@ -34,6 +35,7 @@ export const HighScore: Story = {
       highestPoints: 112,
       rank: 1,
       transfers: 0,
+      freeTransfers: 1,
     },
   },
 };
@@ -43,6 +45,7 @@ export const PartialData: Story = {
     summary: {
       totalPoints: 32,
       transfers: 2,
+      freeTransfers: 1,
     },
   },
 };
@@ -55,6 +58,7 @@ export const ZeroPoints: Story = {
       highestPoints: 112,
       rank: 7000000,
       transfers: 0,
+      freeTransfers: 1,
     },
   },
 };

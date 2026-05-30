@@ -1,7 +1,7 @@
 import './HelpTour.css';
 
 import React from 'react';
-import { ACTIONS, type CallBackProps, EVENTS, Joyride, type Step, type TooltipRenderProps } from 'react-joyride';
+import { ACTIONS, type EventData, EVENTS, Joyride, type Step, type TooltipRenderProps } from 'react-joyride';
 
 import { copy } from '@/lib/copy';
 
@@ -43,66 +43,95 @@ const TourTooltip: React.FC<TooltipRenderProps> = ({
   primaryProps,
   skipProps,
   tooltipProps,
-}) => (
-  <div
-    {...tooltipProps}
-    style={{
-      backgroundColor: '#33104d',
-      borderRadius: '12px',
-      border: '1px solid #3d1a55',
-      boxShadow: '0 1rem 3rem rgba(0,0,0,0.6)',
-      padding: '1.5rem',
-      maxWidth: '24rem',
-      width: 'calc(100vw - 2rem)',
-      boxSizing: 'border-box',
-    }}
-  >
-    {step.title && (
+}) => {
+  // Filter out CSS props that might be leaked by Joyride into DOM props
+  const filterProps = (props: Record<string, unknown>) => {
+    const rest = { ...props };
+    delete rest['borderRadius'];
+    delete rest['boxShadow'];
+    return rest;
+  };
+
+  const cleanTooltipProps = filterProps(tooltipProps as Record<string, unknown>);
+  const cleanPrimaryProps = filterProps(primaryProps as Record<string, unknown>);
+  const cleanBackProps = filterProps(backProps as Record<string, unknown>);
+  const cleanSkipProps = filterProps(skipProps as Record<string, unknown>);
+
+  return (
+    <div
+      {...cleanTooltipProps}
+      style={{
+        backgroundColor: '#33104d',
+        borderRadius: '12px',
+        border: '1px solid #3d1a55',
+        boxShadow: '0 1rem 3rem rgba(0,0,0,0.6)',
+        padding: '1.5rem',
+        maxWidth: '24rem',
+        width: 'calc(100vw - 2rem)',
+        boxSizing: 'border-box',
+      }}
+    >
+      {step.title && (
+        <div
+          style={{
+            fontSize: '1.125rem',
+            fontWeight: 700,
+            color: '#ffffff',
+            marginBottom: '0.625rem',
+            letterSpacing: '-0.01em',
+          }}
+        >
+          {step.title}
+        </div>
+      )}
       <div
         style={{
-          fontSize: '1.125rem',
-          fontWeight: 700,
-          color: '#ffffff',
-          marginBottom: '0.625rem',
-          letterSpacing: '-0.01em',
+          fontSize: '0.9375rem',
+          color: '#e8e0f0',
+          lineHeight: 1.55,
         }}
       >
-        {step.title}
+        {step.content}
       </div>
-    )}
-    <div
-      style={{
-        fontSize: '0.9375rem',
-        color: '#e8e0f0',
-        lineHeight: 1.55,
-      }}
-    >
-      {step.content}
-    </div>
-    <div
-      style={{
-        marginTop: '1.5rem',
-        display: 'flex',
-        justifyContent: 'flex-end',
-        alignItems: 'center',
-        gap: '0.75rem',
-      }}
-    >
-      <button {...skipProps} style={{ color: '#a89bba', fontSize: '0.8125rem', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginRight: 'auto' }}>
-        {copy.tourSkip}
-      </button>
-      <span style={{ color: '#a89bba', fontSize: '0.8125rem' }}>{index + 1}/{size}</span>
-      {index > 0 && (
-        <button {...backProps} style={btnStyle}>
-          {copy.tourBack}
+      <div
+        style={{
+          marginTop: '1.5rem',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          alignItems: 'center',
+          gap: '0.75rem',
+        }}
+      >
+        <button
+          {...cleanSkipProps}
+          style={{
+            color: '#a89bba',
+            fontSize: '0.8125rem',
+            fontWeight: 600,
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 0,
+            marginRight: 'auto',
+          }}
+        >
+          {copy.tourSkip}
         </button>
-      )}
-      <button {...primaryProps} style={btnStyle}>
-        {isLastStep ? copy.tourFinish : copy.tourNext}
-      </button>
+        <span style={{ color: '#a89bba', fontSize: '0.8125rem' }}>
+          {index + 1}/{size}
+        </span>
+        {index > 0 && (
+          <button {...cleanBackProps} style={btnStyle}>
+            {copy.tourBack}
+          </button>
+        )}
+        <button {...cleanPrimaryProps} style={btnStyle}>
+          {isLastStep ? copy.tourFinish : copy.tourNext}
+        </button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const joyrideStyles = {
   options: {
@@ -114,8 +143,7 @@ const joyrideStyles = {
     pointerEvents: 'none' as const,
   },
   spotlight: {
-    borderRadius: '8px',
-    boxShadow: '0 0 0 4px #00ff87',
+    // borderRadius and boxShadow are moved to HelpTour.css to avoid React 19 warnings
   },
 };
 
@@ -123,14 +151,17 @@ export const HelpTour: React.FC<HelpTourProps> = ({ open, onClose }) => {
   const [stepIndex, setStepIndex] = React.useState(0);
   const [tourKey, setTourKey] = React.useState(0);
 
+  const prevOpen = React.useRef(open);
+
   React.useEffect(() => {
-    if (open) {
+    if (open && !prevOpen.current) {
       setStepIndex(0);
       setTourKey((k) => k + 1);
     }
+    prevOpen.current = open;
   }, [open]);
 
-  const handleCallback = (data: CallBackProps) => {
+  const handleCallback = (data: EventData) => {
     const { action, index, type } = data;
     if (action === ACTIONS.CLOSE) return;
     if (type === EVENTS.STEP_AFTER) {
@@ -148,16 +179,17 @@ export const HelpTour: React.FC<HelpTourProps> = ({ open, onClose }) => {
       run={open}
       stepIndex={stepIndex}
       continuous
-      showSkipButton
-      showProgress
       scrollToFirstStep
-      disableScrollParentFix
       tooltipComponent={TourTooltip}
       styles={joyrideStyles}
-      callback={handleCallback}
-      disableOverlayClose
-      spotlightClicks={false}
-      spotlightPadding={4}
+      onEvent={handleCallback}
+      options={{
+        showProgress: true,
+        overlayClickAction: false,
+        blockTargetInteraction: true,
+        spotlightPadding: 4,
+        buttons: ['back', 'primary', 'skip'],
+      }}
     />
   );
 };

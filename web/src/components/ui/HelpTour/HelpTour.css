@@ -1,3 +1,8 @@
 .react-joyride__arrow svg polygon {
   fill: rgb(0, 255, 135);
 }
+
+/* React 19 compatibility: styling spotlight via CSS to avoid prop leaking */
+.react-joyride__spotlight {
+  border-radius: 8px !important;
+}

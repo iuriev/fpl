@@ -38,6 +38,10 @@ The project is built spec-first; application code comes last. Read these before 
   write comments that restate what the code already says through its name and structure — no file
   headers, no JSDoc that lists states or parameters the types already describe, no `// renders X`
   above a function named `renderX`.
+- **Always use the latest library version.** Before using any new library or package, fetch its
+  current documentation via the `context7` MCP tool (`resolve-library-id` then `query-docs`) to
+  learn the latest stable API. Always implement against the latest stable version unless a
+  specific version is explicitly stated in the prompt.
 - **Modern Web Guidance first.** Before implementing any HTML/CSS or client-side JS feature, run
   the `modern-web-guidance` skill to retrieve the current best-practice guide. After retrieving
   guidance, cross-check every suggested API or feature against the project's browser support policy
