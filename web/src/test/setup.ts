@@ -2,6 +2,51 @@ import '@testing-library/jest-dom';
 
 import { vi } from 'vitest';
 
+// Mock react-joyride (uses browser-only APIs incompatible with jsdom)
+vi.mock('react-joyride', async () => {
+  const React = await import('react');
+  type Step = { title?: React.ReactNode; content?: React.ReactNode };
+  type JoyrideProps = {
+    run?: boolean;
+    steps?: Step[];
+    callback?: (data: { status: string }) => void;
+    locale?: { back?: string; next?: string; last?: string; skip?: string };
+  };
+  const MockJoyride = ({ run, steps = [], callback, locale }: JoyrideProps) => {
+    const [index, setIndex] = React.useState(0);
+    if (!run) return null;
+    const step = steps[index];
+    const isLast = index === steps.length - 1;
+    return React.createElement(
+      'div',
+      { 'data-testid': 'joyride' },
+      React.createElement('h3', null, step?.title),
+      React.createElement('p', null, step?.content),
+      index > 0 &&
+        React.createElement('button', { onClick: () => setIndex((i) => i - 1) }, locale?.back ?? 'Back'),
+      React.createElement(
+        'button',
+        {
+          onClick: () => {
+            if (isLast) {
+              callback?.({ status: 'finished' });
+            } else {
+              setIndex((i) => i + 1);
+            }
+          },
+        },
+        isLast ? (locale?.last ?? 'Finish') : (locale?.next ?? 'Next'),
+      ),
+      React.createElement(
+        'button',
+        { onClick: () => callback?.({ status: 'skipped' }) },
+        locale?.skip ?? 'Skip',
+      ),
+    );
+  };
+  return { default: MockJoyride, Joyride: MockJoyride, STATUS: { FINISHED: 'finished', SKIPPED: 'skipped' } };
+});
+
 // Mock IntersectionObserver (not implemented in jsdom)
 class IntersectionObserverStub {
   observe = vi.fn();

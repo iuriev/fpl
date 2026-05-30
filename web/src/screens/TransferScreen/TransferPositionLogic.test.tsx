@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { PoolPlayer, SquadPlayer, SquadResponse } from '@/types';
 
@@ -74,6 +74,13 @@ function renderScreen() {
 }
 
 describe('Transfer Position Logic', () => {
+  beforeEach(() => {
+    localStorage.setItem('fpl_tour_seen_transfer_v1', 'true');
+    HTMLDivElement.prototype.showPopover = vi.fn();
+    HTMLDivElement.prototype.hidePopover = vi.fn();
+    Element.prototype.scrollIntoView = vi.fn();
+  });
+
   it('does NOT show DEF candidates when replacing a MID (CORRECT)', async () => {
     const user = userEvent.setup();
     renderScreen();

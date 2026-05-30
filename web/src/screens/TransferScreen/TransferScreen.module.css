@@ -7,6 +7,10 @@
   background: var(--fpl-bg-deep);
 }
 
+.screen_tourOpen {
+  pointer-events: none;
+}
+
 .pitchArea {
   flex: 1;
   min-height: 0;

@@ -1,0 +1,32 @@
+<!doctype html>
+<html><head><meta charset="utf-8"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css"/>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #170027; font-family: var(--fpl-font-display); color: var(--fpl-text); }
+  body { padding: 20px; box-sizing: border-box; min-height: 110px; }
+  .row { display: flex; gap: 14px; align-items: stretch; flex-wrap: wrap; }
+  .col { display: flex; flex-direction: column; }
+  .swatch { border-radius: 12px; border: 1px solid var(--fpl-bg-hair); padding: 12px; background: var(--fpl-bg); display: flex; gap: 12px; align-items: center; min-width: 0; }
+  .chip { width: 44px; height: 44px; border-radius: 8px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.08); }
+  .lbl { font-size: 11px; font-weight: 600; color: var(--fpl-text); letter-spacing: -0.01em; line-height: 1.2; }
+  .hex { font-family: var(--fpl-font-mono); font-size: 10px; color: var(--fpl-muted-soft); margin-top: 2px; letter-spacing: 0.03em; }
+  .name { font-family: var(--fpl-font-mono); font-size: 10px; color: var(--fpl-muted); margin-top: 1px; }
+</style>
+</head><body><div class="row">
+  <div class="swatch" style="flex:1; min-width: 140px;">
+    <div class="chip" style="background:#170027"></div>
+    <div><div class="lbl">Bg deep</div><div class="hex">#170027</div><div class="name">--fpl-bg-deep</div></div>
+  </div>
+  <div class="swatch" style="flex:1; min-width: 140px;">
+    <div class="chip" style="background:#220035"></div>
+    <div><div class="lbl">Bg</div><div class="hex">#220035</div><div class="name">--fpl-bg</div></div>
+  </div>
+  <div class="swatch" style="flex:1; min-width: 140px;">
+    <div class="chip" style="background:#2D0844"></div>
+    <div><div class="lbl">Bg soft</div><div class="hex">#2D0844</div><div class="name">--fpl-bg-soft</div></div>
+  </div>
+  <div class="swatch" style="flex:1; min-width: 140px;">
+    <div class="chip" style="background:#3D1A55"></div>
+    <div><div class="lbl">Bg hairline</div><div class="hex">#3D1A55</div><div class="name">--fpl-bg-hair</div></div>
+  </div></div></body></html>

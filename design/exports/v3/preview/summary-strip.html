@@ -1,0 +1,95 @@
+<!doctype html>
+<html><head><meta charset="utf-8"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css"/>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #170027; font-family: var(--fpl-font-display); color: var(--fpl-text); }
+  body { padding: 20px; box-sizing: border-box; min-height: 380px; }
+  .grid { display: grid; gap: 16px 14px; align-items: stretch; }
+  .cell { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+  .lbl { font: 700 9px var(--fpl-font-display); letter-spacing: 0.10em; text-transform: uppercase; color: var(--fpl-muted); }
+  .note { font-family: var(--fpl-font-mono); font-size: 9px; color: var(--fpl-muted-soft); line-height: 1.5; }
+  /* spinner */
+  @keyframes fplSpin { to { transform: rotate(360deg); } }
+  .spinner { width:16px;height:16px;border-radius:999px;border:2px solid rgba(23,0,39,0.25);border-top-color:#170027;animation: fplSpin 0.8s linear infinite; }
+</style>
+</head><body>
+    <div class="cell">
+      <div class="lbl">Loaded</div>
+      <div style="background: rgba(0,0,0,0.32); border: 1px solid var(--fpl-bg-hair); border-radius: 12px; padding: 12px 4px; display: grid; grid-template-columns: 1fr 1fr 1.25fr 1fr 1fr;">
+        
+          <div style="display:flex; flex-direction:column; align-items:center; gap:3px; border-left: none;">
+            <span style="font: 700 10px var(--fpl-font-display); color: var(--fpl-muted); letter-spacing: 0.10em; text-transform: uppercase;">AVG</span>
+            <span style="font: 700 15px var(--fpl-font-display); color: var(--fpl-text); font-variant-numeric: tabular-nums;">51</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:3px; border-left: 1px solid var(--fpl-bg-hair);">
+            <span style="font: 700 10px var(--fpl-font-display); color: var(--fpl-muted); letter-spacing: 0.10em; text-transform: uppercase;">HIGHEST</span>
+            <span style="font: 700 15px var(--fpl-font-display); color: var(--fpl-text); font-variant-numeric: tabular-nums;">142</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:3px; border-left: 1px solid var(--fpl-bg-hair);">
+            <span style="font: 700 10px var(--fpl-font-display); color: var(--fpl-accent); letter-spacing: 0.10em; text-transform: uppercase;">TOTAL</span>
+            <span style="font: 800 22px var(--fpl-font-display); color: var(--fpl-accent); font-variant-numeric: tabular-nums;">67</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:3px; border-left: 1px solid var(--fpl-bg-hair);">
+            <span style="font: 700 10px var(--fpl-font-display); color: var(--fpl-muted); letter-spacing: 0.10em; text-transform: uppercase;">RANK</span>
+            <span style="font: 700 15px var(--fpl-font-display); color: var(--fpl-text); font-variant-numeric: tabular-nums;">1.2M</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:3px; border-left: 1px solid var(--fpl-bg-hair);">
+            <span style="font: 700 10px var(--fpl-font-display); color: var(--fpl-muted); letter-spacing: 0.10em; text-transform: uppercase;">TRANSFERS</span>
+            <span style="font: 700 15px var(--fpl-font-display); color: var(--fpl-text); font-variant-numeric: tabular-nums;">2 (−4)</span>
+          </div>
+      </div>
+    </div>
+    <div class="cell" style="margin-top: 14px;">
+      <div class="lbl">Loading (skeleton)</div>
+      <div style="background: rgba(0,0,0,0.32); border: 1px solid var(--fpl-bg-hair); border-radius: 12px; padding: 12px 4px; display: grid; grid-template-columns: 1fr 1fr 1.25fr 1fr 1fr;">
+        
+          <div style="display:flex; flex-direction:column; align-items:center; gap:5px; border-left: none;">
+            <div style="width:40px;height:10px;border-radius:3px;background:rgba(255,255,255,0.10);background-image:linear-gradient(90deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.08) 100%);background-size:200% 100%;animation: fplShimmer 1.6s ease-in-out infinite;"></div>
+            <div style="width:32px;height:16px;border-radius:4px;background:rgba(255,255,255,0.10);background-image:linear-gradient(90deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.08) 100%);background-size:200% 100%;animation: fplShimmer 1.6s ease-in-out infinite;"></div>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:5px; border-left: 1px solid var(--fpl-bg-hair);">
+            <div style="width:56px;height:10px;border-radius:3px;background:rgba(255,255,255,0.10);background-image:linear-gradient(90deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.08) 100%);background-size:200% 100%;animation: fplShimmer 1.6s ease-in-out infinite;"></div>
+            <div style="width:32px;height:16px;border-radius:4px;background:rgba(255,255,255,0.10);background-image:linear-gradient(90deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.08) 100%);background-size:200% 100%;animation: fplShimmer 1.6s ease-in-out infinite;"></div>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:5px; border-left: 1px solid var(--fpl-bg-hair);">
+            <div style="width:52px;height:10px;border-radius:3px;background:rgba(255,255,255,0.10);background-image:linear-gradient(90deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.08) 100%);background-size:200% 100%;animation: fplShimmer 1.6s ease-in-out infinite;"></div>
+            <div style="width:48px;height:22px;border-radius:4px;background:rgba(255,255,255,0.10);background-image:linear-gradient(90deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.08) 100%);background-size:200% 100%;animation: fplShimmer 1.6s ease-in-out infinite;"></div>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:5px; border-left: 1px solid var(--fpl-bg-hair);">
+            <div style="width:40px;height:10px;border-radius:3px;background:rgba(255,255,255,0.10);background-image:linear-gradient(90deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.08) 100%);background-size:200% 100%;animation: fplShimmer 1.6s ease-in-out infinite;"></div>
+            <div style="width:32px;height:16px;border-radius:4px;background:rgba(255,255,255,0.10);background-image:linear-gradient(90deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.08) 100%);background-size:200% 100%;animation: fplShimmer 1.6s ease-in-out infinite;"></div>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:5px; border-left: 1px solid var(--fpl-bg-hair);">
+            <div style="width:68px;height:10px;border-radius:3px;background:rgba(255,255,255,0.10);background-image:linear-gradient(90deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.08) 100%);background-size:200% 100%;animation: fplShimmer 1.6s ease-in-out infinite;"></div>
+            <div style="width:32px;height:16px;border-radius:4px;background:rgba(255,255,255,0.10);background-image:linear-gradient(90deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.08) 100%);background-size:200% 100%;animation: fplShimmer 1.6s ease-in-out infinite;"></div>
+          </div>
+      </div>
+    </div>
+    <div class="cell" style="margin-top: 14px;">
+      <div class="lbl">Partial (early in GW, no rank yet)</div>
+      <div style="background: rgba(0,0,0,0.32); border: 1px solid var(--fpl-bg-hair); border-radius: 12px; padding: 12px 4px; display: grid; grid-template-columns: 1fr 1fr 1.25fr 1fr 1fr;">
+        
+          <div style="display:flex; flex-direction:column; align-items:center; gap:3px; border-left: none;">
+            <span style="font: 700 10px var(--fpl-font-display); color: var(--fpl-muted); letter-spacing: 0.10em; text-transform: uppercase;">AVG</span>
+            <span style="font: 700 15px var(--fpl-font-display); color: var(--fpl-text); font-variant-numeric: tabular-nums;">51</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:3px; border-left: 1px solid var(--fpl-bg-hair);">
+            <span style="font: 700 10px var(--fpl-font-display); color: var(--fpl-muted); letter-spacing: 0.10em; text-transform: uppercase;">HIGHEST</span>
+            <span style="font: 700 15px var(--fpl-font-display); color: var(--fpl-muted-soft); font-variant-numeric: tabular-nums;">—</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:3px; border-left: 1px solid var(--fpl-bg-hair);">
+            <span style="font: 700 10px var(--fpl-font-display); color: var(--fpl-accent); letter-spacing: 0.10em; text-transform: uppercase;">TOTAL</span>
+            <span style="font: 800 22px var(--fpl-font-display); color: var(--fpl-accent); font-variant-numeric: tabular-nums;">42</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:3px; border-left: 1px solid var(--fpl-bg-hair);">
+            <span style="font: 700 10px var(--fpl-font-display); color: var(--fpl-muted); letter-spacing: 0.10em; text-transform: uppercase;">RANK</span>
+            <span style="font: 700 15px var(--fpl-font-display); color: var(--fpl-muted-soft); font-variant-numeric: tabular-nums;">—</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:3px; border-left: 1px solid var(--fpl-bg-hair);">
+            <span style="font: 700 10px var(--fpl-font-display); color: var(--fpl-muted); letter-spacing: 0.10em; text-transform: uppercase;">TRANSFERS</span>
+            <span style="font: 700 15px var(--fpl-font-display); color: var(--fpl-text); font-variant-numeric: tabular-nums;">1 (0)</span>
+          </div>
+      </div>
+      <div class="note" style="margin-top: 6px;">missing values render as em-dash, never error</div>
+    </div></body></html>

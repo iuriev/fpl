@@ -12,7 +12,7 @@ button {
 
 button:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: 0.6;
 }
 
 button:focus-visible {
@@ -38,7 +38,7 @@ button:focus-visible {
 
 .primary:disabled {
   background: var(--fpl-bg-soft);
-  color: var(--fpl-muted-soft);
+  color: var(--fpl-muted);
 }
 
 /* Variant: secondary (soft bg) */
@@ -57,7 +57,7 @@ button:focus-visible {
 
 .secondary:disabled {
   background: var(--fpl-bg-soft);
-  color: var(--fpl-muted-soft);
+  color: var(--fpl-muted);
 }
 
 /* Variant: link (accent text, no bg) */
@@ -76,7 +76,7 @@ button:focus-visible {
 }
 
 .link:disabled {
-  color: var(--fpl-muted-soft);
+  color: var(--fpl-muted);
 }
 
 /* Variant: pill (circle, accent) */
@@ -97,5 +97,5 @@ button:focus-visible {
 
 .pill:disabled {
   background: var(--fpl-bg-soft);
-  color: var(--fpl-muted-soft);
+  color: var(--fpl-muted);
 }

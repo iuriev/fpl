@@ -81,12 +81,19 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
         : validSubTargets.has(player.id)
           ? `${player.name} (SUB TARGET)`
           : `${player.name}${isOut ? ' (OUT)' : isIn ? ' (IN)' : ''}`;
+
+    let tourAttr = undefined;
+    if (size === 'large' && player.position === 'GK') {
+      tourAttr = 'step-6'; // representative for swap arrows
+    }
+
     return (
       <button
         key={player.id}
         className={playerBtnClass(player.id, isOut, isIn)}
         onClick={() => handleCardClick(player.id)}
         aria-label={label}
+        data-tour={tourAttr}
       >
         <PlayerCard
           player={player}
@@ -122,7 +129,7 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
         </Pitch>
       </div>
 
-      <div className={styles.bench}>{bench.map((player) => renderCard(player, 'medium'))}</div>
+      <div className={styles.bench} data-tour="step-7">{bench.map((player) => renderCard(player, 'medium'))}</div>
     </div>
   );
 };

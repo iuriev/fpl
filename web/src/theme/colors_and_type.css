@@ -9,8 +9,10 @@ body {
   --fpl-bg-deep: #170027;
   --fpl-bg: #220035;
   --fpl-bg-soft: #2d0844;
+  --fpl-bg-card: #33104d;
   --fpl-bg-hair: #3d1a55;
   --fpl-shimmer-hi: #6b3d8c;
+  --fpl-overlay-backdrop: rgba(14, 0, 24, 0.75);
 
   --fpl-pitch-a: #1fa64b;
   --fpl-pitch-b: #17933e;

@@ -126,6 +126,7 @@ describe('TransferScreen', () => {
   beforeEach(() => {
     mockState.squad = null;
     mockState.pool = null;
+    localStorage.setItem('fpl_tour_seen_transfer_v1', 'true');
   });
 
   it('shows the Transfers heading', () => {
@@ -140,6 +141,10 @@ describe('TransferScreen', () => {
 });
 
 describe('TransferScreen chip statuses', () => {
+  beforeEach(() => {
+    localStorage.setItem('fpl_tour_seen_transfer_v1', 'true');
+  });
+
   it('pre-selects wildcard when chipStatuses.wildcard === active', async () => {
     mockState.squad = {
       ...SQUAD_DATA,
@@ -177,42 +182,53 @@ describe('TransferScreen chip statuses', () => {
   });
 });
 
-describe('TransferScreen sub mode integration', () => {
+describe('TransferScreen help tour', () => {
   beforeEach(() => {
     mockState.squad = SQUAD_DATA;
     mockState.pool = { players: POOL_PLAYERS };
+    localStorage.clear();
   });
 
-  it('active sub mode blocks PlayerPickerSheet from opening', async () => {
+  it('does not start the tour automatically even if not seen', async () => {
+    renderScreen();
+    // Should NOT find Chip Badges automatically anymore
+    expect(screen.queryByText('Chip Badges')).not.toBeInTheDocument();
+  });
+
+  it('does not start the tour if already seen', async () => {
+    localStorage.setItem('fpl_tour_seen_transfer_v1', 'true');
+    renderScreen();
+    expect(screen.queryByText('Chip Badges')).not.toBeInTheDocument();
+  });
+
+  it('starts the tour when help button is clicked', async () => {
+    const user = userEvent.setup();
+    localStorage.setItem('fpl_tour_seen_transfer_v1', 'true');
+    renderScreen();
+
+    const helpBtn = screen.getByLabelText('Open tour');
+    await user.click(helpBtn);
+
+    expect(await screen.findByText('Chip Badges')).toBeInTheDocument();
+  });
+
+  it('navigates through the tour steps', async () => {
     const user = userEvent.setup();
     renderScreen();
 
-    const subBtns = screen.getAllByLabelText('Substitute');
-    await user.click(subBtns[0]);
+    // Start manually
+    const helpBtn = screen.getByLabelText('Open tour');
+    await user.click(helpBtn);
 
-    // Click Walker's card button (not the sub icon) — should not open the picker
-    const walkerBtn = screen.getByLabelText(/^Walker/);
-    await user.click(walkerBtn);
+    await screen.findByText('Chip Badges');
+    const nextBtn = screen.getByText('Next');
+    await user.click(nextBtn);
 
-    expect(screen.queryByText(/Replace/i)).not.toBeInTheDocument();
-  });
+    expect(await screen.findByText('Bank & Cost')).toBeInTheDocument();
 
-  it('after handleSubTargetClick the two GKs appear in swapped positions', async () => {
-    const { within } = await import('@testing-library/react');
-    const user = userEvent.setup();
-    renderScreen();
+    const backBtn = screen.getByText('Back');
+    await user.click(backBtn);
 
-    // Scope the sub-icon click to Hart's card button
-    const hartCardBtn = screen.getByLabelText(/^Hart/);
-    const hartSubBtn = within(hartCardBtn).getByLabelText('Substitute');
-    await user.click(hartSubBtn);
-
-    // Ederson should now be a valid target
-    const edersonBtn = screen.getByLabelText(/Ederson.*SUB TARGET/);
-    await user.click(edersonBtn);
-
-    // Both players still rendered after the swap
-    expect(screen.getByLabelText(/^Ederson/)).toBeInTheDocument();
-    expect(screen.getByLabelText(/^Hart/)).toBeInTheDocument();
+    expect(await screen.findByText('Chip Badges')).toBeInTheDocument();
   });
 });

@@ -37,7 +37,7 @@ export const SwapsStrip: React.FC<SwapsStripProps> = ({
     swaps.length === 0 ? 'neutral' : overLimit === 0 ? 'green' : overLimit === 1 ? 'amber' : 'red';
 
   return (
-    <div className={styles.strip}>
+    <div className={styles.strip} data-tour="step-8">
       <div className={`${styles.header} ${styles[`header_${labelVariant}`]}`}>
         <span className={styles.title}>{copy.transfersPendingTitle}</span>
         {swaps.length > 0 && (

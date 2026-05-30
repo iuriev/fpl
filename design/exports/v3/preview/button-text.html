@@ -1,0 +1,53 @@
+<!doctype html>
+<html><head><meta charset="utf-8"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css"/>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #170027; font-family: var(--fpl-font-display); color: var(--fpl-text); }
+  body { padding: 20px; box-sizing: border-box; min-height: 230px; }
+  .grid { display: grid; gap: 16px 14px; align-items: stretch; }
+  .cell { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+  .lbl { font: 700 9px var(--fpl-font-display); letter-spacing: 0.10em; text-transform: uppercase; color: var(--fpl-muted); }
+  .note { font-family: var(--fpl-font-mono); font-size: 9px; color: var(--fpl-muted-soft); line-height: 1.5; }
+  /* spinner */
+  @keyframes fplSpin { to { transform: rotate(360deg); } }
+  .spinner { width:16px;height:16px;border-radius:999px;border:2px solid rgba(23,0,39,0.25);border-top-color:#170027;animation: fplSpin 0.8s linear infinite; }
+</style>
+</head><body>
+    <div class="grid" style="grid-template-columns: repeat(4, 1fr);">
+      <div class="cell">
+        <div class="lbl">Idle</div>
+        <button style="background:transparent;border:none;padding:6px 4px;font:700 14px var(--fpl-font-display);color:#00FF87;cursor:pointer;letter-spacing:-0.01em;text-align:left;">Change</button>
+        <div class="note">accent · no underline</div>
+      </div>
+      <div class="cell">
+        <div class="lbl">Hover</div>
+        <button style="background:transparent;border:none;padding:6px 4px;font:700 14px var(--fpl-font-display);color:#00FF87;cursor:pointer;letter-spacing:-0.01em;text-decoration:underline;text-underline-offset:3px;text-align:left;">Change</button>
+        <div class="note">underline appears<br/>offset 3px</div>
+      </div>
+      <div class="cell">
+        <div class="lbl">Pressed</div>
+        <button style="background:transparent;border:none;padding:6px 4px;font:700 14px var(--fpl-font-display);color:#04E36A;cursor:pointer;letter-spacing:-0.01em;text-decoration:underline;text-underline-offset:3px;text-align:left;">Change</button>
+        <div class="note">color → accent-deep<br/>underline stays</div>
+      </div>
+      <div class="cell">
+        <div class="lbl">Focus</div>
+        <button style="background:transparent;border:none;padding:6px 4px;font:700 14px var(--fpl-font-display);color:#00FF87;cursor:pointer;letter-spacing:-0.01em;border-radius:4px;box-shadow:0 0 0 2px rgba(0,255,135,0.45);text-align:left;">Change</button>
+        <div class="note">2px ring (kb only)</div>
+      </div>
+    </div>
+    <div class="grid" style="grid-template-columns: repeat(2, 1fr); margin-top: 22px;">
+      <div class="cell">
+        <div class="lbl">Idle · with icon</div>
+        <button style="background:transparent;border:none;padding:6px 4px;display:inline-flex;align-items:center;gap:6px;font:700 14px var(--fpl-font-display);color:#00FF87;cursor:pointer;letter-spacing:-0.01em;">
+          Try again
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 6a3 3 0 105.8-1M9 3v2.5H6.5" stroke="#00FF87" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="note">used in error states</div>
+      </div>
+      <div class="cell">
+        <div class="lbl">Disabled</div>
+        <button style="background:transparent;border:none;padding:6px 4px;font:700 14px var(--fpl-font-display);color:#7A6B8E;cursor:not-allowed;letter-spacing:-0.01em;text-align:left;">Change</button>
+        <div class="note">color → muted-soft</div>
+      </div>
+    </div></body></html>

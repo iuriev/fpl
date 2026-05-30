@@ -1,0 +1,30 @@
+<!doctype html>
+<html><head><meta charset="utf-8"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css"/>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #170027; font-family: var(--fpl-font-display); color: var(--fpl-text); }
+  body { padding: 20px; box-sizing: border-box; min-height: 160px; }
+  .row { display: flex; gap: 14px; align-items: stretch; flex-wrap: wrap; }
+  .col { display: flex; flex-direction: column; }
+  .swatch { border-radius: 12px; border: 1px solid var(--fpl-bg-hair); padding: 12px; background: var(--fpl-bg); display: flex; gap: 12px; align-items: center; min-width: 0; }
+  .chip { width: 44px; height: 44px; border-radius: 8px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.08); }
+  .lbl { font-size: 11px; font-weight: 600; color: var(--fpl-text); letter-spacing: -0.01em; line-height: 1.2; }
+  .hex { font-family: var(--fpl-font-mono); font-size: 10px; color: var(--fpl-muted-soft); margin-top: 2px; letter-spacing: 0.03em; }
+  .name { font-family: var(--fpl-font-mono); font-size: 10px; color: var(--fpl-muted); margin-top: 1px; }
+</style>
+</head><body>
+    <div class="row">
+      <div class="swatch" style="flex: 2; padding: 0; overflow: hidden; height: 110px; position: relative;">
+        <svg width="100%" height="110" viewBox="0 0 400 110" preserveAspectRatio="none" style="display:block;">
+          <rect x="0" y="0" width="400" height="14" fill="#1FA64B"/><rect x="0" y="14" width="400" height="14" fill="#17933E"/><rect x="0" y="28" width="400" height="14" fill="#1FA64B"/><rect x="0" y="42" width="400" height="14" fill="#17933E"/><rect x="0" y="56" width="400" height="14" fill="#1FA64B"/><rect x="0" y="70" width="400" height="14" fill="#17933E"/><rect x="0" y="84" width="400" height="14" fill="#1FA64B"/><rect x="0" y="98" width="400" height="14" fill="#17933E"/>
+          <rect x="6" y="6" width="388" height="98" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2"/>
+          <line x1="200" y1="6" x2="200" y2="104" stroke="rgba(255,255,255,0.7)" stroke-width="2"/>
+          <circle cx="200" cy="55" r="22" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="col" style="flex: 1; gap: 8px;">
+        <div class="swatch"><div class="chip" style="background:#1FA64B"></div><div><div class="lbl">Pitch A</div><div class="hex">#1FA64B</div></div></div>
+        <div class="swatch"><div class="chip" style="background:#17933E"></div><div><div class="lbl">Pitch B</div><div class="hex">#17933E</div></div></div>
+      </div>
+    </div></body></html>

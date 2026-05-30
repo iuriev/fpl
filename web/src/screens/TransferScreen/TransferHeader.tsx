@@ -17,6 +17,7 @@ export interface TransferHeaderProps {
   onBack: () => void;
   onChipToggle: (chip: PlanChip) => void;
   onChipBlocked: (chip: PlanChip, usedInGw?: number) => void;
+  onHelp: () => void;
 }
 
 export const TransferHeader: React.FC<TransferHeaderProps> = ({
@@ -29,6 +30,7 @@ export const TransferHeader: React.FC<TransferHeaderProps> = ({
   onBack,
   onChipToggle,
   onChipBlocked,
+  onHelp,
 }) => {
   const transferChipActive = planChip === 'wildcard' || planChip === 'freehit';
   const anyChipActive = planChip !== 'none';
@@ -63,22 +65,37 @@ export const TransferHeader: React.FC<TransferHeaderProps> = ({
   }
 
   return (
-    <div className={styles.header}>
-      <button className={styles.backBtn} onClick={onBack}>
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path
-            d="M10 4l-4 4 4 4"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-        {copy.transfersBack}
-      </button>
-
+    <div className={styles.header} data-tour="header">
       <div className={styles.topRow}>
+        <button className={styles.backBtn} onClick={onBack}>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path
+              d="M10 4l-4 4 4 4"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          {copy.transfersBack}
+        </button>
+
         <span className={styles.title}>{copy.transfersTitle}</span>
+
+        <button
+          className={styles.helpBtn}
+          onClick={onHelp}
+          aria-label={copy.tourHelpButton}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+        </button>
+      </div>
+
+      <div className={styles.chipsRow} data-tour="step-1">
         <div className={styles.chips}>
           <button
             className={chipBtnClass('wildcard')}
@@ -111,7 +128,7 @@ export const TransferHeader: React.FC<TransferHeaderProps> = ({
         </div>
       </div>
 
-      <div className={styles.statsBar}>
+      <div className={styles.statsBar} data-tour="step-2">
         <div className={styles.stat}>
           <span className={styles.statValue}>£{(bank / 10).toFixed(1)}m</span>
           <span className={styles.statLabel}>{copy.transfersBank}</span>

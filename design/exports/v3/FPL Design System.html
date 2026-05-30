@@ -1,0 +1,779 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>FPL Squad Viewer — Design System</title>
+
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg"/>
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png"/>
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png"/>
+  <link rel="apple-touch-icon" href="assets/favicon-180.png"/>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="colors_and_type.css"/>
+  <script src="tokens.js"></script>
+
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--fpl-bg-deep); color: var(--fpl-text); font-family: var(--fpl-font-display); }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; }
+
+    /* ── Page shell ───────────────────────────────────────────────── */
+    .page { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+    @media (max-width: 880px) { .page { grid-template-columns: 1fr; } .toc { display: none; } }
+
+    /* ── TOC (left nav) ───────────────────────────────────────────── */
+    .toc {
+      position: sticky; top: 0; align-self: start; height: 100vh;
+      padding: 32px 24px; border-right: 1px solid var(--fpl-bg-hair);
+      background: var(--fpl-bg-deep); display: flex; flex-direction: column;
+      overflow-y: auto;
+    }
+    .toc-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; }
+    .toc-mark { width: 30px; height: 30px; border-radius: 8px; background: var(--fpl-accent); display: grid; place-items: center; flex-shrink: 0; }
+    .toc-title { font-weight: 700; font-size: 15px; letter-spacing: -0.015em; line-height: 1.15; }
+    .toc-sub   { font-family: var(--fpl-font-mono); font-size: 10px; color: var(--fpl-muted-soft); margin-top: 2px; letter-spacing: 0.04em; }
+
+    .toc-section { font: 700 10px var(--fpl-font-display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--fpl-muted); margin: 18px 0 6px; padding: 0 8px; }
+    .toc-link {
+      display: block; padding: 6px 8px; border-radius: 6px;
+      font-size: 13px; color: var(--fpl-text-soft); font-weight: 500;
+      transition: background 0.12s, color 0.12s;
+    }
+    .toc-link:hover { background: var(--fpl-bg); color: var(--fpl-text); }
+    .toc-foot { margin-top: auto; padding-top: 20px; font-family: var(--fpl-font-mono); font-size: 10px; color: var(--fpl-muted-soft); line-height: 1.6; }
+    .toc-foot a { color: var(--fpl-accent); }
+
+    /* ── Main column ──────────────────────────────────────────────── */
+    main { padding: 56px 64px 120px; max-width: 1280px; }
+    @media (max-width: 880px) { main { padding: 32px 24px 80px; } }
+
+    .hero h1 {
+      font: 700 48px/1.0 var(--fpl-font-display);
+      letter-spacing: -0.04em; margin: 0;
+    }
+    .hero h1 .accent { color: var(--fpl-accent); }
+    .hero .kicker { font: 700 11px var(--fpl-font-display); letter-spacing: 0.14em; text-transform: uppercase; color: var(--fpl-muted); margin-bottom: 16px; }
+    .hero .desc { font-size: 17px; line-height: 1.55; color: var(--fpl-text-soft); max-width: 640px; margin-top: 18px; font-weight: 400; }
+    .hero-meta { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--fpl-bg-hair); }
+    .meta-item { font-size: 12px; color: var(--fpl-muted); }
+    .meta-item b { color: var(--fpl-text); font-weight: 600; display: block; font-size: 13px; margin-bottom: 2px; }
+
+    /* ── Section anchor ────────────────────────────────────────────── */
+    section.s { padding-top: 64px; scroll-margin-top: 24px; }
+    section.s h2 {
+      font: 600 28px var(--fpl-font-display); letter-spacing: -0.02em;
+      margin: 0 0 6px; color: var(--fpl-text);
+    }
+    section.s .s-sub { color: var(--fpl-muted); font-size: 14px; line-height: 1.5; max-width: 640px; margin-bottom: 28px; }
+
+    /* ── Subhead ──────────────────────────────────────────────────── */
+    .sub-h {
+      font: 700 11px var(--fpl-font-display); letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--fpl-muted); margin: 32px 0 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .sub-h::after { content: ""; height: 1px; background: var(--fpl-bg-hair); flex: 1; }
+
+    /* ── Card grid ────────────────────────────────────────────────── */
+    .cards { display: grid; gap: 14px; }
+    .cards.col-2 { grid-template-columns: repeat(2, 1fr); }
+    .cards.col-3 { grid-template-columns: repeat(3, 1fr); }
+    .cards.col-4 { grid-template-columns: repeat(4, 1fr); }
+    .cards.col-5 { grid-template-columns: repeat(5, 1fr); }
+    @media (max-width: 720px) {
+      .cards.col-3, .cards.col-4, .cards.col-5 { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ── Token card ───────────────────────────────────────────────── */
+    .tcard {
+      background: var(--fpl-bg); border: 1px solid var(--fpl-bg-hair);
+      border-radius: 12px; padding: 14px; display: flex; gap: 12px; align-items: center;
+    }
+    .chip { width: 48px; height: 48px; border-radius: 8px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.06); }
+    .tcard .name { font-size: 13px; font-weight: 600; color: var(--fpl-text); letter-spacing: -0.01em; line-height: 1.2; }
+    .tcard .hex { font-family: var(--fpl-font-mono); font-size: 10px; color: var(--fpl-muted); margin-top: 3px; }
+    .tcard .varn { font-family: var(--fpl-font-mono); font-size: 10px; color: var(--fpl-muted-soft); margin-top: 1px; }
+
+    /* ── Demo card (component showcases) ──────────────────────────── */
+    .demo {
+      background: var(--fpl-bg); border: 1px solid var(--fpl-bg-hair);
+      border-radius: 14px; padding: 22px; min-height: 80px;
+    }
+    .demo .demo-h { font: 700 10px var(--fpl-font-display); letter-spacing: 0.10em; text-transform: uppercase; color: var(--fpl-muted); margin-bottom: 14px; }
+    .demo .demo-note { font-family: var(--fpl-font-mono); font-size: 10px; color: var(--fpl-muted-soft); line-height: 1.5; margin-top: 10px; }
+
+    /* ── State grid ───────────────────────────────────────────────── */
+    .states { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+    @media (max-width: 720px) { .states { grid-template-columns: repeat(2, 1fr); } }
+    .state { display: flex; flex-direction: column; gap: 8px; }
+    .state-l { font: 700 9px var(--fpl-font-display); letter-spacing: 0.10em; text-transform: uppercase; color: var(--fpl-muted); }
+    .state-n { font-family: var(--fpl-font-mono); font-size: 9px; color: var(--fpl-muted-soft); line-height: 1.5; }
+
+    /* ── Buttons (live) ───────────────────────────────────────────── */
+    .btn {
+      height: 52px; padding: 0 22px; border-radius: 12px; border: none;
+      background: var(--fpl-accent); color: var(--fpl-accent-ink);
+      font: 700 15px var(--fpl-font-display); letter-spacing: -0.01em;
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+      gap: 8px; white-space: nowrap; transition: all 0.15s;
+    }
+    .btn:hover { background: var(--fpl-accent-deep); box-shadow: 0 4px 14px rgba(0,255,135,0.30); }
+    .btn:active { transform: translateY(1px) scale(0.98); box-shadow: none; }
+    .btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(0,255,135,0.35); }
+    .btn[disabled] { background: var(--fpl-bg-soft); color: var(--fpl-muted-soft); cursor: not-allowed; box-shadow: none; transform: none; }
+    .btn--pill { border-radius: 999px; height: 44px; font-size: 14px; }
+    .btn--ghost { background: transparent; color: #fff; border: 1.5px solid #fff; }
+    .btn--ghost:hover { background: rgba(255,255,255,0.10); box-shadow: none; }
+
+    .link {
+      background: transparent; border: none; padding: 6px 4px;
+      font: 700 14px var(--fpl-font-display); letter-spacing: -0.01em;
+      color: var(--fpl-accent); cursor: pointer; border-radius: 4px;
+      text-align: left;
+    }
+    .link:hover { text-decoration: underline; text-underline-offset: 3px; }
+    .link:active { color: var(--fpl-accent-deep); }
+    .link:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(0,255,135,0.45); }
+    .link[disabled] { color: var(--fpl-muted-soft); cursor: not-allowed; text-decoration: none; }
+
+    .arrow-btn {
+      width: 36px; height: 36px; border-radius: 999px; cursor: pointer;
+      background: rgba(0,255,135,0.12); border: 1px solid var(--fpl-accent);
+      display: grid; place-items: center; transition: all 0.15s;
+    }
+    .arrow-btn:hover { background: rgba(0,255,135,0.22); }
+    .arrow-btn:active { background: rgba(4,227,106,0.28); border-color: var(--fpl-accent-deep); transform: scale(0.94); }
+    .arrow-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(0,255,135,0.35); }
+    .arrow-btn[disabled] { background: rgba(255,255,255,0.04); border-color: var(--fpl-bg-hair); opacity: 0.5; cursor: not-allowed; }
+
+    .inp {
+      height: 56px; border-radius: 12px; background: var(--fpl-bg);
+      border: 1.5px solid var(--fpl-bg-hair); padding: 0 18px;
+      display: flex; align-items: center;
+      font-family: var(--fpl-font-mono); font-size: 18px; color: var(--fpl-text);
+    }
+    .inp.is-empty { color: var(--fpl-muted-soft); }
+    .inp.is-focus { border-color: var(--fpl-accent); box-shadow: 0 0 0 3px rgba(0,255,135,0.20); }
+    .inp.is-error { border-color: var(--fpl-error); box-shadow: 0 0 0 3px var(--fpl-error-soft); color: var(--fpl-error); }
+    .inp.is-disabled { background: #1A0028; opacity: 0.7; color: var(--fpl-muted); cursor: not-allowed; }
+
+    /* ── Captain / availability ───────────────────────────────────── */
+    .badge {
+      width: 32px; height: 32px; border-radius: 999px;
+      display: grid; place-items: center;
+      font: 700 14px var(--fpl-font-display); letter-spacing: -0.02em;
+      box-shadow: var(--fpl-shadow-status-dot);
+      border: 2px solid var(--fpl-bg);
+    }
+    .badge--cap { background: var(--fpl-accent); color: var(--fpl-accent-ink); border-color: transparent; }
+    .badge--vice { background: #fff; color: var(--fpl-accent-ink); border-color: transparent; }
+    .badge--d { background: var(--fpl-warn); color: var(--fpl-warn-ink); font-weight: 800; }
+    .badge--i { background: var(--fpl-error); color: #fff; font-size: 17px; font-weight: 800; }
+    .badge--s { background: var(--fpl-error); color: #fff; font-weight: 800; }
+    .badge--u { background: var(--fpl-error); color: #fff; font-weight: 800; }
+
+    /* ── Player pill (full) ───────────────────────────────────────── */
+    .pp { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; position: relative; }
+    .pp .jersey { filter: var(--fpl-drop-shadow-shirt); }
+    .pp .pill { display: flex; flex-direction: column; min-width: 78px; border-radius: 5px; overflow: hidden; box-shadow: var(--fpl-shadow-pill-soft); margin-top: 2px; }
+    .pp .pill .nm { background: var(--fpl-pill-bg); color: var(--fpl-pill-name-ink); font: 600 11px var(--fpl-font-display); padding: 3px 8px; text-align: center; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pp .pill .pt { background: var(--fpl-accent); color: var(--fpl-accent-ink); font: 700 11px var(--fpl-font-display); padding: 2px 8px; text-align: center; font-variant-numeric: tabular-nums; }
+    .pp .cap-slot { position: absolute; top: -3px; left: 8px; z-index: 2; }
+    .pp .av-slot  { position: absolute; top: -3px; right: 8px; z-index: 2; }
+    .pp .cap-slot .badge, .pp .av-slot .badge { width: 18px; height: 18px; font-size: 10px; border-width: 1.5px; }
+    .pp .av-slot .badge--i { font-size: 13px; }
+
+    /* ── Summary strip (live) ─────────────────────────────────────── */
+    .strip {
+      background: rgba(0,0,0,0.32); border: 1px solid var(--fpl-bg-hair);
+      border-radius: 12px; padding: 14px 4px;
+      display: grid; grid-template-columns: 1fr 1fr 1.25fr 1fr 1fr;
+    }
+    .strip .cell { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .strip .cell + .cell { border-left: 1px solid var(--fpl-bg-hair); }
+    .strip .cell .lbl { font: 700 10px var(--fpl-font-display); letter-spacing: 0.10em; text-transform: uppercase; color: var(--fpl-muted); }
+    .strip .cell .val { font: 700 16px var(--fpl-font-display); color: var(--fpl-text); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+    .strip .cell.total .lbl { color: var(--fpl-accent); }
+    .strip .cell.total .val { font: 800 24px var(--fpl-font-display); color: var(--fpl-accent); letter-spacing: -0.02em; }
+    .strip .cell .dash { color: var(--fpl-muted-soft); }
+
+    /* ── Pitch (mini) ─────────────────────────────────────────────── */
+    .pitch-frame {
+      position: relative; border-radius: 10px; overflow: hidden;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.4);
+    }
+
+    /* ── Tokens table ─────────────────────────────────────────────── */
+    .token-table {
+      display: grid; grid-template-columns: 100px 1fr 110px; gap: 6px 16px;
+      align-items: baseline;
+    }
+    .token-table .tkn-name { font-family: var(--fpl-font-mono); font-size: 11px; color: var(--fpl-text); font-variant-numeric: tabular-nums; }
+    .token-table .tkn-meta { font-family: var(--fpl-font-mono); font-size: 10px; color: var(--fpl-muted); text-align: right; }
+
+    /* ── Spacing scale ────────────────────────────────────────────── */
+    .scale {
+      display: grid; grid-template-columns: 70px 1fr 60px; gap: 6px 14px; align-items: center;
+    }
+    .scale .n { font-family: var(--fpl-font-mono); font-size: 11px; color: var(--fpl-text); }
+    .scale .v { font-family: var(--fpl-font-mono); font-size: 11px; color: var(--fpl-muted); text-align: right; }
+    .scale .bar { height: 12px; background: var(--fpl-bg); border: 1px solid var(--fpl-bg-hair); border-radius: 3px; }
+    .scale .bar > div { height: 100%; background: var(--fpl-accent); border-radius: 3px 0 0 3px; }
+
+    /* ── Radii row ────────────────────────────────────────────────── */
+    .radii { display: flex; gap: 16px; flex-wrap: wrap; }
+    .radii .it { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .radii .sq { width: 56px; height: 56px; background: var(--fpl-bg-soft); border: 1px solid var(--fpl-bg-hair); }
+
+    /* ── Shimmer used in some demos ───────────────────────────────── */
+    @keyframes fplShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .shim {
+      background: rgba(255,255,255,0.10);
+      background-image: linear-gradient(90deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.08) 100%);
+      background-size: 200% 100%;
+      animation: fplShimmer 1.6s ease-in-out infinite;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── TOC ─────────────────────────────────────────────────────── -->
+  <aside class="toc">
+    <div class="toc-brand">
+      <div class="toc-mark">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+          <path d="M3 17 L7 3 L11 3 L9 9 L13 9 L11 13 L15 13 L9 19 L11 13" stroke="#170027" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+      <div>
+        <div class="toc-title">FPL Squad Viewer</div>
+        <div class="toc-sub">Design System v0.3</div>
+      </div>
+    </div>
+
+    <div class="toc-section">Foundations</div>
+    <a class="toc-link" href="#colors">Colors</a>
+    <a class="toc-link" href="#type">Typography</a>
+    <a class="toc-link" href="#spacing">Spacing</a>
+    <a class="toc-link" href="#radii">Radii</a>
+    <a class="toc-link" href="#shadows">Elevation</a>
+
+    <div class="toc-section">Components</div>
+    <a class="toc-link" href="#buttons">Buttons</a>
+    <a class="toc-link" href="#links">Text links</a>
+    <a class="toc-link" href="#arrows">Arrow buttons</a>
+    <a class="toc-link" href="#inputs">Inputs</a>
+    <a class="toc-link" href="#badges">Captain &amp; availability</a>
+    <a class="toc-link" href="#pills">Player pill</a>
+    <a class="toc-link" href="#strip">Summary strip</a>
+
+    <div class="toc-section">Brand</div>
+    <a class="toc-link" href="#logo">Logo</a>
+    <a class="toc-link" href="#kits">Club kits</a>
+
+    <div class="toc-foot">
+      <a href="FPL Squad Viewer.html">↗ Full design sheet</a><br/>
+      <a href="README.md">↗ README</a>
+    </div>
+  </aside>
+
+  <!-- ── Main ─────────────────────────────────────────────────────── -->
+  <main>
+
+    <!-- Hero -->
+    <header class="hero">
+      <div class="kicker">FPL Squad Viewer · Design System</div>
+      <h1>The whole<br/>design language,<br/><span class="accent">in one place.</span></h1>
+      <p class="desc">Tokens, components and patterns for a mobile-first viewer of any public FPL team. Deep-purple surface, neon-green accent, real club kit imagery, a green football pitch.</p>
+      <div class="hero-meta">
+        <div class="meta-item"><b>22 tokens</b>across 5 groups</div>
+        <div class="meta-item"><b>9 components</b>with full state coverage</div>
+        <div class="meta-item"><b>2 type families</b>Space Grotesk + JetBrains Mono</div>
+        <div class="meta-item"><b>1 squad layout</b>football-pitch view</div>
+      </div>
+    </header>
+
+    <!-- ═══════════════════════════════ COLORS ═══════════════════════ -->
+    <section class="s" id="colors">
+      <h2>Colors</h2>
+      <div class="s-sub">Surface stack runs deepest-to-lightest in purple; one bright accent in green carries every interactive moment; semantic colors stay narrow and decisive.</div>
+
+      <div class="sub-h">Surface</div>
+      <div class="cards col-4">
+        <div class="tcard"><div class="chip" style="background:#170027"></div><div><div class="name">Bg deep</div><div class="hex">#170027</div><div class="varn">--fpl-bg-deep</div></div></div>
+        <div class="tcard"><div class="chip" style="background:#220035"></div><div><div class="name">Bg</div><div class="hex">#220035</div><div class="varn">--fpl-bg</div></div></div>
+        <div class="tcard"><div class="chip" style="background:#2D0844"></div><div><div class="name">Bg soft</div><div class="hex">#2D0844</div><div class="varn">--fpl-bg-soft</div></div></div>
+        <div class="tcard"><div class="chip" style="background:#3D1A55"></div><div><div class="name">Bg hairline</div><div class="hex">#3D1A55</div><div class="varn">--fpl-bg-hair</div></div></div>
+      </div>
+
+      <div class="sub-h">Text</div>
+      <div class="cards col-4">
+        <div class="tcard"><div class="chip" style="background:#FFFFFF"></div><div><div class="name">Text</div><div class="hex">#FFFFFF</div><div class="varn">--fpl-text</div></div></div>
+        <div class="tcard"><div class="chip" style="background:#E8E0F0"></div><div><div class="name">Text soft</div><div class="hex">#E8E0F0</div><div class="varn">--fpl-text-soft</div></div></div>
+        <div class="tcard"><div class="chip" style="background:#A89BBA"></div><div><div class="name">Muted</div><div class="hex">#A89BBA</div><div class="varn">--fpl-muted</div></div></div>
+        <div class="tcard"><div class="chip" style="background:#7A6B8E"></div><div><div class="name">Muted soft</div><div class="hex">#7A6B8E</div><div class="varn">--fpl-muted-soft</div></div></div>
+      </div>
+
+      <div class="sub-h">Accent</div>
+      <div class="cards col-2">
+        <div class="tcard" style="padding: 20px;">
+          <div class="chip" style="background:#00FF87; width: 64px; height: 64px;"></div>
+          <div>
+            <div class="name" style="font-size: 15px; font-weight: 700;">Accent · Brand green</div>
+            <div class="hex">#00FF87 · --fpl-accent</div>
+            <div style="margin-top: 10px; display: flex; gap: 8px;">
+              <span style="background:#00FF87;color:#170027;font:700 11px var(--fpl-font-display);padding:5px 10px;border-radius:5px;">PRIMARY</span>
+              <span style="border:1px solid #00FF87;color:#00FF87;font:700 11px var(--fpl-font-display);padding:4px 10px;border-radius:5px;">LINK</span>
+            </div>
+          </div>
+        </div>
+        <div class="tcard"><div class="chip" style="background:#04E36A"></div><div><div class="name">Accent deep · hover</div><div class="hex">#04E36A</div><div class="varn">--fpl-accent-deep</div></div></div>
+      </div>
+
+      <div class="sub-h">Pitch</div>
+      <div class="cards col-2">
+        <div class="tcard" style="padding: 0; overflow: hidden; height: 130px;">
+          <svg width="100%" height="130" viewBox="0 0 400 130" preserveAspectRatio="none" style="display: block;">
+            <g>
+              <rect x="0" y="0"  width="400" height="16" fill="#1FA64B"/>
+              <rect x="0" y="16" width="400" height="16" fill="#17933E"/>
+              <rect x="0" y="32" width="400" height="16" fill="#1FA64B"/>
+              <rect x="0" y="48" width="400" height="16" fill="#17933E"/>
+              <rect x="0" y="64" width="400" height="16" fill="#1FA64B"/>
+              <rect x="0" y="80" width="400" height="16" fill="#17933E"/>
+              <rect x="0" y="96" width="400" height="16" fill="#1FA64B"/>
+              <rect x="0" y="112" width="400" height="18" fill="#17933E"/>
+            </g>
+            <rect x="6" y="6" width="388" height="118" fill="none" stroke="rgba(255,255,255,0.70)" stroke-width="2"/>
+            <line x1="200" y1="6" x2="200" y2="124" stroke="rgba(255,255,255,0.70)" stroke-width="2"/>
+            <circle cx="200" cy="65" r="24" fill="none" stroke="rgba(255,255,255,0.70)" stroke-width="2"/>
+            <circle cx="200" cy="65" r="2" fill="rgba(255,255,255,0.70)"/>
+          </svg>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div class="tcard"><div class="chip" style="background:#1FA64B"></div><div><div class="name">Pitch A</div><div class="hex">#1FA64B</div><div class="varn">--fpl-pitch-a</div></div></div>
+          <div class="tcard"><div class="chip" style="background:#17933E"></div><div><div class="name">Pitch B</div><div class="hex">#17933E</div><div class="varn">--fpl-pitch-b</div></div></div>
+        </div>
+      </div>
+
+      <div class="sub-h">Semantic</div>
+      <div class="cards col-3">
+        <div class="tcard"><div class="chip" style="background:#FF4D6D; display:grid; place-items:center; color:#fff; font:800 18px var(--fpl-font-display);">!</div><div><div class="name">Error / Unavailable</div><div class="hex">#FF4D6D</div><div class="varn">--fpl-error</div></div></div>
+        <div class="tcard"><div class="chip" style="background:#FFC000; display:grid; place-items:center; color:#241500; font:800 18px var(--fpl-font-display);">!</div><div><div class="name">Warn / Doubtful</div><div class="hex">#FFC000</div><div class="varn">--fpl-warn</div></div></div>
+        <div class="tcard"><div class="chip" style="background:rgba(255,77,109,0.12); border-color:#FF4D6D;"></div><div><div class="name">Error soft (focus glow)</div><div class="hex">rgba(255,77,109,.12)</div><div class="varn">--fpl-error-soft</div></div></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ TYPE ═════════════════════════ -->
+    <section class="s" id="type">
+      <h2>Typography</h2>
+      <div class="s-sub">Space Grotesk handles display + UI; JetBrains Mono carries every raw value (IDs, club codes, URLs, numbers). Display sizes track tight; uppercase caps track wide.</div>
+
+      <div class="sub-h">Display · Space Grotesk</div>
+      <div class="demo">
+        <div style="font: 700 48px/1.0 var(--fpl-font-display); letter-spacing: -0.035em;">Your squad.</div>
+        <div style="font: 700 48px/1.0 var(--fpl-font-display); letter-spacing: -0.035em; color: var(--fpl-accent);">Every gameweek.</div>
+        <div class="demo-note">700 · 38–48px · line-height 1.02 · tracking -0.035em</div>
+      </div>
+
+      <div class="sub-h">Mono · JetBrains Mono</div>
+      <div class="demo">
+        <div style="font-family: var(--fpl-font-mono); font-size: 22px; color: var(--fpl-text); font-variant-numeric: tabular-nums;">1234567</div>
+        <div style="font-family: var(--fpl-font-mono); font-size: 14px; color: var(--fpl-text-soft); margin-top: 6px;">
+          fantasy.premierleague.com/entry/<span style="color: var(--fpl-accent);">{ID}</span>/event/<span style="color: var(--fpl-accent);">{GW}</span>
+        </div>
+        <div class="demo-note">400–600 · tabular-nums · used for IDs, codes, URLs, raw values</div>
+      </div>
+
+      <div class="sub-h">Scale</div>
+      <div class="demo">
+        <div class="token-table">
+          <div class="tkn-name">h1L · 40</div><div style="font: 700 40px var(--fpl-font-display); letter-spacing: -0.035em;">Your squad</div><div class="tkn-meta">w 700 · -.035em</div>
+          <div class="tkn-name">h2 · 28</div> <div style="font: 600 28px var(--fpl-font-display); letter-spacing: -0.02em;">Squad screen</div><div class="tkn-meta">w 600 · -.02em</div>
+          <div class="tkn-name">h3 · 22</div> <div style="font: 700 22px var(--fpl-font-display); letter-spacing: -0.02em;">No squad yet</div><div class="tkn-meta">w 700 · -.02em</div>
+          <div class="tkn-name">title · 18</div><div style="font: 500 18px var(--fpl-font-mono);">1234567</div><div class="tkn-meta">mono · 500</div>
+          <div class="tkn-name">body-L · 16</div><div style="font: 700 16px var(--fpl-font-display); letter-spacing: -0.015em;">Arteta&#8217;s Army</div><div class="tkn-meta">w 700 · -.015em</div>
+          <div class="tkn-name">body · 14</div><div style="font: 600 14px var(--fpl-font-display); letter-spacing: -0.01em;">View squad</div><div class="tkn-meta">w 600 · -.01em</div>
+          <div class="tkn-name">body-S · 13</div><div style="font: 400 13px var(--fpl-font-display);">Helper text below input</div><div class="tkn-meta">w 400</div>
+          <div class="tkn-name">cap · 11</div><div style="font: 700 11px var(--fpl-font-display); letter-spacing: 0.10em; text-transform: uppercase;">GAMEWEEK</div><div class="tkn-meta">w 700 · .10em</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ SPACING ══════════════════════ -->
+    <section class="s" id="spacing">
+      <h2>Spacing</h2>
+      <div class="s-sub">A 4-based scale, named by role. Use names, not raw pixels — it keeps the rhythm tight.</div>
+
+      <div class="demo">
+        <div class="scale">
+          <div class="n">xs</div>   <div class="bar"><div style="width:4px;"></div></div>  <div class="v">4px</div>
+          <div class="n">s</div>    <div class="bar"><div style="width:6px;"></div></div>  <div class="v">6px</div>
+          <div class="n">sm</div>   <div class="bar"><div style="width:8px;"></div></div>  <div class="v">8px</div>
+          <div class="n">md</div>   <div class="bar"><div style="width:10px;"></div></div> <div class="v">10px</div>
+          <div class="n">base</div> <div class="bar"><div style="width:12px;"></div></div> <div class="v">12px</div>
+          <div class="n">lg</div>   <div class="bar"><div style="width:14px;"></div></div> <div class="v">14px</div>
+          <div class="n">xl</div>   <div class="bar"><div style="width:16px;"></div></div> <div class="v">16px</div>
+          <div class="n">xl2</div>  <div class="bar"><div style="width:18px;"></div></div> <div class="v">18px</div>
+          <div class="n">xl3</div>  <div class="bar"><div style="width:20px;"></div></div> <div class="v">20px</div>
+          <div class="n">xl4</div>  <div class="bar"><div style="width:24px;"></div></div> <div class="v">24px</div>
+          <div class="n">xl5</div>  <div class="bar"><div style="width:28px;"></div></div> <div class="v">28px</div>
+          <div class="n">xl6</div>  <div class="bar"><div style="width:32px;"></div></div> <div class="v">32px</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ RADII ════════════════════════ -->
+    <section class="s" id="radii">
+      <h2>Corner radii</h2>
+      <div class="s-sub">12 is the workhorse — inputs, primary buttons, cards. 5–8 for small pills, ∞ for arrow buttons and the captain dot.</div>
+
+      <div class="demo">
+        <div class="radii">
+          <div class="it"><div class="sq" style="border-radius:4px"></div><div class="n">xs</div><div class="state-n">4px</div></div>
+          <div class="it"><div class="sq" style="border-radius:5px"></div><div class="n">s</div><div class="state-n">5px</div></div>
+          <div class="it"><div class="sq" style="border-radius:6px"></div><div class="n">sm</div><div class="state-n">6px</div></div>
+          <div class="it"><div class="sq" style="border-radius:8px"></div><div class="n">md</div><div class="state-n">8px</div></div>
+          <div class="it"><div class="sq" style="border-radius:10px"></div><div class="n">lg</div><div class="state-n">10px</div></div>
+          <div class="it"><div class="sq" style="border-radius:12px"></div><div class="n">xl</div><div class="state-n">12px</div></div>
+          <div class="it"><div class="sq" style="border-radius:14px"></div><div class="n">xl2</div><div class="state-n">14px</div></div>
+          <div class="it"><div class="sq" style="border-radius:999px"></div><div class="n">pill</div><div class="state-n">∞</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ SHADOWS ══════════════════════ -->
+    <section class="s" id="shadows">
+      <h2>Elevation</h2>
+      <div class="s-sub">Three soft drops + one filter for the shirts. Nothing heavier — the design relies on color contrast, not shadow stacks.</div>
+
+      <div class="demo">
+        <div class="cards col-4">
+          <div class="state" style="align-items: center;">
+            <div style="width: 90px; height: 56px; background: var(--fpl-bg-hair); border-radius: 5px; box-shadow: 0 2px 6px rgba(0,0,0,0.35);"></div>
+            <div class="state-l">pill-soft</div>
+            <div class="state-n">0 2px 6px / .35</div>
+          </div>
+          <div class="state" style="align-items: center;">
+            <div style="width: 90px; height: 56px; background: var(--fpl-bg-hair); border-radius: 5px; box-shadow: 0 2px 6px rgba(0,0,0,0.45);"></div>
+            <div class="state-l">pill-firm</div>
+            <div class="state-n">0 2px 6px / .45</div>
+          </div>
+          <div class="state" style="align-items: center;">
+            <div style="width: 50px; height: 50px; background: var(--fpl-accent); border-radius: 999px; box-shadow: 0 1px 3px rgba(0,0,0,0.40);"></div>
+            <div class="state-l">status-dot</div>
+            <div class="state-n">0 1px 3px / .40</div>
+          </div>
+          <div class="state" style="align-items: center;">
+            <svg width="50" height="65" viewBox="0 0 66 87" style="filter: drop-shadow(0 2px 3px rgba(0,0,0,0.45));">
+              <path d="M9 18 L2 28 L2 44 L13 47 L17 30 Z M57 18 L64 28 L64 44 L53 47 L49 30 Z M17 18 L26 14 L29 19 L37 19 L40 14 L49 18 L52 78 L46 84 L20 84 L14 78 Z" fill="#EF0107"/>
+            </svg>
+            <div class="state-l">shirt</div>
+            <div class="state-n">drop-shadow 0 2px 3px / .45</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ BUTTONS ══════════════════════ -->
+    <section class="s" id="buttons">
+      <h2>Buttons</h2>
+      <div class="s-sub">Primary action only. Surface buttons are accent-filled with dark ink. Hover lifts subtly; press drops; focus shows a soft accent ring (keyboard only).</div>
+
+      <div class="demo">
+        <div class="demo-h">Primary · live (try hover &amp; tab through)</div>
+        <div class="states">
+          <div class="state"><div class="state-l">Idle</div><button class="btn">View squad <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m-3-3l3 3-3 3" stroke="#170027" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="state-n">bg accent · ink dark</div></div>
+          <div class="state"><div class="state-l">Hover</div><button class="btn" style="background:var(--fpl-accent-deep); box-shadow: 0 4px 14px rgba(0,255,135,0.30);">View squad <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m-3-3l3 3-3 3" stroke="#170027" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="state-n">accent-deep · lift</div></div>
+          <div class="state"><div class="state-l">Pressed</div><button class="btn" style="background:var(--fpl-accent-deep); transform:translateY(1px) scale(0.98);">View squad</button><div class="state-n">translateY 1 · scale .98</div></div>
+          <div class="state"><div class="state-l">Focus</div><button class="btn" style="box-shadow:0 0 0 3px rgba(0,255,135,0.35);">View squad</button><div class="state-n">3px accent-soft ring</div></div>
+          <div class="state"><div class="state-l">Disabled</div><button class="btn" disabled>View squad</button><div class="state-n">bg-soft · muted-soft</div></div>
+        </div>
+      </div>
+
+      <div class="demo" style="margin-top: 14px;">
+        <div class="demo-h">Variants</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center;">
+          <button class="btn btn--pill">Jump to current GW <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m-3-3l3 3-3 3" stroke="#170027" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="btn btn--pill btn--ghost">Try again</button>
+        </div>
+        <div class="demo-note">pill (h44, radius ∞) · ghost (used in error toast / try-again states)</div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ LINKS ════════════════════════ -->
+    <section class="s" id="links">
+      <h2>Text links</h2>
+      <div class="s-sub">Accent text, no underline at rest. Underline arrives on hover so the link reveals itself in dense layouts (e.g. "Change" beside the team name).</div>
+
+      <div class="demo">
+        <div class="states" style="grid-template-columns: repeat(5, 1fr);">
+          <div class="state"><div class="state-l">Idle</div><button class="link">Change</button><div class="state-n">no underline</div></div>
+          <div class="state"><div class="state-l">Hover</div><button class="link" style="text-decoration: underline; text-underline-offset: 3px;">Change</button><div class="state-n">underline 3px offset</div></div>
+          <div class="state"><div class="state-l">Pressed</div><button class="link" style="color: var(--fpl-accent-deep); text-decoration: underline; text-underline-offset: 3px;">Change</button><div class="state-n">color → deep</div></div>
+          <div class="state"><div class="state-l">Focus</div><button class="link" style="box-shadow: 0 0 0 2px rgba(0,255,135,0.45);">Change</button><div class="state-n">2px ring · kb</div></div>
+          <div class="state"><div class="state-l">Disabled</div><button class="link" disabled>Change</button><div class="state-n">muted-soft</div></div>
+        </div>
+      </div>
+
+      <div class="demo" style="margin-top: 14px;">
+        <div class="demo-h">With icon</div>
+        <button class="link" style="display: inline-flex; align-items: center; gap: 6px;">
+          Try again
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 6a3 3 0 105.8-1M9 3v2.5H6.5" stroke="#00FF87" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="demo-note">used in error / unreachable states</div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ ARROWS ═══════════════════════ -->
+    <section class="s" id="arrows">
+      <h2>Arrow buttons</h2>
+      <div class="s-sub">Compact circular controls for gameweek navigation. Disabled at the navigation bounds (earliest GW for prev, latest GW for next).</div>
+
+      <div class="demo">
+        <div class="states">
+          <div class="state" style="align-items: center;"><div class="state-l">Idle</div><button class="arrow-btn"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4l-4 4 4 4" stroke="#00FF87" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="state-n">tint 12% · accent border</div></div>
+          <div class="state" style="align-items: center;"><div class="state-l">Hover</div><button class="arrow-btn" style="background:rgba(0,255,135,0.22)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4l-4 4 4 4" stroke="#00FF87" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="state-n">tint 22%</div></div>
+          <div class="state" style="align-items: center;"><div class="state-l">Pressed</div><button class="arrow-btn" style="background:rgba(4,227,106,0.28); transform:scale(0.94)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4l-4 4 4 4" stroke="#04E36A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="state-n">scale .94</div></div>
+          <div class="state" style="align-items: center;"><div class="state-l">Focus</div><button class="arrow-btn" style="box-shadow:0 0 0 3px rgba(0,255,135,0.35)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4l-4 4 4 4" stroke="#00FF87" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="state-n">3px ring</div></div>
+          <div class="state" style="align-items: center;"><div class="state-l">Disabled</div><button class="arrow-btn" disabled><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4l-4 4 4 4" stroke="#7A6B8E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="state-n">at GW bound</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ INPUTS ═══════════════════════ -->
+    <section class="s" id="inputs">
+      <h2>Text input</h2>
+      <div class="s-sub">Used once — for the team ID. Mono value, mono placeholder, accent caret. Error shows in border + soft red glow + tinted value.</div>
+
+      <div class="demo">
+        <div class="cards col-2">
+          <div class="state"><div class="state-l">Idle (empty)</div><div class="inp is-empty">e.g. 1234567</div><div class="state-n">placeholder · muted-soft</div></div>
+          <div class="state"><div class="state-l">Focus (empty)</div><div class="inp is-empty is-focus">e.g. 1234567</div><div class="state-n">accent border + soft ring</div></div>
+          <div class="state"><div class="state-l">Filled</div><div class="inp">1234567<span style="display:inline-block;width:1.5px;height:20px;background:#00FF87;margin-left:2px;opacity:.8;vertical-align:middle;"></span></div><div class="state-n">caret accent</div></div>
+          <div class="state"><div class="state-l">Filled · focus</div><div class="inp is-focus">1234567<span style="display:inline-block;width:1.5px;height:20px;background:#00FF87;margin-left:2px;opacity:.8;vertical-align:middle;"></span></div><div class="state-n">accent ring</div></div>
+          <div class="state"><div class="state-l">Validation error</div><div class="inp is-error">12abc34</div><div class="state-n">red border + glow + tinted value</div></div>
+          <div class="state"><div class="state-l">Submitting (disabled)</div><div class="inp is-disabled">1234567</div><div class="state-n">opacity 0.7 · darker bg</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ BADGES ═══════════════════════ -->
+    <section class="s" id="badges">
+      <h2>Captain &amp; availability badges</h2>
+      <div class="s-sub">18-px discs anchored to the jersey corners. Captain (left) is accent-green, vice (left) is white, availability flags (right) use semantic colors.</div>
+
+      <div class="demo">
+        <div class="demo-h">Captaincy</div>
+        <div class="states" style="grid-template-columns: repeat(2, 1fr);">
+          <div class="state" style="align-items: flex-start;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <div class="badge badge--cap">C</div>
+              <div><div class="state-l">Captain</div><div class="state-n">accent fill · double points</div></div>
+            </div>
+          </div>
+          <div class="state" style="align-items: flex-start;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <div class="badge badge--vice">V</div>
+              <div><div class="state-l">Vice-captain</div><div class="state-n">white fill · backup</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo" style="margin-top: 14px;">
+        <div class="demo-h">Availability flags</div>
+        <div class="states" style="grid-template-columns: repeat(4, 1fr);">
+          <div class="state" style="align-items: center;"><div class="badge badge--d">!</div><div class="state-l">Doubtful</div><div class="state-n">status="d"<br/>&lt; 75% chance</div></div>
+          <div class="state" style="align-items: center;"><div class="badge badge--i">+</div><div class="state-l">Injured</div><div class="state-n">status="i"<br/>unlikely to play</div></div>
+          <div class="state" style="align-items: center;"><div class="badge badge--s">!</div><div class="state-l">Suspended</div><div class="state-n">status="s"<br/>serving ban</div></div>
+          <div class="state" style="align-items: center;"><div class="badge badge--u">×</div><div class="state-l">Unavailable</div><div class="state-n">status="u"<br/>0% chance</div></div>
+        </div>
+        <div class="demo-note" style="margin-top: 16px;">Tapping a flagged player reveals their FPL news text and chance-of-playing % (when provided).</div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ PLAYER PILL ══════════════════ -->
+    <section class="s" id="pills">
+      <h2>Player pill</h2>
+      <div class="s-sub">The atom that lives on the pitch. Jersey on top, two-row pill underneath: name (dark) + points (accent). Captain / availability badges hang off the jersey corners.</div>
+
+      <div class="demo">
+        <div style="display: flex; gap: 36px; align-items: flex-start; flex-wrap: wrap;">
+
+          <div class="state" style="align-items: center;">
+            <div class="state-l">Default</div>
+            <div class="pp">
+              <img class="jersey" src="assets/shirts/shirt_3.webp" width="44" height="58" alt=""/>
+              <div class="pill"><div class="nm">Saka</div><div class="pt">14</div></div>
+            </div>
+          </div>
+
+          <div class="state" style="align-items: center;">
+            <div class="state-l">Captain</div>
+            <div class="pp">
+              <div class="cap-slot"><div class="badge badge--cap">C</div></div>
+              <img class="jersey" src="assets/shirts/shirt_3.webp" width="44" height="58" alt=""/>
+              <div class="pill"><div class="nm">Saka</div><div class="pt">14</div></div>
+            </div>
+          </div>
+
+          <div class="state" style="align-items: center;">
+            <div class="state-l">Vice-captain</div>
+            <div class="pp">
+              <div class="cap-slot"><div class="badge badge--vice">V</div></div>
+              <img class="jersey" src="assets/shirts/shirt_3.webp" width="44" height="58" alt=""/>
+              <div class="pill"><div class="nm">Ødegaard</div><div class="pt">7</div></div>
+            </div>
+          </div>
+
+          <div class="state" style="align-items: center;">
+            <div class="state-l">Doubtful</div>
+            <div class="pp">
+              <div class="av-slot"><div class="badge badge--d">!</div></div>
+              <img class="jersey" src="assets/shirts/shirt_3.webp" width="44" height="58" alt=""/>
+              <div class="pill"><div class="nm">Martinelli</div><div class="pt">5</div></div>
+            </div>
+          </div>
+
+          <div class="state" style="align-items: center;">
+            <div class="state-l">Injured</div>
+            <div class="pp">
+              <div class="av-slot"><div class="badge badge--i">+</div></div>
+              <img class="jersey" src="assets/shirts/shirt_11.webp" width="44" height="58" alt=""/>
+              <div class="pill"><div class="nm">Mykolenko</div><div class="pt">2</div></div>
+            </div>
+          </div>
+
+          <div class="state" style="align-items: center;">
+            <div class="state-l">On bench (dim)</div>
+            <div class="pp" style="opacity: 0.7;">
+              <img class="jersey" src="assets/shirts/shirt_43.webp" width="44" height="58" alt=""/>
+              <div class="pill"><div class="nm">Trippier</div><div class="pt">4</div></div>
+            </div>
+          </div>
+
+          <div class="state" style="align-items: center;">
+            <div class="state-l">Loading (skeleton)</div>
+            <div class="pp">
+              <div class="shim" style="width: 44px; height: 58px; border-radius: 6px;"></div>
+              <div class="shim" style="width: 78px; height: 32px; margin-top: 2px; border-radius: 5px;"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ STRIP ════════════════════════ -->
+    <section class="s" id="strip">
+      <h2>Gameweek summary strip</h2>
+      <div class="s-sub">Five stat cells, middle (TOTAL) promoted to accent. Missing values render as em-dash — never an error.</div>
+
+      <div class="demo">
+        <div class="demo-h">Loaded</div>
+        <div class="strip">
+          <div class="cell"><div class="lbl">AVG</div><div class="val">51</div></div>
+          <div class="cell"><div class="lbl">HIGHEST</div><div class="val">142</div></div>
+          <div class="cell total"><div class="lbl">TOTAL</div><div class="val">67</div></div>
+          <div class="cell"><div class="lbl">RANK</div><div class="val">1.2M</div></div>
+          <div class="cell"><div class="lbl">TRANSFERS</div><div class="val">2 (−4)</div></div>
+        </div>
+      </div>
+
+      <div class="demo" style="margin-top: 14px;">
+        <div class="demo-h">Partial (early in GW — rank not yet computed)</div>
+        <div class="strip">
+          <div class="cell"><div class="lbl">AVG</div><div class="val">51</div></div>
+          <div class="cell"><div class="lbl">HIGHEST</div><div class="val dash">—</div></div>
+          <div class="cell total"><div class="lbl">TOTAL</div><div class="val">42</div></div>
+          <div class="cell"><div class="lbl">RANK</div><div class="val dash">—</div></div>
+          <div class="cell"><div class="lbl">TRANSFERS</div><div class="val">1 (0)</div></div>
+        </div>
+      </div>
+
+      <div class="demo" style="margin-top: 14px;">
+        <div class="demo-h">Loading (skeleton)</div>
+        <div class="strip">
+          <div class="cell"><div class="shim" style="width:40px; height:10px;"></div><div class="shim" style="width:32px; height:16px;"></div></div>
+          <div class="cell"><div class="shim" style="width:56px; height:10px;"></div><div class="shim" style="width:32px; height:16px;"></div></div>
+          <div class="cell"><div class="shim" style="width:52px; height:10px;"></div><div class="shim" style="width:48px; height:22px;"></div></div>
+          <div class="cell"><div class="shim" style="width:40px; height:10px;"></div><div class="shim" style="width:32px; height:16px;"></div></div>
+          <div class="cell"><div class="shim" style="width:68px; height:10px;"></div><div class="shim" style="width:32px; height:16px;"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ LOGO ═════════════════════════ -->
+    <section class="s" id="logo">
+      <h2>Logo mark</h2>
+      <div class="s-sub">A bold lightning glyph on accent green. Reads at any size down to 20 px. Pairs with a small uppercase wordmark for tight headers.</div>
+
+      <div class="demo">
+        <div style="display: flex; gap: 28px; align-items: center; flex-wrap: wrap;">
+          ${[64, 48, 36, 28, 20].map(s => `
+            <div class="state" style="align-items: center;">
+              <div style="width:${s}px;height:${s}px;border-radius:${Math.round(s/4)}px;background:var(--fpl-accent);display:grid;place-items:center;">
+                <svg width="${Math.round(s*0.55)}" height="${Math.round(s*0.55)}" viewBox="0 0 20 20" fill="none">
+                  <path d="M3 17 L7 3 L11 3 L9 9 L13 9 L11 13 L15 13 L9 19 L11 13" stroke="#170027" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+                </svg>
+              </div>
+              <div class="state-n">${s}px</div>
+            </div>
+          `).join('')}
+
+          <div style="display: flex; align-items: center; gap: 10px; margin-left: 16px;">
+            <div style="width:32px;height:32px;border-radius:8px;background:var(--fpl-accent);display:grid;place-items:center;">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                <path d="M3 17 L7 3 L11 3 L9 9 L13 9 L11 13 L15 13 L9 19 L11 13" stroke="#170027" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+              </svg>
+            </div>
+            <div style="font: 600 13px var(--fpl-font-display); color: var(--fpl-muted); letter-spacing: 0.06em; text-transform: uppercase;">Squad Viewer</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ KITS ═════════════════════════ -->
+    <section class="s" id="kits">
+      <h2>Club kits</h2>
+      <div class="s-sub">Real shirt images live in <code style="font-family: var(--fpl-font-mono); color: var(--fpl-accent);">assets/shirts/shirt_{teamCode}.webp</code> at ~66×87 transparent. Drop-shadow filter lifts them off the pitch. Missing clubs fall back to an SVG silhouette in club colors.</div>
+
+      <div class="demo">
+        <div style="display: flex; gap: 32px; align-items: flex-end; flex-wrap: wrap;">
+          <div class="state" style="align-items: center;"><img src="assets/shirts/shirt_3.webp" width="56" height="74" alt="" style="filter: var(--fpl-drop-shadow-shirt);"/><div class="state-l">ARS</div><div class="state-n">shirt_3.webp</div></div>
+          <div class="state" style="align-items: center;"><img src="assets/shirts/shirt_3_gk.webp" width="56" height="74" alt="" style="filter: var(--fpl-drop-shadow-shirt);"/><div class="state-l">ARS · GK</div><div class="state-n">shirt_3_gk.webp</div></div>
+          <div class="state" style="align-items: center;"><img src="assets/shirts/shirt_8.webp" width="56" height="74" alt="" style="filter: var(--fpl-drop-shadow-shirt);"/><div class="state-l">CHE</div><div class="state-n">shirt_8.webp</div></div>
+          <div class="state" style="align-items: center;"><img src="assets/shirts/shirt_43.webp" width="56" height="74" alt="" style="filter: var(--fpl-drop-shadow-shirt);"/><div class="state-l">MCI</div><div class="state-n">shirt_43.webp</div></div>
+          <div class="state" style="align-items: center;"><img src="assets/shirts/shirt_11.webp" width="56" height="74" alt="" style="filter: var(--fpl-drop-shadow-shirt);"/><div class="state-l">EVE</div><div class="state-n">shirt_11.webp</div></div>
+        </div>
+        <div class="demo-note" style="margin-top: 18px;">Naming follows FPL stable team codes. Examples: ARS=3 · AVL=7 · CHE=8 · EVE=11 · MCI=43 · NEW=4 · TOT=6 · BRE=94 · LIV=14 · MUN=1.</div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // Smooth-scroll TOC links + active state
+  document.querySelectorAll('.toc-link').forEach((a) => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const id = a.getAttribute('href').slice(1);
+      const el = document.getElementById(id);
+      if (el) window.scrollTo({ top: el.offsetTop - 20, behavior: 'smooth' });
+    });
+  });
+</script>
+</body>
+</html>

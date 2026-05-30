@@ -225,6 +225,31 @@ export const copy = {
   listLegendRC: 'Red cards',
   listLegendS: 'Saves',
   listLegendBonus: 'Bonus points',
+
+  // Transfer help tour
+  tourHelpButton: 'Open tour',
+  tourSkip: '✕ Skip',
+  tourNext: 'Next',
+  tourBack: 'Back',
+  tourFinish: 'Got it!',
+  tourStep1Title: 'Chip Badges',
+  tourStep1Text: 'Wildcard (WC) and Free Hit (FH) allow unlimited transfers. Bench Boost (BB) and Triple Captain (TC) provide scoring bonuses.',
+  tourStep2Title: 'Bank & Cost',
+  tourStep2Text: 'Track your remaining budget, available free transfers, and the point cost of your planned moves.',
+  tourStep3Title: 'Captaincy',
+  tourStep3Text: 'The Captain (C) scores double points. If they don\'t play, the Vice-captain (V) takes over.',
+  tourStep4Title: 'Ownership',
+  tourStep4Text: 'The percentage shows how many managers globally own this player. Use it to find "differentials".',
+  tourStep5Title: 'Fixture Difficulty',
+  tourStep5Text: 'Colour-coded chips show the next opponent. Green is easy, maroon is hard (FDR 1-5).',
+  tourStep6Title: 'Swap Arrows',
+  tourStep6Text: 'Green up arrow means a player is coming in. Red down means they are going out.',
+  tourStep7Title: 'The Bench',
+  tourStep7Text: 'These players only score if a starter doesn\'t play. Order matters for auto-subs!',
+  tourStep8Title: 'Planned Moves',
+  tourStep8Text: 'See a summary of your staged transfers here before you save them.',
+  tourStep9Title: 'Save Your Plan',
+  tourStep9Text: 'Reset clears your draft. Save Plan stores it in this browser for later.',
 };
 
 /**

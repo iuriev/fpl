@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useGameweeks, usePlayerPool, useSquad } from '@/api/queries';
 import { Button } from '@/components/ui/Button/Button';
 import { CHIP_LABELS } from '@/components/ui/ChipBadge/ChipBadge';
+import { HelpTour } from '@/components/ui/HelpTour/HelpTour';
 import { copy, interpolate } from '@/lib/copy';
 import {
   calcBank,
@@ -73,6 +74,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   const [planChip, setPlanChip] = useState<PlanChip>('none');
   const [selectedPlayerId, setSelectedPlayerId] = useState<number | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [showTour, setShowTour] = useState(false);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const draftSourceRef = useRef<'storage' | 'fresh'>('fresh');
   const chipInitializedRef = useRef(false);
@@ -274,6 +276,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   const { selectedSubId, validSubTargets, handleSubIconClick, handleSubTargetClick, cancelSub } =
     useSubMode(displayStarters, displayBench, updateDraft);
 
+
   const handlePlayerClick = (id: number) => {
     if (selectedSubId !== null) return;
     setSelectedPlayerId(id);
@@ -328,22 +331,28 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   };
 
   const isLoading = squadLoading || poolLoading || !draft;
-  const hasNoSquad = !squadLoading && !squadError && !squadData;
+  const hasNoSquad = !isLoading && !squadError && !squadData;
+
+  const handleCloseTour = () => {
+    setShowTour(false);
+    localStorage.setItem('fpl_tour_seen_transfer_v1', 'true');
+  };
 
   return (
-    <div className={styles.screen}>
+    <div className={`${styles.screen}${showTour ? ` ${styles.screen_tourOpen}` : ''}`}>
       {draft && (
-        <TransferHeader
-          bank={currentBank}
-          freeTransfers={draft.freeTransfers}
-          cost={transferCost}
-          planChip={planChip}
-          chipStatuses={squadData?.chipStatuses ?? DEFAULT_CHIP_STATUSES}
-          nextGw={nextGw}
-          onBack={() => navigate(`/?teamId=${teamId}`)}
-          onChipToggle={handleChipToggle}
-          onChipBlocked={handleChipBlocked}
-        />
+          <TransferHeader
+            bank={currentBank}
+            freeTransfers={draft.freeTransfers}
+            cost={transferCost}
+            planChip={planChip}
+            chipStatuses={squadData?.chipStatuses ?? DEFAULT_CHIP_STATUSES}
+            nextGw={nextGw}
+            onBack={() => navigate(`/?teamId=${teamId}`)}
+            onChipToggle={handleChipToggle}
+            onChipBlocked={handleChipBlocked}
+            onHelp={() => setShowTour(true)}
+          />
       )}
 
       {isLoading && (
@@ -426,6 +435,8 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
           {toast}
         </div>
       )}
+
+      <HelpTour open={showTour} onClose={handleCloseTour} />
     </div>
   );
 };

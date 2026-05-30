@@ -161,6 +161,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
                 <span
                   className={`${styles.capBadge}${player.isViceCaptain ? ` ${styles.capBadge_vice}` : ''}`}
                   aria-label={player.isCaptain ? 'Captain' : 'Vice captain'}
+                  data-tour="step-3"
                 >
                   {player.isCaptain ? copy.statusCaptain : copy.statusViceCaptain}
                 </span>
@@ -191,7 +192,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
         {!hidePoints && <span className={styles.points}>{player.points}</span>}
       </div>
       {playerInfo && (
-        <span className={styles.ownershipPill}>{playerInfo.ownership}%</span>
+        <span className={styles.ownershipPill} data-tour="step-4">{playerInfo.ownership}%</span>
       )}
 
       {(nextFixture || onSubClick) && (
@@ -202,6 +203,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
               opponent={nextFixture.opponent}
               home={nextFixture.home}
               difficulty={nextFixture.difficulty}
+              data-tour="step-5"
             />
           )}
           {onSubClick && (
@@ -232,7 +234,24 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
                 £{(playerInfo.currentPrice / 10).toFixed(1)}m · {playerInfo.ownership}% · {player.position} / {player.club}
               </span>
             </div>
-            <button className={styles.infoClose} onClick={() => setShowInfo(false)} aria-label="Close">✕</button>
+            <div
+              className={styles.infoClose}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowInfo(false);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setShowInfo(false);
+                }
+              }}
+              role="button"
+              tabIndex={0}
+              aria-label="Close"
+            >
+              ✕
+            </div>
           </div>
           <div className={styles.infoBody}>
             <span className={styles.infoSectionLabel}>{copy.playerInfoUpcomingFixtures}</span>

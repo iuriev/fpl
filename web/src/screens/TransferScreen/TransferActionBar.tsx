@@ -16,7 +16,7 @@ export const TransferActionBar: React.FC<TransferActionBarProps> = ({
   onSave,
   hasChanges,
 }) => (
-  <div className={styles.bar}>
+  <div className={styles.bar} data-tour="step-9">
     <Button variant="secondary" onClick={onReset} disabled={!hasChanges}>
       {copy.transfersReset}
     </Button>

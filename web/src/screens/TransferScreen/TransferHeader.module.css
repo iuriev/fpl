@@ -27,16 +27,43 @@
 }
 
 .topRow {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--fpl-space-xs);
+  margin-bottom: var(--fpl-space-sm);
+  min-height: 1.5rem;
 }
 
 .title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   font-size: 1rem;
   font-weight: 700;
   color: var(--fpl-text-primary);
+}
+
+.helpBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--fpl-muted);
+  cursor: pointer;
+  padding: 0;
+  transition: color 120ms;
+}
+
+.helpBtn:hover {
+  color: var(--fpl-text-primary);
+}
+
+.chipsRow {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--fpl-space-xs);
 }
 
 .chips {
@@ -49,9 +76,9 @@
   border-radius: 1rem;
   font-size: 0.6875rem;
   font-weight: 700;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.08);
   border: 1px solid var(--fpl-bg-hair);
-  color: var(--fpl-muted-soft);
+  color: var(--fpl-muted);
   cursor: pointer;
   letter-spacing: 0.04em;
 }
@@ -63,7 +90,7 @@
 }
 
 .chipBtn_used {
-  opacity: 0.35;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
