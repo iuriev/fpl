@@ -4,6 +4,8 @@ export interface Gameweek {
   id: number;
   name: string;
   finished: boolean;
+  averageScore?: number;
+  highestScore?: number;
 }
 
 export interface GameweeksResponse {
