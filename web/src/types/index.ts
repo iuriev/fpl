@@ -124,7 +124,7 @@ export interface LeaguesResponse {
   h2h: LeagueEntry[];
 }
 
-export interface DreamTeamPlayer {
+export interface TeamOfTheWeekPlayer {
   id: number;
   webName: string;
   position: PlayerPosition;
@@ -134,9 +134,9 @@ export interface DreamTeamPlayer {
   pitchPosition: number;
 }
 
-export interface DreamTeamResponse {
+export interface TeamOfTheWeekResponse {
   gw: number;
-  players: DreamTeamPlayer[];
+  players: TeamOfTheWeekPlayer[];
 }
 
 export interface TeamInfo {

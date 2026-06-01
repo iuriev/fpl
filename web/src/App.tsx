@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Route, Routes, useSearchParams } from 'react-router-dom';
 
 import {
-  DreamTeamScreen,
+  TeamOfTheWeekScreen,
   EntryScreen,
   GameweekHistoryScreen,
   LeaguesStatsScreen,
@@ -53,7 +53,7 @@ function AppContent() {
           )
         }
       />
-      <Route path="/dream-team" element={<DreamTeamScreen />} />
+      <Route path="/team-of-the-week" element={<TeamOfTheWeekScreen />} />
       <Route path="/top-players" element={<TopPlayersScreen />} />
       <Route
         path="/transfers"

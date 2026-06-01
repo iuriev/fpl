@@ -3,15 +3,15 @@ import { flushSync } from 'react-dom';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { ApiError } from '@/api/client';
-import { useDreamTeam, useGameweeks } from '@/api/queries';
+import { useTeamOfTheWeek, useGameweeks } from '@/api/queries';
 import { Button } from '@/components/ui/Button/Button';
 import { Pitch } from '@/components/ui/Pitch/Pitch';
 import { PlayerCard } from '@/components/ui/PlayerCard/PlayerCard';
 import { copy } from '@/lib/copy';
-import type { DreamTeamPlayer, PlayerPosition, PlayerStatus, SquadPlayer } from '@/types';
+import type { TeamOfTheWeekPlayer, PlayerPosition, PlayerStatus, SquadPlayer } from '@/types';
 import { MAX_GAMEWEEK } from '@/types';
 
-import styles from './DreamTeamScreen.module.css';
+import styles from './TeamOfTheWeekScreen.module.css';
 
 const POSITION_ORDER: PlayerPosition[] = ['GK', 'DEF', 'MID', 'FWD'];
 
@@ -23,7 +23,7 @@ function withTransition(update: () => void): void {
   document.startViewTransition(() => flushSync(update));
 }
 
-function toSquadPlayer(p: DreamTeamPlayer): SquadPlayer {
+function toSquadPlayer(p: TeamOfTheWeekPlayer): SquadPlayer {
   return {
     id: p.id,
     name: p.webName,
@@ -56,15 +56,15 @@ function toSquadPlayer(p: DreamTeamPlayer): SquadPlayer {
   };
 }
 
-function groupByPosition(players: DreamTeamPlayer[]): Record<PlayerPosition, DreamTeamPlayer[]> {
-  const groups: Record<PlayerPosition, DreamTeamPlayer[]> = { GK: [], DEF: [], MID: [], FWD: [] };
+function groupByPosition(players: TeamOfTheWeekPlayer[]): Record<PlayerPosition, TeamOfTheWeekPlayer[]> {
+  const groups: Record<PlayerPosition, TeamOfTheWeekPlayer[]> = { GK: [], DEF: [], MID: [], FWD: [] };
   for (const p of players) {
     groups[p.position].push(p);
   }
   return groups;
 }
 
-export const DreamTeamScreen: React.FC = () => {
+export const TeamOfTheWeekScreen: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -91,7 +91,7 @@ export const DreamTeamScreen: React.FC = () => {
     [finishedGws, selectedGw]
   );
 
-  const { data, isLoading, isError, error, refetch } = useDreamTeam(
+  const { data, isLoading, isError, error, refetch } = useTeamOfTheWeek(
     selectedGwFinished ? selectedGw : null
   );
 
@@ -137,7 +137,7 @@ export const DreamTeamScreen: React.FC = () => {
   return (
     <div className={styles.screen}>
       <header className={styles.header}>
-        <button className={styles.backBtn} onClick={handleBack} aria-label={copy.dreamTeamBack}>
+        <button className={styles.backBtn} onClick={handleBack} aria-label={copy.teamOfTheWeekBack}>
           <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path
               d="M10 4l-4 4 4 4"
@@ -147,11 +147,11 @@ export const DreamTeamScreen: React.FC = () => {
               strokeLinejoin="round"
             />
           </svg>
-          {copy.dreamTeamBack}
+          {copy.teamOfTheWeekBack}
         </button>
 
         <div className={styles.heading}>
-          <span className={styles.title}>{copy.dreamTeamTitle}</span>
+          <span className={styles.title}>{copy.teamOfTheWeekTitle}</span>
         </div>
 
         <div className={styles.gwNav}>
@@ -195,16 +195,16 @@ export const DreamTeamScreen: React.FC = () => {
 
       {isRealError && (
         <div className={styles.stateCenter}>
-          <p className={styles.stateText}>{copy.dreamTeamLoadError}</p>
+          <p className={styles.stateText}>{copy.teamOfTheWeekLoadError}</p>
           <Button variant="secondary" onClick={() => refetch()}>
-            {copy.dreamTeamRetry}
+            {copy.teamOfTheWeekRetry}
           </Button>
         </div>
       )}
 
       {(isNotAvailable || is400) && (
         <div className={styles.stateCenter}>
-          <p className={styles.stateText}>{copy.dreamTeamNotAvailable}</p>
+          <p className={styles.stateText}>{copy.teamOfTheWeekNotAvailable}</p>
         </div>
       )}
 
@@ -227,7 +227,7 @@ export const DreamTeamScreen: React.FC = () => {
   );
 };
 
-DreamTeamScreen.displayName = 'DreamTeamScreen';
+TeamOfTheWeekScreen.displayName = 'TeamOfTheWeekScreen';
 
 function PitchSkeleton() {
   return (

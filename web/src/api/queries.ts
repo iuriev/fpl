@@ -55,12 +55,12 @@ export function useLeagues(teamId: number | null) {
   });
 }
 
-export function useDreamTeam(gameweek: number | null) {
+export function useTeamOfTheWeek(gameweek: number | null) {
   return useQuery({
     queryKey: ['dream-team', gameweek],
     queryFn: () => {
       if (gameweek === null) throw new Error('Gameweek required');
-      return api.getDreamTeam(gameweek);
+      return api.getTeamOfTheWeek(gameweek);
     },
     enabled: gameweek !== null,
     staleTime: 1000 * 60 * 60 * 24, // 24h — finished GW data is immutable

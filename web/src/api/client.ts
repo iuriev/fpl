@@ -4,7 +4,7 @@
  */
 
 import {
-  DreamTeamResponse,
+  TeamOfTheWeekResponse,
   EntryResponse,
   GameweeksResponse,
   HistoryResponse,
@@ -62,7 +62,7 @@ export const api = {
 
   getLeagues: (teamId: number) => request<LeaguesResponse>(`/entry/${teamId}/leagues`),
 
-  getDreamTeam: (gw: number) => request<DreamTeamResponse>(`/dream-team/${gw}`),
+  getTeamOfTheWeek: (gw: number) => request<TeamOfTheWeekResponse>(`/team-of-the-week/${gw}`),
 
   getTopPlayersGw: (gw: number) => request<TopPlayersGwResponse>(`/top-players/gameweek/${gw}`),
 

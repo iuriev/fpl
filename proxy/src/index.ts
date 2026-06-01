@@ -3,7 +3,7 @@ import { serveStatic } from '@hono/node-server/serve-static';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 
-import * as dreamTeamService from './dream-team-service';
+import * as teamOfTheWeekService from './team-of-the-week-service';
 import * as entryService from './entry-service';
 import * as fixturesService from './fixtures-service';
 import * as gameweeksService from './gameweeks-service';
@@ -165,8 +165,8 @@ app.get('/api/player-pool', async (c) => {
   }
 });
 
-// GET /api/dream-team/:gw
-app.get('/api/dream-team/:gw', async (c) => {
+// GET /api/team-of-the-week/:gw
+app.get('/api/team-of-the-week/:gw', async (c) => {
   const gw = parseInt(c.req.param('gw'), 10);
 
   if (isNaN(gw) || gw < 1 || gw > MAX_GAMEWEEK) {
@@ -174,18 +174,18 @@ app.get('/api/dream-team/:gw', async (c) => {
   }
 
   try {
-    const result = await dreamTeamService.getDreamTeam(gw);
+    const result = await teamOfTheWeekService.getTeamOfTheWeek(gw);
     return c.json(result);
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
     if (errorMsg.includes('not yet finished')) {
-      return c.json({ error: `Dream Team is not yet available for gameweek ${gw}` }, { status: 400 });
+      return c.json({ error: `Team of the Week is not yet available for gameweek ${gw}` }, { status: 400 });
     }
     if (errorMsg.includes('not found')) {
       return c.json({ error: `Gameweek ${gw} not found` }, { status: 404 });
     }
-    console.error('Error fetching dream team:', error);
-    return c.json({ error: 'Unable to fetch dream team' }, { status: 500 });
+    console.error('Error fetching team of the week:', error);
+    return c.json({ error: 'Unable to fetch team of the week' }, { status: 500 });
   }
 });
 

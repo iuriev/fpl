@@ -6,7 +6,7 @@ import { fixtureDreamTeam, fixtureGameweeks } from '@/fixtures';
 
 vi.mock('@/api/queries', () => ({
   useGameweeks: () => ({ data: fixtureGameweeks }),
-  useDreamTeam: () => ({
+  useTeamOfTheWeek: () => ({
     data: fixtureDreamTeam,
     isLoading: false,
     isError: false,
@@ -15,20 +15,20 @@ vi.mock('@/api/queries', () => ({
   }),
 }));
 
-import { DreamTeamScreen } from './DreamTeamScreen';
+import { TeamOfTheWeekScreen } from './TeamOfTheWeekScreen';
 
-function renderScreen(path = '/dream-team?gw=36') {
+function renderScreen(path = '/team-of-the-week?gw=36') {
   return render(
     <MemoryRouter initialEntries={[path]}>
-      <DreamTeamScreen />
+      <TeamOfTheWeekScreen />
     </MemoryRouter>
   );
 }
 
-describe('DreamTeamScreen', () => {
-  it('renders the Dream Team heading', () => {
+describe('TeamOfTheWeekScreen', () => {
+  it('renders the Team of the Week heading', () => {
     renderScreen();
-    expect(screen.getByText('Dream Team')).toBeInTheDocument();
+    expect(screen.getByText('Team of the Week')).toBeInTheDocument();
   });
 
   it('renders the gameweek label', () => {
@@ -55,14 +55,14 @@ describe('DreamTeamScreen', () => {
   });
 
   it('prev button is disabled when on GW 1', () => {
-    renderScreen('/dream-team?gw=1');
+    renderScreen('/team-of-the-week?gw=1');
     expect(screen.getByRole('button', { name: /previous gameweek/i })).toBeDisabled();
   });
 });
 
-describe('DreamTeamScreen not-available state', () => {
+describe('TeamOfTheWeekScreen not-available state', () => {
   it('shows not-available message for an unfinished gameweek', () => {
-    renderScreen('/dream-team?gw=37');
+    renderScreen('/team-of-the-week?gw=37');
     expect(screen.getByText(/not available yet/i)).toBeInTheDocument();
   });
 });

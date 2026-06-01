@@ -1,7 +1,7 @@
 import * as cacheLayer from './cache';
 import type { FPLBootstrapStatic, FPLDreamTeam } from './fpl-client';
 import * as fplClient from './fpl-client';
-import type { DreamTeamPlayer, DreamTeamResponse, PlayerPosition } from './types';
+import type { TeamOfTheWeekPlayer, TeamOfTheWeekResponse, PlayerPosition } from './types';
 
 const POSITION_MAP: Record<number, PlayerPosition> = {
   1: 'GK',
@@ -21,8 +21,8 @@ async function getBootstrapWithCache(): Promise<FPLBootstrapStatic> {
   return bootstrap;
 }
 
-async function getDreamTeamWithCache(gameweek: number): Promise<FPLDreamTeam> {
-  const cacheKey = `dream-team:${gameweek}`;
+async function getTeamOfTheWeekWithCache(gameweek: number): Promise<FPLDreamTeam> {
+  const cacheKey = `team-of-the-week:${gameweek}`;
   const cached = cacheLayer.get<FPLDreamTeam>(cacheKey);
   if (cached) return cached;
 
@@ -31,19 +31,19 @@ async function getDreamTeamWithCache(gameweek: number): Promise<FPLDreamTeam> {
   return data;
 }
 
-export async function getDreamTeam(gameweek: number): Promise<DreamTeamResponse> {
+export async function getTeamOfTheWeek(gameweek: number): Promise<TeamOfTheWeekResponse> {
   const bootstrap = await getBootstrapWithCache();
 
   const gameweekEvent = bootstrap.events.find((e) => e.id === gameweek);
   if (!gameweekEvent) throw new Error(`Gameweek ${gameweek} not found`);
   if (!gameweekEvent.finished) throw new Error(`Gameweek ${gameweek} not yet finished`);
 
-  const dreamTeamData = await getDreamTeamWithCache(gameweek);
+  const teamOfTheWeekData = await getTeamOfTheWeekWithCache(gameweek);
 
   const teamMap = new Map(bootstrap.teams.map((t) => [t.id, t]));
   const playerMap = new Map(bootstrap.elements.map((e) => [e.id, e]));
 
-  const players: DreamTeamPlayer[] = dreamTeamData.team.map((entry) => {
+  const players: TeamOfTheWeekPlayer[] = teamOfTheWeekData.team.map((entry) => {
     const playerData = playerMap.get(entry.element);
     if (!playerData) throw new Error(`Player ${entry.element} not found in bootstrap`);
 

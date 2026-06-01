@@ -106,13 +106,13 @@ export const copy = {
   statsRetry: 'Try again',
   statsMyStats: 'My Stats',
 
-  // Dream Team screen
-  dreamTeamTitle: 'Dream Team',
-  dreamTeamBack: 'Squad',
-  dreamTeamLoadError: "Couldn't load the Dream Team",
-  dreamTeamRetry: 'Try again',
-  dreamTeamNotAvailable: 'Dream Team not available yet for this gameweek',
-  dreamTeamNavLink: 'Dream Team',
+  // Team of the Week screen
+  teamOfTheWeekTitle: 'Team of the Week',
+  teamOfTheWeekBack: 'Squad',
+  teamOfTheWeekLoadError: "Couldn't load the Team of the Week",
+  teamOfTheWeekRetry: 'Try again',
+  teamOfTheWeekNotAvailable: 'Team of the Week not available yet for this gameweek',
+  teamOfTheWeekNavLink: 'Team of the Week',
 
   // Top Players screen
   topPlayersTitle: 'Top Players',

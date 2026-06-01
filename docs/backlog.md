@@ -557,7 +557,7 @@ For reference — features that are live in the codebase:
 - **Chips in Planner (CHIP-02)** — Wildcard/Free Hit zero out transfer costs; chip selection in TransferHeader
 - **Summary Strip** — GW total, average, highest score, rank, transfers made
 - **Team Info Panel** — drawer with team/manager stats
-- **Dream Team Screen** — best XI for a GW
+- **Team of the Week Screen** — best XI for a GW
 - **Gameweek History Screen** — per-GW points history chart/table
 - **Leagues Stats Screen** — mini-league standings
 - **Top Players Screen** — top performers for a GW

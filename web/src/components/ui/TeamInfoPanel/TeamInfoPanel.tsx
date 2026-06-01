@@ -64,8 +64,8 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({ entry, teamId }) =
         <Link to={`/stats?teamId=${teamId}`} className={styles.navLink}>
           {copy.statsMyStats}
         </Link>
-        <Link to={`/dream-team?teamId=${teamId}`} className={styles.navLink}>
-          {copy.dreamTeamNavLink}
+        <Link to={`/team-of-the-week?teamId=${teamId}`} className={styles.navLink}>
+          {copy.teamOfTheWeekNavLink}
         </Link>
         <Link to={`/top-players?teamId=${teamId}`} className={styles.navLink}>
           {copy.topPlayersNavLink}

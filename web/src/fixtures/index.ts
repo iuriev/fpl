@@ -1,6 +1,6 @@
 import type {
-  DreamTeamPlayer,
-  DreamTeamResponse,
+  TeamOfTheWeekPlayer,
+  TeamOfTheWeekResponse,
   EntryResponse,
   GameweeksResponse,
   PlayerStats,
@@ -303,9 +303,9 @@ export const fixtureSquadEmpty: SquadResponse = {
 };
 
 function mkDtPlayer(
-  overrides: Partial<DreamTeamPlayer> &
-    Pick<DreamTeamPlayer, 'id' | 'webName' | 'position' | 'pitchPosition'>
-): DreamTeamPlayer {
+  overrides: Partial<TeamOfTheWeekPlayer> &
+    Pick<TeamOfTheWeekPlayer, 'id' | 'webName' | 'position' | 'pitchPosition'>
+): TeamOfTheWeekPlayer {
   return {
     teamCode: 3,
     teamShortName: 'ARS',
@@ -368,7 +368,7 @@ export const fixtureTeamPlayers: TeamPlayersResponse = {
   ],
 };
 
-export const fixtureDreamTeam: DreamTeamResponse = {
+export const fixtureDreamTeam: TeamOfTheWeekResponse = {
   gw: 36,
   players: [
     mkDtPlayer({ id: 101, webName: 'Raya', position: 'GK', pitchPosition: 1, points: 10 }),

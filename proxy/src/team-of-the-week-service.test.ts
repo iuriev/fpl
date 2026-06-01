@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as cache from './cache';
-import * as dreamTeamService from './dream-team-service';
+import * as teamOfTheWeekService from './team-of-the-week-service';
 import * as fplClient from './fpl-client';
 
 vi.mock('./fpl-client');
@@ -53,7 +53,7 @@ const mockBootstrap = {
   ],
 };
 
-const mockDreamTeam = {
+const mockTeamOfTheWeek = {
   team: [
     { element: 10, points: 10, position: 1 },
     { element: 20, points: 12, position: 2 },
@@ -70,7 +70,7 @@ const mockDreamTeam = {
   top_player: { id: 90, points: 20 },
 };
 
-describe('Dream Team Service', () => {
+describe('Team of the Week Service', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -78,9 +78,9 @@ describe('Dream Team Service', () => {
   it('returns 11 players merged with bootstrap metadata', async () => {
     (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
     (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockBootstrap);
-    (fplClient.getDreamTeam as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockDreamTeam);
+    (fplClient.getDreamTeam as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockTeamOfTheWeek);
 
-    const result = await dreamTeamService.getDreamTeam(1);
+    const result = await teamOfTheWeekService.getTeamOfTheWeek(1);
 
     expect(result.gw).toBe(1);
     expect(result.players).toHaveLength(11);
@@ -89,9 +89,9 @@ describe('Dream Team Service', () => {
   it('maps player fields correctly', async () => {
     (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
     (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockBootstrap);
-    (fplClient.getDreamTeam as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockDreamTeam);
+    (fplClient.getDreamTeam as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockTeamOfTheWeek);
 
-    const result = await dreamTeamService.getDreamTeam(1);
+    const result = await teamOfTheWeekService.getTeamOfTheWeek(1);
 
     const gk = result.players.find((p) => p.id === 10)!;
     expect(gk.webName).toBe('Raya');
@@ -111,9 +111,9 @@ describe('Dream Team Service', () => {
   it('returns players sorted GK → DEF → MID → FWD', async () => {
     (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
     (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockBootstrap);
-    (fplClient.getDreamTeam as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockDreamTeam);
+    (fplClient.getDreamTeam as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockTeamOfTheWeek);
 
-    const result = await dreamTeamService.getDreamTeam(1);
+    const result = await teamOfTheWeekService.getTeamOfTheWeek(1);
 
     const positions = result.players.map((p) => p.position);
     const firstGkIdx = positions.indexOf('GK');
@@ -130,22 +130,22 @@ describe('Dream Team Service', () => {
     (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
     (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ ...mockBootstrap, events: [] });
 
-    await expect(dreamTeamService.getDreamTeam(1)).rejects.toThrow('Gameweek 1 not found');
+    await expect(teamOfTheWeekService.getTeamOfTheWeek(1)).rejects.toThrow('Gameweek 1 not found');
   });
 
   it('throws when gameweek is not yet finished', async () => {
     (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
     (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockBootstrap);
 
-    await expect(dreamTeamService.getDreamTeam(2)).rejects.toThrow('not yet finished');
+    await expect(teamOfTheWeekService.getTeamOfTheWeek(2)).rejects.toThrow('not yet finished');
   });
 
   it('uses cached bootstrap data', async () => {
     (cache.get as ReturnType<typeof vi.fn>).mockReturnValueOnce(mockBootstrap);
     (cache.get as ReturnType<typeof vi.fn>).mockReturnValueOnce(null);
-    (fplClient.getDreamTeam as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockDreamTeam);
+    (fplClient.getDreamTeam as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockTeamOfTheWeek);
 
-    await dreamTeamService.getDreamTeam(1);
+    await teamOfTheWeekService.getTeamOfTheWeek(1);
 
     expect(fplClient.getBootstrapStatic).not.toHaveBeenCalled();
   });
@@ -153,10 +153,10 @@ describe('Dream Team Service', () => {
   it('caches dream team data with SQUAD_FINISHED TTL', async () => {
     (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
     (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockBootstrap);
-    (fplClient.getDreamTeam as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockDreamTeam);
+    (fplClient.getDreamTeam as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockTeamOfTheWeek);
 
-    await dreamTeamService.getDreamTeam(1);
+    await teamOfTheWeekService.getTeamOfTheWeek(1);
 
-    expect(cache.set).toHaveBeenCalledWith('dream-team:1', mockDreamTeam, cache.ttl.SQUAD_FINISHED);
+    expect(cache.set).toHaveBeenCalledWith('team-of-the-week:1', mockTeamOfTheWeek, cache.ttl.SQUAD_FINISHED);
   });
 });
