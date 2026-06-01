@@ -31,6 +31,8 @@ export async function getGameweeks(): Promise<GameweeksResponse> {
     id: e.id,
     name: e.name,
     finished: e.finished,
+    averageScore: e.average_entry_score > 0 ? e.average_entry_score : undefined,
+    highestScore: e.highest_score > 0 ? e.highest_score : undefined,
   }));
 
   return { current, gameweeks };

@@ -53,6 +53,8 @@ describe('Gameweeks Service', () => {
         id: 1,
         name: 'Gameweek 1',
         finished: true,
+        averageScore: 50,
+        highestScore: 100,
       });
     });
 
