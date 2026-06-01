@@ -9,4 +9,8 @@
 
 .bar > * {
   flex: 1;
+  height: var(--fpl-size-btn-h) !important;
+  font-size: var(--fpl-fs-body-xs) !important;
+  padding: 0 var(--fpl-space-xs) !important;
+  white-space: nowrap;
 }

@@ -103,6 +103,21 @@ export const ZeroPoints: Story = {
   args: { player: { ...base, name: 'Mbete', teamCode: 17, points: 0 } },
 };
 
+export const WithInfo: Story = {
+  args: {
+    player: base,
+    playerInfo: {
+      ownership: '45.2',
+      currentPrice: 125,
+      expectedPoints: '5.4',
+      nextFixtures: [
+        { gw: 1, opponent: 'CHE', home: true, difficulty: 3 },
+        { gw: 2, opponent: 'IPS', home: false, difficulty: 2 },
+      ],
+    },
+  },
+};
+
 export const GoalkeeperLarge: Story = {
   args: {
     player: { ...base, name: 'Flekken', position: 'GK', teamCode: 94, points: 6 },

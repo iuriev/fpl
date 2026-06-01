@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 
 import { useGameweeks, usePlayerPool, useSquad } from '@/api/queries';
+import { BottomSheet } from '@/components/ui/BottomSheet/BottomSheet';
 import { Button } from '@/components/ui/Button/Button';
 import { CHIP_LABELS } from '@/components/ui/ChipBadge/ChipBadge';
 import { HelpTour } from '@/components/ui/HelpTour/HelpTour';
@@ -73,6 +74,8 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   const [draft, setDraft] = useState<TransferDraft | null>(null);
   const [planChip, setPlanChip] = useState<PlanChip>('none');
   const [selectedPlayerId, setSelectedPlayerId] = useState<number | null>(null);
+  const [isTransfersOpen, setIsTransfersOpen] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [showTour, setShowTour] = useState(false);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -131,7 +134,8 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   }, []);
 
   const updateDraft = useCallback(
-    (updater: (prev: TransferDraft) => TransferDraft) => {
+    (updater: (prev: TransferDraft) => TransferDraft, silent = false) => {
+      if (!silent) setIsDirty(true);
       setDraft((prev) => {
         const next = updater(prev ?? makeDefaultDraft(teamId, nextGw ?? 0));
         persistDraft(next);
@@ -153,13 +157,18 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
       'none';
     if (draftSourceRef.current === 'fresh') {
       setPlanChip(initial);
-      updateDraft((d) => ({
-        ...d,
-        freeTransfers: squadData.summary.freeTransfers,
-        ...(initial === 'wildcard' || initial === 'freehit' ? { chip: initial as TransferChip } : {}),
-      }));
+      updateDraft(
+        (d) => ({
+          ...d,
+          freeTransfers: squadData.summary.freeTransfers,
+          ...(initial === 'wildcard' || initial === 'freehit'
+            ? { chip: initial as TransferChip }
+            : {}),
+        }),
+        true
+      );
     } else {
-      updateDraft((d) => ({ ...d, freeTransfers: squadData.summary.freeTransfers }));
+      updateDraft((d) => ({ ...d, freeTransfers: squadData.summary.freeTransfers }), true);
     }
   }, [squadData, updateDraft]);
 
@@ -315,7 +324,10 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   const handleReset = () => updateDraft((d) => ({ ...d, swaps: [] }));
 
   const handleSave = () => {
-    if (draft) saveDraft(draft);
+    if (draft) {
+      saveDraft(draft);
+      setIsDirty(false);
+    }
   };
 
   const handleChipToggle = (chip: PlanChip) => {
@@ -396,20 +408,13 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
             />
           </div>
 
-          {draft && (
-            <SwapsStrip
-              swaps={draft.swaps}
-              nameMap={nameMap}
-              costMap={costMap}
-              freeTransfers={draft.freeTransfers}
-              onUndo={handleUndo}
-            />
-          )}
-
           <TransferActionBar
+            onOpenTransfers={() => setIsTransfersOpen(true)}
             onReset={handleReset}
             onSave={handleSave}
+            hasSwaps={(draft?.swaps.length ?? 0) > 0}
             hasChanges={(draft?.swaps.length ?? 0) > 0 || (draft?.subs.length ?? 0) > 0}
+            isDirty={isDirty}
           />
         </>
       )}
@@ -434,6 +439,23 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
         <div className={styles.toast} role="status">
           {toast}
         </div>
+      )}
+
+      {draft && (
+        <BottomSheet
+          open={isTransfersOpen}
+          onClose={() => setIsTransfersOpen(false)}
+          title={copy.transfersPendingTitle}
+        >
+          <SwapsStrip
+            swaps={draft.swaps}
+            nameMap={nameMap}
+            costMap={costMap}
+            freeTransfers={draft.freeTransfers}
+            onUndo={handleUndo}
+            hideTitle={true}
+          />
+        </BottomSheet>
       )}
 
       <HelpTour open={showTour} onClose={handleCloseTour} />

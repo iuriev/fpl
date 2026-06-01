@@ -30,6 +30,12 @@
   padding: 4% 0;
 }
 
+@media (max-height: 800px) {
+  .pitchRows {
+    padding: 2% 0;
+  }
+}
+
 .playerRow {
   display: flex;
   justify-content: center;

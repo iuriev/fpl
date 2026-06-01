@@ -11,6 +11,7 @@ export interface SwapsStripProps {
   costMap: Map<number, number>;
   freeTransfers: number;
   onUndo: (outId: number) => void;
+  hideTitle?: boolean;
 }
 
 function formatDelta(
@@ -31,6 +32,7 @@ export const SwapsStrip: React.FC<SwapsStripProps> = ({
   costMap,
   freeTransfers,
   onUndo,
+  hideTitle = false,
 }) => {
   const overLimit = Math.max(0, swaps.length - freeTransfers);
   const labelVariant =
@@ -39,7 +41,7 @@ export const SwapsStrip: React.FC<SwapsStripProps> = ({
   return (
     <div className={styles.strip} data-tour="step-8">
       <div className={`${styles.header} ${styles[`header_${labelVariant}`]}`}>
-        <span className={styles.title}>{copy.transfersPendingTitle}</span>
+        {!hideTitle && <span className={styles.title}>{copy.transfersPendingTitle}</span>}
         {swaps.length > 0 && (
           <span className={styles.count}>
             {interpolate(copy.transfersNFree, { n: swaps.length, m: freeTransfers })}

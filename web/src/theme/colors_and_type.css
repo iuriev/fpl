@@ -158,6 +158,13 @@ body {
   --fpl-popup-inset-b: 6rem;
 }
 
+@media (max-height: 800px) {
+  :root {
+    --fpl-size-jersey-l: 2.75rem;
+    --fpl-size-jersey-m: 2.5rem;
+  }
+}
+
 /* ── semantic role classes (optional) ───────────────────────────────── */
 .fpl-h1 {
   font: var(--fpl-fw-bold) var(--fpl-fs-h1-l) / 1.02 var(--fpl-font-display);

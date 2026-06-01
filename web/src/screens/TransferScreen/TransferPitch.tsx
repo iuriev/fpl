@@ -69,7 +69,12 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
   function buildPlayerInfo(player: SquadPlayer): PlayerInfo | undefined {
     const p = poolLookup?.get(player.id);
     if (!p) return undefined;
-    return { ownership: p.selectedByPercent, currentPrice: p.nowCost, nextFixtures: p.nextFixtures };
+    return {
+      ownership: p.selectedByPercent,
+      currentPrice: p.nowCost,
+      expectedPoints: p.expectedPoints,
+      nextFixtures: p.nextFixtures,
+    };
   }
 
   function renderCard(player: SquadPlayer, size: 'large' | 'medium') {
@@ -101,6 +106,7 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
           hidePoints
           hideStats
           hideClub
+          hideCaptaincy
           nextFixture={poolLookup?.get(player.id)?.nextFixtures[0]}
           playerInfo={buildPlayerInfo(player)}
           onSubClick={

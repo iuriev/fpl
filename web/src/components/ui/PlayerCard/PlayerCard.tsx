@@ -10,6 +10,7 @@ import styles from './PlayerCard.module.css';
 export interface PlayerInfo {
   ownership: string;
   currentPrice: number;
+  expectedPoints?: string;
   nextFixtures: FixtureInfo[];
 }
 
@@ -23,6 +24,7 @@ export interface PlayerCardProps {
   footBadge?: React.ReactNode;
   onSubClick?: () => void;
   playerInfo?: PlayerInfo;
+  hideCaptaincy?: boolean;
 }
 
 function availBadge(status: PlayerStatus): { char: string; variant: 'warn' | 'error' } | null {
@@ -57,6 +59,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   footBadge,
   onSubClick,
   playerInfo,
+  hideCaptaincy = false,
 }) => {
   const [showStatus, setShowStatus] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
@@ -143,7 +146,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
       }
     >
       <div className={styles.jerseyWrap}>
-        {(footBadge || badge || player.isCaptain || player.isViceCaptain) && (
+        {(footBadge || badge || (!hideCaptaincy && (player.isCaptain || player.isViceCaptain))) && (
           <div className={styles.badgeRow}>
             <div className={styles.badgeRow_left}>
               {footBadge && <span aria-hidden="true">{footBadge}</span>}
@@ -157,7 +160,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
               )}
             </div>
             <div className={styles.badgeRow_right}>
-              {(player.isCaptain || player.isViceCaptain) && (
+              {!hideCaptaincy && (player.isCaptain || player.isViceCaptain) && (
                 <span
                   className={`${styles.capBadge}${player.isViceCaptain ? ` ${styles.capBadge_vice}` : ''}`}
                   aria-label={player.isCaptain ? 'Captain' : 'Vice captain'}
@@ -192,7 +195,9 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
         {!hidePoints && <span className={styles.points}>{player.points}</span>}
       </div>
       {playerInfo && (
-        <span className={styles.ownershipPill} data-tour="step-4">{playerInfo.ownership}%</span>
+        <span className={styles.ownershipPill} data-tour="step-4">
+          {playerInfo.ownership}%{playerInfo.expectedPoints ? ` / ${playerInfo.expectedPoints}` : ''}
+        </span>
       )}
 
       {(nextFixture || onSubClick) && (
@@ -231,7 +236,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
             <div className={styles.infoHeaderText}>
               <span className={styles.infoName}>{player.name}</span>
               <span className={styles.infoMeta}>
-                £{(playerInfo.currentPrice / 10).toFixed(1)}m · {playerInfo.ownership}% · {player.position} / {player.club}
+                £{(playerInfo.currentPrice / 10).toFixed(1)}m · {playerInfo.ownership}%{playerInfo.expectedPoints ? ` · ${playerInfo.expectedPoints} XP` : ''} · {player.position} / {player.club}
               </span>
             </div>
             <div

@@ -106,6 +106,7 @@ describe('PlayerCard stats badges', () => {
 const makePlayerInfo = (overrides?: Partial<PlayerInfo>): PlayerInfo => ({
   ownership: '44.5',
   currentPrice: 95,
+  expectedPoints: '4.5',
   nextFixtures: [makeFixture({ gw: 37, opponent: 'MCI', home: false, difficulty: 5 })],
   ...overrides,
 });
@@ -151,5 +152,44 @@ describe('PlayerCard info popup', () => {
     await user.click(screen.getByRole('button', { name: /player info/i }));
     await user.keyboard('{Escape}');
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('renders ownership and expected points in the pill', () => {
+    render(<PlayerCard player={makePlayer()} playerInfo={makePlayerInfo({ ownership: '10.5', expectedPoints: '6.2' })} />);
+    expect(screen.getByText('10.5% / 6.2')).toBeInTheDocument();
+  });
+
+  it('renders expected points in the info popup async', async () => {
+    const user = userEvent.setup();
+    render(<PlayerCard player={makePlayer()} playerInfo={makePlayerInfo({ expectedPoints: '8.1' })} />);
+    await user.click(screen.getByRole('button', { name: /player info/i }));
+    expect(screen.getByText(/8.1 XP/)).toBeInTheDocument();
+  });
+
+  it('does not render expected points when missing', async () => {
+    const user = userEvent.setup();
+    render(<PlayerCard player={makePlayer()} playerInfo={makePlayerInfo({ ownership: '10.5', expectedPoints: undefined })} />);
+    expect(screen.getByText('10.5%')).toBeInTheDocument();
+    expect(screen.queryByText(/XP/)).not.toBeInTheDocument();
+    
+    await user.click(screen.getByRole('button', { name: /player info/i }));
+    expect(screen.queryByText(/XP/)).not.toBeInTheDocument();
+  });
+});
+
+describe('PlayerCard captaincy', () => {
+  it('renders captain badge when isCaptain is true', () => {
+    render(<PlayerCard player={makePlayer({ isCaptain: true })} />);
+    expect(screen.getByLabelText('Captain')).toBeInTheDocument();
+  });
+
+  it('renders vice captain badge when isViceCaptain is true', () => {
+    render(<PlayerCard player={makePlayer({ isViceCaptain: true })} />);
+    expect(screen.getByLabelText('Vice captain')).toBeInTheDocument();
+  });
+
+  it('hides captain badge when hideCaptaincy is true', () => {
+    render(<PlayerCard player={makePlayer({ isCaptain: true })} hideCaptaincy />);
+    expect(screen.queryByLabelText('Captain')).not.toBeInTheDocument();
   });
 });

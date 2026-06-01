@@ -518,7 +518,7 @@ Deep research + build a prediction model that scores players for the next GW usi
 - Head-to-head match history
 - Home / away performance splits
 - Scrape/aggregate internet prediction articles (pre-match xPts predictions)
-- Historical EPL results (consider bulk-importing last 20 years of results)
+- Historical EPL results (import dataset from GitHub, e.g. vaastav/FPL-data, instead of official API)
 - Consider hooking up a free AI/ML model for the inference layer
 
 **Output value:** best transfer recommendations, optimal first-GW squad, best Free Hit squad,
@@ -593,4 +593,5 @@ Sites to study for feature inspiration and UI patterns:
 - **https://fplukraine.com** — AI assistant concept, squad comparison, CS probability & xG market screen.
 - **https://cheatography.com/sertalpbilal/cheat-sheets/fpl-api-endpoints/** — FPL API endpoints cheat sheet (dev resource).
 - **https://fantasyfootballscout.co.uk** — Alternative subscription model reference; DEFCON tables, xG heatmaps, captaincy matrix.
+- **https://github.com/vaastav/FPL-data** — Historical FPL datasets (seasons 2016-present).
 - Official FPL app — source of truth for rules and official UX conventions.

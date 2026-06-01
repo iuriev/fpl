@@ -95,6 +95,27 @@ const POOL_PLAYERS: PoolPlayer[] = SQUAD_DATA.starters.concat(SQUAD_DATA.bench).
   nextFixtures: [],
 }));
 
+const EXTRA_PLAYER: PoolPlayer = {
+  id: 99,
+  webName: 'Extra',
+  firstName: 'Extra',
+  lastName: 'Player',
+  team: 2,
+  teamCode: 2,
+  teamShortName: 'EXT',
+  position: 'GK',
+  nowCost: 40,
+  totalPoints: 0,
+  eventPoints: 0,
+  status: 'a',
+  chanceOfPlaying: null,
+  news: '',
+  selectedByPercent: '5',
+  expectedPoints: '3.0',
+  form: '3.0',
+  nextFixtures: [],
+};
+
 // Mutable refs so individual describes can swap mock responses.
 const mockState = {
   squad: null as SquadResponse | null,
@@ -138,6 +159,40 @@ describe('TransferScreen', () => {
     renderScreen();
     expect(screen.getByText(/No squad found/i)).toBeInTheDocument();
   });
+
+  it('opens the transfers bottom sheet when the Transfers button is clicked', async () => {
+    const user = userEvent.setup();
+    mockState.squad = SQUAD_DATA;
+    mockState.pool = { players: [...POOL_PLAYERS, EXTRA_PLAYER] };
+    renderScreen();
+
+    // Make a swap first to enable the button
+    const playerCard = screen.getByRole('button', { name: /Hart/i });
+    await user.click(playerCard);
+    
+    // Select replacement (Extra)
+    const replacementBtn = screen.getAllByRole('button', { name: /Extra/i })[0];
+    await user.click(replacementBtn);
+
+    const transfersBtn = screen.getByRole('button', { name: 'Transfers' });
+    expect(transfersBtn).not.toBeDisabled();
+    await user.click(transfersBtn);
+
+    // Should find the swap row in the bottom sheet
+    // We use getAllByText because "Extra" is now both on the pitch and in the swaps list
+    expect(screen.getAllByText(/Hart/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Extra/).length).toBeGreaterThan(0);
+  });
+
+  it('disables the footer buttons when no transfers are planned', () => {
+    mockState.squad = SQUAD_DATA;
+    mockState.pool = { players: POOL_PLAYERS };
+    renderScreen();
+
+    expect(screen.getByRole('button', { name: 'Transfers' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Reset' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Save Plan' })).toBeDisabled();
+  });
 });
 
 describe('TransferScreen chip statuses', () => {
@@ -158,7 +213,7 @@ describe('TransferScreen chip statuses', () => {
     };
     mockState.pool = { players: POOL_PLAYERS };
     renderScreen();
-    const wcBtn = screen.getByRole('button', { name: 'WC' });
+    const wcBtn = await screen.findByRole('button', { name: 'WC' });
     expect(wcBtn).toHaveAttribute('aria-pressed', 'true');
   });
 
