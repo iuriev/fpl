@@ -5,6 +5,7 @@ import {
   TeamOfTheWeekScreen,
   EntryScreen,
   GameweekHistoryScreen,
+  GameweekReviewScreen,
   LeaguesStatsScreen,
   SquadScreen,
   TopPlayersScreen,
@@ -48,6 +49,16 @@ function AppContent() {
         element={
           teamId ? (
             <LeaguesStatsScreen teamId={teamId} />
+          ) : (
+            <EntryScreen onSubmit={(id) => setSearchParams({ teamId: String(id) })} />
+          )
+        }
+      />
+      <Route
+        path="/review"
+        element={
+          teamId ? (
+            <GameweekReviewScreen teamId={teamId} />
           ) : (
             <EntryScreen onSubmit={(id) => setSearchParams({ teamId: String(id) })} />
           )
