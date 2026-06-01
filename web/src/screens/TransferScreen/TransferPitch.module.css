@@ -31,6 +31,10 @@
 }
 
 @media (max-height: 800px) {
+  .pitchBench {
+    --fpl-size-jersey-l: 2.3rem;
+    --fpl-size-jersey-m: 2.3rem;
+  }
   .pitchRows {
     padding: 2% 0;
   }

@@ -4,7 +4,7 @@
  * - bootstrap-static: 1 hour (3600s)
  * - entry: 1 hour (3600s)
  * - finished gameweek squad: 24 hours (86400s)
- * - current gameweek squad: 60 seconds
+ * - current gameweek squad: 300 seconds (5 minutes)
  */
 
 interface CacheEntry {

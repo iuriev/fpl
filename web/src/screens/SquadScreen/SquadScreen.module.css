@@ -365,6 +365,17 @@
   pointer-events: none;
 }
 
+@media (max-height: 800px) {
+  .screen {
+    --fpl-size-jersey-l: 2rem;
+    --fpl-size-jersey-m: 2rem;
+  }
+
+  .pitchRows {
+    padding: 2% 1%;
+  }
+}
+
 @media (min-width: 37.5rem) {
   .screen {
     height: 100vh;

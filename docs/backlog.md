@@ -18,8 +18,6 @@
 
 | ID | Task | Effort | Why now |
 |----|------|--------|---------|
-| INF-01 | Raise current-GW squad/live TTL from 60s → 300s | XS | App is now publicly accessible — cuts FPL API calls ~5× before any traffic arrives. |
-| INF-02 | Add proxy-level rate limiter toward FPL API (queue, max N req/sec) | S | Required before public launch — prevents FPL banning our IP as user count grows. |
 
 ### Fixed bugs
 
@@ -42,7 +40,7 @@ matching FPL design conventions.
 | ~~UX-04~~ | ~~Player card ⓘ button → upcoming 5 fixtures + price popup~~ | S | ✅ Done — popup implemented in PlayerCard; wired in SquadScreen + TransferPitch. |
 | ~~DES-04~~ | ~~Standardize FDR difficulty colours app-wide (1–5 palette)~~ | XS | ✅ Done — `--fpl-fdr-*` tokens in colors_and_type.css; FdrChip uses them everywhere. |
 | ~~VIS-01~~ | ~~Goals/assists badge counters on PlayerCard~~ | S | ✅ Done — goal/assist badges on all card sizes; ownership % pill bottom-right of jersey. |
-| UX-05 | Transfer screen help overlay — guided tour explaining every UI element | S | The Transfer screen has many non-obvious elements (chip badges, Bank/Free/Cost strip, FDR chips, C/V badges, ownership %, swap arrows). New users need a one-time walkthrough. |
+| ~~UX-05~~ | ~~Transfer screen help overlay — guided tour explaining every UI element~~ | S | ✅ Done — step-by-step help tour implemented using `HelpTour` component. |
 
 ### Feature details
 
@@ -113,7 +111,7 @@ These features give the app reasons to return every gameweek — essential for g
 |----|------|--------|-----|
 | ANA-01 | Gameweek review screen ("how did my week go?") | M | High stickiness: users come back to review after each GW deadline. |
 | ~~CHIP-01~~ | ~~Display active chip on squad screen + SummaryStrip~~ | S | ✅ Done — chip cell replaces AVERAGE+HIGHEST in SummaryStrip. |
-| CHIP-02 | Consider active chip in transfer planner (Wildcard = unlimited free transfers) | S | Without this, the planner is wrong when a chip is active. |
+| ~~CHIP-02~~ | ~~Consider active chip in transfer planner (Wildcard = unlimited free transfers)~~ | S | ✅ Done — Wildcard and Free Hit now zero out transfer costs in the planner. |
 | CHIP-07 | Research + implement Assistant Manager chip (new in 2025/26) | S | New chip visible in FPL chip selection UI; rules and API value unknown — needs research before display/logic work. |
 | LIVE-01 | Live rank tracker — real-time points & rank during gameweek | M | "Watch your rank move live." High-stickiness during match days. |
 | LIVE-02 | Live mini-league standings | M | Real-time rival tracking. Complements LIVE-01. |
@@ -554,6 +552,9 @@ xPts for the opening gameweek / fixture difficulty for the first 3–4 rounds.
 For reference — features that are live in the codebase:
 
 - **Squad Viewer** — pitch view, list view, gameweek navigation, player status badges
+- **Proxy Optimization (INF-01, INF-02)** — current-GW TTL increased to 300s; request rate limiting (10 req/s) implemented in `fpl-client`
+- **Help Tour (UX-05)** — interactive walkthrough explaining transfer screen elements (chips, cost strip, badges)
+- **Chips in Planner (CHIP-02)** — Wildcard/Free Hit zero out transfer costs; chip selection in TransferHeader
 - **Summary Strip** — GW total, average, highest score, rank, transfers made
 - **Team Info Panel** — drawer with team/manager stats
 - **Dream Team Screen** — best XI for a GW
@@ -562,7 +563,7 @@ For reference — features that are live in the codebase:
 - **Top Players Screen** — top performers for a GW
 - **Transfer Planner** — pick players to transfer in/out, budget tracking, squad validation
 - **Transfer screen polish** — captain badge right, team abbrev + FDR chip under PlayerCard, outfield picker, position filter tabs, Sort button (UX-01 SwapsStrip scroll, UX-02 next 3 fixtures column, UX-03 %, pts, xPts columns); UX-04 player info popup (fixtures + price); DES-04 FDR colour tokens; VIS-01 goals/assists badges + ownership pill on all card sizes
-- **Fly.io deployment (INF-03)** — single Hono service on `fpl-squad-viewer.fly.dev`; serves SPA + proxy from one Docker image; in-memory cache preserved
+- **Fly.io deployment** — single Hono service on `fpl-squad-viewer.fly.dev`; serves SPA + proxy from one Docker image; in-memory cache preserved
 - **Active chip display (CHIP-01)** — chip cell replaces AVERAGE+HIGHEST in SummaryStrip when a chip is active; octagonal badge icon + chip name + ACTIVE label; per-chip accent colours (Wildcard gold, Triple Captain red, Free Hit cyan, Bench Boost green)
 - **Fix bugs** — BUG-01 (position limits), BUG-02 (transfer arrows)
 - **Proxy/BFF** — services for squad, entry, gameweeks, history, leagues, dream-team, fixtures, player pool, top players, team
