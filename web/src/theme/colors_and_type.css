@@ -160,8 +160,8 @@ body {
 
 @media (max-height: 800px) {
   :root {
-    --fpl-size-jersey-l: 2.75rem;
-    --fpl-size-jersey-m: 2.5rem;
+    --fpl-size-jersey-l: 2.3rem;
+    --fpl-size-jersey-m: 2.3rem;
   }
 }
 

@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { useGameweeks, usePlayerPool, useSquad } from '@/api/queries';
 import { BottomSheet } from '@/components/ui/BottomSheet/BottomSheet';
 import { Button } from '@/components/ui/Button/Button';
-import { CHIP_LABELS } from '@/components/ui/ChipBadge/ChipBadge';
 import { HelpTour } from '@/components/ui/HelpTour/HelpTour';
 import { copy, interpolate } from '@/lib/copy';
 import {
@@ -120,13 +119,6 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
     return () => clearTimeout(t);
   }, [toast]);
 
-  function handleChipBlocked(chip: PlanChip, usedInGw?: number) {
-    const name = chip !== 'none' ? CHIP_LABELS[chip as keyof typeof CHIP_LABELS] : chip;
-    const msg = usedInGw !== undefined
-      ? interpolate(copy.chipBlockedUsed, { name, gw: usedInGw })
-      : interpolate(copy.chipBlockedNoGw, { name });
-    setToast(msg);
-  }
 
   const persistDraft = useCallback((d: TransferDraft) => {
     clearTimeout(saveTimerRef.current);
@@ -362,7 +354,6 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
             nextGw={nextGw}
             onBack={() => navigate(`/?teamId=${teamId}`)}
             onChipToggle={handleChipToggle}
-            onChipBlocked={handleChipBlocked}
             onHelp={() => setShowTour(true)}
           />
       )}

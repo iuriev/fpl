@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
+import { CHIP_LABELS } from '@/components/ui/ChipBadge/ChipBadge';
 import { copy, interpolate } from '@/lib/copy';
 import type { ChipStatuses } from '@/types';
 
@@ -16,7 +17,6 @@ export interface TransferHeaderProps {
   nextGw: number | null;
   onBack: () => void;
   onChipToggle: (chip: PlanChip) => void;
-  onChipBlocked: (chip: PlanChip, usedInGw?: number) => void;
   onHelp: () => void;
 }
 
@@ -29,9 +29,15 @@ export const TransferHeader: React.FC<TransferHeaderProps> = ({
   nextGw,
   onBack,
   onChipToggle,
-  onChipBlocked,
   onHelp,
 }) => {
+  const [blockedMsg, setBlockedMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!blockedMsg) return;
+    const t = setTimeout(() => setBlockedMsg(null), 3000);
+    return () => clearTimeout(t);
+  }, [blockedMsg]);
   const transferChipActive = planChip === 'wildcard' || planChip === 'freehit';
   const anyChipActive = planChip !== 'none';
 
@@ -46,7 +52,12 @@ export const TransferHeader: React.FC<TransferHeaderProps> = ({
   function handleChipClick(chip: PlanChip) {
     const key = chip as keyof ChipStatuses;
     if (chipStatuses[key].status === 'used') {
-      onChipBlocked(chip, chipStatuses[key].usedInGw);
+      const name = chip !== 'none' ? CHIP_LABELS[chip as keyof typeof CHIP_LABELS] : chip;
+      const usedInGw = chipStatuses[key].usedInGw;
+      const msg = usedInGw !== undefined
+        ? interpolate(copy.chipBlockedUsed, { name, gw: usedInGw })
+        : interpolate(copy.chipBlockedNoGw, { name });
+      setBlockedMsg(msg);
     } else {
       onChipToggle(chip);
     }
@@ -126,6 +137,12 @@ export const TransferHeader: React.FC<TransferHeaderProps> = ({
             {copy.transfersTripleCaptain}
           </button>
         </div>
+
+        {blockedMsg && (
+          <div className={styles.hint} role="status">
+            {blockedMsg}
+          </div>
+        )}
       </div>
 
       <div className={styles.statsBar} data-tour="step-2">
