@@ -56,8 +56,8 @@ const SQUAD_DATA: SquadResponse = {
   summary: { totalPoints: 60, transfers: 0, bank: 0, freeTransfers: 1 },
   starters: [
     makePlayer(1, 'Hart', 'GK'),
-    makePlayer(2, 'Walker', 'DEF'),
-    makePlayer(3, 'Stones', 'DEF'),
+    { ...makePlayer(2, 'Walker', 'DEF'), isCaptain: true },
+    { ...makePlayer(3, 'Stones', 'DEF'), isViceCaptain: true },
     makePlayer(4, 'Dias', 'DEF'),
     makePlayer(5, 'Cancelo', 'DEF'),
     makePlayer(6, 'Foden', 'MID'),
@@ -281,11 +281,19 @@ describe('TransferScreen help tour', () => {
     await user.click(nextBtn);
 
     expect(await screen.findByText('Bank & Cost')).toBeInTheDocument();
+    await user.click(nextBtn);
 
-    const backBtn = screen.getByText('Back');
-    await user.click(backBtn);
+    expect(await screen.findByText('Player Stats')).toBeInTheDocument();
+    await user.click(nextBtn);
 
-    expect(await screen.findByText('Chip Badges')).toBeInTheDocument();
+    expect(await screen.findByText('Fixture Difficulty')).toBeInTheDocument();
+    await user.click(nextBtn);
+
+    expect(await screen.findByText('Substitutions')).toBeInTheDocument();
+    await user.click(nextBtn);
+
+    expect(await screen.findByText('Save Your Plan')).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });
 

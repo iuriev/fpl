@@ -64,6 +64,7 @@ The project is built spec-first; application code comes last. Read these before 
   `import { Foo } from '@/components/ui/Foo/Foo'`.
 - **Spec-first workflow.** Work in this order: business requirements → task breakdown → design →
   code. Do not write application code until requirements and design are approved.
+- **Maintain Help Tour.** Always update the help tour (`HelpTour.tsx`, `copy.ts`, `TransferScreen.test.tsx`) when changing the Transfer Screen layout or functionality to ensure steps remain accurate and targets exist.
 - **Backlog workflow.** When the user dictates ideas, mentions features to remember, or asks to
   note something, add it to `docs/backlog.md` immediately. The backlog is the single capture
   point for everything not yet in an OpenSpec change. To promote an idea to active work: run

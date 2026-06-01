@@ -8,17 +8,15 @@ import { copy } from '@/lib/copy';
 export interface HelpTourProps {
   open: boolean;
   onClose: () => void;
+  onStepChange?: (index: number) => void;
 }
 
 const STEPS: Step[] = [
   { title: copy.tourStep1Title, content: copy.tourStep1Text, target: '[data-tour="step-1"]', skipBeacon: true },
   { title: copy.tourStep2Title, content: copy.tourStep2Text, target: '[data-tour="step-2"]', skipBeacon: true },
-  { title: copy.tourStep3Title, content: copy.tourStep3Text, target: '[data-tour="step-3"]', skipBeacon: true },
   { title: copy.tourStep4Title, content: copy.tourStep4Text, target: '[data-tour="step-4"]', skipBeacon: true },
   { title: copy.tourStep5Title, content: copy.tourStep5Text, target: '[data-tour="step-5"]', skipBeacon: true },
   { title: copy.tourStep6Title, content: copy.tourStep6Text, target: '[data-tour="step-6"]', skipBeacon: true },
-  { title: copy.tourStep7Title, content: copy.tourStep7Text, target: '[data-tour="step-7"]', skipBeacon: true },
-  { title: copy.tourStep8Title, content: copy.tourStep8Text, target: '[data-tour="step-8"]', skipBeacon: true },
   { title: copy.tourStep9Title, content: copy.tourStep9Text, target: '[data-tour="step-9"]', skipBeacon: true },
 ];
 
@@ -147,7 +145,7 @@ const joyrideStyles = {
   },
 };
 
-export const HelpTour: React.FC<HelpTourProps> = ({ open, onClose }) => {
+export const HelpTour: React.FC<HelpTourProps> = ({ open, onClose, onStepChange }) => {
   const [stepIndex, setStepIndex] = React.useState(0);
   const [tourKey, setTourKey] = React.useState(0);
 
@@ -164,7 +162,10 @@ export const HelpTour: React.FC<HelpTourProps> = ({ open, onClose }) => {
   const handleCallback = (data: EventData) => {
     const { action, index, type } = data;
     if (action === ACTIONS.CLOSE) return;
-    if (type === EVENTS.STEP_AFTER) {
+
+    if (type === EVENTS.STEP_BEFORE) {
+      onStepChange?.(index);
+    } else if (type === EVENTS.STEP_AFTER) {
       if (action === ACTIONS.NEXT) setStepIndex(index + 1);
       else if (action === ACTIONS.PREV) setStepIndex(index - 1);
     } else if (type === EVENTS.TOUR_END) {

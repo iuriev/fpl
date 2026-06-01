@@ -25,6 +25,7 @@ export interface PlayerCardProps {
   onSubClick?: () => void;
   playerInfo?: PlayerInfo;
   hideCaptaincy?: boolean;
+  subTourAttr?: string;
 }
 
 function availBadge(status: PlayerStatus): { char: string; variant: 'warn' | 'error' } | null {
@@ -60,6 +61,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   onSubClick,
   playerInfo,
   hideCaptaincy = false,
+  subTourAttr,
 }) => {
   const [showStatus, setShowStatus] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
@@ -164,7 +166,6 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
                 <span
                   className={`${styles.capBadge}${player.isViceCaptain ? ` ${styles.capBadge_vice}` : ''}`}
                   aria-label={player.isCaptain ? 'Captain' : 'Vice captain'}
-                  data-tour="step-3"
                 >
                   {player.isCaptain ? copy.statusCaptain : copy.statusViceCaptain}
                 </span>
@@ -220,6 +221,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
               }}
               role="button"
               aria-label="Substitute"
+              data-tour={subTourAttr}
             >
               <svg width="8" height="10" viewBox="0 0 10 12" fill="none" aria-hidden="true">
                 <path d="M5 1L1 5H9L5 1Z" fill="currentColor" />

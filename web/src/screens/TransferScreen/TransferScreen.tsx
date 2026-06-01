@@ -360,7 +360,12 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
 
   const handleCloseTour = () => {
     setShowTour(false);
+    setIsTransfersOpen(false);
     localStorage.setItem('fpl_tour_seen_transfer_v1', 'true');
+  };
+
+  const handleTourStepChange = (_index: number) => {
+    setIsTransfersOpen(false);
   };
 
   return (
@@ -470,7 +475,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
         </BottomSheet>
       )}
 
-      <HelpTour open={showTour} onClose={handleCloseTour} />
+      <HelpTour open={showTour} onClose={handleCloseTour} onStepChange={handleTourStepChange} />
     </div>
   );
 };

@@ -98,7 +98,6 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
         className={playerBtnClass(player.id, isOut, isIn)}
         onClick={() => handleCardClick(player.id)}
         aria-label={label}
-        data-tour={tourAttr}
       >
         <PlayerCard
           player={player}
@@ -109,6 +108,7 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
           hideCaptaincy
           nextFixture={poolLookup?.get(player.id)?.nextFixtures[0]}
           playerInfo={buildPlayerInfo(player)}
+          subTourAttr={tourAttr}
           onSubClick={
             !subModeActive && onSubIconClick ? () => onSubIconClick(player.id) : undefined
           }
