@@ -1,0 +1,108 @@
+.section {
+  background: var(--fpl-bg-card);
+  padding: 1rem;
+}
+
+.sectionLabel {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fpl-muted-soft);
+  margin-bottom: 0.5rem;
+}
+
+.noTransfers {
+  font-size: 0.8rem;
+  color: var(--fpl-muted);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.card {
+  flex: 1;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.625rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.cardOut {
+  background: var(--fpl-error-soft);
+  border: 1px solid rgba(255, 77, 109, 0.3);
+}
+
+.cardIn {
+  background: var(--fpl-accent-faint);
+  border: 1px solid rgba(0, 255, 135, 0.25);
+}
+
+.cardDir {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cardOut .cardDir { color: var(--fpl-error); }
+.cardIn  .cardDir { color: var(--fpl-accent); }
+
+.cardName {
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--fpl-text);
+}
+
+.cardPts {
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.cardOut .cardPts { color: rgba(255, 77, 109, 0.8); }
+.cardIn  .cardPts { color: var(--fpl-accent); }
+
+.arrow {
+  font-size: 1rem;
+  color: var(--fpl-muted-soft);
+  flex-shrink: 0;
+}
+
+.delta {
+  min-width: 2.25rem;
+  text-align: center;
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.375rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.deltaPos {
+  background: var(--fpl-accent-faint);
+  color: var(--fpl-accent);
+  border: 1px solid rgba(0, 255, 135, 0.3);
+}
+
+.deltaNeg {
+  background: var(--fpl-error-soft);
+  color: var(--fpl-error);
+  border: 1px solid rgba(255, 77, 109, 0.3);
+}
+
+.hitNote {
+  font-size: 0.65rem;
+  color: var(--fpl-error);
+  text-align: right;
+  margin-top: 0.125rem;
+}
