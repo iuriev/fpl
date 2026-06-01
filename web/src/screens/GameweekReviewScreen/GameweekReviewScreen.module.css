@@ -1,0 +1,92 @@
+.screen {
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--fpl-bg-deep);
+  color: var(--fpl-text);
+}
+
+.header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-md);
+  padding: var(--fpl-space-md) var(--fpl-space-xl3);
+  border-bottom: 1px solid var(--fpl-bg-hair);
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-xs);
+  background: none;
+  border: none;
+  color: var(--fpl-muted);
+  font: var(--fpl-fw-medium) var(--fpl-fs-body) var(--fpl-font-display);
+  cursor: pointer;
+  padding: var(--fpl-space-xs) 0;
+  transition: color 120ms;
+  white-space: nowrap;
+}
+
+.backBtn:hover { color: var(--fpl-text); }
+
+.backBtn svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: var(--fpl-fs-body);
+  font-weight: var(--fpl-fw-bold);
+  color: var(--fpl-text);
+  flex: 1;
+}
+
+.gwBadge {
+  background: var(--fpl-bg);
+  color: var(--fpl-accent);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.1875rem 0.5rem;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+}
+
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.loading {
+  padding: 2rem;
+  text-align: center;
+  color: var(--fpl-muted);
+  font-size: var(--fpl-fs-body);
+}
+
+.stateCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--fpl-space-md);
+  flex: 1;
+  padding: 2rem;
+}
+
+.stateText {
+  color: var(--fpl-muted);
+  font-size: var(--fpl-fs-body);
+  text-align: center;
+}
