@@ -1,9 +1,10 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { copy } from '@/lib/copy';
 import type { PoolPlayer, SquadPlayer, SquadResponse } from '@/types';
 
 import { TransferScreen } from './TransferScreen';
@@ -285,5 +286,92 @@ describe('TransferScreen help tour', () => {
     await user.click(backBtn);
 
     expect(await screen.findByText('Chip Badges')).toBeInTheDocument();
+  });
+});
+
+describe('TransferScreen Reset button', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    localStorage.setItem('fpl_tour_seen_transfer_v1', 'true');
+  });
+
+  it('enables Reset button when a chip is toggled', async () => {
+    const user = userEvent.setup();
+    mockState.squad = SQUAD_DATA;
+    mockState.pool = { players: POOL_PLAYERS };
+
+    renderScreen();
+
+    const resetBtn = screen.getByRole('button', { name: 'Reset' });
+    expect(resetBtn).toBeDisabled();
+
+    const wcBtn = screen.getByRole('button', { name: 'WC' });
+    await user.click(wcBtn);
+
+    expect(resetBtn).not.toBeDisabled();
+
+    await user.click(resetBtn);
+    expect(resetBtn).toBeDisabled();
+    expect(wcBtn).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  it('enables Reset button when bench sub is made', async () => {
+    const user = userEvent.setup();
+    mockState.squad = SQUAD_DATA;
+    mockState.pool = { players: POOL_PLAYERS };
+
+    renderScreen();
+
+    const resetBtn = screen.getByRole('button', { name: 'Reset' });
+    expect(resetBtn).toBeDisabled();
+
+    // Ederson is on the bench
+    const edersonCard = screen.getByRole('button', { name: /Ederson/i });
+    const subIcon = within(edersonCard).getByLabelText('Substitute');
+    await user.click(subIcon);
+
+    // Hart is a starter
+    const hartCard = screen.getByRole('button', { name: /Hart/i });
+    await user.click(hartCard);
+
+    expect(resetBtn).not.toBeDisabled();
+
+    await user.click(resetBtn);
+    expect(resetBtn).toBeDisabled();
+  });
+});
+
+describe('TransferScreen auto-close modal', () => {
+  beforeEach(() => {
+    mockState.squad = SQUAD_DATA;
+    mockState.pool = { players: [...POOL_PLAYERS, EXTRA_PLAYER] };
+    localStorage.setItem('fpl_tour_seen_transfer_v1', 'true');
+  });
+
+  it('closes the transfers modal automatically when the last swap is removed', async () => {
+    const user = userEvent.setup();
+    renderScreen();
+
+    // 1. Make a swap
+    const hartCard = screen.getByRole('button', { name: /Hart/i });
+    await user.click(hartCard);
+    const replacementBtn = screen.getAllByRole('button', { name: /Extra/i })[0];
+    await user.click(replacementBtn);
+
+    // 2. Open the modal
+    const transfersBtn = screen.getByRole('button', { name: 'Transfers' });
+    await user.click(transfersBtn);
+
+    // Verify it's open
+    expect(screen.getByText(copy.transfersPendingTitle)).toBeInTheDocument();
+
+    // 3. Remove the swap
+    const removeBtn = screen.getByRole('button', { name: new RegExp(copy.transfersUndoSwap, 'i') });
+    await user.click(removeBtn);
+
+    // 4. Verify modal is closed
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
   });
 });

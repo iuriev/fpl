@@ -164,6 +164,16 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
     }
   }, [squadData, updateDraft]);
 
+  const initialChip = useMemo<PlanChip>(() => {
+    if (!squadData) return 'none';
+    const s = squadData.chipStatuses;
+    if (s.wildcard.status === 'active') return 'wildcard';
+    if (s.freehit.status === 'active') return 'freehit';
+    if (s.bboost.status === 'active') return 'bboost';
+    if (s['3xc'].status === 'active') return '3xc';
+    return 'none';
+  }, [squadData]);
+
   const originalSquad: SquadPlayer[] = useMemo(() => {
     if (!squadData) return [];
     return [...squadData.starters, ...squadData.bench];
@@ -311,9 +321,20 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
 
   const handleUndo = (outId: number) => {
     updateDraft((d) => ({ ...d, swaps: d.swaps.filter((s) => s.outId !== outId) }));
+    if (draft?.swaps.length === 1 && draft.swaps[0].outId === outId) {
+      setIsTransfersOpen(false);
+    }
   };
 
-  const handleReset = () => updateDraft((d) => ({ ...d, swaps: [] }));
+  const handleReset = () => {
+    setPlanChip(initialChip);
+    updateDraft((d) => ({
+      ...d,
+      swaps: [],
+      subs: [],
+      chip: (initialChip === 'wildcard' || initialChip === 'freehit') ? initialChip : 'none',
+    }));
+  };
 
   const handleSave = () => {
     if (draft) {
@@ -404,7 +425,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
             onReset={handleReset}
             onSave={handleSave}
             hasSwaps={(draft?.swaps.length ?? 0) > 0}
-            hasChanges={(draft?.swaps.length ?? 0) > 0 || (draft?.subs.length ?? 0) > 0}
+            hasChanges={(draft?.swaps.length ?? 0) > 0 || (draft?.subs.length ?? 0) > 0 || planChip !== initialChip}
             isDirty={isDirty}
           />
         </>
