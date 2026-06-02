@@ -252,7 +252,7 @@ export async function getTransfers(teamId: number): Promise<FPLTransfer[]> {
 
 export async function getLeagueStandings(
   leagueId: number,
-  page: number,
+  page: number
 ): Promise<FPLLeagueStandings> {
   return fetchFPL(`/leagues-classic/${leagueId}/standings/?page_standings=${page}`);
 }

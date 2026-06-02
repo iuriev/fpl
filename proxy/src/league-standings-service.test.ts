@@ -12,8 +12,24 @@ const mockStandingsResponse = {
   standings: {
     has_next: true,
     results: [
-      { entry: 111, entry_name: 'Top Squad', player_name: 'Alice Smith', rank: 1, last_rank: 2, total: 2200, event_total: 85 },
-      { entry: 222, entry_name: 'Dream XI', player_name: 'Bob Jones', rank: 2, last_rank: 1, total: 2150, event_total: 70 },
+      {
+        entry: 111,
+        entry_name: 'Top Squad',
+        player_name: 'Alice Smith',
+        rank: 1,
+        last_rank: 2,
+        total: 2200,
+        event_total: 85,
+      },
+      {
+        entry: 222,
+        entry_name: 'Dream XI',
+        player_name: 'Bob Jones',
+        rank: 2,
+        last_rank: 1,
+        total: 2150,
+        event_total: 70,
+      },
     ],
   },
 };
@@ -25,7 +41,9 @@ describe('League Standings Service', () => {
 
   it('fetches standings and maps response correctly', async () => {
     (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
-    (fplClient.getLeagueStandings as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockStandingsResponse);
+    (fplClient.getLeagueStandings as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+      mockStandingsResponse
+    );
 
     const result = await leagueStandingsService.getLeagueStandings(314, 1);
 
@@ -35,8 +53,24 @@ describe('League Standings Service', () => {
       page: 1,
       hasNext: true,
       standings: [
-        { entry: 111, entryName: 'Top Squad', playerName: 'Alice Smith', rank: 1, lastRank: 2, total: 2200, eventTotal: 85 },
-        { entry: 222, entryName: 'Dream XI', playerName: 'Bob Jones', rank: 2, lastRank: 1, total: 2150, eventTotal: 70 },
+        {
+          entry: 111,
+          entryName: 'Top Squad',
+          playerName: 'Alice Smith',
+          rank: 1,
+          lastRank: 2,
+          total: 2200,
+          eventTotal: 85,
+        },
+        {
+          entry: 222,
+          entryName: 'Dream XI',
+          playerName: 'Bob Jones',
+          rank: 2,
+          lastRank: 1,
+          total: 2150,
+          eventTotal: 70,
+        },
       ],
     });
     expect(fplClient.getLeagueStandings).toHaveBeenCalledWith(314, 1);
@@ -79,7 +113,7 @@ describe('League Standings Service', () => {
   it('propagates 404 for unknown league', async () => {
     (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
     (fplClient.getLeagueStandings as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
-      new Error('FPL API error: 404 Not Found'),
+      new Error('FPL API error: 404 Not Found')
     );
 
     await expect(leagueStandingsService.getLeagueStandings(99999, 1)).rejects.toThrow('404');

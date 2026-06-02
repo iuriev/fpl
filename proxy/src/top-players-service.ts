@@ -1,7 +1,13 @@
 import * as cacheLayer from './cache';
 import type { FPLBootstrapStatic, FPLLive } from './fpl-client';
 import * as fplClient from './fpl-client';
-import type { PlayerPosition, StatEntry, TopPlayer, TopPlayersGameweekResponse, TopPlayersSeasonResponse } from './types';
+import type {
+  PlayerPosition,
+  StatEntry,
+  TopPlayer,
+  TopPlayersGameweekResponse,
+  TopPlayersSeasonResponse,
+} from './types';
 
 const TOP_N = 100;
 
@@ -17,7 +23,11 @@ function buildStatBreakdown(explain: FPLLive['elements'][0]['explain']): StatEnt
         existing.value += stat.value;
         existing.points += stat.points;
       } else {
-        map.set(stat.identifier, { identifier: stat.identifier, value: stat.value, points: stat.points });
+        map.set(stat.identifier, {
+          identifier: stat.identifier,
+          value: stat.value,
+          points: stat.points,
+        });
       }
     }
   }
@@ -62,16 +72,18 @@ export async function getTopPlayersGameweek(gw: number): Promise<TopPlayersGamew
       const element = elementMap.get(live.id);
       if (!element) return [];
       const team = teamMap.get(element.team);
-      return [{
-        id: live.id,
-        webName: element.web_name,
-        position: POSITION_MAP[element.element_type] ?? 'GK',
-        teamCode: element.team_code,
-        teamShortName: team?.short_name ?? 'UNK',
-        points: live.stats.total_points,
-        selectedByPercent: element.selected_by_percent,
-        statBreakdown: buildStatBreakdown(live.explain),
-      } satisfies TopPlayer];
+      return [
+        {
+          id: live.id,
+          webName: element.web_name,
+          position: POSITION_MAP[element.element_type] ?? 'GK',
+          teamCode: element.team_code,
+          teamShortName: team?.short_name ?? 'UNK',
+          points: live.stats.total_points,
+          selectedByPercent: element.selected_by_percent,
+          statBreakdown: buildStatBreakdown(live.explain),
+        } satisfies TopPlayer,
+      ];
     })
     .sort((a, b) => b.points - a.points)
     .slice(0, TOP_N);
@@ -79,7 +91,10 @@ export async function getTopPlayersGameweek(gw: number): Promise<TopPlayersGamew
   return { gw, players };
 }
 
-export async function getPlayersLiveGw(gw: number, ids: number[]): Promise<TopPlayersGameweekResponse> {
+export async function getPlayersLiveGw(
+  gw: number,
+  ids: number[]
+): Promise<TopPlayersGameweekResponse> {
   const bootstrap = await getBootstrapWithCache();
 
   const event = bootstrap.events.find((e) => e.id === gw);
@@ -103,16 +118,18 @@ export async function getPlayersLiveGw(gw: number, ids: number[]): Promise<TopPl
       const element = elementMap.get(live.id);
       if (!element) return [];
       const team = teamMap.get(element.team);
-      return [{
-        id: live.id,
-        webName: element.web_name,
-        position: POSITION_MAP[element.element_type] ?? 'GK',
-        teamCode: element.team_code,
-        teamShortName: team?.short_name ?? 'UNK',
-        points: live.stats.total_points,
-        selectedByPercent: element.selected_by_percent,
-        statBreakdown: buildStatBreakdown(live.explain),
-      } satisfies TopPlayer];
+      return [
+        {
+          id: live.id,
+          webName: element.web_name,
+          position: POSITION_MAP[element.element_type] ?? 'GK',
+          teamCode: element.team_code,
+          teamShortName: team?.short_name ?? 'UNK',
+          points: live.stats.total_points,
+          selectedByPercent: element.selected_by_percent,
+          statBreakdown: buildStatBreakdown(live.explain),
+        } satisfies TopPlayer,
+      ];
     });
 
   return { gw, players };

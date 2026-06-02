@@ -8,6 +8,8 @@ export type { LeaguesStatsScreenProps } from './LeaguesStatsScreen/LeaguesStatsS
 export { LeaguesStatsScreen } from './LeaguesStatsScreen/LeaguesStatsScreen';
 export { LeagueStandingsScreen } from './LeagueStandingsScreen/LeagueStandingsScreen';
 export { PlayerWatchlistScreen } from './PlayerWatchlistScreen/PlayerWatchlistScreen';
+export { SignInScreen } from './SignInScreen/SignInScreen';
+export { SignUpScreen } from './SignUpScreen/SignUpScreen';
 export type { SquadScreenProps } from './SquadScreen/SquadScreen';
 export { SquadScreen } from './SquadScreen/SquadScreen';
 export { TeamOfTheWeekScreen } from './TeamOfTheWeekScreen/TeamOfTheWeekScreen';

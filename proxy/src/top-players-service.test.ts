@@ -34,10 +34,54 @@ const mockBootstrap = {
     { id: 2, name: 'Man City', short_name: 'MCI', code: 43 },
   ],
   elements: [
-    { id: 10, web_name: 'Raya', team: 1, team_code: 3, element_type: 1, status: 'a', chance_of_playing_this_round: null, news: '', total_points: 80, selected_by_percent: '12.5' },
-    { id: 20, web_name: 'Saliba', team: 1, team_code: 3, element_type: 2, status: 'a', chance_of_playing_this_round: null, news: '', total_points: 100, selected_by_percent: '34.2' },
-    { id: 30, web_name: 'Haaland', team: 2, team_code: 43, element_type: 4, status: 'a', chance_of_playing_this_round: null, news: '', total_points: 200, selected_by_percent: '66.7' },
-    { id: 40, web_name: 'Saka', team: 1, team_code: 3, element_type: 3, status: 'a', chance_of_playing_this_round: null, news: '', total_points: 150, selected_by_percent: '22.1' },
+    {
+      id: 10,
+      web_name: 'Raya',
+      team: 1,
+      team_code: 3,
+      element_type: 1,
+      status: 'a',
+      chance_of_playing_this_round: null,
+      news: '',
+      total_points: 80,
+      selected_by_percent: '12.5',
+    },
+    {
+      id: 20,
+      web_name: 'Saliba',
+      team: 1,
+      team_code: 3,
+      element_type: 2,
+      status: 'a',
+      chance_of_playing_this_round: null,
+      news: '',
+      total_points: 100,
+      selected_by_percent: '34.2',
+    },
+    {
+      id: 30,
+      web_name: 'Haaland',
+      team: 2,
+      team_code: 43,
+      element_type: 4,
+      status: 'a',
+      chance_of_playing_this_round: null,
+      news: '',
+      total_points: 200,
+      selected_by_percent: '66.7',
+    },
+    {
+      id: 40,
+      web_name: 'Saka',
+      team: 1,
+      team_code: 3,
+      element_type: 3,
+      status: 'a',
+      chance_of_playing_this_round: null,
+      news: '',
+      total_points: 150,
+      selected_by_percent: '22.1',
+    },
   ],
   element_types: [
     { id: 1, singular_name_short: 'GKP' },
@@ -49,10 +93,122 @@ const mockBootstrap = {
 
 const mockLive = {
   elements: [
-    { id: 10, stats: { total_points: 6, minutes: 90, goals_scored: 0, assists: 0, clean_sheets: 1, goals_conceded: 0, own_goals: 0, penalties_saved: 0, penalties_missed: 0, yellow_cards: 0, red_cards: 0, saves: 3, bonus: 0 }, explain: [{ fixture: 1, stats: [{ identifier: 'minutes', points: 2, value: 90 }, { identifier: 'clean_sheets', points: 4, value: 1 }, { identifier: 'saves', points: 0, value: 3 }] }] },
-    { id: 20, stats: { total_points: 14, minutes: 90, goals_scored: 1, assists: 1, clean_sheets: 1, goals_conceded: 0, own_goals: 0, penalties_saved: 0, penalties_missed: 0, yellow_cards: 0, red_cards: 0, saves: 0, bonus: 3 }, explain: [{ fixture: 1, stats: [{ identifier: 'minutes', points: 2, value: 90 }, { identifier: 'goals_scored', points: 6, value: 1 }, { identifier: 'assists', points: 3, value: 1 }, { identifier: 'clean_sheets', points: 4, value: 1 }, { identifier: 'bonus', points: 3, value: 3 }] }] },
-    { id: 30, stats: { total_points: 18, minutes: 90, goals_scored: 2, assists: 0, clean_sheets: 0, goals_conceded: 0, own_goals: 0, penalties_saved: 0, penalties_missed: 0, yellow_cards: 0, red_cards: 0, saves: 0, bonus: 3 }, explain: [{ fixture: 1, stats: [{ identifier: 'minutes', points: 2, value: 90 }, { identifier: 'goals_scored', points: 12, value: 2 }, { identifier: 'bonus', points: 3, value: 3 }, { identifier: 'goals_conceded', points: 0, value: 0 }, { identifier: 'bps', points: 0, value: 42 }] }] },
-    { id: 40, stats: { total_points: 12, minutes: 90, goals_scored: 1, assists: 0, clean_sheets: 0, goals_conceded: 0, own_goals: 0, penalties_saved: 0, penalties_missed: 0, yellow_cards: 0, red_cards: 0, saves: 0, bonus: 2 }, explain: [{ fixture: 1, stats: [{ identifier: 'minutes', points: 2, value: 90 }, { identifier: 'goals_scored', points: 6, value: 1 }, { identifier: 'bonus', points: 2, value: 2 }] }] },
+    {
+      id: 10,
+      stats: {
+        total_points: 6,
+        minutes: 90,
+        goals_scored: 0,
+        assists: 0,
+        clean_sheets: 1,
+        goals_conceded: 0,
+        own_goals: 0,
+        penalties_saved: 0,
+        penalties_missed: 0,
+        yellow_cards: 0,
+        red_cards: 0,
+        saves: 3,
+        bonus: 0,
+      },
+      explain: [
+        {
+          fixture: 1,
+          stats: [
+            { identifier: 'minutes', points: 2, value: 90 },
+            { identifier: 'clean_sheets', points: 4, value: 1 },
+            { identifier: 'saves', points: 0, value: 3 },
+          ],
+        },
+      ],
+    },
+    {
+      id: 20,
+      stats: {
+        total_points: 14,
+        minutes: 90,
+        goals_scored: 1,
+        assists: 1,
+        clean_sheets: 1,
+        goals_conceded: 0,
+        own_goals: 0,
+        penalties_saved: 0,
+        penalties_missed: 0,
+        yellow_cards: 0,
+        red_cards: 0,
+        saves: 0,
+        bonus: 3,
+      },
+      explain: [
+        {
+          fixture: 1,
+          stats: [
+            { identifier: 'minutes', points: 2, value: 90 },
+            { identifier: 'goals_scored', points: 6, value: 1 },
+            { identifier: 'assists', points: 3, value: 1 },
+            { identifier: 'clean_sheets', points: 4, value: 1 },
+            { identifier: 'bonus', points: 3, value: 3 },
+          ],
+        },
+      ],
+    },
+    {
+      id: 30,
+      stats: {
+        total_points: 18,
+        minutes: 90,
+        goals_scored: 2,
+        assists: 0,
+        clean_sheets: 0,
+        goals_conceded: 0,
+        own_goals: 0,
+        penalties_saved: 0,
+        penalties_missed: 0,
+        yellow_cards: 0,
+        red_cards: 0,
+        saves: 0,
+        bonus: 3,
+      },
+      explain: [
+        {
+          fixture: 1,
+          stats: [
+            { identifier: 'minutes', points: 2, value: 90 },
+            { identifier: 'goals_scored', points: 12, value: 2 },
+            { identifier: 'bonus', points: 3, value: 3 },
+            { identifier: 'goals_conceded', points: 0, value: 0 },
+            { identifier: 'bps', points: 0, value: 42 },
+          ],
+        },
+      ],
+    },
+    {
+      id: 40,
+      stats: {
+        total_points: 12,
+        minutes: 90,
+        goals_scored: 1,
+        assists: 0,
+        clean_sheets: 0,
+        goals_conceded: 0,
+        own_goals: 0,
+        penalties_saved: 0,
+        penalties_missed: 0,
+        yellow_cards: 0,
+        red_cards: 0,
+        saves: 0,
+        bonus: 2,
+      },
+      explain: [
+        {
+          fixture: 1,
+          stats: [
+            { identifier: 'minutes', points: 2, value: 90 },
+            { identifier: 'goals_scored', points: 6, value: 1 },
+            { identifier: 'bonus', points: 2, value: 2 },
+          ],
+        },
+      ],
+    },
   ],
 };
 
@@ -139,9 +295,14 @@ describe('Top Players Service — gameweek', () => {
 
   it('throws when gameweek not found', async () => {
     (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
-    (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ ...mockBootstrap, events: [] });
+    (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ...mockBootstrap,
+      events: [],
+    });
 
-    await expect(topPlayersService.getTopPlayersGameweek(99)).rejects.toThrow('Gameweek 99 not found');
+    await expect(topPlayersService.getTopPlayersGameweek(99)).rejects.toThrow(
+      'Gameweek 99 not found'
+    );
   });
 
   it('limits result to top 100', async () => {
@@ -160,13 +321,30 @@ describe('Top Players Service — gameweek', () => {
     const manyLive = {
       elements: manyElements.map((e, i) => ({
         id: e.id,
-        stats: { total_points: 150 - i, minutes: 90, goals_scored: 0, assists: 0, clean_sheets: 0, goals_conceded: 0, own_goals: 0, penalties_saved: 0, penalties_missed: 0, yellow_cards: 0, red_cards: 0, saves: 0, bonus: 0 },
+        stats: {
+          total_points: 150 - i,
+          minutes: 90,
+          goals_scored: 0,
+          assists: 0,
+          clean_sheets: 0,
+          goals_conceded: 0,
+          own_goals: 0,
+          penalties_saved: 0,
+          penalties_missed: 0,
+          yellow_cards: 0,
+          red_cards: 0,
+          saves: 0,
+          bonus: 0,
+        },
         explain: [],
       })),
     };
 
     (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
-    (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ ...mockBootstrap, elements: manyElements });
+    (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ...mockBootstrap,
+      elements: manyElements,
+    });
     (fplClient.getLive as ReturnType<typeof vi.fn>).mockResolvedValueOnce(manyLive);
 
     const result = await topPlayersService.getTopPlayersGameweek(1);
@@ -204,14 +382,45 @@ describe('Top Players Service — gameweek', () => {
 
   it('aggregates statBreakdown across multiple fixtures (double gameweek)', async () => {
     const doubleGwLive = {
-      elements: [{
-        id: 10,
-        stats: { total_points: 14, minutes: 180, goals_scored: 2, assists: 0, clean_sheets: 2, goals_conceded: 0, own_goals: 0, penalties_saved: 0, penalties_missed: 0, yellow_cards: 0, red_cards: 0, saves: 0, bonus: 2 },
-        explain: [
-          { fixture: 1, stats: [{ identifier: 'goals_scored', points: 6, value: 1 }, { identifier: 'clean_sheets', points: 4, value: 1 }, { identifier: 'minutes', points: 2, value: 90 }] },
-          { fixture: 2, stats: [{ identifier: 'goals_scored', points: 6, value: 1 }, { identifier: 'clean_sheets', points: 4, value: 1 }, { identifier: 'bonus', points: 2, value: 2 }, { identifier: 'minutes', points: 2, value: 90 }] },
-        ],
-      }],
+      elements: [
+        {
+          id: 10,
+          stats: {
+            total_points: 14,
+            minutes: 180,
+            goals_scored: 2,
+            assists: 0,
+            clean_sheets: 2,
+            goals_conceded: 0,
+            own_goals: 0,
+            penalties_saved: 0,
+            penalties_missed: 0,
+            yellow_cards: 0,
+            red_cards: 0,
+            saves: 0,
+            bonus: 2,
+          },
+          explain: [
+            {
+              fixture: 1,
+              stats: [
+                { identifier: 'goals_scored', points: 6, value: 1 },
+                { identifier: 'clean_sheets', points: 4, value: 1 },
+                { identifier: 'minutes', points: 2, value: 90 },
+              ],
+            },
+            {
+              fixture: 2,
+              stats: [
+                { identifier: 'goals_scored', points: 6, value: 1 },
+                { identifier: 'clean_sheets', points: 4, value: 1 },
+                { identifier: 'bonus', points: 2, value: 2 },
+                { identifier: 'minutes', points: 2, value: 90 },
+              ],
+            },
+          ],
+        },
+      ],
     };
 
     (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
@@ -291,7 +500,10 @@ describe('Top Players Service — season', () => {
     }));
 
     (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
-    (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ ...mockBootstrap, elements: manyElements });
+    (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ...mockBootstrap,
+      elements: manyElements,
+    });
 
     const result = await topPlayersService.getTopPlayersSeason();
 

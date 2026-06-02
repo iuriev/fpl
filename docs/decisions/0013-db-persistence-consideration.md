@@ -1,6 +1,6 @@
 # ADR 0013: Persistent storage to reduce FPL API request volume
 
-- Status: Proposed
+- Status: Superseded by ADR-0015
 - Date: 2026-05-25
 - Deciders: ivan.iuriev
 

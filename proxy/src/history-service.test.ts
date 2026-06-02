@@ -10,8 +10,24 @@ vi.mock('./cache');
 const mockBootstrap = {
   total_players: 10000000,
   events: [
-    { id: 1, name: 'Gameweek 1', deadline_time: '', is_current: false, finished: true, average_entry_score: 50, highest_score: 120 },
-    { id: 2, name: 'Gameweek 2', deadline_time: '', is_current: true, finished: false, average_entry_score: 55, highest_score: 130 },
+    {
+      id: 1,
+      name: 'Gameweek 1',
+      deadline_time: '',
+      is_current: false,
+      finished: true,
+      average_entry_score: 50,
+      highest_score: 120,
+    },
+    {
+      id: 2,
+      name: 'Gameweek 2',
+      deadline_time: '',
+      is_current: true,
+      finished: false,
+      average_entry_score: 55,
+      highest_score: 130,
+    },
   ],
   teams: [],
   elements: [],
@@ -20,8 +36,28 @@ const mockBootstrap = {
 
 const mockFPLHistory = {
   current: [
-    { event: 1, points: 65, total_points: 65, rank: 2000000, overall_rank: 2000000, value: 1000, event_transfers: 0, event_transfers_cost: 0, points_on_bench: 8 },
-    { event: 2, points: 72, total_points: 137, rank: 1500000, overall_rank: 1800000, value: 1020, event_transfers: 1, event_transfers_cost: 0, points_on_bench: 4 },
+    {
+      event: 1,
+      points: 65,
+      total_points: 65,
+      rank: 2000000,
+      overall_rank: 2000000,
+      value: 1000,
+      event_transfers: 0,
+      event_transfers_cost: 0,
+      points_on_bench: 8,
+    },
+    {
+      event: 2,
+      points: 72,
+      total_points: 137,
+      rank: 1500000,
+      overall_rank: 1800000,
+      value: 1020,
+      event_transfers: 1,
+      event_transfers_cost: 0,
+      points_on_bench: 4,
+    },
   ],
 };
 
@@ -34,7 +70,9 @@ describe('History Service', () => {
     it('fetches history and bootstrap, maps all fields, reverses array', async () => {
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
       (fplClient.getHistory as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockFPLHistory);
-      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockBootstrap);
+      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+        mockBootstrap
+      );
 
       const result = await historyService.getHistory(123);
 
@@ -47,7 +85,9 @@ describe('History Service', () => {
     it('maps all fields correctly', async () => {
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
       (fplClient.getHistory as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockFPLHistory);
-      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockBootstrap);
+      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+        mockBootstrap
+      );
 
       const result = await historyService.getHistory(123);
       const gw2 = result.gameweeks[0];
@@ -68,7 +108,9 @@ describe('History Service', () => {
     it('divides value by 10 for teamValue', async () => {
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
       (fplClient.getHistory as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockFPLHistory);
-      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockBootstrap);
+      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+        mockBootstrap
+      );
 
       const result = await historyService.getHistory(123);
 
@@ -78,8 +120,14 @@ describe('History Service', () => {
     it('caches with HISTORY_CURRENT TTL when current GW is not finished', async () => {
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
       (fplClient.getHistory as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockFPLHistory);
-      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockBootstrap);
-      (cache.ttl as typeof cache.ttl) = { ...cache.ttl, HISTORY_CURRENT: 60, HISTORY_FINISHED: 86400 };
+      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+        mockBootstrap
+      );
+      (cache.ttl as typeof cache.ttl) = {
+        ...cache.ttl,
+        HISTORY_CURRENT: 60,
+        HISTORY_FINISHED: 86400,
+      };
 
       await historyService.getHistory(123);
 
@@ -89,15 +137,18 @@ describe('History Service', () => {
     it('caches with HISTORY_FINISHED TTL when current GW is finished', async () => {
       const finishedBootstrap = {
         ...mockBootstrap,
-        events: [
-          { ...mockBootstrap.events[0] },
-          { ...mockBootstrap.events[1], finished: true },
-        ],
+        events: [{ ...mockBootstrap.events[0] }, { ...mockBootstrap.events[1], finished: true }],
       };
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
       (fplClient.getHistory as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockFPLHistory);
-      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(finishedBootstrap);
-      (cache.ttl as typeof cache.ttl) = { ...cache.ttl, HISTORY_CURRENT: 60, HISTORY_FINISHED: 86400 };
+      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+        finishedBootstrap
+      );
+      (cache.ttl as typeof cache.ttl) = {
+        ...cache.ttl,
+        HISTORY_CURRENT: 60,
+        HISTORY_FINISHED: 86400,
+      };
 
       await historyService.getHistory(123);
 
@@ -117,7 +168,9 @@ describe('History Service', () => {
     it('handles empty history', async () => {
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
       (fplClient.getHistory as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ current: [] });
-      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockBootstrap);
+      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+        mockBootstrap
+      );
 
       const result = await historyService.getHistory(123);
 
@@ -127,11 +180,15 @@ describe('History Service', () => {
     it('propagates errors from FPL client', async () => {
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
       (fplClient.getHistory as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
-        new Error('FPL API error: 404 Not Found'),
+        new Error('FPL API error: 404 Not Found')
       );
-      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockBootstrap);
+      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+        mockBootstrap
+      );
 
-      await expect(historyService.getHistory(999999)).rejects.toThrow('FPL API error: 404 Not Found');
+      await expect(historyService.getHistory(999999)).rejects.toThrow(
+        'FPL API error: 404 Not Found'
+      );
     });
   });
 });

@@ -16,11 +16,22 @@ const mockBootstrap = {
   teams: [{ id: 1, name: 'Arsenal', short_name: 'ARS', code: 3 }],
   elements: [
     {
-      id: 100, web_name: 'Saka', first_name: 'Bukayo', second_name: 'Saka',
-      team: 1, team_code: 3, element_type: 3, status: 'a',
-      chance_of_playing_this_round: null, news: '',
-      total_points: 120, now_cost: 95, event_points: 12,
-      form: '7.2', selected_by_percent: '44.5', ep_next: '5.5',
+      id: 100,
+      web_name: 'Saka',
+      first_name: 'Bukayo',
+      second_name: 'Saka',
+      team: 1,
+      team_code: 3,
+      element_type: 3,
+      status: 'a',
+      chance_of_playing_this_round: null,
+      news: '',
+      total_points: 120,
+      now_cost: 95,
+      event_points: 12,
+      form: '7.2',
+      selected_by_percent: '44.5',
+      ep_next: '5.5',
     },
   ],
   element_types: [],
@@ -33,7 +44,9 @@ describe('player-pool-service', () => {
     it('composes pool players from bootstrap and fixture data', async () => {
       vi.mocked(cache.get).mockReturnValue(null);
       vi.mocked(cache.set).mockReturnValue(undefined);
-      vi.mocked(fplClient.getBootstrapStatic).mockResolvedValue(mockBootstrap as unknown as FPLBootstrapStatic);
+      vi.mocked(fplClient.getBootstrapStatic).mockResolvedValue(
+        mockBootstrap as unknown as FPLBootstrapStatic
+      );
       vi.mocked(fixturesService.getUpcomingFixtures).mockResolvedValue({
         1: [{ gw: 3, opponent: 'MCI', home: true, difficulty: 4 }],
       });

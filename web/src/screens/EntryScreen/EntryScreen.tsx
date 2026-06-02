@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { api, ApiError } from '@/api/client';
+import { authClient } from '@/auth/auth-client';
+import { useCurrentUser } from '@/auth/AuthContext';
 import { Button } from '@/components/ui/Button/Button';
 import { Input } from '@/components/ui/Input/Input';
 import { copy } from '@/lib/copy';
@@ -20,7 +23,10 @@ export const EntryScreen: React.FC<EntryScreenProps> = ({
   _storyInputValue,
   _storyIsSubmitting,
 }) => {
-  const [teamId, setTeamId] = useState(_storyInputValue ?? '');
+  const { user } = useCurrentUser();
+  const [teamId, setTeamId] = useState(
+    _storyInputValue ?? (user?.fplTeamId ? String(user.fplTeamId) : '')
+  );
   const [error, setError] = useState<string | null>(_storyError ?? null);
   const [isSubmitting, setIsSubmitting] = useState(_storyIsSubmitting ?? false);
 
@@ -57,6 +63,13 @@ export const EntryScreen: React.FC<EntryScreenProps> = ({
 
     try {
       await api.getEntry(id);
+
+      if (user && !user.fplTeamId) {
+        authClient.saveTeam(id).catch(() => {
+          // Fire-and-forget, don't block on error
+        });
+      }
+
       onSubmit?.(id);
     } catch (err) {
       if (err instanceof ApiError) {
@@ -103,6 +116,15 @@ export const EntryScreen: React.FC<EntryScreenProps> = ({
         </form>
 
         <p className={styles.helper}>{copy.entryHelper}</p>
+
+        {!user && (
+          <p className={styles.footer}>
+            {copy.signInNoAccount || "Don't have an account yet?"}{' '}
+            <Link to="/sign-in" className={styles.link}>
+              {copy.signInSignUp || 'Sign in'}
+            </Link>
+          </p>
+        )}
       </div>
     </div>
   );

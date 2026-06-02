@@ -2,10 +2,13 @@ import * as cacheLayer from './cache';
 import * as fixturesService from './fixtures-service';
 import type { FPLBootstrapStatic } from './fpl-client';
 import * as fplClient from './fpl-client';
-import type { PlayerPoolResponse, PlayerPosition, PlayerStatus,PoolPlayer } from './types';
+import type { PlayerPoolResponse, PlayerPosition, PlayerStatus, PoolPlayer } from './types';
 
 const POSITION_MAP: Record<number, PlayerPosition> = {
-  1: 'GK', 2: 'DEF', 3: 'MID', 4: 'FWD',
+  1: 'GK',
+  2: 'DEF',
+  3: 'MID',
+  4: 'FWD',
 };
 
 async function getBootstrapWithCache(): Promise<FPLBootstrapStatic> {

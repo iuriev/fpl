@@ -79,7 +79,7 @@ describe('Proxy Endpoints', () => {
         if (errorMsg.includes('No picks available')) {
           return c.json(
             { error: `No squad available for gameweek ${c.req.param('gw')}` },
-            { status: 404 },
+            { status: 404 }
           );
         }
         if (errorMsg.includes('not found')) {
@@ -97,7 +97,7 @@ describe('Proxy Endpoints', () => {
         gameweeks: [{ id: 1, name: 'Gameweek 1', finished: true }],
       };
       (gameweeksService.getGameweeks as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-        mockResponse,
+        mockResponse
       );
 
       const req = new Request('http://localhost:3001/api/gameweeks');
@@ -110,7 +110,7 @@ describe('Proxy Endpoints', () => {
 
     it('returns 500 on error', async () => {
       (gameweeksService.getGameweeks as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
-        new Error('API error'),
+        new Error('API error')
       );
 
       const req = new Request('http://localhost:3001/api/gameweeks');
@@ -146,7 +146,7 @@ describe('Proxy Endpoints', () => {
 
     it('returns 404 for unknown team', async () => {
       (entryService.getEntry as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
-        new Error('FPL API error: 404 Not Found'),
+        new Error('FPL API error: 404 Not Found')
       );
 
       const req = new Request('http://localhost:3001/api/entry/999999');
@@ -159,7 +159,9 @@ describe('Proxy Endpoints', () => {
   describe('GET /api/fixtures/upcoming', () => {
     it('returns 200 with fixture data', async () => {
       const mockData = { 1: [{ gw: 3, opponent: 'MCI', home: true, difficulty: 4 }] };
-      vi.mocked(fixturesService.getUpcomingFixtures).mockResolvedValue(mockData as unknown as Record<number, FixtureInfo[]>);
+      vi.mocked(fixturesService.getUpcomingFixtures).mockResolvedValue(
+        mockData as unknown as Record<number, FixtureInfo[]>
+      );
 
       const res = await app.request('/api/fixtures/upcoming');
 
@@ -208,7 +210,7 @@ describe('Proxy Endpoints', () => {
 
       const req = new Request('http://localhost:3001/api/squad/123/1');
       const res = await app.fetch(req);
-      const data = await res.json() as Record<string, unknown>;
+      const data = (await res.json()) as Record<string, unknown>;
 
       expect(res.status).toBe(200);
       expect(data.gameweek).toBe(1);
@@ -223,7 +225,7 @@ describe('Proxy Endpoints', () => {
 
     it('returns 404 when no picks available', async () => {
       (squadService.getSquad as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
-        new Error('No picks available for gameweek 1'),
+        new Error('No picks available for gameweek 1')
       );
 
       const req = new Request('http://localhost:3001/api/squad/123/1');

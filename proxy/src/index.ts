@@ -3,12 +3,15 @@ import { serveStatic } from '@hono/node-server/serve-static';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 
+import { auth } from './auth/auth';
+import { runMigrations } from './db/client';
 import * as entryService from './entry-service';
 import * as fixturesService from './fixtures-service';
 import * as gameweeksService from './gameweeks-service';
 import * as historyService from './history-service';
 import * as leagueStandingsService from './league-standings-service';
 import * as leaguesService from './leagues-service';
+import { me } from './me-routes';
 import * as playerPoolService from './player-pool-service';
 import * as squadService from './squad-service';
 import * as teamOfTheWeekService from './team-of-the-week-service';
@@ -16,6 +19,18 @@ import * as teamService from './team-service';
 import * as topPlayersService from './top-players-service';
 import * as transfersService from './transfers-service';
 import { MAX_GAMEWEEK } from './types';
+
+if (!process.env.DATABASE_URL) {
+  console.error('DATABASE_URL is required');
+  process.exit(1);
+}
+
+if (!process.env.BETTER_AUTH_SECRET) {
+  console.error('BETTER_AUTH_SECRET is required');
+  process.exit(1);
+}
+
+await runMigrations();
 
 const app = new Hono();
 
@@ -34,10 +49,7 @@ app.get('/api/gameweeks', async (c) => {
     return c.json(result);
   } catch (error) {
     console.error('Error fetching gameweeks:', error);
-    return c.json(
-      { error: 'Unable to fetch gameweeks' },
-      { status: 500 },
-    );
+    return c.json({ error: 'Unable to fetch gameweeks' }, { status: 500 });
   }
 });
 
@@ -46,10 +58,7 @@ app.get('/api/entry/:teamId', async (c) => {
   try {
     const teamId = parseInt(c.req.param('teamId'), 10);
     if (isNaN(teamId) || teamId <= 0) {
-      return c.json(
-        { error: 'Invalid team ID' },
-        { status: 400 },
-      );
+      return c.json({ error: 'Invalid team ID' }, { status: 400 });
     }
 
     const result = await entryService.getEntry(teamId);
@@ -57,16 +66,10 @@ app.get('/api/entry/:teamId', async (c) => {
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
     if (errorMsg.includes('404')) {
-      return c.json(
-        { error: 'Team not found' },
-        { status: 404 },
-      );
+      return c.json({ error: 'Team not found' }, { status: 404 });
     }
     console.error('Error fetching entry:', error);
-    return c.json(
-      { error: 'Unable to fetch team information' },
-      { status: 500 },
-    );
+    return c.json({ error: 'Unable to fetch team information' }, { status: 500 });
   }
 });
 
@@ -134,10 +137,7 @@ app.get('/api/squad/:teamId/:gw', async (c) => {
     const gw = parseInt(c.req.param('gw'), 10);
 
     if (isNaN(teamId) || teamId <= 0 || isNaN(gw) || gw < 1 || gw > MAX_GAMEWEEK) {
-      return c.json(
-        { error: 'Invalid team ID or gameweek' },
-        { status: 400 },
-      );
+      return c.json({ error: 'Invalid team ID or gameweek' }, { status: 400 });
     }
 
     const result = await squadService.getSquad(teamId, gw);
@@ -147,20 +147,14 @@ app.get('/api/squad/:teamId/:gw', async (c) => {
     if (errorMsg.includes('No picks available')) {
       return c.json(
         { error: `No squad available for gameweek ${c.req.param('gw')}` },
-        { status: 404 },
+        { status: 404 }
       );
     }
     if (errorMsg.includes('not found')) {
-      return c.json(
-        { error: 'Team or gameweek not found' },
-        { status: 404 },
-      );
+      return c.json({ error: 'Team or gameweek not found' }, { status: 404 });
     }
     console.error('Error fetching squad:', error);
-    return c.json(
-      { error: 'Unable to fetch squad' },
-      { status: 500 },
-    );
+    return c.json({ error: 'Unable to fetch squad' }, { status: 500 });
   }
 });
 
@@ -200,7 +194,10 @@ app.get('/api/team-of-the-week/:gw', async (c) => {
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
     if (errorMsg.includes('not yet finished')) {
-      return c.json({ error: `Team of the Week is not yet available for gameweek ${gw}` }, { status: 400 });
+      return c.json(
+        { error: `Team of the Week is not yet available for gameweek ${gw}` },
+        { status: 400 }
+      );
     }
     if (errorMsg.includes('not found')) {
       return c.json({ error: `Gameweek ${gw} not found` }, { status: 404 });
@@ -327,6 +324,9 @@ app.get('/api/top-players/season', async (c) => {
     return c.json({ error: 'Unable to fetch top players' }, { status: 500 });
   }
 });
+
+app.on(['GET', 'POST'], '/api/auth/*', (c) => auth.handler(c.req.raw));
+app.route('/api/me', me);
 
 app.use('*', serveStatic({ root: './web/dist' }));
 app.get('*', serveStatic({ path: './web/dist/index.html' }));

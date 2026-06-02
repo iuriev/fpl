@@ -29,8 +29,11 @@ it behaves. Avoid duplicating: link between them instead.
 | [0010](0010-proxy-implementation.md) | Proxy implementation: service layer composition | Accepted |
 | [0011](0011-browser-support-policy.md) | Browser support policy: rolling last-N versions | Accepted |
 | [0012](0012-drop-screenshot-qa-gate.md) | Drop screenshot QA gate | Accepted |
-| [0013](0013-db-persistence-consideration.md) | Persistent storage to reduce FPL API request volume | Proposed |
+| [0013](0013-db-persistence-consideration.md) | Persistent storage to reduce FPL API request volume | Superseded by 0015 |
 | [0014](0014-native-css-primitives.md) | Prefer native CSS: Popover API, :has(), @starting-style | Accepted |
+| [0015](0015-database-postgres.md) | Adopt Postgres (Supabase) as the user-data store | Accepted |
+| [0016](0016-auth-better-auth.md) | Use better-auth for authentication | Accepted |
+| [0017](0017-session-transport-cookie.md) | Session transport — HttpOnly cookie | Accepted |
 
 ## Template
 

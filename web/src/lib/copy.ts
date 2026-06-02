@@ -23,6 +23,34 @@ export const copy = {
   entryErrorNotFound: "We couldn't find a team with that ID. Please check and try again.",
   entryErrorUnreachable: "Couldn't reach the FPL servers. Please try again.",
 
+  // Sign in screen
+  signInHeadline: 'Sign In',
+  signInSubtitle: 'Access your FPL dashboard',
+  signInEmailLabel: 'Email',
+  signInEmailPlaceholder: 'you@example.com',
+  signInPasswordLabel: 'Password',
+  signInPasswordPlaceholder: 'Password',
+  signInSubmit: 'Sign In',
+  signInGoogle: 'Sign in with Google',
+  signInDivider: 'or',
+  signInNoAccount: "Don't have an account?",
+  signInSignUp: 'Sign up',
+
+  // Sign up screen
+  signUpHeadline: 'Create Account',
+  signUpSubtitle: 'Join FPL Squad Viewer',
+  signUpNameLabel: 'Name',
+  signUpNamePlaceholder: 'Your name',
+  signUpEmailLabel: 'Email',
+  signUpEmailPlaceholder: 'you@example.com',
+  signUpPasswordLabel: 'Password',
+  signUpPasswordPlaceholder: 'Password',
+  signUpSubmit: 'Create Account',
+  signUpGoogle: 'Sign up with Google',
+  signUpDivider: 'or',
+  signUpHaveAccount: 'Already have an account?',
+  signUpSignIn: 'Sign in',
+
   // Squad screen
   squadChangeTeam: 'Change',
   squadGameweekLabel: 'GW',

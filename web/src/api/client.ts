@@ -53,6 +53,8 @@ async function request<T>(endpoint: string): Promise<T> {
 }
 
 export const api = {
+  getMe: () => request<{ id: string; email: string; name: string; fplTeamId: number | null }>('/me'),
+
   getGameweeks: () => request<GameweeksResponse>('/gameweeks'),
 
   getEntry: (teamId: number) => request<EntryResponse>(`/entry/${teamId}`),

@@ -2,6 +2,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useSearchParams } from 'react-router-dom';
 
+import { AuthProvider } from '@/auth/AuthProvider';
+import { ProtectedRoute } from '@/auth/ProtectedRoute';
 import { useMyTeam } from '@/lib/my-team/MyTeamContext';
 import { MyTeamProvider } from '@/lib/my-team/MyTeamProvider';
 import { PlayerWatchlistPremiumProvider } from '@/lib/player-watchlist-premium/PlayerWatchlistPremiumProvider';
@@ -21,6 +23,8 @@ import {
   LeaguesStatsScreen,
   LeagueStandingsScreen,
   PlayerWatchlistScreen,
+  SignInScreen,
+  SignUpScreen,
   SquadScreen,
   TeamOfTheWeekScreen,
   TopPlayersScreen,
@@ -32,7 +36,7 @@ const queryClient = new QueryClient();
 const watchlistRepo = new LocalStorageWatchlistRepository();
 const playerWatchlistRepo = new LocalStoragePlayerWatchlistRepository();
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
+function MyTeamProtectedRoute({ children }: { children: React.ReactNode }) {
   const { myTeamId } = useMyTeam();
   if (!myTeamId) return <Navigate to="/" replace />;
   return <>{children}</>;
@@ -56,78 +60,70 @@ function AppContent() {
   return (
     <Routes>
       <Route path="/" element={rootElement()} />
+      <Route path="/sign-in" element={<SignInScreen />} />
+      <Route path="/sign-up" element={<SignUpScreen />} />
       <Route
         path="/history"
         element={
-          <ProtectedRoute>
+          <MyTeamProtectedRoute>
             <GameweekHistoryScreen teamId={myTeamId!} />
-          </ProtectedRoute>
+          </MyTeamProtectedRoute>
         }
       />
       <Route
         path="/stats"
         element={
-          <ProtectedRoute>
+          <MyTeamProtectedRoute>
             <LeaguesStatsScreen teamId={myTeamId!} />
-          </ProtectedRoute>
+          </MyTeamProtectedRoute>
         }
       />
       <Route
         path="/review"
         element={
-          <ProtectedRoute>
+          <MyTeamProtectedRoute>
             <GameweekReviewScreen teamId={myTeamId!} />
-          </ProtectedRoute>
+          </MyTeamProtectedRoute>
         }
       />
       <Route
         path="/team-of-the-week"
         element={
-          <ProtectedRoute>
+          <MyTeamProtectedRoute>
             <TeamOfTheWeekScreen />
-          </ProtectedRoute>
+          </MyTeamProtectedRoute>
         }
       />
       <Route
         path="/top-players"
         element={
-          <ProtectedRoute>
+          <MyTeamProtectedRoute>
             <TopPlayersScreen />
-          </ProtectedRoute>
+          </MyTeamProtectedRoute>
         }
       />
       <Route
         path="/transfers"
         element={
-          <ProtectedRoute>
+          <MyTeamProtectedRoute>
             <TransferScreen teamId={myTeamId!} />
-          </ProtectedRoute>
+          </MyTeamProtectedRoute>
         }
       />
-      <Route
-        path="/watchlist"
-        element={
-          <ProtectedRoute>
-            <WatchlistScreen />
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/watchlist" element={<ProtectedRoute />}>
+        <Route index element={<WatchlistScreen />} />
+      </Route>
       <Route
         path="/leagues/:leagueId/standings"
         element={
-          <ProtectedRoute>
+          <MyTeamProtectedRoute>
             <LeagueStandingsScreen />
-          </ProtectedRoute>
+          </MyTeamProtectedRoute>
         }
       />
-      <Route
-        path="/player-watchlist"
-        element={
-          <ProtectedRoute>
-            <PlayerWatchlistScreen />
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/player-watchlist" element={<ProtectedRoute />}>
+        <Route index element={<PlayerWatchlistScreen />} />
+      </Route>
     </Routes>
   );
 }
@@ -141,7 +137,9 @@ export function App() {
             <PlayerWatchlistPremiumProvider>
               <MyTeamProvider>
                 <BrowserRouter>
-                  <AppContent />
+                  <AuthProvider>
+                    <AppContent />
+                  </AuthProvider>
                 </BrowserRouter>
               </MyTeamProvider>
             </PlayerWatchlistPremiumProvider>

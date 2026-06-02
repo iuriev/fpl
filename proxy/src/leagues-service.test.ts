@@ -21,9 +21,7 @@ const mockFPLEntry = {
       { id: 1, name: 'Overall', entry_rank: 1000000, entry_last_rank: 1100000 },
       { id: 100, name: 'My Private League', entry_rank: 5, entry_last_rank: 3 },
     ],
-    h2h: [
-      { id: 200, name: 'H2H League', entry_rank: 2, entry_last_rank: null },
-    ],
+    h2h: [{ id: 200, name: 'H2H League', entry_rank: 2, entry_last_rank: null }],
   },
 };
 
@@ -50,8 +48,18 @@ describe('Leagues Service', () => {
 
       const result = await leaguesService.getLeagues(123);
 
-      expect(result.classic[0]).toEqual({ id: 1, name: 'Overall', rank: 1000000, lastRank: 1100000 });
-      expect(result.classic[1]).toEqual({ id: 100, name: 'My Private League', rank: 5, lastRank: 3 });
+      expect(result.classic[0]).toEqual({
+        id: 1,
+        name: 'Overall',
+        rank: 1000000,
+        lastRank: 1100000,
+      });
+      expect(result.classic[1]).toEqual({
+        id: 100,
+        name: 'My Private League',
+        rank: 5,
+        lastRank: 3,
+      });
     });
 
     it('maps h2h league with null lastRank', async () => {
@@ -97,10 +105,12 @@ describe('Leagues Service', () => {
     it('propagates errors from FPL client', async () => {
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
       (fplClient.getEntry as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
-        new Error('FPL API error: 404 Not Found'),
+        new Error('FPL API error: 404 Not Found')
       );
 
-      await expect(leaguesService.getLeagues(999999)).rejects.toThrow('FPL API error: 404 Not Found');
+      await expect(leaguesService.getLeagues(999999)).rejects.toThrow(
+        'FPL API error: 404 Not Found'
+      );
     });
   });
 });

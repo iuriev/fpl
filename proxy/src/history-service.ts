@@ -40,7 +40,7 @@ export async function getHistory(teamId: number): Promise<HistoryResponse> {
   cacheLayer.set(
     cacheKey,
     result,
-    isFinished ? cacheLayer.ttl.HISTORY_FINISHED : cacheLayer.ttl.HISTORY_CURRENT,
+    isFinished ? cacheLayer.ttl.HISTORY_FINISHED : cacheLayer.ttl.HISTORY_CURRENT
   );
 
   return result;

@@ -4,107 +4,119 @@
 > **Rule:** any change to `schema.ts` must update this file in the same PR.
 > For interactive browsing run `npm run db:studio -w proxy` (Drizzle Studio on `https://local.drizzle.studio`).
 
----
+## Tables
+
+### `user`
+
+Stores registered user accounts. Extended from better-auth's base schema with `fpl_team_id`.
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| `id` | text | NO | Primary key (better-auth generated) |
+| `name` | text | NO | Display name |
+| `email` | text | NO | Unique |
+| `email_verified` | boolean | NO | Default false |
+| `image` | text | YES | Avatar URL |
+| `fpl_team_id` | integer | YES | User's saved FPL team ID |
+| `created_at` | timestamp | NO | |
+| `updated_at` | timestamp | NO | |
+
+### `session`
+
+Active user sessions managed by better-auth.
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| `id` | text | NO | Primary key |
+| `expires_at` | timestamp | NO | Session expiry (30 days) |
+| `token` | text | NO | Unique session token |
+| `created_at` | timestamp | NO | |
+| `updated_at` | timestamp | NO | |
+| `ip_address` | text | YES | |
+| `user_agent` | text | YES | |
+| `user_id` | text | NO | FK → `user.id` (cascade delete) |
+
+### `account`
+
+OAuth provider accounts and password credentials, managed by better-auth.
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| `id` | text | NO | Primary key |
+| `account_id` | text | NO | Provider's account ID |
+| `provider_id` | text | NO | e.g. `google`, `credential` |
+| `user_id` | text | NO | FK → `user.id` (cascade delete) |
+| `access_token` | text | YES | OAuth access token |
+| `refresh_token` | text | YES | OAuth refresh token |
+| `id_token` | text | YES | OAuth ID token |
+| `access_token_expires_at` | timestamp | YES | |
+| `refresh_token_expires_at` | timestamp | YES | |
+| `scope` | text | YES | OAuth scopes |
+| `password` | text | YES | Argon2id hash (email/password accounts) |
+| `created_at` | timestamp | NO | |
+| `updated_at` | timestamp | NO | |
+
+### `verification`
+
+Email verification tokens.
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| `id` | text | NO | Primary key |
+| `identifier` | text | NO | Email address |
+| `value` | text | NO | Verification token |
+| `expires_at` | timestamp | NO | |
+| `created_at` | timestamp | YES | |
+| `updated_at` | timestamp | YES | |
 
 ## ER Diagram
 
-> This section will be populated in Step 3 of AUTH-01 once the full Drizzle schema is defined.
-
 ```mermaid
 erDiagram
-  users ||--o{ accounts : has
-  users ||--o{ sessions : has
-  users {
-    text      id          PK
-    text      email
-    boolean   email_verified
-    text      password_hash   "null for OAuth-only"
-    text      display_name
-    integer   fpl_team_id     "null until user saves it"
-    timestamp created_at
-    timestamp updated_at
-  }
-  accounts {
-    text      id              PK
-    text      user_id         FK
-    text      provider
-    text      provider_account_id
-    timestamp expires_at
-  }
-  sessions {
-    text      id              PK
-    text      user_id         FK
-    text      token
-    timestamp expires_at
-    text      user_agent
-    text      ip_address
-  }
-  verification_tokens {
-    text      id              PK
-    text      identifier
-    text      value
-    timestamp expires_at
-  }
+    user {
+        text id PK
+        text name
+        text email
+        boolean email_verified
+        text image
+        integer fpl_team_id
+        timestamp created_at
+        timestamp updated_at
+    }
+    session {
+        text id PK
+        timestamp expires_at
+        text token
+        timestamp created_at
+        timestamp updated_at
+        text ip_address
+        text user_agent
+        text user_id FK
+    }
+    account {
+        text id PK
+        text account_id
+        text provider_id
+        text user_id FK
+        text access_token
+        text refresh_token
+        text id_token
+        timestamp access_token_expires_at
+        timestamp refresh_token_expires_at
+        text scope
+        text password
+        timestamp created_at
+        timestamp updated_at
+    }
+    verification {
+        text id PK
+        text identifier
+        text value
+        timestamp expires_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    user ||--o{ session : "has"
+    user ||--o{ account : "has"
 ```
-
----
-
-## Tables
-
-### users
-
-| Column           | Type      | Null | Default | Notes                          |
-|------------------|-----------|------|---------|--------------------------------|
-| id               | text (PK) | no   | —       | better-auth user id            |
-| email            | text      | no   | —       | unique                         |
-| email_verified   | boolean   | no   | false   |                                |
-| password_hash    | text      | yes  | —       | null for OAuth-only users      |
-| display_name     | text      | yes  | —       |                                |
-| fpl_team_id      | integer   | yes  | —       | AUTH-01: saved FPL team ID     |
-| created_at       | timestamp | no   | now()   |                                |
-| updated_at       | timestamp | no   | now()   |                                |
-
-**Relations:** `accounts.user_id → users.id`, `sessions.user_id → users.id`
-
----
-
-### accounts
-
-| Column               | Type      | Null | Default | Notes                        |
-|----------------------|-----------|------|---------|------------------------------|
-| id                   | text (PK) | no   | —       |                              |
-| user_id              | text (FK) | no   | —       | → users.id                   |
-| provider             | text      | no   | —       | e.g. `"google"`              |
-| provider_account_id  | text      | no   | —       | provider's user identifier   |
-| expires_at           | timestamp | yes  | —       | OAuth token expiry           |
-
----
-
-### sessions
-
-| Column      | Type      | Null | Default | Notes                        |
-|-------------|-----------|------|---------|------------------------------|
-| id          | text (PK) | no   | —       |                              |
-| user_id     | text (FK) | no   | —       | → users.id                   |
-| token       | text      | no   | —       | refresh token (hashed)       |
-| expires_at  | timestamp | no   | —       | ~30 days from creation       |
-| user_agent  | text      | yes  | —       |                              |
-| ip_address  | text      | yes  | —       |                              |
-
----
-
-### verification_tokens
-
-| Column      | Type      | Null | Default | Notes                        |
-|-------------|-----------|------|---------|------------------------------|
-| id          | text (PK) | no   | —       |                              |
-| identifier  | text      | no   | —       | e.g. email address           |
-| value       | text      | no   | —       | hashed token                 |
-| expires_at  | timestamp | no   | —       |                              |
-
----
-
-> **How to view live data:**
-> - `npm run db:studio -w proxy` — Drizzle Studio (local, reads `DATABASE_URL` from `.env`)
-> - Supabase Dashboard → Table editor (cloud)
-> - Generated SQL migrations: `proxy/src/db/migrations/*.sql`

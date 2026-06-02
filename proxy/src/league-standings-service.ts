@@ -6,7 +6,7 @@ const TTL_STANDINGS = 600;
 
 export async function getLeagueStandings(
   leagueId: number,
-  page: number,
+  page: number
 ): Promise<LeagueStandingsResponse> {
   const cacheKey = `league-standings:${leagueId}:${page}`;
   const cached = cacheLayer.get<LeagueStandingsResponse>(cacheKey);

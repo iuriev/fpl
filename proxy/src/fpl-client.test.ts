@@ -28,7 +28,9 @@ describe('FPL Client', () => {
 
       const result = await fplClient.getBootstrapStatic();
       expect(result).toEqual(mockData);
-      expect(global.fetch).toHaveBeenCalledWith('https://fantasy.premierleague.com/api/bootstrap-static/');
+      expect(global.fetch).toHaveBeenCalledWith(
+        'https://fantasy.premierleague.com/api/bootstrap-static/'
+      );
     });
 
     it('throws on API error', async () => {
@@ -39,7 +41,7 @@ describe('FPL Client', () => {
       });
 
       await expect(fplClient.getBootstrapStatic()).rejects.toThrow(
-        'FPL API error: 500 Internal Server Error',
+        'FPL API error: 500 Internal Server Error'
       );
     });
   });
@@ -105,7 +107,7 @@ describe('FPL Client', () => {
       const result = await fplClient.getPicks(123, 1);
       expect(result).toEqual(mockData);
       expect(global.fetch).toHaveBeenCalledWith(
-        'https://fantasy.premierleague.com/api/entry/123/event/1/picks/',
+        'https://fantasy.premierleague.com/api/entry/123/event/1/picks/'
       );
     });
   });
@@ -130,7 +132,9 @@ describe('FPL Client', () => {
 
       const result = await fplClient.getLive(1);
       expect(result).toEqual(mockData);
-      expect(global.fetch).toHaveBeenCalledWith('https://fantasy.premierleague.com/api/event/1/live/');
+      expect(global.fetch).toHaveBeenCalledWith(
+        'https://fantasy.premierleague.com/api/event/1/live/'
+      );
     });
   });
 

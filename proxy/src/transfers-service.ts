@@ -23,9 +23,7 @@ export async function getTransfers(teamId: number): Promise<TransfersResponse> {
     getBootstrapWithCache(),
   ]);
 
-  const playerMap = new Map<number, string>(
-    bootstrap.elements.map((e) => [e.id, e.web_name]),
-  );
+  const playerMap = new Map<number, string>(bootstrap.elements.map((e) => [e.id, e.web_name]));
 
   const result: TransfersResponse = {
     teamId,

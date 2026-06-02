@@ -10,7 +10,15 @@ vi.mock('./cache');
 const mockBootstrap = {
   total_players: 10000000,
   events: [
-    { id: 1, name: 'Gameweek 1', finished: true, average_entry_score: 50, highest_score: 120, deadline_time: '2025-08-09T11:00:00Z', is_current: false },
+    {
+      id: 1,
+      name: 'Gameweek 1',
+      finished: true,
+      average_entry_score: 50,
+      highest_score: 120,
+      deadline_time: '2025-08-09T11:00:00Z',
+      is_current: false,
+    },
   ],
   teams: [
     { id: 1, name: 'Arsenal', short_name: 'ARS', code: 3 },
@@ -18,11 +26,66 @@ const mockBootstrap = {
     { id: 3, name: 'Chelsea', short_name: 'CHE', code: 8 },
   ],
   elements: [
-    { id: 10, web_name: 'Raya', team: 1, team_code: 3, element_type: 1, status: 'a', chance_of_playing_this_round: null, news: '', total_points: 80, selected_by_percent: '12.5' },
-    { id: 20, web_name: 'Saliba', team: 1, team_code: 3, element_type: 2, status: 'a', chance_of_playing_this_round: null, news: '', total_points: 100, selected_by_percent: '34.2' },
-    { id: 30, web_name: 'Haaland', team: 2, team_code: 43, element_type: 4, status: 'a', chance_of_playing_this_round: null, news: '', total_points: 200, selected_by_percent: '66.7' },
-    { id: 40, web_name: 'Saka', team: 1, team_code: 3, element_type: 3, status: 'a', chance_of_playing_this_round: null, news: '', total_points: 150, selected_by_percent: '22.1' },
-    { id: 50, web_name: 'Palmer', team: 3, team_code: 8, element_type: 3, status: 'a', chance_of_playing_this_round: null, news: '', total_points: 170, selected_by_percent: '41.3' },
+    {
+      id: 10,
+      web_name: 'Raya',
+      team: 1,
+      team_code: 3,
+      element_type: 1,
+      status: 'a',
+      chance_of_playing_this_round: null,
+      news: '',
+      total_points: 80,
+      selected_by_percent: '12.5',
+    },
+    {
+      id: 20,
+      web_name: 'Saliba',
+      team: 1,
+      team_code: 3,
+      element_type: 2,
+      status: 'a',
+      chance_of_playing_this_round: null,
+      news: '',
+      total_points: 100,
+      selected_by_percent: '34.2',
+    },
+    {
+      id: 30,
+      web_name: 'Haaland',
+      team: 2,
+      team_code: 43,
+      element_type: 4,
+      status: 'a',
+      chance_of_playing_this_round: null,
+      news: '',
+      total_points: 200,
+      selected_by_percent: '66.7',
+    },
+    {
+      id: 40,
+      web_name: 'Saka',
+      team: 1,
+      team_code: 3,
+      element_type: 3,
+      status: 'a',
+      chance_of_playing_this_round: null,
+      news: '',
+      total_points: 150,
+      selected_by_percent: '22.1',
+    },
+    {
+      id: 50,
+      web_name: 'Palmer',
+      team: 3,
+      team_code: 8,
+      element_type: 3,
+      status: 'a',
+      chance_of_playing_this_round: null,
+      news: '',
+      total_points: 170,
+      selected_by_percent: '41.3',
+    },
   ],
   element_types: [
     { id: 1, singular_name_short: 'GKP' },
@@ -141,7 +204,9 @@ describe('Team Service — getTeamPlayers', () => {
       elements: mockBootstrap.elements.filter((e) => e.team_code !== 8),
     };
     (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
-    (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(bootstrapNoPlayers);
+    (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+      bootstrapNoPlayers
+    );
 
     const result = await teamService.getTeamPlayers(8);
 

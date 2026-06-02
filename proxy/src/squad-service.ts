@@ -4,7 +4,13 @@
  */
 
 import * as cacheLayer from './cache';
-import type { FPLBootstrapStatic, FPLHistory, FPLHistoryChip, FPLLive,FPLPicks } from './fpl-client';
+import type {
+  FPLBootstrapStatic,
+  FPLHistory,
+  FPLHistoryChip,
+  FPLLive,
+  FPLPicks,
+} from './fpl-client';
 import * as fplClient from './fpl-client';
 import type {
   ActiveChip,
@@ -29,7 +35,11 @@ function buildStatBreakdown(explain: FPLLive['elements'][0]['explain']): StatEnt
         existing.value += stat.value;
         existing.points += stat.points;
       } else {
-        map.set(stat.identifier, { identifier: stat.identifier, value: stat.value, points: stat.points });
+        map.set(stat.identifier, {
+          identifier: stat.identifier,
+          value: stat.value,
+          points: stat.points,
+        });
       }
     }
   }
@@ -62,7 +72,7 @@ async function getBootstrapWithCache(): Promise<FPLBootstrapStatic> {
 async function getPicksWithCache(
   teamId: number,
   gameweek: number,
-  gameweekFinished: boolean,
+  gameweekFinished: boolean
 ): Promise<FPLPicks> {
   const cacheKey = `picks:${teamId}:${gameweek}`;
   const cached = cacheLayer.get<FPLPicks>(cacheKey);
@@ -106,7 +116,7 @@ export function computeChipStatuses(
   activeChip: ActiveChip,
   playedChips: FPLHistoryChip[],
   bootstrapChips: FPLBootstrapStatic['chips'],
-  currentGw: number,
+  currentGw: number
 ): ChipStatuses {
   const chips = playedChips ?? [];
   const windows = bootstrapChips ?? [];
@@ -114,11 +124,11 @@ export function computeChipStatuses(
 
   const wcWindows = windows.filter((c) => c.name === 'wildcard');
   const currentWindow = wcWindows.find(
-    (w) => currentGw >= w.start_event && currentGw <= w.stop_event,
+    (w) => currentGw >= w.start_event && currentGw <= w.stop_event
   );
   const wcPlayInWindow = currentWindow
     ? played('wildcard').find(
-        (c) => c.event >= currentWindow.start_event && c.event <= currentWindow.stop_event,
+        (c) => c.event >= currentWindow.start_event && c.event <= currentWindow.stop_event
       )
     : undefined;
 
@@ -136,9 +146,9 @@ export function computeChipStatuses(
 
   return {
     wildcard: chipInfo('wildcard', { used: !!wcPlayInWindow, event: wcPlayInWindow?.event }),
-    freehit:  chipInfo('freehit'),
-    bboost:   chipInfo('bboost'),
-    '3xc':    chipInfo('3xc'),
+    freehit: chipInfo('freehit'),
+    bboost: chipInfo('bboost'),
+    '3xc': chipInfo('3xc'),
   };
 }
 
@@ -194,7 +204,9 @@ export async function getSquad(teamId: number, gameweek: number): Promise<SquadR
       bonus: liveStats?.bonus ?? 0,
     };
 
-    const statBreakdown = liveElement?.explain ? buildStatBreakdown(liveElement.explain) : undefined;
+    const statBreakdown = liveElement?.explain
+      ? buildStatBreakdown(liveElement.explain)
+      : undefined;
 
     return {
       id: pick.element,
@@ -255,7 +267,10 @@ export async function getSquad(teamId: number, gameweek: number): Promise<SquadR
       rank: entryHistory.rank,
       transfers: entryHistory.event_transfers,
       bank: entryHistory.bank,
-      freeTransfers: Math.max(0, computeFreeTransfers(history.current) - entryHistory.event_transfers),
+      freeTransfers: Math.max(
+        0,
+        computeFreeTransfers(history.current) - entryHistory.event_transfers
+      ),
     },
     starters,
     bench,

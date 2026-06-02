@@ -1,0 +1,34 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-lg);
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-md);
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--fpl-size-btn-h);
+  height: var(--fpl-size-btn-h);
+  border-radius: var(--fpl-radius-pill);
+  background: var(--fpl-accent);
+  color: var(--fpl-accent-ink);
+  font-weight: var(--fpl-fw-bold);
+  font-size: var(--fpl-fs-body-m);
+}
+
+.name {
+  font-size: var(--fpl-fs-body);
+  color: var(--fpl-text);
+  font-weight: var(--fpl-fw-medium);
+  max-width: 10rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

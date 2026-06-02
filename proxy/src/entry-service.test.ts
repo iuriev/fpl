@@ -36,7 +36,9 @@ describe('Entry Service', () => {
     it('fetches entry and bootstrap, maps all fields', async () => {
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
       (fplClient.getEntry as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockFPLEntry);
-      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockBootstrap);
+      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+        mockBootstrap
+      );
 
       const result = await entryService.getEntry(123);
 
@@ -88,7 +90,9 @@ describe('Entry Service', () => {
       const entryNoRegion = { ...mockFPLEntry, player_region_iso_code_short: null };
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
       (fplClient.getEntry as ReturnType<typeof vi.fn>).mockResolvedValueOnce(entryNoRegion);
-      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockBootstrap);
+      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+        mockBootstrap
+      );
 
       const result = await entryService.getEntry(123);
 
@@ -96,10 +100,18 @@ describe('Entry Service', () => {
     });
 
     it('concatenates first and last name correctly', async () => {
-      const entry = { ...mockFPLEntry, id: 456, name: 'Test Squad', player_first_name: 'Jane', player_last_name: 'Smith' };
+      const entry = {
+        ...mockFPLEntry,
+        id: 456,
+        name: 'Test Squad',
+        player_first_name: 'Jane',
+        player_last_name: 'Smith',
+      };
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
       (fplClient.getEntry as ReturnType<typeof vi.fn>).mockResolvedValueOnce(entry);
-      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockBootstrap);
+      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+        mockBootstrap
+      );
 
       const result = await entryService.getEntry(456);
 
@@ -109,13 +121,13 @@ describe('Entry Service', () => {
     it('propagates errors from FPL client', async () => {
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
       (fplClient.getEntry as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
-        new Error('FPL API error: 404 Not Found'),
+        new Error('FPL API error: 404 Not Found')
       );
-      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockBootstrap);
+      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+        mockBootstrap
+      );
 
-      await expect(entryService.getEntry(999999)).rejects.toThrow(
-        'FPL API error: 404 Not Found',
-      );
+      await expect(entryService.getEntry(999999)).rejects.toThrow('FPL API error: 404 Not Found');
     });
   });
 });

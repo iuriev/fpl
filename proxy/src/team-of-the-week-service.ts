@@ -1,7 +1,7 @@
 import * as cacheLayer from './cache';
 import type { FPLBootstrapStatic, FPLDreamTeam } from './fpl-client';
 import * as fplClient from './fpl-client';
-import type { PlayerPosition,TeamOfTheWeekPlayer, TeamOfTheWeekResponse } from './types';
+import type { PlayerPosition, TeamOfTheWeekPlayer, TeamOfTheWeekResponse } from './types';
 
 const POSITION_MAP: Record<number, PlayerPosition> = {
   1: 'GK',

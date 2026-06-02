@@ -97,14 +97,17 @@ describe('Squad Service', () => {
 
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValueOnce(null);
       (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-        mockBootstrap,
+        mockBootstrap
       );
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValueOnce(null);
       (fplClient.getPicks as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockPicks);
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValueOnce(null);
       (fplClient.getLive as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockLive);
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValueOnce(null);
-      (fplClient.getHistory as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ current: [], chips: [] });
+      (fplClient.getHistory as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        current: [],
+        chips: [],
+      });
 
       const result = await squadService.getSquad(123, 1);
 
@@ -195,18 +198,55 @@ describe('Squad Service', () => {
 
       const mockLive = {
         elements: [
-          { id: 1, stats: { total_points: 10, minutes: 90, goals_scored: 0, assists: 0, clean_sheets: 0, goals_conceded: 0, own_goals: 0, penalties_saved: 0, penalties_missed: 0, yellow_cards: 0, red_cards: 0, saves: 0, bonus: 0 } },
-          { id: 2, stats: { total_points: 5, minutes: 45, goals_scored: 0, assists: 0, clean_sheets: 0, goals_conceded: 0, own_goals: 0, penalties_saved: 0, penalties_missed: 0, yellow_cards: 0, red_cards: 0, saves: 0, bonus: 0 } },
+          {
+            id: 1,
+            stats: {
+              total_points: 10,
+              minutes: 90,
+              goals_scored: 0,
+              assists: 0,
+              clean_sheets: 0,
+              goals_conceded: 0,
+              own_goals: 0,
+              penalties_saved: 0,
+              penalties_missed: 0,
+              yellow_cards: 0,
+              red_cards: 0,
+              saves: 0,
+              bonus: 0,
+            },
+          },
+          {
+            id: 2,
+            stats: {
+              total_points: 5,
+              minutes: 45,
+              goals_scored: 0,
+              assists: 0,
+              clean_sheets: 0,
+              goals_conceded: 0,
+              own_goals: 0,
+              penalties_saved: 0,
+              penalties_missed: 0,
+              yellow_cards: 0,
+              red_cards: 0,
+              saves: 0,
+              bonus: 0,
+            },
+          },
         ],
       };
 
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
       (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-        mockBootstrap,
+        mockBootstrap
       );
       (fplClient.getPicks as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockPicks);
       (fplClient.getLive as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockLive);
-      (fplClient.getHistory as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ current: [], chips: [] });
+      (fplClient.getHistory as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        current: [],
+        chips: [],
+      });
 
       const result = await squadService.getSquad(123, 1);
 
@@ -227,12 +267,10 @@ describe('Squad Service', () => {
 
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValueOnce(null);
       (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-        mockBootstrap,
+        mockBootstrap
       );
 
-      await expect(squadService.getSquad(123, 999)).rejects.toThrow(
-        'Gameweek 999 not found',
-      );
+      await expect(squadService.getSquad(123, 999)).rejects.toThrow('Gameweek 999 not found');
     });
 
     it('throws error when no picks available', async () => {
@@ -254,18 +292,16 @@ describe('Squad Service', () => {
         element_types: [],
       };
 
-      (cache.get as ReturnType<typeof vi.fn>)
-        .mockReturnValueOnce(null)
-        .mockReturnValueOnce(null);
+      (cache.get as ReturnType<typeof vi.fn>).mockReturnValueOnce(null).mockReturnValueOnce(null);
       (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-        mockBootstrap,
+        mockBootstrap
       );
       (fplClient.getPicks as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
-        new Error('FPL API error: 404 Not Found'),
+        new Error('FPL API error: 404 Not Found')
       );
 
       await expect(squadService.getSquad(123, 1)).rejects.toThrow(
-        'No picks available for gameweek 1',
+        'No picks available for gameweek 1'
       );
     });
 
@@ -278,24 +314,85 @@ describe('Squad Service', () => {
       [null, null],
     ] as const)('normalises active_chip "%s" → activeChip %s', async (raw, expected) => {
       const bootstrap = {
-        events: [{ id: 1, name: 'Gameweek 1', finished: false, average_entry_score: 50, highest_score: 100, deadline_time: '2025-01-01T12:00:00Z', is_current: true }],
+        events: [
+          {
+            id: 1,
+            name: 'Gameweek 1',
+            finished: false,
+            average_entry_score: 50,
+            highest_score: 100,
+            deadline_time: '2025-01-01T12:00:00Z',
+            is_current: true,
+          },
+        ],
         teams: [{ id: 1, name: 'Arsenal', short_name: 'ARS', code: 1 }],
         chips: [],
-        elements: [{ id: 1, web_name: 'Saka', first_name: 'Bukayo', second_name: 'Saka', team: 1, team_code: 3, element_type: 3, status: 'a', chance_of_playing_this_round: null, news: '', now_cost: 85, event_points: 0, form: '0', selected_by_percent: '0' }],
+        elements: [
+          {
+            id: 1,
+            web_name: 'Saka',
+            first_name: 'Bukayo',
+            second_name: 'Saka',
+            team: 1,
+            team_code: 3,
+            element_type: 3,
+            status: 'a',
+            chance_of_playing_this_round: null,
+            news: '',
+            now_cost: 85,
+            event_points: 0,
+            form: '0',
+            selected_by_percent: '0',
+          },
+        ],
         element_types: [{ id: 3, singular_name_short: 'MID' }],
       };
       const picks = {
         active_chip: raw as string | null,
-        entry_history: { event: 1, points: 0, total_points: 0, rank: 0, event_transfers: 0, event_transfers_cost: 0, points_on_bench: 0, bank: 0, value: 0 },
+        entry_history: {
+          event: 1,
+          points: 0,
+          total_points: 0,
+          rank: 0,
+          event_transfers: 0,
+          event_transfers_cost: 0,
+          points_on_bench: 0,
+          bank: 0,
+          value: 0,
+        },
         picks: [{ element: 1, position: 1, is_captain: false, is_vice_captain: false }],
       };
-      const live = { elements: [{ id: 1, stats: { total_points: 0, minutes: 0, goals_scored: 0, assists: 0, clean_sheets: 0, goals_conceded: 0, own_goals: 0, penalties_saved: 0, penalties_missed: 0, yellow_cards: 0, red_cards: 0, saves: 0, bonus: 0 } }] };
+      const live = {
+        elements: [
+          {
+            id: 1,
+            stats: {
+              total_points: 0,
+              minutes: 0,
+              goals_scored: 0,
+              assists: 0,
+              clean_sheets: 0,
+              goals_conceded: 0,
+              own_goals: 0,
+              penalties_saved: 0,
+              penalties_missed: 0,
+              yellow_cards: 0,
+              red_cards: 0,
+              saves: 0,
+              bonus: 0,
+            },
+          },
+        ],
+      };
 
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
       (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(bootstrap);
       (fplClient.getPicks as ReturnType<typeof vi.fn>).mockResolvedValueOnce(picks);
       (fplClient.getLive as ReturnType<typeof vi.fn>).mockResolvedValueOnce(live);
-      (fplClient.getHistory as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ current: [], chips: [] });
+      (fplClient.getHistory as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        current: [],
+        chips: [],
+      });
 
       const result = await squadService.getSquad(123, 1);
       expect(result.activeChip).toBe(expected);
@@ -303,27 +400,89 @@ describe('Squad Service', () => {
 
     it('includes chipStatuses in the response', async () => {
       const bootstrap = {
-        events: [{ id: 5, name: 'Gameweek 5', finished: true, average_entry_score: 55, highest_score: 110, deadline_time: '2025-01-05T12:00:00Z', is_current: false }],
+        events: [
+          {
+            id: 5,
+            name: 'Gameweek 5',
+            finished: true,
+            average_entry_score: 55,
+            highest_score: 110,
+            deadline_time: '2025-01-05T12:00:00Z',
+            is_current: false,
+          },
+        ],
         teams: [{ id: 1, name: 'Arsenal', short_name: 'ARS', code: 1 }],
         chips: [
           { chip_type: 'transfer', name: 'wildcard', start_event: 1, stop_event: 19 },
           { chip_type: 'transfer', name: 'wildcard', start_event: 20, stop_event: 38 },
         ],
-        elements: [{ id: 1, web_name: 'Saka', first_name: 'Bukayo', second_name: 'Saka', team: 1, team_code: 3, element_type: 3, status: 'a', chance_of_playing_this_round: null, news: '', now_cost: 85, event_points: 0, form: '0', selected_by_percent: '0', ep_next: '5' }],
+        elements: [
+          {
+            id: 1,
+            web_name: 'Saka',
+            first_name: 'Bukayo',
+            second_name: 'Saka',
+            team: 1,
+            team_code: 3,
+            element_type: 3,
+            status: 'a',
+            chance_of_playing_this_round: null,
+            news: '',
+            now_cost: 85,
+            event_points: 0,
+            form: '0',
+            selected_by_percent: '0',
+            ep_next: '5',
+          },
+        ],
         element_types: [{ id: 3, singular_name_short: 'MID' }],
       };
       const picks = {
         active_chip: 'wildcard',
-        entry_history: { event: 5, points: 60, total_points: 200, rank: 500, event_transfers: 0, event_transfers_cost: 0, points_on_bench: 3, bank: 10, value: 1005 },
+        entry_history: {
+          event: 5,
+          points: 60,
+          total_points: 200,
+          rank: 500,
+          event_transfers: 0,
+          event_transfers_cost: 0,
+          points_on_bench: 3,
+          bank: 10,
+          value: 1005,
+        },
         picks: [{ element: 1, position: 1, is_captain: false, is_vice_captain: false }],
       };
-      const live = { elements: [{ id: 1, stats: { total_points: 8, minutes: 90, goals_scored: 0, assists: 0, clean_sheets: 0, goals_conceded: 0, own_goals: 0, penalties_saved: 0, penalties_missed: 0, yellow_cards: 0, red_cards: 0, saves: 0, bonus: 0 } }] };
+      const live = {
+        elements: [
+          {
+            id: 1,
+            stats: {
+              total_points: 8,
+              minutes: 90,
+              goals_scored: 0,
+              assists: 0,
+              clean_sheets: 0,
+              goals_conceded: 0,
+              own_goals: 0,
+              penalties_saved: 0,
+              penalties_missed: 0,
+              yellow_cards: 0,
+              red_cards: 0,
+              saves: 0,
+              bonus: 0,
+            },
+          },
+        ],
+      };
 
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
       (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(bootstrap);
       (fplClient.getPicks as ReturnType<typeof vi.fn>).mockResolvedValueOnce(picks);
       (fplClient.getLive as ReturnType<typeof vi.fn>).mockResolvedValueOnce(live);
-      (fplClient.getHistory as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ current: [], chips: [] });
+      (fplClient.getHistory as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        current: [],
+        chips: [],
+      });
 
       const result = await squadService.getSquad(123, 5);
       expect(result.chipStatuses.wildcard).toEqual({ status: 'active' });
@@ -364,7 +523,11 @@ describe('Squad Service', () => {
     });
 
     it('banks 1 when no transfer made last GW', () => {
-      const history = [{ event: 1, event_transfers: 0 } as Parameters<typeof squadService.computeFreeTransfers>[0][number]];
+      const history = [
+        { event: 1, event_transfers: 0 } as Parameters<
+          typeof squadService.computeFreeTransfers
+        >[0][number],
+      ];
       expect(squadService.computeFreeTransfers(history)).toBe(2);
     });
 
@@ -378,9 +541,9 @@ describe('Squad Service', () => {
     });
 
     it('resets to 1 when a transfer is made with only 1 free', () => {
-      const history = [
-        { event: 1, event_transfers: 1 },
-      ] as Parameters<typeof squadService.computeFreeTransfers>[0];
+      const history = [{ event: 1, event_transfers: 1 }] as Parameters<
+        typeof squadService.computeFreeTransfers
+      >[0];
       expect(squadService.computeFreeTransfers(history)).toBe(1);
     });
 
@@ -432,9 +595,9 @@ describe('Squad Service', () => {
       const result = squadService.computeChipStatuses(null, [], wcWindows, 15);
       expect(result).toEqual({
         wildcard: { status: 'available' },
-        freehit:  { status: 'available' },
-        bboost:   { status: 'available' },
-        '3xc':    { status: 'available' },
+        freehit: { status: 'available' },
+        bboost: { status: 'available' },
+        '3xc': { status: 'available' },
       });
     });
 

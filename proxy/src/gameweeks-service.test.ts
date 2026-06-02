@@ -42,7 +42,7 @@ describe('Gameweeks Service', () => {
 
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValueOnce(null);
       (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-        mockBootstrap,
+        mockBootstrap
       );
 
       const result = await gameweeksService.getGameweeks();
@@ -96,7 +96,7 @@ describe('Gameweeks Service', () => {
 
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValueOnce(null);
       (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-        mockBootstrap,
+        mockBootstrap
       );
 
       const result = await gameweeksService.getGameweeks();
@@ -124,7 +124,7 @@ describe('Gameweeks Service', () => {
 
       (cache.get as ReturnType<typeof vi.fn>).mockReturnValueOnce(null);
       (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-        mockBootstrap,
+        mockBootstrap
       );
 
       const result = await gameweeksService.getGameweeks();
