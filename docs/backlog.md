@@ -119,7 +119,9 @@ These features give the app reasons to return every gameweek — essential for g
 | ANA-02 | Most popular players (ownership %) screen | S | TopPlayersScreen already exists — extend with ownership sort/filter. |
 | ANA-04 | Top-ranked managers → view their squads | M | Viral / social feature. Re-uses existing squad viewer. |
 | ANA-12 | League participants browser (click league on Stats to see all members) | S | Natural extension of existing leagues screen. |
-| MGR-01 | Manager Watchlist — follow managers, see their points/transfers in a table | M | High priority. |
+| MGR-01 | Manager Watchlist — follow managers, see their points/transfers in a table | M | ✅ In progress (OpenSpec change 2026-06-01-manager-watchlist). localStorage phase, max 5. |
+| MGR-02 | Backend watchlist — migrate MGR-01 from localStorage to backend API | S | Depends on AUTH-01. Swap LocalStorageWatchlistRepository → ApiWatchlistRepository; no UI changes. |
+| MGR-03 | Freemium watchlist limits — 2 entries free, 10 with subscription | S | Depends on MGR-02 + MON-01. `repo.getLimit()` returns tier-specific cap; upsell prompt on `'limit'` response. |
 | WATCH-01 | Player Watchlist — shortlist of players you're tracking but not yet transferring | S | Low effort; high utility for planning. |
 
 ### Feature details
@@ -228,8 +230,32 @@ Reference: fpl.team "Climb your mini-leagues faster".
 
 #### MGR-01: Manager Watchlist / Follow managers
 Ability to follow specific managers and track them in a table:
-Columns: Rank | Manager Name | Points | Rank Δ | Overall Rank | Transfers | Captain | Latest transfers | ✕
+Columns: Manager | GW Pts | GW Rank | Overall Rank | Rank Δ | Transfers | Captain | Latest transfers in | ✕
+
+Three ways to add a manager:
+1. Manual team ID input
+2. "Follow" button on any squad view (via TeamInfoPanel)
+3. "From My Leagues" — browse classic league standings inline and follow
+
 Click a row to view their squad using the existing squad viewer.
+
+Phase 1: localStorage, max 5 entries. See OpenSpec change `2026-06-01-manager-watchlist`.
+`WatchlistRepository` abstraction makes Phase 2 (MGR-02) a backend swap with no UI changes.
+
+New proxy endpoints needed: `GET /api/entry/:teamId/transfers`, `GET /api/leagues/:leagueId/standings`.
+
+#### MGR-02: Backend watchlist (depends on AUTH-01)
+Migrate the watchlist from localStorage to the backend so it syncs across devices.
+- New endpoint: `GET/POST/DELETE /api/user/watchlist`
+- Implement `ApiWatchlistRepository` swapping out `LocalStorageWatchlistRepository`
+- No UI changes — the `WatchlistRepository` interface is the seam
+
+#### MGR-03: Freemium watchlist limits (depends on MGR-02 + MON-01)
+Enforce tier-based limits on the watchlist:
+- Free tier: 2 managers
+- Premium subscription: 10 managers
+`ApiWatchlistRepository.getLimit()` returns the cap based on subscription tier from auth context.
+When `repo.add()` returns `'limit'` and user is on free tier, show upsell prompt (links to MON-01 premium flow).
 
 #### WATCH-01: Player Watchlist
 A screen where the user can add players they're interested in but not yet ready to transfer in.

@@ -1,0 +1,57 @@
+<h2>Вопрос 1: Как попасть на экран GW Review?</h2>
+<p class="subtitle">Откуда пользователь открывает обзор прошедшего гейм-вика?</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Кнопка на SquadScreen</h3>
+      <p>На экране состава появляется кнопка «Review GW» рядом с навигацией по гейм-викам. Только для завершённых GW. Самый прямой путь — пользователь уже смотрит на результаты.</p>
+      <div class="mockup" style="margin-top:0.75rem">
+        <div class="mockup-body" style="font-size:0.75rem;padding:0.75rem">
+          <div style="display:flex;align-items:center;gap:0.5rem;justify-content:center;background:#1a1a2e;padding:0.5rem;border-radius:6px;color:#fff">
+            <span>← GW35</span>
+            <span style="background:#37003c;padding:2px 10px;border-radius:4px;font-weight:bold">GW36 ✓</span>
+            <span>GW37 →</span>
+            <span style="background:#00ff87;color:#000;padding:2px 8px;border-radius:4px;font-size:0.7rem;font-weight:bold">📊 Review</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Отдельный пункт навигации</h3>
+      <p>«GW Review» — самостоятельный экран в нижней панели навигации или боковом меню, рядом с «History» и «Stats». Легко найти, всегда доступен.</p>
+      <div class="mockup" style="margin-top:0.75rem">
+        <div class="mockup-body" style="font-size:0.75rem;padding:0.75rem">
+          <div style="display:flex;justify-content:space-around;background:#1a1a2e;padding:0.5rem;border-radius:6px;color:#ccc;font-size:0.7rem">
+            <span>⚽ Squad</span>
+            <span>🔄 Transfers</span>
+            <span style="color:#00ff87;font-weight:bold">📊 Review</span>
+            <span>📈 History</span>
+            <span>🏆 Stats</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Баннер-приглашение на SquadScreen</h3>
+      <p>После завершения GW на SquadScreen появляется коллапсируемый баннер «GW36 завершён — посмотри итоги». Таp открывает панель/экран ревью. Нативно встроен в основной поток.</p>
+      <div class="mockup" style="margin-top:0.75rem">
+        <div class="mockup-body" style="font-size:0.75rem;padding:0.75rem">
+          <div style="background:linear-gradient(90deg,#37003c,#00ff87 300%);padding:0.5rem 0.75rem;border-radius:6px;color:#fff;display:flex;justify-content:space-between;align-items:center">
+            <span>✅ GW36 завершён · 68 очков</span>
+            <span style="background:rgba(255,255,255,0.2);padding:2px 8px;border-radius:4px;font-size:0.7rem">Итоги →</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

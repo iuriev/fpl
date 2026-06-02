@@ -1,0 +1,450 @@
+.screen {
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--fpl-bg-deep);
+  color: var(--fpl-text);
+}
+
+.header {
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 3rem;
+  padding: 0 var(--fpl-space-xl3);
+  border-bottom: 1px solid var(--fpl-bg-hair);
+}
+
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--fpl-space-xs);
+  background: none;
+  border: none;
+  color: var(--fpl-accent);
+  font-size: var(--fpl-fs-body-m);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1;
+  flex-shrink: 0;
+  transition: opacity 120ms;
+  white-space: nowrap;
+}
+
+.backBtn:hover {
+  opacity: 0.8;
+}
+
+.backBtn svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+.heading {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: baseline;
+  gap: var(--fpl-space-sm);
+  pointer-events: none;
+}
+
+.title {
+  font: var(--fpl-fw-bold) var(--fpl-fs-title) var(--fpl-font-display);
+  letter-spacing: var(--fpl-tr-head-s);
+  white-space: nowrap;
+}
+
+.capacity {
+  font: var(--fpl-fw-regular) var(--fpl-fs-body-s) var(--fpl-font-display);
+  color: var(--fpl-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.body {
+  flex: 1;
+  padding: var(--fpl-space-lg) var(--fpl-space-xl3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--fpl-space-lg);
+}
+
+/* ── Add manager section ── */
+
+.addSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fpl-space-xs);
+}
+
+.addForm {
+  display: flex;
+  gap: var(--fpl-space-sm);
+}
+
+.addInput {
+  flex: 1;
+  min-width: 0;
+  padding: var(--fpl-space-sm) var(--fpl-space-md);
+  border: 1px solid var(--fpl-bg-hair);
+  border-radius: var(--fpl-radius-sm);
+  background: var(--fpl-bg-card);
+  color: var(--fpl-text);
+  font: var(--fpl-fw-regular) var(--fpl-fs-body) var(--fpl-font-display);
+}
+
+.addInput:focus {
+  outline: 2px solid var(--fpl-accent);
+  outline-offset: 1px;
+}
+
+.addBtn {
+  padding: var(--fpl-space-sm) var(--fpl-space-lg);
+  border: none;
+  border-radius: var(--fpl-radius-sm);
+  background: var(--fpl-accent);
+  color: var(--fpl-on-accent, #fff);
+  font: var(--fpl-fw-medium) var(--fpl-fs-body) var(--fpl-font-display);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 120ms;
+}
+
+.addBtn:disabled { opacity: 0.5; cursor: default; }
+
+.addPreview {
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-sm);
+  font: var(--fpl-fw-regular) var(--fpl-fs-body-s) var(--fpl-font-display);
+  color: var(--fpl-text-soft);
+}
+
+.confirmBtn {
+  padding: var(--fpl-space-xs) var(--fpl-space-md);
+  border: none;
+  border-radius: var(--fpl-radius-sm);
+  background: var(--fpl-positive, #22c55e);
+  color: #fff;
+  font: var(--fpl-fw-medium) var(--fpl-fs-body-s) var(--fpl-font-display);
+  cursor: pointer;
+}
+
+.cancelBtn {
+  padding: var(--fpl-space-xs) var(--fpl-space-md);
+  border: 1px solid var(--fpl-bg-hair);
+  border-radius: var(--fpl-radius-sm);
+  background: none;
+  color: var(--fpl-muted);
+  font: var(--fpl-fw-medium) var(--fpl-fs-body-s) var(--fpl-font-display);
+  cursor: pointer;
+}
+
+.addError {
+  font: var(--fpl-fw-regular) var(--fpl-fs-body-s) var(--fpl-font-display);
+  color: var(--fpl-negative, #ef4444);
+  margin: 0;
+}
+
+/* ── Empty state ── */
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--fpl-space-sm);
+  padding: var(--fpl-space-xl3) var(--fpl-space-lg);
+  text-align: center;
+}
+
+.emptyHeading {
+  font: var(--fpl-fw-medium) var(--fpl-fs-body) var(--fpl-font-display);
+  color: var(--fpl-text);
+  margin: 0;
+}
+
+.emptySubtext {
+  font: var(--fpl-fw-regular) var(--fpl-fs-body-s) var(--fpl-font-display);
+  color: var(--fpl-muted);
+  margin: 0;
+}
+
+/* ── Table ── */
+
+.tableWrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--fpl-bg-hair);
+  border-radius: var(--fpl-radius-md);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font: var(--fpl-fw-regular) var(--fpl-fs-body-s) var(--fpl-font-display);
+  white-space: nowrap;
+}
+
+.th {
+  padding: var(--fpl-space-sm) var(--fpl-space-md);
+  background: var(--fpl-bg-card);
+  color: var(--fpl-muted);
+  font: var(--fpl-fw-medium) var(--fpl-fs-label) var(--fpl-font-display);
+  letter-spacing: var(--fpl-tr-head-s);
+  text-align: left;
+  border-bottom: 1px solid var(--fpl-bg-hair);
+}
+
+.row {
+  border-bottom: 1px solid var(--fpl-bg-hair);
+  transition: background 80ms;
+}
+
+.row:last-child { border-bottom: none; }
+
+.row:hover { background: var(--fpl-bg-card); }
+
+.cell {
+  padding: var(--fpl-space-sm) var(--fpl-space-md);
+  vertical-align: middle;
+}
+
+.cellSticky {
+  position: sticky;
+  left: 0;
+  background: var(--fpl-bg-deep);
+  z-index: 1;
+  min-width: 10rem;
+}
+
+.row:hover .cellSticky { background: var(--fpl-bg-card); }
+
+.managerCell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.managerName {
+  font-weight: var(--fpl-fw-medium);
+  color: var(--fpl-text);
+}
+
+.teamName {
+  font-size: var(--fpl-fs-label);
+  color: var(--fpl-muted);
+}
+
+.rankUp { color: var(--fpl-positive, #22c55e); }
+.rankDown { color: var(--fpl-negative, #ef4444); }
+.rankNeutral { color: var(--fpl-muted); }
+
+.skeletonCell {
+  display: inline-block;
+  width: 3rem;
+  height: 0.875rem;
+  border-radius: var(--fpl-radius-xs, 0.25rem);
+  background: var(--fpl-bg-hair);
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.removeBtn {
+  background: none;
+  border: none;
+  color: var(--fpl-muted);
+  cursor: pointer;
+  font-size: var(--fpl-fs-body-s);
+  padding: var(--fpl-space-xs);
+  border-radius: var(--fpl-radius-xs, 0.25rem);
+  line-height: 1;
+  transition: color 120ms;
+}
+
+.removeBtn:hover { color: var(--fpl-negative, #ef4444); }
+
+.rowError {
+  padding: var(--fpl-space-sm) var(--fpl-space-md);
+  color: var(--fpl-muted);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fpl-space-sm);
+}
+
+/* ── From My Leagues ── */
+
+.fromLeagues {
+  border: 1px solid var(--fpl-bg-hair);
+  border-radius: var(--fpl-radius-md);
+  overflow: hidden;
+}
+
+.fromLeaguesToggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--fpl-space-sm) var(--fpl-space-md);
+  background: var(--fpl-bg-card);
+  border: none;
+  color: var(--fpl-text);
+  font: var(--fpl-fw-medium) var(--fpl-fs-body-s) var(--fpl-font-display);
+  cursor: pointer;
+  text-align: left;
+}
+
+.fromLeaguesBody {
+  padding: var(--fpl-space-sm) var(--fpl-space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--fpl-space-xs);
+}
+
+.fromLeaguesHint {
+  font: var(--fpl-fw-regular) var(--fpl-fs-body-s) var(--fpl-font-display);
+  color: var(--fpl-muted);
+  margin: 0;
+}
+
+.leagueItem {
+  border: 1px solid var(--fpl-bg-hair);
+  border-radius: var(--fpl-radius-sm);
+  overflow: hidden;
+}
+
+.leagueToggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-sm);
+  padding: var(--fpl-space-sm) var(--fpl-space-md);
+  background: none;
+  border: none;
+  color: var(--fpl-text);
+  font: var(--fpl-fw-regular) var(--fpl-fs-body-s) var(--fpl-font-display);
+  cursor: pointer;
+  text-align: left;
+}
+
+.leagueName { flex: 1; }
+
+.leagueRank {
+  font-size: var(--fpl-fs-label);
+  color: var(--fpl-muted);
+}
+
+.leagueChevron {
+  font-size: var(--fpl-fs-label);
+  color: var(--fpl-muted);
+}
+
+.leagueLoading,
+.leagueError {
+  font: var(--fpl-fw-regular) var(--fpl-fs-body-s) var(--fpl-font-display);
+  color: var(--fpl-muted);
+  padding: var(--fpl-space-sm) var(--fpl-space-md);
+  margin: 0;
+}
+
+.standingsList {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--fpl-bg-hair);
+}
+
+.standingRow {
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-sm);
+  padding: var(--fpl-space-xs) var(--fpl-space-md);
+  border-bottom: 1px solid var(--fpl-bg-hair);
+}
+
+.standingRow:last-child { border-bottom: none; }
+
+.standingRank {
+  width: 1.5rem;
+  text-align: right;
+  font: var(--fpl-fw-medium) var(--fpl-fs-label) var(--fpl-font-display);
+  color: var(--fpl-muted);
+  flex-shrink: 0;
+}
+
+.standingManager {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.standingPlayerName {
+  font: var(--fpl-fw-medium) var(--fpl-fs-body-s) var(--fpl-font-display);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.standingEntryName {
+  font: var(--fpl-fw-regular) var(--fpl-fs-label) var(--fpl-font-display);
+  color: var(--fpl-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.standingEventTotal {
+  font: var(--fpl-fw-medium) var(--fpl-fs-body-s) var(--fpl-font-display);
+  color: var(--fpl-text-soft);
+  flex-shrink: 0;
+}
+
+.followBtn {
+  padding: var(--fpl-space-xs) var(--fpl-space-sm);
+  border: 1px solid var(--fpl-accent);
+  border-radius: var(--fpl-radius-sm);
+  background: none;
+  color: var(--fpl-accent);
+  font: var(--fpl-fw-medium) var(--fpl-fs-label) var(--fpl-font-display);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 120ms, color 120ms;
+}
+
+.followBtn:hover:not(:disabled) {
+  background: var(--fpl-accent);
+  color: var(--fpl-on-accent, #fff);
+}
+
+.followingBtn {
+  background: var(--fpl-accent);
+  color: var(--fpl-on-accent, #fff);
+  cursor: default;
+}
+
+.followBtn:disabled { opacity: 0.5; cursor: default; }
+
+.loadMoreBtn {
+  align-self: center;
+  margin: var(--fpl-space-xs) 0;
+  padding: var(--fpl-space-xs) var(--fpl-space-md);
+  border: 1px solid var(--fpl-bg-hair);
+  border-radius: var(--fpl-radius-sm);
+  background: none;
+  color: var(--fpl-muted);
+  font: var(--fpl-fw-regular) var(--fpl-fs-body-s) var(--fpl-font-display);
+  cursor: pointer;
+}

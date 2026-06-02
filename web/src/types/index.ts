@@ -20,6 +20,7 @@ export interface EntryResponse {
   overallPoints: number;
   overallRank: number;
   eventPoints: number;
+  eventRank: number;
   totalPlayers: number;
   regionIsoCode?: string;
 }
@@ -207,6 +208,40 @@ export interface PoolPlayer {
 
 export interface PlayerPoolResponse {
   players: PoolPlayer[];
+}
+
+export interface Transfer {
+  event: number;
+  elementIn: number;
+  elementInName: string;
+  elementOut: number;
+  elementOutName: string;
+  elementInCost: number;
+  elementOutCost: number;
+  time: string;
+}
+
+export interface TransfersResponse {
+  teamId: number;
+  transfers: Transfer[];
+}
+
+export interface StandingEntry {
+  entry: number;
+  entryName: string;
+  playerName: string;
+  rank: number;
+  lastRank: number | null;
+  total: number;
+  eventTotal: number;
+}
+
+export interface LeagueStandingsResponse {
+  leagueId: number;
+  leagueName: string;
+  page: number;
+  hasNext: boolean;
+  standings: StandingEntry[];
 }
 
 export type TransferChip = 'none' | 'wildcard' | 'freehit';

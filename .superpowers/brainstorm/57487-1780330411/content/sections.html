@@ -1,0 +1,91 @@
+<h2>Вопрос 2: Какие секции нужны на экране GW Review?</h2>
+<p class="subtitle">Выбери все, которые хочешь видеть (мультивыбор)</p>
+
+<div class="options" data-multiselect>
+
+  <div class="option" data-choice="summary" onclick="toggleSelect(this)">
+    <div class="letter">1</div>
+    <div class="content">
+      <h3>Итоговая шапка GW</h3>
+      <p>Очки за неделю, ранк GW, изменение overall rank (↑↓), сравнение со средним и высшим баллом. Один взгляд — и всё ясно.</p>
+      <div style="display:flex;gap:0.5rem;margin-top:0.5rem;flex-wrap:wrap">
+        <div style="background:#37003c;color:#fff;padding:4px 10px;border-radius:6px;font-size:0.75rem;text-align:center"><div style="font-size:1.1rem;font-weight:bold">68</div><div>GW очки</div></div>
+        <div style="background:#1a1a2e;color:#fff;padding:4px 10px;border-radius:6px;font-size:0.75rem;text-align:center"><div style="font-size:1.1rem;font-weight:bold;color:#00ff87">↑ 142k</div><div>Overall rank</div></div>
+        <div style="background:#1a1a2e;color:#fff;padding:4px 10px;border-radius:6px;font-size:0.75rem;text-align:center"><div style="font-size:1.1rem;font-weight:bold">54 avg</div><div>vs среднее</div></div>
+        <div style="background:#1a1a2e;color:#fff;padding:4px 10px;border-radius:6px;font-size:0.75rem;text-align:center"><div style="font-size:1.1rem;font-weight:bold">112 top</div><div>высший балл</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="captain" onclick="toggleSelect(this)">
+    <div class="letter">2</div>
+    <div class="content">
+      <h3>Анализ капитана</h3>
+      <p>Сколько дал капитан (с множителем), сколько дал вице (для сравнения), дал ли вице-капитан в случае 0 минут у капитана.</p>
+      <div style="display:flex;gap:0.5rem;margin-top:0.5rem">
+        <div style="background:#1a1a2e;color:#fff;padding:6px 12px;border-radius:6px;font-size:0.75rem;flex:1">
+          <div style="color:#e8c000;font-weight:bold">(C) Haaland</div>
+          <div>16 pts × 2 = <span style="color:#00ff87;font-weight:bold">32</span></div>
+        </div>
+        <div style="background:#1a1a2e;color:#ccc;padding:6px 12px;border-radius:6px;font-size:0.75rem;flex:1">
+          <div style="color:#aaa">(VC) Salah</div>
+          <div>14 pts</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="bench" onclick="toggleSelect(this)">
+    <div class="letter">3</div>
+    <div class="content">
+      <h3>Очки на скамейке</h3>
+      <p>Сколько очков осталось на бенче. Были ли авто-замены. «Зря оставил на скамейке» — боль каждого FPL-менеджера.</p>
+      <div style="background:#1a1a2e;color:#fff;padding:6px 10px;border-radius:6px;font-size:0.75rem;margin-top:0.5rem">
+        <div style="color:#ff4444;font-weight:bold">😬 Потерял 14 очков на скамейке</div>
+        <div style="color:#aaa;margin-top:2px">Watkins 8 · Pedro Porro 6 · подстановок не было</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="transfers" onclick="toggleSelect(this)">
+    <div class="letter">4</div>
+    <div class="content">
+      <h3>Анализ трансферов</h3>
+      <p>Для каждого трансфера: кто ушёл → кто пришёл, очки того и другого за этот GW. Сразу видно — выиграл или проиграл от трансфера.</p>
+      <div style="background:#1a1a2e;color:#fff;padding:6px 10px;border-radius:6px;font-size:0.75rem;margin-top:0.5rem">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="color:#ff4444">Son 6pts OUT</span>
+          <span>→</span>
+          <span style="color:#00ff87">Mbappé 14pts IN</span>
+          <span style="background:#00ff87;color:#000;border-radius:4px;padding:1px 5px;font-weight:bold">+8</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="whatif" onclick="toggleSelect(this)">
+    <div class="letter">5</div>
+    <div class="content">
+      <h3>«Что если без трансферов»</h3>
+      <p>Сравнение: сколько бы ты набрал с исходным составом (без трансферов этого GW). Популярный вопрос после каждого дедлайна.</p>
+      <div style="background:#1a1a2e;color:#fff;padding:6px 10px;border-radius:6px;font-size:0.75rem;margin-top:0.5rem">
+        <div>Твой счёт: <span style="font-weight:bold">68 pts</span></div>
+        <div style="color:#aaa">Без трансферов: <span style="color:#ff9900">61 pts</span> → трансферы принесли +7</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="players" onclick="toggleSelect(this)">
+    <div class="letter">6</div>
+    <div class="content">
+      <h3>Список игроков с очками</h3>
+      <p>Все 11 игроков + 4 на скамейке с их очками за GW. Можно сортировать по очкам (лучшие → худшие). Подробная статистика (голы, ас, CS, бонус) при тапе.</p>
+      <div style="background:#1a1a2e;color:#fff;padding:6px 10px;border-radius:6px;font-size:0.75rem;margin-top:0.5rem;display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;justify-content:space-between"><span>(C) Haaland</span><span style="color:#00ff87;font-weight:bold">32</span></div>
+        <div style="display:flex;justify-content:space-between"><span>Salah</span><span>14</span></div>
+        <div style="display:flex;justify-content:space-between;color:#ff4444"><span>Alexander-Arnold</span><span>2</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>

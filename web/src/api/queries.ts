@@ -135,6 +135,38 @@ export function usePlayerPool() {
   });
 }
 
+export function useTransfers(teamId: number | null) {
+  return useQuery({
+    queryKey: ['transfers', teamId],
+    queryFn: () => {
+      if (!teamId) throw new Error('Team ID required');
+      return api.getTransfers(teamId);
+    },
+    enabled: !!teamId,
+    staleTime: 1000 * 60 * 60,
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && error.status === 404) return false;
+      return failureCount < 3;
+    },
+  });
+}
+
+export function useLeagueStandings(leagueId: number | null, page: number) {
+  return useQuery({
+    queryKey: ['league-standings', leagueId, page],
+    queryFn: () => {
+      if (!leagueId) throw new Error('League ID required');
+      return api.getLeagueStandings(leagueId, page);
+    },
+    enabled: !!leagueId,
+    staleTime: 1000 * 60 * 10,
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && error.status === 404) return false;
+      return failureCount < 3;
+    },
+  });
+}
+
 export function useSquad(teamId: number | null, gameweek: number | null) {
   return useQuery({
     queryKey: ['squad', teamId, gameweek],

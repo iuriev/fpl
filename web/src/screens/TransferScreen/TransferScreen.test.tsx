@@ -198,6 +198,7 @@ describe('TransferScreen', () => {
 
 describe('TransferScreen chip statuses', () => {
   beforeEach(() => {
+    localStorage.removeItem('fpl-transfer-draft-123');
     localStorage.setItem('fpl_tour_seen_transfer_v1', 'true');
   });
 
@@ -214,8 +215,10 @@ describe('TransferScreen chip statuses', () => {
     };
     mockState.pool = { players: POOL_PLAYERS };
     renderScreen();
-    const wcBtn = await screen.findByRole('button', { name: 'WC' });
-    expect(wcBtn).toHaveAttribute('aria-pressed', 'true');
+    await waitFor(() => {
+      const wcBtn = screen.getByRole('button', { name: 'WC' });
+      expect(wcBtn).toHaveAttribute('aria-pressed', 'true');
+    });
   });
 
   it('shows toast when a used chip button is tapped', async () => {

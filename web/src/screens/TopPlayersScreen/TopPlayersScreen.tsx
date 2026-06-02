@@ -192,19 +192,21 @@ export const TopPlayersScreen: React.FC = () => {
   return (
     <div className={styles.screen}>
       <header className={styles.header}>
-        <button className={styles.backBtn} onClick={handleBack} aria-label={copy.topPlayersBack}>
-          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path
-              d="M10 4l-4 4 4 4"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          {copy.topPlayersBack}
-        </button>
-        <span className={styles.title}>{copy.topPlayersTitle}</span>
+        <div className={styles.headerNav}>
+          <button className={styles.backBtn} onClick={handleBack} aria-label={copy.topPlayersBack}>
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path
+                d="M10 4l-4 4 4 4"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            {copy.topPlayersBack}
+          </button>
+          <span className={styles.title}>{copy.topPlayersTitle}</span>
+        </div>
 
         <div className={styles.tabs} role="tablist" aria-label={copy.topPlayersTitle}>
           <button

@@ -28,6 +28,7 @@ export async function getEntry(teamId: number): Promise<EntryResponse> {
     overallPoints: entry.summary_overall_points,
     overallRank: entry.summary_overall_rank,
     eventPoints: entry.summary_event_points,
+    eventRank: entry.summary_event_rank,
     totalPlayers: bootstrap.total_players,
     ...(entry.player_region_iso_code_short
       ? { regionIsoCode: entry.player_region_iso_code_short }

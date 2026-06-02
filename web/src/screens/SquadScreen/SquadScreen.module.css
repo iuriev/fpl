@@ -18,24 +18,62 @@
 .header {
   flex-shrink: 0;
   background: transparent;
-  padding: var(--fpl-space-sm) var(--fpl-space-xl3) var(--fpl-space-xs);
+  padding: 0 var(--fpl-space-xl3) var(--fpl-space-xs);
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
 }
 
 .headerMain {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  min-height: 3rem;
 }
 
 .headerLeft {
   display: flex;
   align-items: center;
   gap: var(--fpl-space-md);
-  min-width: 0;
-  flex: 1;
+  flex-shrink: 0;
+}
+
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--fpl-space-xs);
+  background: none;
+  border: none;
+  color: var(--fpl-accent);
+  font-size: var(--fpl-fs-body-m);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1;
+  flex-shrink: 0;
+  transition: opacity 120ms;
+}
+
+.backBtn:hover {
+  opacity: 0.8;
+}
+
+.backBtn svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+.teamInfoCenter {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.0625rem;
+  pointer-events: none;
+  text-align: center;
 }
 
 .burgerBtn {
@@ -99,9 +137,10 @@
 }
 
 .gwNav {
-  display: grid;
-  grid-template-columns: var(--fpl-size-arrow-btn) 1fr var(--fpl-size-arrow-btn);
+  display: flex;
   align-items: center;
+  justify-content: center;
+  gap: var(--fpl-space-md);
   padding: 0.25rem var(--fpl-space-xs);
 }
 
@@ -112,6 +151,7 @@
   color: var(--fpl-text);
   letter-spacing: var(--fpl-tr-head-s);
   text-align: center;
+  min-width: 7rem;
 }
 
 .navBtn {

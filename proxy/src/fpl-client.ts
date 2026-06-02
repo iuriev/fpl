@@ -68,6 +68,7 @@ export interface FPLEntry {
   summary_overall_points: number;
   summary_overall_rank: number;
   summary_event_points: number;
+  summary_event_rank: number;
   player_region_iso_code_short: string | null;
   leagues: {
     classic: FPLLeagueEntry[];
@@ -94,6 +95,35 @@ export interface FPLPicks {
     is_captain: boolean;
     is_vice_captain: boolean;
   }>;
+}
+
+export interface FPLTransfer {
+  element_in: number;
+  element_out: number;
+  element_in_cost: number;
+  element_out_cost: number;
+  entry: number;
+  event: number;
+  time: string;
+}
+
+export interface FPLLeagueStandings {
+  standings: {
+    results: Array<{
+      entry: number;
+      entry_name: string;
+      player_name: string;
+      rank: number;
+      last_rank: number | null;
+      total: number;
+      event_total: number;
+    }>;
+    has_next: boolean;
+  };
+  league: {
+    id: number;
+    name: string;
+  };
 }
 
 export interface FPLHistoryChip {
@@ -206,6 +236,17 @@ export async function getLive(gameweek: number): Promise<FPLLive> {
 
 export async function getHistory(teamId: number): Promise<FPLHistory> {
   return fetchFPL(`/entry/${teamId}/history/`);
+}
+
+export async function getTransfers(teamId: number): Promise<FPLTransfer[]> {
+  return fetchFPL(`/entry/${teamId}/transfers/`);
+}
+
+export async function getLeagueStandings(
+  leagueId: number,
+  page: number,
+): Promise<FPLLeagueStandings> {
+  return fetchFPL(`/leagues-classic/${leagueId}/standings/?page_standings=${page}`);
 }
 
 export async function getDreamTeam(gameweek: number): Promise<FPLDreamTeam> {

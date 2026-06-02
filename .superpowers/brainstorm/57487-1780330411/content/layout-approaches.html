@@ -1,0 +1,77 @@
+<h2>Вопрос 3: Как скомпоновать экран?</h2>
+<p class="subtitle">Три подхода к структуре GW Review — у каждого свой характер</p>
+
+<div class="options">
+
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Report Card — вертикальный скролл карточек</h3>
+      <p>Экран читается сверху вниз как «отчёт о неделе». Каждая секция — отдельная карточка. Нарратив: итог → игроки → скамейка → трансферы → вердикт.</p>
+      <div style="display:flex;flex-direction:column;gap:4px;margin-top:0.5rem;font-size:0.7rem">
+        <div style="background:#37003c;color:#fff;padding:6px 10px;border-radius:6px;display:flex;justify-content:space-between">
+          <span>GW36 · 68 pts</span><span style="color:#00ff87">↑ 142k ranks</span>
+        </div>
+        <div style="background:#1a1a2e;color:#fff;padding:5px 10px;border-radius:6px">👥 Игроки (11+4) — sorted by pts</div>
+        <div style="background:#1a1a2e;color:#fff;padding:5px 10px;border-radius:6px">🪑 Скамейка — потеряно 14 pts</div>
+        <div style="background:#1a1a2e;color:#fff;padding:5px 10px;border-radius:6px">🔄 Трансферы — Son→Mbappé +8</div>
+        <div style="background:#00ff87;color:#000;padding:5px 10px;border-radius:6px;font-weight:bold">✅ Вердикт: трансферы принесли +7</div>
+      </div>
+      <div class="pros-cons" style="margin-top:0.5rem">
+        <div class="pros"><h4>Плюсы</h4><ul><li>Естественный нарратив</li><li>Просто реализовать</li><li>Идеально для мобайла</li></ul></div>
+        <div class="cons"><h4>Минусы</h4><ul><li>Много скролла</li><li>Нет структуры «навигации»</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Hero + Tabs — шапка фиксирована, контент по вкладкам</h3>
+      <p>Сверху всегда видна шапка с итогами (68 pts, ↑rank). Ниже — две вкладки: «Игроки» и «Решения» (трансферы + скамейка + what-if). Меньше скролла, всё организовано.</p>
+      <div style="margin-top:0.5rem;font-size:0.7rem">
+        <div style="background:#37003c;color:#fff;padding:8px 10px;border-radius:6px 6px 0 0;display:flex;justify-content:space-around">
+          <span>68 pts</span><span style="color:#00ff87">↑ 142k</span><span>avg 54</span>
+        </div>
+        <div style="display:flex;background:#1a1a2e;color:#fff">
+          <div style="flex:1;padding:5px;text-align:center;border-bottom:2px solid #00ff87;color:#00ff87">👥 Игроки</div>
+          <div style="flex:1;padding:5px;text-align:center;color:#aaa">🔄 Решения</div>
+        </div>
+        <div style="background:#1a1a2e;color:#fff;padding:8px 10px;border-radius:0 0 6px 6px">
+          <div>Haaland (C) · <b style="color:#00ff87">32 pts</b></div>
+          <div>Salah · <b>14 pts</b></div>
+          <div style="color:#aaa">… ещё 9 игроков</div>
+        </div>
+      </div>
+      <div class="pros-cons" style="margin-top:0.5rem">
+        <div class="pros"><h4>Плюсы</h4><ul><li>Итоги всегда на виду</li><li>Чёткое разделение контента</li></ul></div>
+        <div class="cons"><h4>Минусы</h4><ul><li>«Решения» прячутся во вкладку</li><li>Чуть сложнее реализация</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Pitch View + раскрывающиеся панели снизу</h3>
+      <p>Состав на поле с очками каждого игрока (как SquadScreen, но режим «Review»). Под полем — 3 компактных аккордеона: Скамейка / Трансферы / Что-если. Самый визуальный вариант.</p>
+      <div style="margin-top:0.5rem;font-size:0.7rem">
+        <div style="background:#2d5a27;color:#fff;padding:8px 10px;border-radius:6px;text-align:center;border:1px solid #3a7a32">
+          <div style="opacity:0.7;font-size:0.65rem">⚽ ПОЛЕ (питч-вью с очками)</div>
+          <div style="margin:4px 0">🟢·32  🟢·14  🟢·12</div>
+          <div>🟡·8   🟡·7   🔴·2   🔴·1</div>
+        </div>
+        <div style="margin-top:4px;display:flex;flex-direction:column;gap:2px">
+          <div style="background:#1a1a2e;color:#fff;padding:4px 8px;border-radius:4px;display:flex;justify-content:space-between"><span>🪑 Скамейка</span><span>▾</span></div>
+          <div style="background:#1a1a2e;color:#fff;padding:4px 8px;border-radius:4px;display:flex;justify-content:space-between"><span>🔄 Трансферы</span><span>▾</span></div>
+          <div style="background:#1a1a2e;color:#fff;padding:4px 8px;border-radius:4px;display:flex;justify-content:space-between"><span>🤔 Что если…</span><span>▾</span></div>
+        </div>
+      </div>
+      <div class="pros-cons" style="margin-top:0.5rem">
+        <div class="pros"><h4>Плюсы</h4><ul><li>Максимально визуально</li><li>Знакомый питч-лейаут</li><li>Аккордеоны компактны</li></ul></div>
+        <div class="cons"><h4>Минусы</h4><ul><li>Самый сложный в реализации</li><li>Питч занимает много места</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+</div>
