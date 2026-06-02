@@ -43,3 +43,4 @@ storybook-static/
 
 # Superpowers local working files (brainstorms, docs)
 .superpowers/
+docs/superpowers/
