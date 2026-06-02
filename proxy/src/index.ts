@@ -8,11 +8,13 @@ import * as entryService from './entry-service';
 import * as fixturesService from './fixtures-service';
 import * as gameweeksService from './gameweeks-service';
 import * as historyService from './history-service';
+import * as leagueStandingsService from './league-standings-service';
 import * as leaguesService from './leagues-service';
 import * as playerPoolService from './player-pool-service';
 import * as squadService from './squad-service';
 import * as teamService from './team-service';
 import * as topPlayersService from './top-players-service';
+import * as transfersService from './transfers-service';
 import { MAX_GAMEWEEK } from './types';
 
 const app = new Hono();
@@ -84,6 +86,25 @@ app.get('/api/entry/:teamId/leagues', async (c) => {
     }
     console.error('Error fetching leagues:', error);
     return c.json({ error: 'Unable to fetch leagues' }, { status: 500 });
+  }
+});
+
+// GET /api/entry/:teamId/transfers
+app.get('/api/entry/:teamId/transfers', async (c) => {
+  try {
+    const teamId = parseInt(c.req.param('teamId'), 10);
+    if (isNaN(teamId) || teamId <= 0) {
+      return c.json({ error: 'Invalid team ID' }, { status: 400 });
+    }
+    const result = await transfersService.getTransfers(teamId);
+    return c.json(result);
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    if (errorMsg.includes('404')) {
+      return c.json({ error: 'Team not found' }, { status: 404 });
+    }
+    console.error('Error fetching transfers:', error);
+    return c.json({ error: 'Unable to fetch transfers' }, { status: 500 });
   }
 });
 
@@ -239,6 +260,30 @@ app.get('/api/top-players/gameweek/:gw', async (c) => {
     }
     console.error('Error fetching top players for gameweek:', error);
     return c.json({ error: 'Unable to fetch top players' }, { status: 500 });
+  }
+});
+
+// GET /api/leagues/:leagueId/standings
+app.get('/api/leagues/:leagueId/standings', async (c) => {
+  try {
+    const leagueId = parseInt(c.req.param('leagueId'), 10);
+    if (isNaN(leagueId) || leagueId <= 0) {
+      return c.json({ error: 'Invalid league ID' }, { status: 400 });
+    }
+    const pageParam = c.req.query('page') ?? '1';
+    const page = parseInt(pageParam, 10);
+    if (isNaN(page) || page < 1) {
+      return c.json({ error: 'Invalid page number' }, { status: 400 });
+    }
+    const result = await leagueStandingsService.getLeagueStandings(leagueId, page);
+    return c.json(result);
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    if (errorMsg.includes('404')) {
+      return c.json({ error: 'League not found' }, { status: 404 });
+    }
+    console.error('Error fetching league standings:', error);
+    return c.json({ error: 'Unable to fetch league standings' }, { status: 500 });
   }
 });
 

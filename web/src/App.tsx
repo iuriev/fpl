@@ -2,16 +2,22 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Route, Routes, useSearchParams } from 'react-router-dom';
 
 import {
-  TeamOfTheWeekScreen,
+  LocalStorageWatchlistRepository,
+  WatchlistRepositoryContext,
+} from '@/lib/watchlist-repository';
+import {
   EntryScreen,
   GameweekHistoryScreen,
   LeaguesStatsScreen,
   SquadScreen,
+  TeamOfTheWeekScreen,
   TopPlayersScreen,
   TransferScreen,
+  WatchlistScreen,
 } from '@/screens';
 
 const queryClient = new QueryClient();
+const watchlistRepo = new LocalStorageWatchlistRepository();
 
 function AppContent() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -65,6 +71,10 @@ function AppContent() {
           )
         }
       />
+      <Route
+        path="/watchlist"
+        element={<WatchlistScreen userTeamId={teamId ?? undefined} />}
+      />
     </Routes>
   );
 }
@@ -72,9 +82,11 @@ function AppContent() {
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
+      <WatchlistRepositoryContext.Provider value={watchlistRepo}>
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </WatchlistRepositoryContext.Provider>
     </QueryClientProvider>
   );
 }

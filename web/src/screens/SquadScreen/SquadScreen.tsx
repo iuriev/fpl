@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { flushSync } from 'react-dom';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { ApiError } from '@/api/client';
 import { useEntry, useGameweeks, usePlayerPool, useSquad } from '@/api/queries';
@@ -47,6 +47,20 @@ function benchLabel(index: number, position: PlayerPosition): string {
 export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [returnTo] = useState<string | null>(() => {
+    const stateReturnTo = (location.state as { returnTo?: string } | null)?.returnTo ?? null;
+    if (stateReturnTo) return stateReturnTo;
+    try {
+      const stored = sessionStorage.getItem('fpl-guest-return-to');
+      if (stored) sessionStorage.removeItem('fpl-guest-return-to');
+      return stored;
+    } catch {
+      return null;
+    }
+  });
+  const isGuestMode = returnTo !== null;
 
   const { data: gameweeksData } = useGameweeks();
   const { data: entry, isError: entryIsError } = useEntry(teamId);
@@ -113,13 +127,11 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
   };
 
   const handleViewChange = (mode: ViewMode) => {
-    withTransition(() =>
-      setSearchParams((prev) => {
-        const p = new URLSearchParams(prev);
-        p.set('view', mode);
-        return p;
-      })
-    );
+    setSearchParams((prev) => {
+      const p = new URLSearchParams(prev);
+      p.set('view', mode);
+      return p;
+    });
   };
 
   const handleChangeTeam = () => {
@@ -151,13 +163,27 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
         ariaLabel={copy.teamInfoDrawerLabel}
         header={drawerHeader}
       >
-        {entry && <TeamInfoPanel entry={entry} teamId={teamId} />}
+        {entry && <TeamInfoPanel entry={entry} teamId={teamId} showFollow={isGuestMode} />}
       </Drawer>
 
       <div className={styles.squadCol}>
         <header className={styles.header}>
           <div className={styles.headerMain}>
             <div className={styles.headerLeft}>
+              {isGuestMode && (
+                <button className={styles.backBtn} onClick={() => navigate(returnTo!)} aria-label={copy.squadGuestBack}>
+                  <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path
+                      d="M10 4l-4 4 4 4"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  {copy.squadGuestBack}
+                </button>
+              )}
               <button
                 className={styles.burgerBtn}
                 onClick={() => setDrawerOpen(true)}
@@ -172,14 +198,24 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
                   />
                 </svg>
               </button>
-              <div className={styles.teamInfo}>
+              {!isGuestMode && (
+                <div className={styles.teamInfo}>
+                  <span className={styles.teamName}>{entry?.teamName ?? ' '}</span>
+                  <span className={styles.teamId}>{'ID · ' + teamId}</span>
+                </div>
+              )}
+            </div>
+            {isGuestMode && (
+              <div className={styles.teamInfoCenter}>
                 <span className={styles.teamName}>{entry?.teamName ?? ' '}</span>
                 <span className={styles.teamId}>{'ID · ' + teamId}</span>
               </div>
-            </div>
-            <Button variant="link" onClick={handleChangeTeam}>
-              {copy.squadChangeTeam}
-            </Button>
+            )}
+            {!isGuestMode && (
+              <Button variant="link" onClick={handleChangeTeam}>
+                {copy.squadChangeTeam}
+              </Button>
+            )}
           </div>
 
           <div className={styles.viewToggleWrap}>
