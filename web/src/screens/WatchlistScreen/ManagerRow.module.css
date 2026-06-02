@@ -218,9 +218,8 @@
 
 .xfrPlayers {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 0.25rem;
-  flex-wrap: wrap;
   font: var(--fpl-fw-regular) var(--fpl-fs-label) var(--fpl-font-display);
 }
 
@@ -246,6 +245,7 @@
   flex-shrink: 0;
 }
 
+.xfrLine     { display: flex; align-items: center; gap: 0.25rem; }
 .xfrNames    { color: var(--fpl-text-soft); font-weight: var(--fpl-fw-medium); }
 .xfrNamesOut { color: var(--fpl-text-soft); font-weight: var(--fpl-fw-medium); }
 

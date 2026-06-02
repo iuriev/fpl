@@ -167,13 +167,15 @@ export const ManagerRow: React.FC<ManagerRowProps> = ({ teamId, currentGw, onRem
                 </span>
               </div>
               <div className={styles.xfrPlayers}>
-                <span className={styles.inBadge}>IN</span>
-                <span className={styles.xfrNames}>{transfersIn.join(', ')}</span>
+                <div className={styles.xfrLine}>
+                  <span className={styles.inBadge}>IN</span>
+                  <span className={styles.xfrNames}>{transfersIn.join(', ')}</span>
+                </div>
                 {transfersOut.length > 0 && (
-                  <>
+                  <div className={styles.xfrLine}>
                     <span className={styles.outBadge}>OUT</span>
                     <span className={styles.xfrNamesOut}>{transfersOut.join(', ')}</span>
-                  </>
+                  </div>
                 )}
               </div>
             </div>
