@@ -10,7 +10,7 @@ import { ListView, ListViewSkeleton } from '@/components/ui/ListView/ListView';
 import { Pitch } from '@/components/ui/Pitch/Pitch';
 import { PlayerCard } from '@/components/ui/PlayerCard/PlayerCard';
 import { SummaryStrip } from '@/components/ui/SummaryStrip/SummaryStrip';
-import { TeamInfoPanel } from '@/components/ui/TeamInfoPanel/TeamInfoPanel';
+import { TeamInfoPanel, TeamInfoPanelSkeleton } from '@/components/ui/TeamInfoPanel/TeamInfoPanel';
 import { type ViewMode, ViewToggle } from '@/components/ui/ViewToggle/ViewToggle';
 import { copy, interpolate } from '@/lib/copy';
 import type { PlayerPosition, SquadPlayer } from '@/types';
@@ -163,7 +163,9 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
         ariaLabel={copy.teamInfoDrawerLabel}
         header={drawerHeader}
       >
-        {entry && <TeamInfoPanel entry={entry} teamId={teamId} showFollow={isGuestMode} />}
+        {entry
+          ? <TeamInfoPanel entry={entry} teamId={teamId} showFollow={isGuestMode} />
+          : !entryIsError && <TeamInfoPanelSkeleton />}
       </Drawer>
 
       <div className={styles.squadCol}>
@@ -240,28 +242,27 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
               </svg>
             </button>
             <span className={styles.gwLabel}>{gwLabel}</span>
-            {canGoNext && (
-              <button
-                className={styles.navBtn}
-                onClick={() => navigateGw(1)}
-                aria-label="Next gameweek"
+            <button
+              className={styles.navBtn}
+              onClick={() => navigateGw(1)}
+              disabled={!canGoNext}
+              aria-label="Next gameweek"
+            >
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                aria-hidden="true"
+                className={styles.chevronRight}
               >
-                <svg
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  aria-hidden="true"
-                  className={styles.chevronRight}
-                >
-                  <path
-                    d="M10 4l-4 4 4 4"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-            )}
+                <path
+                  d="M10 4l-4 4 4 4"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
           </div>
         </header>
 
