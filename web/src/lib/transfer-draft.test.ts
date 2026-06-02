@@ -48,8 +48,8 @@ const makePoolPlayer = (id: number, team: number, nowCost: number): PoolPlayer =
 });
 
 describe('transfer-draft', () => {
-  beforeEach(() => localStorage.clear());
-  afterEach(() => localStorage.clear());
+  beforeEach(() => localStorage.removeItem('fpl-transfer-draft-123'));
+  afterEach(() => localStorage.removeItem('fpl-transfer-draft-123'));
 
   describe('saveDraft / loadDraft', () => {
     it('persists and retrieves a draft', () => {

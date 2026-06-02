@@ -47,6 +47,7 @@ export const fixtureEntry: EntryResponse = {
   overallPoints: 2156,
   overallRank: 142857,
   eventPoints: 67,
+  eventRank: 234567,
   totalPlayers: 10500000,
   regionIsoCode: 'UA',
 };

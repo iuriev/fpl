@@ -6,11 +6,11 @@ import { fixtureEntry } from '@/fixtures';
 
 import { TeamInfoPanel } from './TeamInfoPanel';
 
-function renderPanel(overrides: Partial<typeof fixtureEntry> = {}) {
+function renderPanel(overrides: Partial<typeof fixtureEntry> = {}, showFollow = false) {
   const entry = { ...fixtureEntry, ...overrides };
   return render(
     <MemoryRouter>
-      <TeamInfoPanel entry={entry} teamId={entry.teamId} />
+      <TeamInfoPanel entry={entry} teamId={entry.teamId} showFollow={showFollow} />
     </MemoryRouter>
   );
 }
@@ -67,8 +67,13 @@ describe('TeamInfoPanel', () => {
     expect(link.getAttribute('href')).toBe('/history?teamId=72828');
   });
 
-  it('does not render a toggle button', () => {
+  it('does not render Follow button by default (own team)', () => {
     renderPanel();
-    expect(screen.queryByRole('button')).toBeNull();
+    expect(screen.queryByRole('button', { name: /follow/i })).toBeNull();
+  });
+
+  it('renders Follow button when showFollow=true (guest mode)', () => {
+    renderPanel({}, true);
+    expect(screen.getByRole('button', { name: /follow/i })).toBeInTheDocument();
   });
 });

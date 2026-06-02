@@ -8,6 +8,7 @@ import {
   EntryResponse,
   GameweeksResponse,
   HistoryResponse,
+  LeagueStandingsResponse,
   LeaguesResponse,
   PlayerPoolResponse,
   SquadResponse,
@@ -15,6 +16,7 @@ import {
   TeamsResponse,
   TopPlayersGwResponse,
   TopPlayersSeasonResponse,
+  TransfersResponse,
 } from '@/types';
 
 const API_BASE = '/api';
@@ -73,4 +75,9 @@ export const api = {
   getTeamPlayers: (teamCode: number) => request<TeamPlayersResponse>(`/team-players/${teamCode}`),
 
   getPlayerPool: () => request<PlayerPoolResponse>('/player-pool'),
+
+  getTransfers: (teamId: number) => request<TransfersResponse>(`/entry/${teamId}/transfers`),
+
+  getLeagueStandings: (leagueId: number, page: number) =>
+    request<LeagueStandingsResponse>(`/leagues/${leagueId}/standings?page=${page}`),
 };

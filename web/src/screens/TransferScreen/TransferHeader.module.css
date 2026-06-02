@@ -3,7 +3,7 @@
   top: 0;
   z-index: 20;
   flex-shrink: 0;
-  padding: var(--fpl-space-xs) var(--fpl-space-md);
+  padding: var(--fpl-space-sm) var(--fpl-space-xl3) var(--fpl-space-xs);
   background: var(--fpl-bg-deep);
   border-bottom: 1px solid var(--fpl-bg-hair);
 }
@@ -14,13 +14,18 @@
   gap: var(--fpl-space-xs);
   background: none;
   border: none;
-  color: var(--fpl-muted);
+  color: var(--fpl-accent);
   font-size: 0.8125rem;
   font-weight: 600;
   cursor: pointer;
   padding: 0;
-  margin-bottom: 2px;
-  transition: color 120ms;
+  transition: opacity 120ms;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.backBtn:hover {
+  opacity: 0.8;
 }
 
 .backBtn svg {
@@ -35,7 +40,7 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: var(--fpl-space-sm);
-  min-height: 1.5rem;
+  min-height: 3rem;
 }
 
 .title {
