@@ -10,9 +10,10 @@ type Phase = 'idle' | 'validating' | 'preview' | 'error';
 
 export interface AddManagerInputProps {
   onAdded: () => void;
+  onLimitReached: () => void;
 }
 
-export const AddManagerInput: React.FC<AddManagerInputProps> = ({ onAdded }) => {
+export const AddManagerInput: React.FC<AddManagerInputProps> = ({ onAdded, onLimitReached }) => {
   const repo = useWatchlistRepository();
   const [input, setInput] = useState('');
   const [phase, setPhase] = useState<Phase>('idle');
@@ -54,9 +55,9 @@ export const AddManagerInput: React.FC<AddManagerInputProps> = ({ onAdded }) => 
       setPhase('error');
       setPreview(null);
     } else {
-      setErrorMsg(interpolate(copy.watchlistAddLimit, { max: repo.getLimit() }));
-      setPhase('error');
+      setPhase('idle');
       setPreview(null);
+      onLimitReached();
     }
   };
 

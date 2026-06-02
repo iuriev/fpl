@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useGameweeks } from '@/api/queries';
+import { ScreenHeader } from '@/components/ui/ScreenHeader/ScreenHeader';
+import { PremiumSheet } from '@/components/ui/PremiumSheet/PremiumSheet';
 import { copy, interpolate } from '@/lib/copy';
 import { useWatchlistRepository } from '@/lib/watchlist-repository';
 
@@ -21,6 +23,7 @@ export const WatchlistScreen: React.FC<WatchlistScreenProps> = ({ userTeamId }) 
   const { data: gameweeksData } = useGameweeks();
 
   const [watchedIds, setWatchedIds] = useState<number[]>([]);
+  const [premiumOpen, setPremiumOpen] = useState(false);
 
   const refreshList = useCallback(async () => {
     const ids = await repo.list();
@@ -39,6 +42,7 @@ export const WatchlistScreen: React.FC<WatchlistScreenProps> = ({ userTeamId }) 
   const handleFollow = useCallback(async (teamId: number) => {
     const result = await repo.add(teamId);
     if (result === 'ok') refreshList();
+    else if (result === 'limit') setPremiumOpen(true);
   }, [repo, refreshList]);
 
   const handleBack = () => {
@@ -54,29 +58,19 @@ export const WatchlistScreen: React.FC<WatchlistScreenProps> = ({ userTeamId }) 
 
   return (
     <div className={styles.screen}>
-      <header className={styles.header}>
-        <button className={styles.backBtn} onClick={handleBack} aria-label={copy.watchlistBack}>
-          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path
-              d="M10 4l-4 4 4 4"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          {copy.watchlistBack}
-        </button>
-        <div className={styles.heading}>
-          <span className={styles.title}>{copy.watchlistTitle}</span>
-        </div>
-        <span className={styles.capacity}>
-          {interpolate(copy.watchlistCapacity, { n: watchedIds.length, max: limit })}
-        </span>
-      </header>
+      <ScreenHeader
+        backLabel={copy.watchlistBack}
+        onBack={handleBack}
+        title={copy.watchlistTitle}
+        right={
+          <span className={styles.capacity}>
+            {interpolate(copy.watchlistCapacity, { n: watchedIds.length, max: limit })}
+          </span>
+        }
+      />
 
       <div className={styles.body}>
-        <AddManagerInput onAdded={refreshList} />
+        <AddManagerInput onAdded={refreshList} onLimitReached={() => setPremiumOpen(true)} />
 
         {watchedIds.length === 0 ? (
           <div className={styles.emptyState}>
@@ -84,32 +78,15 @@ export const WatchlistScreen: React.FC<WatchlistScreenProps> = ({ userTeamId }) 
             <p className={styles.emptySubtext}>{copy.watchlistEmptySubtext}</p>
           </div>
         ) : (
-          <div className={styles.tableWrapper}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th className={`${styles.th} ${styles.cellSticky}`}>{copy.watchlistColManager}</th>
-                  <th className={styles.th}>{copy.watchlistColGwPts}</th>
-                  <th className={styles.th}>{copy.watchlistColGwRank}</th>
-                  <th className={styles.th}>{copy.watchlistColOverallRank}</th>
-                  <th className={styles.th}>{copy.watchlistColRankDelta}</th>
-                  <th className={styles.th}>{copy.watchlistColTransfers}</th>
-                  <th className={styles.th}>{copy.watchlistColCaptain}</th>
-                  <th className={styles.th}>{copy.watchlistColLatestIn}</th>
-                  <th className={styles.th} aria-label="Remove" />
-                </tr>
-              </thead>
-              <tbody>
-                {currentGw !== null && watchedIds.map((teamId) => (
-                  <ManagerRow
-                    key={teamId}
-                    teamId={teamId}
-                    currentGw={currentGw}
-                    onRemove={() => handleRemove(teamId)}
-                  />
-                ))}
-              </tbody>
-            </table>
+          <div className={styles.cardList}>
+            {currentGw !== null && watchedIds.map((teamId) => (
+              <ManagerRow
+                key={teamId}
+                teamId={teamId}
+                currentGw={currentGw}
+                onRemove={() => handleRemove(teamId)}
+              />
+            ))}
           </div>
         )}
 
@@ -118,8 +95,18 @@ export const WatchlistScreen: React.FC<WatchlistScreenProps> = ({ userTeamId }) 
           watchedIds={watchedSet}
           isFull={isFull}
           onFollow={handleFollow}
+          onLimitReached={() => setPremiumOpen(true)}
         />
       </div>
+
+      <PremiumSheet
+        open={premiumOpen}
+        onClose={() => setPremiumOpen(false)}
+        title={copy.premiumWatchlistTitle}
+        description={copy.premiumWatchlistDescription}
+        freeLabel={copy.premiumWatchlistFreeLabel}
+        premiumLabel={copy.premiumWatchlistPremiumLabel}
+      />
     </div>
   );
 };

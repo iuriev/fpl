@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useEntry, useHistory, useSquad, useTransfers } from '@/api/queries';
 import { copy, interpolate } from '@/lib/copy';
 
-import styles from './WatchlistScreen.module.css';
+import styles from './ManagerRow.module.css';
 
 export interface ManagerRowProps {
   teamId: number;
@@ -16,20 +16,16 @@ function fmt(n: number): string {
   return n.toLocaleString('en-GB');
 }
 
+function fmtValue(v: number): string {
+  return `£${v.toFixed(1)}m`;
+}
+
 function RankDelta({ current, prev }: { current: number; prev: number | undefined }) {
-  if (prev === undefined) return <span className={styles.rankNeutral}>—</span>;
+  if (prev === undefined) return <span className={styles.deltaNeutral}>—</span>;
   const delta = prev - current;
-  if (delta > 0) return <span className={styles.rankUp}>↑ {fmt(delta)}</span>;
-  if (delta < 0) return <span className={styles.rankDown}>↓ {fmt(-delta)}</span>;
-  return <span className={styles.rankNeutral}>—</span>;
-}
-
-function Cell({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <td className={`${styles.cell} ${className ?? ''}`}>{children}</td>;
-}
-
-function SkeletonCell() {
-  return <Cell><span className={styles.skeletonCell} aria-hidden="true" /></Cell>;
+  if (delta > 0) return <span className={styles.deltaUp}>↑{fmt(delta)}</span>;
+  if (delta < 0) return <span className={styles.deltaDown}>↓{fmt(-delta)}</span>;
+  return <span className={styles.deltaNeutral}>—</span>;
 }
 
 export const ManagerRow: React.FC<ManagerRowProps> = ({ teamId, currentGw, onRemove }) => {
@@ -43,97 +39,160 @@ export const ManagerRow: React.FC<ManagerRowProps> = ({ teamId, currentGw, onRem
 
   const isLoading = entryLoading || squadLoading || historyLoading || transfersLoading;
 
-  if (entryError) {
-    return (
-      <tr className={styles.row}>
-        <td colSpan={9} className={styles.rowError}>
-          <span>Team {teamId} — {copy.watchlistLoadError}</span>
-          <button
-            className={styles.removeBtn}
-            onClick={(e) => { e.stopPropagation(); onRemove(); }}
-            aria-label={copy.watchlistRowErrorRemove}
-          >
-            ✕
-          </button>
-        </td>
-      </tr>
-    );
-  }
-
-  const captain = squad?.starters.find((p) => p.isCaptain);
-  const latestTransfers = transfersData?.transfers
-    .filter((t) => t.event === currentGw)
-    .map((t) => t.elementInName);
-
-  const sortedHistory = history?.gameweeks ?? [];
-  const prevOverallRank = sortedHistory.length >= 2 ? sortedHistory[1].overallRank : undefined;
-
   const handleRowClick = () => {
     const returnTo = location.pathname + location.search;
     try { sessionStorage.setItem('fpl-guest-return-to', returnTo); } catch { /* ignore */ }
     navigate(`/?teamId=${teamId}`, { state: { returnTo } });
   };
 
+  if (entryError) {
+    return (
+      <div className={styles.card}>
+        <div className={styles.errorRow}>
+          <span className={styles.errorText}>Team {teamId} — {copy.watchlistLoadError}</span>
+          <button
+            className={styles.unfollowBtn}
+            onClick={(e) => { e.stopPropagation(); onRemove(); }}
+            aria-label={copy.watchlistRowErrorRemove}
+          >
+            {copy.watchlistUnfollow}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const allPlayers = squad ? [...squad.starters, ...squad.bench] : [];
+  const captain = allPlayers.find((p) => p.isCaptain);
+  const viceCaptain = allPlayers.find((p) => p.isViceCaptain);
+
+  const gwTransfers = transfersData?.transfers.filter((t) => t.event === currentGw) ?? [];
+  const transfersIn = gwTransfers.map((t) => t.elementInName);
+  const transfersOut = gwTransfers.map((t) => t.elementOutName);
+
+  const sortedHistory = history?.gameweeks ?? [];
+  const historyGw = sortedHistory[0];
+  const prevHistoryGw = sortedHistory[1];
+
   return (
-    <tr
-      className={styles.row}
+    <div
+      className={styles.card}
       onClick={handleRowClick}
-      style={{ cursor: 'pointer' }}
+      role="button"
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && handleRowClick()}
       aria-label={entry ? `${entry.managerName} — view squad` : undefined}
     >
-      <Cell className={styles.cellSticky}>
-        {isLoading && !entry ? (
-          <span className={styles.skeletonCell} />
-        ) : (
-          <div className={styles.managerCell}>
-            <span className={styles.managerName}>{entry?.managerName}</span>
-            <span className={styles.teamName}>{entry?.teamName}</span>
-          </div>
-        )}
-      </Cell>
+      <div className={styles.top}>
+        <div className={styles.scoreBlock}>
+          {isLoading && !entry ? (
+            <span className={styles.skeletonScore} aria-hidden="true" />
+          ) : (
+            <>
+              <span className={styles.pts}>{entry ? fmt(entry.eventPoints) : '—'}</span>
+              <span className={styles.ptsLabel}>{copy.watchlistColGwPts}</span>
+            </>
+          )}
+        </div>
 
-      {isLoading ? (
+        <div className={styles.identity}>
+          {isLoading && !entry ? (
+            <span className={styles.skeletonName} aria-hidden="true" />
+          ) : (
+            <>
+              <span className={styles.managerName}>{entry?.managerName}</span>
+              <span className={styles.teamName}>{entry?.teamName}</span>
+            </>
+          )}
+        </div>
+
+        <div className={styles.rankBlock}>
+          {isLoading ? (
+            <span className={styles.skeletonCell} aria-hidden="true" />
+          ) : (
+            <>
+              <span className={styles.or}>{entry ? fmt(entry.overallRank) : '—'}</span>
+              <span className={styles.orLabel}>{copy.watchlistColOverallRank}</span>
+              <RankDelta current={entry?.overallRank ?? 0} prev={prevHistoryGw?.overallRank} />
+            </>
+          )}
+        </div>
+      </div>
+
+      {!isLoading && (
         <>
-          <SkeletonCell />
-          <SkeletonCell />
-          <SkeletonCell />
-          <SkeletonCell />
-          <SkeletonCell />
-          <SkeletonCell />
-          <SkeletonCell />
-        </>
-      ) : (
-        <>
-          <Cell>{entry ? fmt(entry.eventPoints) : '—'}</Cell>
-          <Cell>{entry ? fmt(entry.eventRank) : '—'}</Cell>
-          <Cell>{entry ? fmt(entry.overallRank) : '—'}</Cell>
-          <Cell>
-            <RankDelta current={entry?.overallRank ?? 0} prev={prevOverallRank} />
-          </Cell>
-          <Cell>{squad ? squad.summary.transfers : '—'}</Cell>
-          <Cell>{captain?.name ?? '—'}</Cell>
-          <Cell>
-            {latestTransfers && latestTransfers.length > 0
-              ? latestTransfers.join(', ')
-              : '—'}
-          </Cell>
+          <div className={styles.statsGrid}>
+            <div className={styles.statItem}>
+              <span className={styles.statVal}>{entry ? fmt(entry.eventRank) : '—'}</span>
+              <span className={styles.statLbl}>{copy.watchlistColGwRank}</span>
+            </div>
+            <div className={styles.statItem}>
+              <span className={`${styles.statVal} ${historyGw?.transferCost ? styles.statValNeg : styles.statValPos}`}>
+                {historyGw?.transferCost ? `−${historyGw.transferCost} pts` : copy.watchlistTransferCostFree}
+              </span>
+              <span className={styles.statLbl}>{copy.watchlistColXfrCost}</span>
+            </div>
+            <div className={styles.statItem}>
+              <span className={`${styles.statVal} ${styles.statValAccent}`}>
+                {historyGw ? fmtValue(historyGw.teamValue) : '—'}
+              </span>
+              <span className={styles.statLbl}>{copy.watchlistColSquadValue}</span>
+            </div>
+            <div className={styles.statItem}>
+              <span className={styles.statVal}>
+                {squad?.summary.bank !== undefined ? fmtValue(squad.summary.bank / 10) : '—'}
+              </span>
+              <span className={styles.statLbl}>{copy.watchlistColBank}</span>
+            </div>
+          </div>
+
+          <div className={styles.leadership}>
+            <div className={styles.leader}>
+              <span className={styles.capBadge}>{copy.watchlistColCaptain}</span>
+              <span className={styles.leaderName}>{captain?.name ?? '—'}</span>
+            </div>
+            <span className={styles.sepLine} />
+            <div className={styles.leader}>
+              <span className={styles.vcBadge}>{copy.watchlistColViceCaptain}</span>
+              <span className={styles.leaderName}>{viceCaptain?.name ?? '—'}</span>
+            </div>
+          </div>
+
+          {transfersIn.length > 0 && (
+            <div className={styles.transfers}>
+              <div className={styles.xfrRow}>
+                <span className={styles.xfrChip}>
+                  <span className={styles.xfrLbl}>{copy.watchlistColTransfers}</span>
+                  <span className={styles.xfrVal}>{squad?.summary.transfers ?? 0}</span>
+                </span>
+              </div>
+              <div className={styles.xfrPlayers}>
+                <span className={styles.inBadge}>IN</span>
+                <span className={styles.xfrNames}>{transfersIn.join(', ')}</span>
+                {transfersOut.length > 0 && (
+                  <>
+                    <span className={styles.outBadge}>OUT</span>
+                    <span className={styles.xfrNamesOut}>{transfersOut.join(', ')}</span>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
         </>
       )}
 
-      <Cell>
+      <div className={styles.actions}>
         <button
-          className={styles.removeBtn}
+          className={styles.unfollowBtn}
           onClick={(e) => { e.stopPropagation(); onRemove(); }}
           aria-label={interpolate(copy.watchlistRemoveAriaLabel, {
             name: entry?.managerName ?? String(teamId),
           })}
         >
-          ✕
+          {copy.watchlistUnfollow}
         </button>
-      </Cell>
-    </tr>
+      </div>
+    </div>
   );
 };
 

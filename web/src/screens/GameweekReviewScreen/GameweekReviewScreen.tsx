@@ -3,8 +3,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useGameweeks, useHistory, usePlayerPool, useSquad } from '@/api/queries';
 import { Button } from '@/components/ui/Button/Button';
+import { ScreenHeader } from '@/components/ui/ScreenHeader/ScreenHeader';
 import { copy } from '@/lib/copy';
 
+import styles from './GameweekReviewScreen.module.css';
 import {
   buildTransferPairs,
   computeWhatIfScore,
@@ -16,7 +18,6 @@ import { ReviewHero } from './ReviewHero';
 import { ReviewPlayerList } from './ReviewPlayerList';
 import { ReviewTransfers } from './ReviewTransfers';
 import { ReviewWhatIf } from './ReviewWhatIf';
-import styles from './GameweekReviewScreen.module.css';
 
 export interface GameweekReviewScreenProps {
   teamId: number;
@@ -113,22 +114,12 @@ export const GameweekReviewScreen: React.FC<GameweekReviewScreenProps> = ({ team
 
   return (
     <div className={styles.screen}>
-      <header className={styles.header}>
-        <button className={styles.backBtn} onClick={handleBack} aria-label={copy.reviewBack}>
-          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path
-              d="M10 4l-4 4 4 4"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          {copy.reviewBack}
-        </button>
-        <span className={styles.title}>{copy.reviewTitle}</span>
-        {reviewGw && <span className={styles.gwBadge}>GW {reviewGw}</span>}
-      </header>
+      <ScreenHeader
+        backLabel={copy.reviewBack}
+        onBack={handleBack}
+        title={copy.reviewTitle}
+        right={reviewGw ? <span className={styles.gwBadge}>GW {reviewGw}</span> : undefined}
+      />
 
       <div className={styles.body}>
         {historyLoading && <div className={styles.loading}>{copy.loadingPlaceholder}</div>}

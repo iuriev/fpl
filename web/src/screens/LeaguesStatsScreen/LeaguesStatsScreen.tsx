@@ -1,8 +1,9 @@
 import React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import { useEntry, useLeagues } from '@/api/queries';
+import { useLeagues } from '@/api/queries';
 import { Button } from '@/components/ui/Button/Button';
+import { ScreenHeader } from '@/components/ui/ScreenHeader/ScreenHeader';
 import { copy } from '@/lib/copy';
 import type { LeagueEntry } from '@/types';
 
@@ -73,7 +74,6 @@ export const LeaguesStatsScreen: React.FC<LeaguesStatsScreenProps> = ({ teamId }
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const { data: entry } = useEntry(teamId);
   const { data, isLoading, isError, refetch } = useLeagues(teamId);
 
   const handleBack = () => {
@@ -83,24 +83,7 @@ export const LeaguesStatsScreen: React.FC<LeaguesStatsScreenProps> = ({ teamId }
 
   return (
     <div className={styles.screen}>
-      <header className={styles.header}>
-        <button className={styles.backBtn} onClick={handleBack} aria-label={copy.statsBack}>
-          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path
-              d="M10 4l-4 4 4 4"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          {copy.statsBack}
-        </button>
-        <div className={styles.heading}>
-          <span className={styles.title}>{copy.statsTitle}</span>
-          {entry && <span className={styles.teamName}>{entry.teamName}</span>}
-        </div>
-      </header>
+      <ScreenHeader backLabel={copy.statsBack} onBack={handleBack} title={copy.statsTitle} />
 
       <div className={styles.body}>
         {isLoading && <LeaguesSkeleton />}

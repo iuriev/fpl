@@ -35,11 +35,7 @@ function renderRow(overrides?: Partial<React.ComponentProps<typeof ManagerRow>>)
   return render(
     <WatchlistRepositoryContext.Provider value={repo}>
       <MemoryRouter>
-        <table>
-          <tbody>
-            <ManagerRow teamId={72828} currentGw={37} onRemove={vi.fn()} {...overrides} />
-          </tbody>
-        </table>
+        <ManagerRow teamId={72828} currentGw={37} onRemove={vi.fn()} {...overrides} />
       </MemoryRouter>
     </WatchlistRepositoryContext.Provider>
   );
@@ -83,7 +79,7 @@ describe('ManagerRow', () => {
   it('clicking row navigates to squad view with returnTo state', async () => {
     const user = userEvent.setup();
     renderRow();
-    const row = screen.getByRole('row');
+    const row = screen.getByRole('button', { name: /view squad/i });
     await user.click(row);
     expect(mockNavigate).toHaveBeenCalledWith(
       '/?teamId=72828',
