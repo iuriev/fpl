@@ -22,6 +22,7 @@ import styles from './SquadScreen.module.css';
 
 export interface SquadScreenProps {
   teamId: number;
+  isGuest?: boolean;
 }
 
 const POSITION_ORDER: PlayerPosition[] = ['FWD', 'MID', 'DEF', 'GK'];

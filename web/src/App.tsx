@@ -1,6 +1,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Route, Routes, useSearchParams } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter, Navigate, Route, Routes, useSearchParams } from 'react-router-dom';
 
+import { MyTeamProvider, useMyTeam } from '@/lib/my-team';
 import { PlayerWatchlistPremiumProvider } from '@/lib/player-watchlist-premium';
 import {
   LocalStoragePlayerWatchlistRepository,
@@ -29,74 +31,102 @@ const queryClient = new QueryClient();
 const watchlistRepo = new LocalStorageWatchlistRepository();
 const playerWatchlistRepo = new LocalStoragePlayerWatchlistRepository();
 
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { myTeamId } = useMyTeam();
+  if (!myTeamId) return <Navigate to="/" replace />;
+  return <>{children}</>;
+}
+
 function AppContent() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const teamId = searchParams.get('teamId') ? Number(searchParams.get('teamId')) : null;
+  const { myTeamId, setMyTeamId } = useMyTeam();
+  const [searchParams] = useSearchParams();
+
+  const viewedTeamId = searchParams.get('teamId') ? Number(searchParams.get('teamId')) : null;
+
+  const rootElement = () => {
+    if (viewedTeamId) {
+      if (!myTeamId) return <Navigate to="/" replace />;
+      return <SquadScreen teamId={viewedTeamId} isGuest />;
+    }
+    if (myTeamId) return <SquadScreen teamId={myTeamId} />;
+    return <EntryScreen onSubmit={(id) => setMyTeamId(id)} />;
+  };
 
   return (
     <Routes>
-      <Route
-        path="/"
-        element={
-          teamId ? (
-            <SquadScreen teamId={teamId} />
-          ) : (
-            <EntryScreen
-              onSubmit={(id) => {
-                setSearchParams({ teamId: String(id) });
-              }}
-            />
-          )
-        }
-      />
+      <Route path="/" element={rootElement()} />
       <Route
         path="/history"
         element={
-          teamId ? (
-            <GameweekHistoryScreen teamId={teamId} />
-          ) : (
-            <EntryScreen onSubmit={(id) => setSearchParams({ teamId: String(id) })} />
-          )
+          <ProtectedRoute>
+            <GameweekHistoryScreen teamId={myTeamId!} />
+          </ProtectedRoute>
         }
       />
       <Route
         path="/stats"
         element={
-          teamId ? (
-            <LeaguesStatsScreen teamId={teamId} />
-          ) : (
-            <EntryScreen onSubmit={(id) => setSearchParams({ teamId: String(id) })} />
-          )
+          <ProtectedRoute>
+            <LeaguesStatsScreen teamId={myTeamId!} />
+          </ProtectedRoute>
         }
       />
       <Route
         path="/review"
         element={
-          teamId ? (
-            <GameweekReviewScreen teamId={teamId} />
-          ) : (
-            <EntryScreen onSubmit={(id) => setSearchParams({ teamId: String(id) })} />
-          )
+          <ProtectedRoute>
+            <GameweekReviewScreen teamId={myTeamId!} />
+          </ProtectedRoute>
         }
       />
-      <Route path="/team-of-the-week" element={<TeamOfTheWeekScreen />} />
-      <Route path="/top-players" element={<TopPlayersScreen />} />
+      <Route
+        path="/team-of-the-week"
+        element={
+          <ProtectedRoute>
+            <TeamOfTheWeekScreen />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/top-players"
+        element={
+          <ProtectedRoute>
+            <TopPlayersScreen />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/transfers"
         element={
-          teamId ? (
-            <TransferScreen teamId={teamId} />
-          ) : (
-            <EntryScreen onSubmit={(id) => setSearchParams({ teamId: String(id) })} />
-          )
+          <ProtectedRoute>
+            <TransferScreen teamId={myTeamId!} />
+          </ProtectedRoute>
         }
       />
       <Route
         path="/watchlist"
-        element={<WatchlistScreen userTeamId={teamId ?? undefined} />}
+        element={
+          <ProtectedRoute>
+            <WatchlistScreen />
+          </ProtectedRoute>
+        }
       />
-      <Route path="/leagues/:leagueId/standings" element={<LeagueStandingsScreen />} />
-      <Route path="/player-watchlist" element={<PlayerWatchlistScreen />} />
+      <Route
+        path="/leagues/:leagueId/standings"
+        element={
+          <ProtectedRoute>
+            <LeagueStandingsScreen />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/player-watchlist"
+        element={
+          <ProtectedRoute>
+            <PlayerWatchlistScreen />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }
@@ -108,9 +138,11 @@ export function App() {
         <PlayerWatchlistRepositoryContext.Provider value={playerWatchlistRepo}>
           <ToastProvider>
             <PlayerWatchlistPremiumProvider>
-              <BrowserRouter>
-                <AppContent />
-              </BrowserRouter>
+              <MyTeamProvider>
+                <BrowserRouter>
+                  <AppContent />
+                </BrowserRouter>
+              </MyTeamProvider>
             </PlayerWatchlistPremiumProvider>
           </ToastProvider>
         </PlayerWatchlistRepositoryContext.Provider>
