@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useSearchParams } from 'react-router-dom';
 
+import { useCurrentUser } from '@/auth/AuthContext';
 import { AuthProvider } from '@/auth/AuthProvider';
 import { ProtectedRoute } from '@/auth/ProtectedRoute';
 import { useMyTeam } from '@/lib/my-team/MyTeamContext';
@@ -36,25 +37,35 @@ const queryClient = new QueryClient();
 const watchlistRepo = new LocalStorageWatchlistRepository();
 const playerWatchlistRepo = new LocalStoragePlayerWatchlistRepository();
 
-function MyTeamProtectedRoute({ children }: { children: React.ReactNode }) {
+function AuthAndTeamProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useCurrentUser();
   const { myTeamId } = useMyTeam();
-  if (!myTeamId) return <Navigate to="/" replace />;
+  if (loading) return null;
+  if (!user) return <Navigate to="/sign-in" replace />;
+  if (!myTeamId) return <Navigate to="/entry" replace />;
   return <>{children}</>;
 }
 
 function AppContent() {
-  const { myTeamId, setMyTeamId } = useMyTeam();
+  const { user, loading } = useCurrentUser();
+  const { myTeamId, isDemoMode } = useMyTeam();
   const [searchParams] = useSearchParams();
 
   const viewedTeamId = searchParams.get('teamId') !== null ? Number(searchParams.get('teamId')) : null;
 
   const rootElement = () => {
+    if (loading) return null;
+
     if (viewedTeamId) {
-      if (!myTeamId) return <Navigate to="/" replace />;
+      if (!user && !isDemoMode) return <Navigate to="/sign-in" replace />;
       return <SquadScreen teamId={viewedTeamId} isGuest />;
     }
-    if (myTeamId) return <SquadScreen teamId={myTeamId} />;
-    return <EntryScreen onSubmit={(id) => setMyTeamId(id)} />;
+
+    if (!user && !isDemoMode) return <Navigate to="/sign-in" replace />;
+    if (isDemoMode && !myTeamId) return <Navigate to="/entry" state={{ demo: true }} replace />;
+    if (isDemoMode && myTeamId) return <SquadScreen teamId={myTeamId} />;
+    if (user && !user.fplTeamId) return <EntryScreen />;
+    return <SquadScreen teamId={user!.fplTeamId!} />;
   };
 
   return (
@@ -62,52 +73,53 @@ function AppContent() {
       <Route path="/" element={rootElement()} />
       <Route path="/sign-in" element={<SignInScreen />} />
       <Route path="/sign-up" element={<SignUpScreen />} />
+      <Route path="/entry" element={<EntryScreen />} />
       <Route
         path="/history"
         element={
-          <MyTeamProtectedRoute>
+          <AuthAndTeamProtectedRoute>
             <GameweekHistoryScreen teamId={myTeamId!} />
-          </MyTeamProtectedRoute>
+          </AuthAndTeamProtectedRoute>
         }
       />
       <Route
         path="/stats"
         element={
-          <MyTeamProtectedRoute>
+          <AuthAndTeamProtectedRoute>
             <LeaguesStatsScreen teamId={myTeamId!} />
-          </MyTeamProtectedRoute>
+          </AuthAndTeamProtectedRoute>
         }
       />
       <Route
         path="/review"
         element={
-          <MyTeamProtectedRoute>
+          <AuthAndTeamProtectedRoute>
             <GameweekReviewScreen teamId={myTeamId!} />
-          </MyTeamProtectedRoute>
+          </AuthAndTeamProtectedRoute>
         }
       />
       <Route
         path="/team-of-the-week"
         element={
-          <MyTeamProtectedRoute>
+          <AuthAndTeamProtectedRoute>
             <TeamOfTheWeekScreen />
-          </MyTeamProtectedRoute>
+          </AuthAndTeamProtectedRoute>
         }
       />
       <Route
         path="/top-players"
         element={
-          <MyTeamProtectedRoute>
+          <AuthAndTeamProtectedRoute>
             <TopPlayersScreen />
-          </MyTeamProtectedRoute>
+          </AuthAndTeamProtectedRoute>
         }
       />
       <Route
         path="/transfers"
         element={
-          <MyTeamProtectedRoute>
+          <AuthAndTeamProtectedRoute>
             <TransferScreen teamId={myTeamId!} />
-          </MyTeamProtectedRoute>
+          </AuthAndTeamProtectedRoute>
         }
       />
       <Route path="/watchlist" element={<ProtectedRoute />}>
@@ -116,9 +128,9 @@ function AppContent() {
       <Route
         path="/leagues/:leagueId/standings"
         element={
-          <MyTeamProtectedRoute>
+          <AuthAndTeamProtectedRoute>
             <LeagueStandingsScreen />
-          </MyTeamProtectedRoute>
+          </AuthAndTeamProtectedRoute>
         }
       />
       <Route path="/player-watchlist" element={<ProtectedRoute />}>
@@ -135,13 +147,13 @@ export function App() {
         <PlayerWatchlistRepositoryContext.Provider value={playerWatchlistRepo}>
           <ToastProvider>
             <PlayerWatchlistPremiumProvider>
-              <MyTeamProvider>
-                <BrowserRouter>
-                  <AuthProvider>
+              <BrowserRouter>
+                <AuthProvider>
+                  <MyTeamProvider>
                     <AppContent />
-                  </AuthProvider>
-                </BrowserRouter>
-              </MyTeamProvider>
+                  </MyTeamProvider>
+                </AuthProvider>
+              </BrowserRouter>
             </PlayerWatchlistPremiumProvider>
           </ToastProvider>
         </PlayerWatchlistRepositoryContext.Provider>

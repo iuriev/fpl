@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import { DemoSignInDialog } from '@/components/ui/DemoSignInDialog/DemoSignInDialog';
 import { copy, interpolate } from '@/lib/copy';
 import { useWatchlistRepository } from '@/lib/watchlist-repository';
 import type { EntryResponse } from '@/types';
@@ -17,18 +18,38 @@ function fmt(n: number): string {
   return n.toLocaleString('en-GB');
 }
 
+export type NavLinksMode = 'full' | 'hidden' | 'demo';
+
 export interface TeamInfoPanelProps {
   entry: EntryResponse;
   teamId: number;
   showFollow?: boolean;
-  showNavLinks?: boolean;
+  navLinksMode?: NavLinksMode;
 }
 
-export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({ entry, teamId, showFollow = false, showNavLinks = true }) => {
+const NAV_LINKS: { to: string; label: () => string; featured?: boolean }[] = [
+  { to: '/history', label: () => copy.teamInfoGwHistory },
+  { to: '/review', label: () => copy.reviewNavLink },
+  { to: '/stats', label: () => copy.statsMyStats },
+  { to: '/team-of-the-week', label: () => copy.teamOfTheWeekNavLink },
+  { to: '/top-players', label: () => copy.topPlayersNavLink },
+  { to: '/watchlist', label: () => copy.watchlistNavLink },
+  { to: '/player-watchlist', label: () => copy.playerWatchlistNavLink },
+  { to: '/transfers', label: () => copy.transfersNavLink, featured: true },
+];
+
+export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({
+  entry,
+  teamId,
+  showFollow = false,
+  navLinksMode = 'full',
+}) => {
   const flag = entry.regionIsoCode ? isoToFlag(entry.regionIsoCode) : null;
   const repo = useWatchlistRepository();
   const [following, setFollowing] = useState(false);
   const [limitReached, setLimitReached] = useState(false);
+  const [demoGateOpen, setDemoGateOpen] = useState(false);
+  const openDemoGate = useCallback(() => setDemoGateOpen(true), []);
 
   useEffect(() => {
     if (!showFollow) return;
@@ -53,6 +74,8 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({ entry, teamId, sho
 
   return (
     <aside className={styles.panel}>
+      <DemoSignInDialog open={demoGateOpen} onClose={() => setDemoGateOpen(false)} />
+
       <div className={styles.avatarWrap} aria-hidden="true">
         <div className={styles.avatar} />
       </div>
@@ -84,35 +107,32 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({ entry, teamId, sho
         </div>
       </div>
 
-      {showNavLinks && (
+      {navLinksMode === 'full' && (
         <div className={styles.navLinks}>
-          <Link to="/history" className={styles.navLink}>
-            {copy.teamInfoGwHistory}
-          </Link>
-          <Link to="/review" className={styles.navLink}>
-            {copy.reviewNavLink}
-          </Link>
-          <Link to="/stats" className={styles.navLink}>
-            {copy.statsMyStats}
-          </Link>
-          <Link to="/team-of-the-week" className={styles.navLink}>
-            {copy.teamOfTheWeekNavLink}
-          </Link>
-          <Link to="/top-players" className={styles.navLink}>
-            {copy.topPlayersNavLink}
-          </Link>
-          <Link to="/watchlist" className={styles.navLink}>
-            {copy.watchlistNavLink}
-          </Link>
-          <Link to="/player-watchlist" className={styles.navLink}>
-            {copy.playerWatchlistNavLink}
-          </Link>
-          <Link
-            to="/transfers"
-            className={`${styles.navLink} ${styles.navLinkFeatured}`}
-          >
-            {copy.transfersNavLink}
-          </Link>
+          {NAV_LINKS.map(({ to, label, featured }) => (
+            <Link
+              key={to}
+              to={to}
+              className={`${styles.navLink}${featured ? ` ${styles.navLinkFeatured}` : ''}`}
+            >
+              {label()}
+            </Link>
+          ))}
+        </div>
+      )}
+
+      {navLinksMode === 'demo' && (
+        <div className={styles.navLinks}>
+          {NAV_LINKS.map(({ to, label, featured }) => (
+            <button
+              key={to}
+              type="button"
+              className={`${styles.navLink} ${styles.navLinkDemo}${featured ? ` ${styles.navLinkFeatured}` : ''}`}
+              onClick={openDemoGate}
+            >
+              {label()}
+            </button>
+          ))}
         </div>
       )}
 

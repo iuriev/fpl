@@ -4,6 +4,7 @@ import { beforeEach,describe, expect, it, vi } from 'vitest';
 
 import * as authClient from '@/auth/auth-client';
 import { AuthContext, AuthContextValue } from '@/auth/AuthContext';
+import { MyTeamContext, MyTeamContextValue } from '@/lib/my-team/MyTeamContext';
 
 import { SignUpScreen } from './SignUpScreen';
 
@@ -15,11 +16,21 @@ const mockAuthContext: AuthContextValue = {
   refetch: vi.fn(),
 };
 
+const mockMyTeamContext: MyTeamContextValue = {
+  myTeamId: null,
+  isDemoMode: false,
+  setMyTeamId: vi.fn(),
+  setDemoTeamId: vi.fn(),
+  clearDemoMode: vi.fn(),
+};
+
 function renderSignUp() {
   return render(
     <BrowserRouter>
       <AuthContext.Provider value={mockAuthContext}>
-        <SignUpScreen />
+        <MyTeamContext.Provider value={mockMyTeamContext}>
+          <SignUpScreen />
+        </MyTeamContext.Provider>
       </AuthContext.Provider>
     </BrowserRouter>
   );

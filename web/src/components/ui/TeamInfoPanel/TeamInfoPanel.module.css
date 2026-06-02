@@ -87,6 +87,7 @@
 
 .navLink {
   display: block;
+  width: 100%;
   text-align: center;
   padding: var(--fpl-space-sm) var(--fpl-space-md);
   border: 1px solid var(--fpl-bg-hair);
@@ -95,9 +96,16 @@
   font-weight: var(--fpl-fw-semibold);
   color: var(--fpl-text-soft);
   text-decoration: none;
+  background: none;
+  cursor: pointer;
   transition:
     border-color 120ms,
     color 120ms;
+}
+
+.navLinkDemo {
+  opacity: 0.6;
+  cursor: pointer;
 }
 
 .navLink:hover {

@@ -12,16 +12,25 @@ vi.mock('@/api/queries', () => ({
   usePlayerPool: () => ({ data: null }),
 }));
 
+import { AuthContext, AuthContextValue } from '@/auth/AuthContext';
 import { MyTeamProvider } from '@/lib/my-team/MyTeamProvider';
 
 import { SquadScreen } from './SquadScreen';
 
+const mockAuthContext: AuthContextValue = {
+  user: null,
+  loading: false,
+  refetch: vi.fn(),
+};
+
 function renderScreen(isGuest?: boolean, state?: Record<string, unknown>) {
   return render(
     <MemoryRouter initialEntries={state ? [{ pathname: '/', search: '?teamId=72828', state }] : ['/?teamId=72828']}>
-      <MyTeamProvider>
-        <SquadScreen teamId={72828} isGuest={isGuest} />
-      </MyTeamProvider>
+      <AuthContext.Provider value={mockAuthContext}>
+        <MyTeamProvider>
+          <SquadScreen teamId={72828} isGuest={isGuest} />
+        </MyTeamProvider>
+      </AuthContext.Provider>
     </MemoryRouter>
   );
 }

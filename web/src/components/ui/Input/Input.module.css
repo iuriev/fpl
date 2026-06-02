@@ -35,6 +35,29 @@
   outline: none;
 }
 
+@keyframes autofillDetect {
+  from { opacity: 1; }
+  to { opacity: 1; }
+}
+
+.input:autofill,
+.input:-webkit-autofill {
+  animation-name: autofillDetect;
+  animation-duration: 1ms;
+  box-shadow: 0 0 0 100vmax var(--fpl-bg-soft) inset;
+  -webkit-text-fill-color: var(--fpl-text);
+  border-color: transparent !important;
+  outline: none;
+}
+
+.input:autofill:focus-visible,
+.input:-webkit-autofill:focus-visible {
+  box-shadow: 0 0 0 100vmax var(--fpl-bg) inset;
+  -webkit-text-fill-color: var(--fpl-text);
+  border-color: var(--fpl-accent) !important;
+  outline: none;
+}
+
 .input:user-valid {
   border-color: var(--fpl-accent-deep);
 }

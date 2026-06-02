@@ -6,12 +6,14 @@ import { useCurrentUser } from '@/auth/AuthContext';
 import { Button } from '@/components/ui/Button/Button';
 import { Input } from '@/components/ui/Input/Input';
 import { copy } from '@/lib/copy';
+import { useMyTeam } from '@/lib/my-team/MyTeamContext';
 
 import styles from './SignUpScreen.module.css';
 
 export const SignUpScreen: React.FC = () => {
   const navigate = useNavigate();
   const { refetch } = useCurrentUser();
+  const { clearDemoMode } = useMyTeam();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -26,6 +28,7 @@ export const SignUpScreen: React.FC = () => {
 
     try {
       await authClient.signUp(email, password, name);
+      clearDemoMode();
       await refetch();
       navigate('/', { replace: true });
     } catch (err) {

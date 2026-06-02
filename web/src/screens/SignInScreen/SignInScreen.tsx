@@ -6,6 +6,7 @@ import { useCurrentUser } from '@/auth/AuthContext';
 import { Button } from '@/components/ui/Button/Button';
 import { Input } from '@/components/ui/Input/Input';
 import { copy } from '@/lib/copy';
+import { useMyTeam } from '@/lib/my-team/MyTeamContext';
 
 import styles from './SignInScreen.module.css';
 
@@ -17,6 +18,7 @@ export const SignInScreen: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { refetch } = useCurrentUser();
+  const { clearDemoMode } = useMyTeam();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,6 +32,7 @@ export const SignInScreen: React.FC = () => {
 
     try {
       await authClient.signIn(email, password);
+      clearDemoMode();
       await refetch();
       const returnTo = (location.state as LocationState)?.returnTo || '/';
       navigate(returnTo, { replace: true });
@@ -43,6 +46,10 @@ export const SignInScreen: React.FC = () => {
 
   const handleGoogleSignIn = () => {
     window.location.href = `/api/auth/sign-in/social/google?callbackURL=${window.location.origin}/`;
+  };
+
+  const handleTryDemo = () => {
+    navigate('/entry', { state: { demo: true } });
   };
 
   return (
@@ -66,6 +73,10 @@ export const SignInScreen: React.FC = () => {
               setEmail(e.target.value);
               if (error) setError(null);
             }}
+            onAnimationStart={(e) => {
+              const val = e.currentTarget.value;
+              if (val) setEmail(val);
+            }}
             disabled={isSubmitting}
             required
           />
@@ -82,13 +93,17 @@ export const SignInScreen: React.FC = () => {
               setPassword(e.target.value);
               if (error) setError(null);
             }}
+            onAnimationStart={(e) => {
+              const val = e.currentTarget.value;
+              if (val) setPassword(val);
+            }}
             disabled={isSubmitting}
             required
           />
 
           {error && <div className={styles.errorMessage}>{error}</div>}
 
-          <Button type="submit" disabled={!email.trim() || !password.trim() || isSubmitting} loading={isSubmitting}>
+          <Button type="submit" variant="secondary" disabled={!email.trim() || !password.trim() || isSubmitting} loading={isSubmitting}>
             {copy.signInSubmit || 'Sign In'}
           </Button>
         </form>
@@ -99,6 +114,15 @@ export const SignInScreen: React.FC = () => {
 
         <Button variant="secondary" onClick={handleGoogleSignIn} disabled={isSubmitting}>
           {copy.signInGoogle || 'Sign in with Google'}
+        </Button>
+
+        <Button
+          variant="secondary"
+          className={styles.demoBtn}
+          onClick={handleTryDemo}
+          disabled={isSubmitting}
+        >
+          {copy.signInTryDemo}
         </Button>
 
         <p className={styles.footer}>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { api, ApiError } from '@/api/client';
 import { authClient } from '@/auth/auth-client';
@@ -7,6 +7,7 @@ import { useCurrentUser } from '@/auth/AuthContext';
 import { Button } from '@/components/ui/Button/Button';
 import { Input } from '@/components/ui/Input/Input';
 import { copy } from '@/lib/copy';
+import { useMyTeam } from '@/lib/my-team/MyTeamContext';
 
 import styles from './EntryScreen.module.css';
 
@@ -24,6 +25,11 @@ export const EntryScreen: React.FC<EntryScreenProps> = ({
   _storyIsSubmitting,
 }) => {
   const { user } = useCurrentUser();
+  const { setDemoTeamId } = useMyTeam();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isDemo = (location.state as { demo?: boolean } | null)?.demo ?? false;
+
   const [teamId, setTeamId] = useState(
     _storyInputValue ?? (user?.fplTeamId ? String(user.fplTeamId) : '')
   );
@@ -64,6 +70,12 @@ export const EntryScreen: React.FC<EntryScreenProps> = ({
     try {
       await api.getEntry(id);
 
+      if (isDemo) {
+        setDemoTeamId(id);
+        navigate('/', { replace: true });
+        return;
+      }
+
       if (user && !user.fplTeamId) {
         authClient.saveTeam(id).catch(() => {
           // Fire-and-forget, don't block on error
@@ -71,6 +83,7 @@ export const EntryScreen: React.FC<EntryScreenProps> = ({
       }
 
       onSubmit?.(id);
+      navigate('/', { replace: true });
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.statusCode === 'not-found') {
@@ -117,12 +130,12 @@ export const EntryScreen: React.FC<EntryScreenProps> = ({
 
         <p className={styles.helper}>{copy.entryHelper}</p>
 
-        {!user && (
+        {!user && !isDemo && (
           <p className={styles.footer}>
             {copy.signInNoAccount || "Don't have an account yet?"}{' '}
-            <Link to="/sign-in" className={styles.link}>
+            <a href="/sign-in" className={styles.link}>
               {copy.signInSignUp || 'Sign in'}
-            </Link>
+            </a>
           </p>
         )}
       </div>

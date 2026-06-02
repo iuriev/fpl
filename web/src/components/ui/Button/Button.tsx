@@ -10,11 +10,12 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'primary', disabled = false, loading = false, children, ...props }, ref) => {
+  ({ variant = 'primary', disabled = false, loading = false, children, className, ...props }, ref) => {
+    const cls = [styles[variant], className].filter(Boolean).join(' ');
     return (
       <button
         ref={ref}
-        className={styles[variant]}
+        className={cls}
         disabled={disabled || loading}
         aria-busy={loading}
         {...props}

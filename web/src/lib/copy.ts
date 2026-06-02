@@ -35,6 +35,14 @@ export const copy = {
   signInDivider: 'or',
   signInNoAccount: "Don't have an account?",
   signInSignUp: 'Sign up',
+  signInTryDemo: 'Try Demo',
+
+  // Demo gate dialog
+  demoGateTitle: 'Sign in to unlock',
+  demoGateBody: 'All features are available after creating a free account. Your demo session is saved.',
+  demoGateSignIn: 'Sign In',
+  demoGateSignUp: 'Create Account',
+  demoGateDismiss: 'Dismiss',
 
   // Sign up screen
   signUpHeadline: 'Create Account',

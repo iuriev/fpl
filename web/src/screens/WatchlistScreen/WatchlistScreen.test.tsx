@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { AuthContext, AuthContextValue } from '@/auth/AuthContext';
 import { fixtureEntry, fixtureGameweeks } from '@/fixtures';
 import { MyTeamProvider } from '@/lib/my-team/MyTeamProvider';
 import {
@@ -31,20 +32,31 @@ vi.mock('@/api/client', () => ({
   },
 }));
 
-function renderScreen(repo = new LocalStorageWatchlistRepository()) {
-  return render(
-    <MyTeamProvider>
-      <WatchlistRepositoryContext.Provider value={repo}>
-        <MemoryRouter initialEntries={['/watchlist']}>
-          <div>
-            {/* lazy import avoids circular deps in test */}
-            <WatchlistScreenLazy />
-          </div>
-        </MemoryRouter>
-      </WatchlistRepositoryContext.Provider>
-    </MyTeamProvider>
+const mockAuthContext: AuthContextValue = {
+  user: null,
+  loading: false,
+  refetch: vi.fn(),
+};
+
+function withProviders(children: React.ReactNode, repo = new LocalStorageWatchlistRepository()) {
+  return (
+    <AuthContext.Provider value={mockAuthContext}>
+      <MyTeamProvider>
+        <WatchlistRepositoryContext.Provider value={repo}>
+          <MemoryRouter initialEntries={['/watchlist']}>
+            <div>{children}</div>
+          </MemoryRouter>
+        </WatchlistRepositoryContext.Provider>
+      </MyTeamProvider>
+    </AuthContext.Provider>
   );
 }
+
+function renderScreen(repo = new LocalStorageWatchlistRepository()) {
+  return render(withProviders(<WatchlistScreenLazy />, repo));
+}
+
+import React from 'react';
 
 import { WatchlistScreen as WatchlistScreenLazy } from './WatchlistScreen';
 
@@ -71,13 +83,15 @@ describe('WatchlistScreen', () => {
     await repo.add(72828);
 
     render(
-      <MyTeamProvider>
-        <WatchlistRepositoryContext.Provider value={repo}>
-          <MemoryRouter>
-            <WatchlistScreenLazy />
-          </MemoryRouter>
-        </WatchlistRepositoryContext.Provider>
-      </MyTeamProvider>
+      <AuthContext.Provider value={mockAuthContext}>
+        <MyTeamProvider>
+          <WatchlistRepositoryContext.Provider value={repo}>
+            <MemoryRouter>
+              <WatchlistScreenLazy />
+            </MemoryRouter>
+          </WatchlistRepositoryContext.Provider>
+        </MyTeamProvider>
+      </AuthContext.Provider>
     );
 
     await waitFor(() => {
@@ -102,13 +116,15 @@ describe('WatchlistScreen', () => {
     const user = userEvent.setup();
 
     render(
-      <MyTeamProvider>
-        <WatchlistRepositoryContext.Provider value={repo}>
-          <MemoryRouter>
-            <WatchlistScreenLazy />
-          </MemoryRouter>
-        </WatchlistRepositoryContext.Provider>
-      </MyTeamProvider>
+      <AuthContext.Provider value={mockAuthContext}>
+        <MyTeamProvider>
+          <WatchlistRepositoryContext.Provider value={repo}>
+            <MemoryRouter>
+              <WatchlistScreenLazy />
+            </MemoryRouter>
+          </WatchlistRepositoryContext.Provider>
+        </MyTeamProvider>
+      </AuthContext.Provider>
     );
 
     await waitFor(() => {

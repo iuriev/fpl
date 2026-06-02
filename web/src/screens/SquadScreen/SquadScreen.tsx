@@ -10,6 +10,7 @@ import { ListView, ListViewSkeleton } from '@/components/ui/ListView/ListView';
 import { Pitch } from '@/components/ui/Pitch/Pitch';
 import { PlayerCard } from '@/components/ui/PlayerCard/PlayerCard';
 import { SummaryStrip } from '@/components/ui/SummaryStrip/SummaryStrip';
+import type { NavLinksMode } from '@/components/ui/TeamInfoPanel/TeamInfoPanel';
 import { TeamInfoPanel, TeamInfoPanelSkeleton } from '@/components/ui/TeamInfoPanel/TeamInfoPanel';
 import { type ViewMode, ViewToggle } from '@/components/ui/ViewToggle/ViewToggle';
 import { copy, interpolate } from '@/lib/copy';
@@ -53,8 +54,10 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { setMyTeamId } = useMyTeam();
+  const { isDemoMode } = useMyTeam();
   const isGuestMode = isGuest ?? false;
+
+  const navLinksMode: NavLinksMode = isDemoMode ? 'demo' : isGuestMode ? 'hidden' : 'full';
   const returnTo = (location.state as { returnTo?: string } | null)?.returnTo ?? '/';
 
   const { following: followingTeam, limitReached: followLimitReached, toggle: toggleFollowTeam } = useFollowTeam(teamId, isGuestMode);
@@ -132,7 +135,11 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
   };
 
   const handleChangeTeam = () => {
-    setMyTeamId(null);
+    if (isDemoMode) {
+      navigate('/entry', { state: { demo: true } });
+    } else {
+      navigate('/entry');
+    }
   };
 
   const positionGroups = useMemo(() => {
@@ -161,7 +168,7 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
         header={drawerHeader}
       >
         {entry
-          ? <TeamInfoPanel entry={entry} teamId={teamId} showFollow={isGuestMode} showNavLinks={!isGuestMode} />
+          ? <TeamInfoPanel entry={entry} teamId={teamId} showFollow={isGuestMode} navLinksMode={navLinksMode} />
           : !entryIsError && <TeamInfoPanelSkeleton />}
       </Drawer>
 
