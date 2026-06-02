@@ -93,7 +93,7 @@ export const LeaguesStatsScreen: React.FC<LeaguesStatsScreenProps> = ({ teamId }
   const gwParam = searchParams.get('gw');
 
   const handleBack = () => {
-    navigate(`/?teamId=${teamId}${gwParam ? `&gw=${gwParam}` : ''}`);
+    navigate('/');
   };
 
   const handleLeagueClick = useCallback(

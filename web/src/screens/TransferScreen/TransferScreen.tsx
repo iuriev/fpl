@@ -378,7 +378,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
             planChip={planChip}
             chipStatuses={squadData?.chipStatuses ?? DEFAULT_CHIP_STATUSES}
             nextGw={nextGw}
-            onBack={() => navigate(`/?teamId=${teamId}`)}
+            onBack={() => navigate('/')}
             onChipToggle={handleChipToggle}
             onHelp={() => setShowTour(true)}
           />

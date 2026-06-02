@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { useHistory } from '@/api/queries';
 import { Button } from '@/components/ui/Button/Button';
@@ -33,12 +33,11 @@ function RankDir({ current, previous }: { current: number; previous: number | un
 
 export const GameweekHistoryScreen: React.FC<GameweekHistoryScreenProps> = ({ teamId }) => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
 
   const { data, isLoading, isError, refetch } = useHistory(teamId);
 
   const handleBack = () => {
-    navigate(`/?teamId=${teamId}${searchParams.get('gw') ? `&gw=${searchParams.get('gw')}` : ''}`);
+    navigate('/');
   };
 
   return (
@@ -66,7 +65,7 @@ export const GameweekHistoryScreen: React.FC<GameweekHistoryScreenProps> = ({ te
         )}
 
         {data && data.gameweeks.length > 0 && (
-          <HistoryTable gameweeks={data.gameweeks} teamId={teamId} />
+          <HistoryTable gameweeks={data.gameweeks} />
         )}
       </div>
     </div>
@@ -75,7 +74,7 @@ export const GameweekHistoryScreen: React.FC<GameweekHistoryScreenProps> = ({ te
 
 GameweekHistoryScreen.displayName = 'GameweekHistoryScreen';
 
-function HistoryTable({ gameweeks, teamId }: { gameweeks: HistoryGameweek[]; teamId: number }) {
+function HistoryTable({ gameweeks }: { gameweeks: HistoryGameweek[] }) {
   const navigate = useNavigate();
 
   return (
@@ -102,7 +101,7 @@ function HistoryTable({ gameweeks, teamId }: { gameweeks: HistoryGameweek[]; tea
               <tr
                 key={row.gw}
                 className={styles.clickableRow}
-                onClick={() => navigate(`/?teamId=${teamId}&gw=${row.gw}`)}
+                onClick={() => navigate(`/?gw=${row.gw}`)}
               >
                 <td>GW{row.gw}</td>
                 <td>{formatNumber(row.overallRank)}</td>

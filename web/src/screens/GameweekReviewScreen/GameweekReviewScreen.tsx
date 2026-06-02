@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { useGameweeks, useHistory, usePlayerPool, useSquad } from '@/api/queries';
 import { Button } from '@/components/ui/Button/Button';
@@ -25,7 +25,6 @@ export interface GameweekReviewScreenProps {
 
 export const GameweekReviewScreen: React.FC<GameweekReviewScreenProps> = ({ teamId }) => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
 
   const { data: gameweeksData } = useGameweeks();
   const { data: historyData, isLoading: historyLoading, isError: historyError, refetch } =
@@ -107,9 +106,7 @@ export const GameweekReviewScreen: React.FC<GameweekReviewScreenProps> = ({ team
   ]);
 
   const handleBack = () => {
-    navigate(
-      `/?teamId=${teamId}${searchParams.get('gw') ? `&gw=${searchParams.get('gw')}` : ''}`
-    );
+    navigate('/');
   };
 
   return (

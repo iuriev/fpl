@@ -121,11 +121,7 @@ export const TeamOfTheWeekScreen: React.FC = () => {
   };
 
   const handleBack = () => {
-    const teamIdParam = searchParams.get('teamId');
-    const gwBackParam = searchParams.get('gw');
-    navigate(
-      `/${teamIdParam ? `?teamId=${teamIdParam}` : ''}${gwBackParam && teamIdParam ? `&gw=${gwBackParam}` : ''}`
-    );
+    navigate('/');
   };
 
   const positionGroups = useMemo(() => {

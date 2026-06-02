@@ -86,29 +86,29 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({ entry, teamId, sho
 
       {showNavLinks && (
         <div className={styles.navLinks}>
-          <Link to={`/history?teamId=${teamId}`} className={styles.navLink}>
+          <Link to="/history" className={styles.navLink}>
             {copy.teamInfoGwHistory}
           </Link>
-          <Link to={`/review?teamId=${teamId}`} className={styles.navLink}>
+          <Link to="/review" className={styles.navLink}>
             {copy.reviewNavLink}
           </Link>
-          <Link to={`/stats?teamId=${teamId}`} className={styles.navLink}>
+          <Link to="/stats" className={styles.navLink}>
             {copy.statsMyStats}
           </Link>
-          <Link to={`/team-of-the-week?teamId=${teamId}`} className={styles.navLink}>
+          <Link to="/team-of-the-week" className={styles.navLink}>
             {copy.teamOfTheWeekNavLink}
           </Link>
-          <Link to={`/top-players?teamId=${teamId}`} className={styles.navLink}>
+          <Link to="/top-players" className={styles.navLink}>
             {copy.topPlayersNavLink}
           </Link>
-          <Link to={`/watchlist?teamId=${teamId}`} className={styles.navLink}>
+          <Link to="/watchlist" className={styles.navLink}>
             {copy.watchlistNavLink}
           </Link>
-          <Link to={`/player-watchlist?teamId=${teamId}`} className={styles.navLink}>
+          <Link to="/player-watchlist" className={styles.navLink}>
             {copy.playerWatchlistNavLink}
           </Link>
           <Link
-            to={`/transfers?teamId=${teamId}`}
+            to="/transfers"
             className={`${styles.navLink} ${styles.navLinkFeatured}`}
           >
             {copy.transfersNavLink}

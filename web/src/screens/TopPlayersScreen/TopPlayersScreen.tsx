@@ -161,11 +161,7 @@ export const TopPlayersScreen: React.FC = () => {
   const { visible, sentinelRef, hasMore } = useProgressiveList(activePlayers);
 
   const handleBack = () => {
-    const teamIdParam = searchParams.get('teamId');
-    const gwBackParam = searchParams.get('gw');
-    navigate(
-      `/${teamIdParam ? `?teamId=${teamIdParam}` : ''}${gwBackParam && teamIdParam ? `&gw=${gwBackParam}` : ''}`
-    );
+    navigate('/');
   };
 
   const gwLabel = selectedGw !== null ? `GW ${selectedGw}` : '';
