@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { api, ApiError } from '@/api/client';
 import { Button } from '@/components/ui/Button/Button';
@@ -21,7 +20,6 @@ export const EntryScreen: React.FC<EntryScreenProps> = ({
   _storyInputValue,
   _storyIsSubmitting,
 }) => {
-  const navigate = useNavigate();
   const [teamId, setTeamId] = useState(_storyInputValue ?? '');
   const [error, setError] = useState<string | null>(_storyError ?? null);
   const [isSubmitting, setIsSubmitting] = useState(_storyIsSubmitting ?? false);
@@ -59,12 +57,7 @@ export const EntryScreen: React.FC<EntryScreenProps> = ({
 
     try {
       await api.getEntry(id);
-
-      if (onSubmit) {
-        onSubmit(id);
-      } else {
-        navigate(`/?teamId=${id}`);
-      }
+      onSubmit?.(id);
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.statusCode === 'not-found') {

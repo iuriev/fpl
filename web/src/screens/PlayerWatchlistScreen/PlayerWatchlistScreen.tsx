@@ -21,10 +21,7 @@ export const PlayerWatchlistScreen: React.FC = () => {
   const [search, setSearch] = useState('');
 
   const { data: gameweeksData } = useGameweeks();
-  const currentGw = useMemo(
-    () => gameweeksData?.gameweeks.find((gw) => gw.finished)?.id ?? gameweeksData?.current ?? null,
-    [gameweeksData],
-  );
+  const currentGw = gameweeksData?.gameweeks.find((gw) => gw.finished)?.id ?? gameweeksData?.current ?? null;
 
   const gwQuery = useTopPlayersGw(currentGw);
   const seasonQuery = useTopPlayersSeason();

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import type { StandingEntry } from '@/types';
 
 import { getLeagueRankDirection } from '../LeaguesStatsScreen/leagues-helpers';

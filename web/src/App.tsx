@@ -2,8 +2,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useSearchParams } from 'react-router-dom';
 
-import { MyTeamProvider, useMyTeam } from '@/lib/my-team';
-import { PlayerWatchlistPremiumProvider } from '@/lib/player-watchlist-premium';
+import { useMyTeam } from '@/lib/my-team/MyTeamContext';
+import { MyTeamProvider } from '@/lib/my-team/MyTeamProvider';
+import { PlayerWatchlistPremiumProvider } from '@/lib/player-watchlist-premium/PlayerWatchlistPremiumProvider';
 import {
   LocalStoragePlayerWatchlistRepository,
   PlayerWatchlistRepositoryContext,

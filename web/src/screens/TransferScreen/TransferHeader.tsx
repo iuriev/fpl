@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { CHIP_LABELS } from '@/components/ui/ChipBadge/ChipBadge';
+import { CHIP_LABELS } from '@/components/ui/ChipBadge/ChipBadge.constants';
 import { copy, interpolate } from '@/lib/copy';
 import type { ChipStatuses } from '@/types';
 

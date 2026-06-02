@@ -4,14 +4,14 @@
  */
 
 import {
-  TeamOfTheWeekResponse,
   EntryResponse,
   GameweeksResponse,
   HistoryResponse,
-  LeagueStandingsResponse,
   LeaguesResponse,
+  LeagueStandingsResponse,
   PlayerPoolResponse,
   SquadResponse,
+  TeamOfTheWeekResponse,
   TeamPlayersResponse,
   TeamsResponse,
   TopPlayersGwResponse,

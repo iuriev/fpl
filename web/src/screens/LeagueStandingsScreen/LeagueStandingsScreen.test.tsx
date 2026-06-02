@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { LeagueStandingsResponse, StandingEntry } from '@/types';
 
@@ -37,14 +37,6 @@ const PAGE_1: LeagueStandingsResponse = {
 const PAGE_1_HAS_NEXT: LeagueStandingsResponse = {
   ...PAGE_1,
   hasNext: true,
-};
-
-const PAGE_2: LeagueStandingsResponse = {
-  leagueId: 42,
-  leagueName: 'My Mini League',
-  page: 2,
-  hasNext: false,
-  standings: [makeStanding(3, 3)],
 };
 
 let mockStandingsData: LeagueStandingsResponse | null = null;

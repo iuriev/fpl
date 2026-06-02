@@ -3,9 +3,9 @@ import React from 'react';
 import { copy } from '@/lib/copy';
 import type { ActiveChip } from '@/types';
 
+import { CHIP_LABELS } from './ChipBadge.constants';
 import styles from './ChipBadge.module.css';
 
-// Shared octagonal badge path — same shape for every chip (matches FPL official design)
 const BADGE = 'M6 2h12l4 4v12l-4 4H6l-4-4V6Z';
 
 function WildcardSvg() {
@@ -74,13 +74,6 @@ const SVG_MAP: Record<NonNullable<ActiveChip>, () => React.ReactElement> = {
   '3xc':    TripleCaptainSvg,
   freehit:  FreeHitSvg,
   bboost:   BenchBoostSvg,
-};
-
-export const CHIP_LABELS: Record<NonNullable<ActiveChip>, string> = {
-  wildcard: copy.chipWildcard,
-  '3xc':    copy.chipTripleCaptain,
-  freehit:  copy.chipFreeHit,
-  bboost:   copy.chipBenchBoost,
 };
 
 export function ChipIconSvg({ chip }: { chip: NonNullable<ActiveChip> }) {

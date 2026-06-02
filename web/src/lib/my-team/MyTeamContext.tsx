@@ -1,13 +1,13 @@
-import React, { createContext, useCallback, useContext, useState } from 'react';
+import React, { createContext, useCallback, useState } from 'react';
 
 const KEY = 'fpl-my-team-id';
 
-interface MyTeamContextValue {
+export interface MyTeamContextValue {
   myTeamId: number | null;
   setMyTeamId: (id: number | null) => void;
 }
 
-const MyTeamContext = createContext<MyTeamContextValue | null>(null);
+export const MyTeamContext = createContext<MyTeamContextValue | null>(null);
 
 export function MyTeamProvider({ children }: { children: React.ReactNode }) {
   const [myTeamId, setMyTeamIdState] = useState<number | null>(() => {
@@ -29,10 +29,4 @@ export function MyTeamProvider({ children }: { children: React.ReactNode }) {
       {children}
     </MyTeamContext.Provider>
   );
-}
-
-export function useMyTeam(): MyTeamContextValue {
-  const ctx = useContext(MyTeamContext);
-  if (!ctx) throw new Error('useMyTeam must be used within MyTeamProvider');
-  return ctx;
 }

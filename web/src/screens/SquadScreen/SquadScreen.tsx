@@ -13,6 +13,7 @@ import { SummaryStrip } from '@/components/ui/SummaryStrip/SummaryStrip';
 import { TeamInfoPanel, TeamInfoPanelSkeleton } from '@/components/ui/TeamInfoPanel/TeamInfoPanel';
 import { type ViewMode, ViewToggle } from '@/components/ui/ViewToggle/ViewToggle';
 import { copy, interpolate } from '@/lib/copy';
+import { useMyTeam } from '@/lib/my-team/MyTeamContext';
 import { useFollowPlayer } from '@/lib/use-follow-player';
 import { useFollowTeam } from '@/lib/use-follow-team';
 import type { PlayerPosition, SquadPlayer } from '@/types';
@@ -52,12 +53,9 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const [returnTo] = useState<string | null>(() => {
-    const stateReturnTo = (location.state as { returnTo?: string } | null)?.returnTo ?? null;
-    try { sessionStorage.removeItem('fpl-guest-return-to'); } catch { /* ignore */ }
-    return stateReturnTo ?? null;
-  });
-  const isGuestMode = returnTo !== null;
+  const { setMyTeamId } = useMyTeam();
+  const isGuestMode = isGuest ?? false;
+  const returnTo = (location.state as { returnTo?: string } | null)?.returnTo ?? '/';
 
   const { following: followingTeam, limitReached: followLimitReached, toggle: toggleFollowTeam } = useFollowTeam(teamId, isGuestMode);
 
@@ -134,7 +132,7 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
   };
 
   const handleChangeTeam = () => {
-    setSearchParams({});
+    setMyTeamId(null);
   };
 
   const positionGroups = useMemo(() => {
@@ -172,7 +170,7 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
           <div className={styles.headerMain}>
             <div className={styles.headerLeft}>
               {isGuestMode && (
-                <button className={styles.backBtn} onClick={() => navigate(returnTo!)} aria-label={copy.squadGuestBack}>
+                <button className={styles.backBtn} onClick={() => navigate(returnTo)} aria-label={copy.squadGuestBack}>
                   <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
                     <path
                       d="M10 4l-4 4 4 4"

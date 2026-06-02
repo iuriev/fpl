@@ -1,14 +1,10 @@
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, { createContext, useCallback, useEffect, useRef, useState } from 'react';
 
 import styles from './toast.module.css';
 
 type ShowToast = (message: string) => void;
 
 const ToastContext = createContext<ShowToast>(() => {});
-
-export function useToast(): ShowToast {
-  return useContext(ToastContext);
-}
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [message, setMessage] = useState<string | null>(null);

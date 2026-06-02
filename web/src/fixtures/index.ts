@@ -1,10 +1,10 @@
 import type {
-  TeamOfTheWeekPlayer,
-  TeamOfTheWeekResponse,
   EntryResponse,
   GameweeksResponse,
   PlayerStats,
   SquadResponse,
+  TeamOfTheWeekPlayer,
+  TeamOfTheWeekResponse,
   TeamPlayersResponse,
   TeamsResponse,
   TopPlayersGwResponse,

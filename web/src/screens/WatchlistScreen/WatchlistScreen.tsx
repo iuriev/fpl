@@ -31,8 +31,8 @@ export const WatchlistScreen: React.FC<WatchlistScreenProps> = ({ userTeamId }) 
   }, [repo]);
 
   useEffect(() => {
-    refreshList();
-  }, [refreshList]);
+    repo.list().then((ids) => setWatchedIds(ids));
+  }, [repo]);
 
   const handleRemove = useCallback(async (teamId: number) => {
     await repo.remove(teamId);

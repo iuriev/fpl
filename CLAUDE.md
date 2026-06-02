@@ -62,6 +62,12 @@ The project is built spec-first; application code comes last. Read these before 
 - **No barrel re-exports.** Do not create `index.ts` files inside component folders. Do not
   create a global `components/index.ts` or `ui/index.ts` barrel. Import directly:
   `import { Foo } from '@/components/ui/Foo/Foo'`.
+- **Split context from provider.** Never mix React component exports with non-component exports
+  in the same file — it breaks React Fast Refresh. For context modules, use two files in a
+  named folder: `XxxContext.ts` (plain TS — `createContext` + `useXxx` hook) and
+  `XxxProvider.tsx` (only the Provider component). Non-component exports (constants,
+  utilities) used by other files must also live in a separate file (e.g. `Foo.constants.ts`),
+  not co-located with the component.
 - **Spec-first workflow.** Work in this order: business requirements → task breakdown → design →
   code. Do not write application code until requirements and design are approved.
 - **Maintain Help Tour.** Always update the help tour (`HelpTour.tsx`, `copy.ts`, `TransferScreen.test.tsx`) when changing the Transfer Screen layout or functionality to ensure steps remain accurate and targets exist.

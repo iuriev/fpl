@@ -12,48 +12,36 @@ vi.mock('@/api/queries', () => ({
   usePlayerPool: () => ({ data: null }),
 }));
 
+import { MyTeamProvider } from '@/lib/my-team/MyTeamProvider';
+
 import { SquadScreen } from './SquadScreen';
 
-function renderScreen() {
+function renderScreen(isGuest?: boolean, state?: Record<string, unknown>) {
   return render(
-    <MemoryRouter initialEntries={['/?teamId=72828']}>
-      <SquadScreen teamId={72828} />
-    </MemoryRouter>
-  );
-}
-
-function renderScreenWithState(state: Record<string, unknown>) {
-  return render(
-    <MemoryRouter initialEntries={[{ pathname: '/', search: '?teamId=72828', state }]}>
-      <SquadScreen teamId={72828} />
+    <MemoryRouter initialEntries={state ? [{ pathname: '/', search: '?teamId=72828', state }] : ['/?teamId=72828']}>
+      <MyTeamProvider>
+        <SquadScreen teamId={72828} isGuest={isGuest} />
+      </MyTeamProvider>
     </MemoryRouter>
   );
 }
 
 describe('SquadScreen header navigation', () => {
   it('shows Change button when no returnTo state (own team)', () => {
-    renderScreen();
+    renderScreen(false);
     expect(screen.getByRole('button', { name: /change/i })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /back/i })).toBeNull();
   });
 
-  it('shows Back button when returnTo state is present (guest mode)', () => {
-    renderScreenWithState({ returnTo: '/watchlist?teamId=72828' });
+  it('shows Back button when isGuest=true (guest mode)', () => {
+    renderScreen(true, { returnTo: '/watchlist?teamId=72828' });
     expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /change/i })).toBeNull();
   });
 
-  it('shows Back button when returnTo is in sessionStorage (browser navigation)', () => {
-    sessionStorage.setItem('fpl-guest-return-to', '/watchlist?teamId=72828');
-    renderScreen();
+  it('shows Back button when returnTo is in location state', () => {
+    renderScreen(true, { returnTo: '/watchlist?teamId=72828' });
     expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
-    sessionStorage.removeItem('fpl-guest-return-to');
-  });
-
-  it('clears sessionStorage after reading returnTo', () => {
-    sessionStorage.setItem('fpl-guest-return-to', '/watchlist?teamId=72828');
-    renderScreen();
-    expect(sessionStorage.getItem('fpl-guest-return-to')).toBeNull();
   });
 });
 

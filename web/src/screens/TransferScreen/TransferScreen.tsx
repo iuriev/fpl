@@ -364,7 +364,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
     localStorage.setItem('fpl_tour_seen_transfer_v1', 'true');
   };
 
-  const handleTourStepChange = (_index: number) => {
+  const handleTourStepChange = (_step: number) => {
     setIsTransfersOpen(false);
   };
 
