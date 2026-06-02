@@ -23,6 +23,7 @@ const mockFPLEntry = {
   summary_overall_points: 2156,
   summary_overall_rank: 50000,
   summary_event_points: 67,
+  summary_event_rank: 234567,
   player_region_iso_code_short: 'UA',
 };
 
@@ -46,6 +47,7 @@ describe('Entry Service', () => {
         overallPoints: 2156,
         overallRank: 50000,
         eventPoints: 67,
+        eventRank: 234567,
         totalPlayers: 10000000,
         regionIsoCode: 'UA',
       });

@@ -1,4 +1,3 @@
-export { TeamOfTheWeekScreen } from './TeamOfTheWeekScreen/TeamOfTheWeekScreen';
 export type { EntryScreenProps } from './EntryScreen/EntryScreen';
 export { EntryScreen } from './EntryScreen/EntryScreen';
 export type { GameweekHistoryScreenProps } from './GameweekHistoryScreen/GameweekHistoryScreen';
@@ -7,6 +6,9 @@ export type { LeaguesStatsScreenProps } from './LeaguesStatsScreen/LeaguesStatsS
 export { LeaguesStatsScreen } from './LeaguesStatsScreen/LeaguesStatsScreen';
 export type { SquadScreenProps } from './SquadScreen/SquadScreen';
 export { SquadScreen } from './SquadScreen/SquadScreen';
+export { TeamOfTheWeekScreen } from './TeamOfTheWeekScreen/TeamOfTheWeekScreen';
 export { TopPlayersScreen } from './TopPlayersScreen/TopPlayersScreen';
 export type { TransferScreenProps } from './TransferScreen/TransferScreen';
 export { TransferScreen } from './TransferScreen/TransferScreen';
+export type { WatchlistScreenProps } from './WatchlistScreen/WatchlistScreen';
+export { WatchlistScreen } from './WatchlistScreen/WatchlistScreen';

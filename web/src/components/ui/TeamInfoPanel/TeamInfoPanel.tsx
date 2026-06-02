@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { copy } from '@/lib/copy';
+import { copy, interpolate } from '@/lib/copy';
+import { useWatchlistRepository } from '@/lib/watchlist-repository';
 import type { EntryResponse } from '@/types';
 
 import styles from './TeamInfoPanel.module.css';
@@ -19,10 +20,35 @@ function fmt(n: number): string {
 export interface TeamInfoPanelProps {
   entry: EntryResponse;
   teamId: number;
+  showFollow?: boolean;
 }
 
-export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({ entry, teamId }) => {
+export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({ entry, teamId, showFollow = false }) => {
   const flag = entry.regionIsoCode ? isoToFlag(entry.regionIsoCode) : null;
+  const repo = useWatchlistRepository();
+  const [following, setFollowing] = useState(false);
+  const [limitReached, setLimitReached] = useState(false);
+
+  useEffect(() => {
+    if (!showFollow) return;
+    repo.has(teamId).then(setFollowing);
+  }, [repo, teamId, showFollow]);
+
+  const handleFollow = async () => {
+    if (following) {
+      await repo.remove(teamId);
+      setFollowing(false);
+      setLimitReached(false);
+    } else {
+      const result = await repo.add(teamId);
+      if (result === 'ok') {
+        setFollowing(true);
+        setLimitReached(false);
+      } else if (result === 'limit') {
+        setLimitReached(true);
+      }
+    }
+  };
 
   return (
     <aside className={styles.panel}>
@@ -70,6 +96,9 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({ entry, teamId }) =
         <Link to={`/top-players?teamId=${teamId}`} className={styles.navLink}>
           {copy.topPlayersNavLink}
         </Link>
+        <Link to={`/watchlist?teamId=${teamId}`} className={styles.navLink}>
+          {copy.watchlistNavLink}
+        </Link>
         <Link
           to={`/transfers?teamId=${teamId}`}
           className={`${styles.navLink} ${styles.navLinkFeatured}`}
@@ -77,6 +106,23 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({ entry, teamId }) =
           {copy.transfersNavLink}
         </Link>
       </div>
+
+      {showFollow && (
+        <div className={styles.followWrap}>
+          {limitReached && (
+            <p className={styles.followLimit}>
+              {interpolate(copy.watchlistFollowLimitToast, { max: repo.getLimit() })}
+            </p>
+          )}
+          <button
+            className={`${styles.followBtn} ${following ? styles.followingBtn : ''}`}
+            onClick={handleFollow}
+            aria-pressed={following}
+          >
+            {following ? copy.watchlistUnfollowButton : copy.watchlistFollowButton}
+          </button>
+        </div>
+      )}
     </aside>
   );
 };
