@@ -176,6 +176,68 @@
   margin: 0;
 }
 
+/* ── Skeleton ──────────────────────────────────────────────── */
+
+.skeletonBase {
+  border-radius: var(--fpl-radius-sm);
+  background: rgba(255, 255, 255, 0.08);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.14) 50%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  background-size: 200% 100%;
+  animation: fplShimmer 1.6s ease-in-out infinite;
+}
+
+.skeletonAvatar {
+  composes: skeletonBase;
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--fpl-radius-pill);
+  align-self: center;
+}
+
+.skeletonBar {
+  composes: skeletonBase;
+  height: 1rem;
+  width: 9rem;
+  align-self: center;
+}
+
+.skeletonBarShort {
+  composes: skeletonBase;
+  height: 0.75rem;
+  width: 6rem;
+  align-self: center;
+}
+
+.skeletonStat {
+  composes: skeletonBase;
+  border-radius: var(--fpl-radius-md);
+  height: 3.5rem;
+}
+
+.skeletonNavBar {
+  composes: skeletonBase;
+  height: 2.25rem;
+  border-radius: var(--fpl-radius-pill);
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeletonBase,
+  .skeletonAvatar,
+  .skeletonBar,
+  .skeletonBarShort,
+  .skeletonStat,
+  .skeletonNavBar {
+    animation: none;
+    background-image: none;
+  }
+}
+
 /* ── Desktop sidebar ───────────────────────────────────────── */
 
 @media (min-width: 56.25rem) {

@@ -131,3 +131,35 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({ entry, teamId, sho
 };
 
 TeamInfoPanel.displayName = 'TeamInfoPanel';
+
+export const TeamInfoPanelSkeleton: React.FC = () => (
+  <aside
+    className={styles.panel}
+    aria-busy="true"
+    aria-label={copy.loadingPlaceholder}
+  >
+    <div className={styles.avatarWrap} aria-hidden="true">
+      <div className={styles.skeletonAvatar} />
+    </div>
+
+    <div className={styles.identity} aria-hidden="true">
+      <div className={styles.skeletonBar} />
+      <div className={styles.skeletonBarShort} />
+    </div>
+
+    <div className={styles.stats} aria-hidden="true">
+      <div className={styles.skeletonStat} />
+      <div className={styles.skeletonStat} />
+      <div className={styles.skeletonStat} />
+      <div className={styles.skeletonStat} />
+    </div>
+
+    <div className={styles.navLinks} aria-hidden="true">
+      {Array.from({ length: 7 }).map((_, i) => (
+        <div key={i} className={styles.skeletonNavBar} />
+      ))}
+    </div>
+  </aside>
+);
+
+TeamInfoPanelSkeleton.displayName = 'TeamInfoPanelSkeleton';
