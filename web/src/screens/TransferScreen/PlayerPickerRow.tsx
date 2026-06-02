@@ -1,6 +1,8 @@
 import React from 'react';
 
 import { FdrChip } from '@/components/ui/FdrChip/FdrChip';
+import { copy } from '@/lib/copy';
+import { useFollowPlayer } from '@/lib/use-follow-player';
 import type { PoolPlayer } from '@/types';
 
 import styles from './PlayerPickerRow.module.css';
@@ -21,6 +23,7 @@ export const PlayerPickerRow: React.FC<PlayerPickerRowProps> = ({
   onSelect,
 }) => {
   const disabled = overBudget || clubLimitReached || positionLimitReached;
+  const { following, toggle } = useFollowPlayer(player.id);
 
   return (
     <li
@@ -59,6 +62,14 @@ export const PlayerPickerRow: React.FC<PlayerPickerRowProps> = ({
       <div className={`${styles.cost} ${overBudget ? styles.cost_over : ''}`}>
         £{(player.nowCost / 10).toFixed(1)}m
       </div>
+      <button
+        className={`${styles.followBtn} ${following ? styles.followBtnActive : ''}`}
+        onClick={(e) => { e.stopPropagation(); toggle(); }}
+        aria-label={following ? copy.playerWatchlistUnfollow : copy.playerWatchlistFollow}
+        aria-pressed={following}
+      >
+        {following ? '★' : '☆'}
+      </button>
     </li>
   );
 };

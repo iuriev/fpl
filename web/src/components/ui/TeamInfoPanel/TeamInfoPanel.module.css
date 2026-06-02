@@ -154,7 +154,7 @@
 
 .followBtn:hover:not(:disabled) {
   background: var(--fpl-accent);
-  color: var(--fpl-on-accent, #fff);
+  color: var(--fpl-accent-ink);
 }
 
 .followingBtn {

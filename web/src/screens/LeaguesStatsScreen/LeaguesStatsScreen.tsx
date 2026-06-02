@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useLeagues } from '@/api/queries';
@@ -26,26 +26,40 @@ const DIR_CLASS: Record<RankDirection, string> = {
   neutral: styles.dirNeutral,
 };
 
-function LeagueRow({ league }: { league: LeagueEntry }) {
+function LeagueRow({ league, onClick }: { league: LeagueEntry; onClick: () => void }) {
   const dir = getLeagueRankDirection(league.rank, league.lastRank);
   return (
-    <div className={styles.row}>
+    <button
+      className={styles.row}
+      onClick={onClick}
+      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onClick()}
+      type="button"
+    >
       <span className={styles.leagueName}>{league.name}</span>
       <span className={styles.rank}>{formatRank(league.rank)}</span>
       <span className={`${styles.dir} ${DIR_CLASS[dir]}`} aria-label={dir}>
         {DIR_SYMBOL[dir]}
       </span>
-    </div>
+      <span className={styles.chevron} aria-hidden="true">›</span>
+    </button>
   );
 }
 
-function LeagueSection({ title, leagues }: { title: string; leagues: LeagueEntry[] }) {
+function LeagueSection({
+  title,
+  leagues,
+  onLeagueClick,
+}: {
+  title: string;
+  leagues: LeagueEntry[];
+  onLeagueClick: (league: LeagueEntry) => void;
+}) {
   return (
     <section className={styles.section}>
       <span className={styles.sectionLabel}>{title}</span>
       <div className={styles.leagueList}>
         {leagues.map((league) => (
-          <LeagueRow key={league.id} league={league} />
+          <LeagueRow key={league.id} league={league} onClick={() => onLeagueClick(league)} />
         ))}
       </div>
     </section>
@@ -76,10 +90,18 @@ export const LeaguesStatsScreen: React.FC<LeaguesStatsScreenProps> = ({ teamId }
 
   const { data, isLoading, isError, refetch } = useLeagues(teamId);
 
+  const gwParam = searchParams.get('gw');
+
   const handleBack = () => {
-    const gwParam = searchParams.get('gw');
     navigate(`/?teamId=${teamId}${gwParam ? `&gw=${gwParam}` : ''}`);
   };
+
+  const handleLeagueClick = useCallback(
+    (league: LeagueEntry) => {
+      navigate(`/leagues/${league.id}/standings${gwParam ? `?gw=${gwParam}` : ''}`);
+    },
+    [navigate, gwParam],
+  );
 
   return (
     <div className={styles.screen}>
@@ -104,11 +126,19 @@ export const LeaguesStatsScreen: React.FC<LeaguesStatsScreenProps> = ({ teamId }
         )}
 
         {data && data.classic.length > 0 && (
-          <LeagueSection title={copy.statsGeneralLeagues} leagues={data.classic} />
+          <LeagueSection
+            title={copy.statsGeneralLeagues}
+            leagues={data.classic}
+            onLeagueClick={handleLeagueClick}
+          />
         )}
 
         {data && data.h2h.length > 0 && (
-          <LeagueSection title={copy.statsH2HLeagues} leagues={data.h2h} />
+          <LeagueSection
+            title={copy.statsH2HLeagues}
+            leagues={data.h2h}
+            onLeagueClick={handleLeagueClick}
+          />
         )}
       </div>
     </div>

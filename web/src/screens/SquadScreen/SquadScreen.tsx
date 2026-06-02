@@ -13,6 +13,8 @@ import { SummaryStrip } from '@/components/ui/SummaryStrip/SummaryStrip';
 import { TeamInfoPanel, TeamInfoPanelSkeleton } from '@/components/ui/TeamInfoPanel/TeamInfoPanel';
 import { type ViewMode, ViewToggle } from '@/components/ui/ViewToggle/ViewToggle';
 import { copy, interpolate } from '@/lib/copy';
+import { useFollowPlayer } from '@/lib/use-follow-player';
+import { useFollowTeam } from '@/lib/use-follow-team';
 import type { PlayerPosition, SquadPlayer } from '@/types';
 import { MAX_GAMEWEEK } from '@/types';
 
@@ -55,6 +57,8 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
     return stateReturnTo ?? null;
   });
   const isGuestMode = returnTo !== null;
+
+  const { following: followingTeam, limitReached: followLimitReached, toggle: toggleFollowTeam } = useFollowTeam(teamId, isGuestMode);
 
   const { data: gameweeksData } = useGameweeks();
   const { data: entry, isError: entryIsError } = useEntry(teamId);
@@ -158,7 +162,7 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
         header={drawerHeader}
       >
         {entry
-          ? <TeamInfoPanel entry={entry} teamId={teamId} showFollow={isGuestMode} />
+          ? <TeamInfoPanel entry={entry} teamId={teamId} showFollow={isGuestMode} showNavLinks={!isGuestMode} />
           : !entryIsError && <TeamInfoPanelSkeleton />}
       </Drawer>
 
@@ -216,6 +220,16 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
 
           <div className={styles.viewToggleWrap}>
             <ViewToggle value={view} onChange={handleViewChange} />
+            {isGuestMode && (
+              <button
+                className={`${styles.followHeaderBtn} ${followingTeam ? styles.followHeaderBtn_following : ''}`}
+                onClick={toggleFollowTeam}
+                aria-pressed={followingTeam}
+                disabled={!followingTeam && followLimitReached}
+              >
+                {followingTeam ? copy.watchlistUnfollowButton : copy.watchlistFollowButton}
+              </button>
+            )}
           </div>
 
           <div className={styles.gwNav}>
@@ -321,7 +335,7 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
                           {positionGroups[pos].map((player) => {
                             const pool = poolLookup?.get(player.id);
                             return (
-                              <PlayerCard
+                              <FollowableCard
                                 key={player.id}
                                 player={player}
                                 size="large"
@@ -357,7 +371,7 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
                     {squad.bench.map((player) => {
                       const pool = poolLookup?.get(player.id);
                       return (
-                        <PlayerCard
+                        <FollowableCard
                           key={player.id}
                           player={player}
                           size="medium"
@@ -385,6 +399,18 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
 };
 
 SquadScreen.displayName = 'SquadScreen';
+
+function FollowableCard(props: React.ComponentProps<typeof PlayerCard>) {
+  const { following, toggle } = useFollowPlayer(props.player.id);
+  const showFollow = !!props.playerInfo;
+  return (
+    <PlayerCard
+      {...props}
+      onFollow={showFollow ? () => toggle() : undefined}
+      isFollowing={following}
+    />
+  );
+}
 
 function SquadSkeleton() {
   return (

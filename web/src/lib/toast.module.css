@@ -1,0 +1,16 @@
+.toast {
+  position: fixed;
+  bottom: 5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--fpl-bg-card);
+  border: 1px solid var(--fpl-bg-hair);
+  border-radius: var(--fpl-radius-md);
+  padding: var(--fpl-space-sm) var(--fpl-space-md);
+  font-size: 0.8125rem;
+  color: var(--fpl-text-primary);
+  max-width: 80vw;
+  text-align: center;
+  z-index: 300;
+  white-space: nowrap;
+}

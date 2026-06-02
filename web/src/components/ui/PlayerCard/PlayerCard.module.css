@@ -264,6 +264,13 @@
   border-bottom: 1px solid var(--fpl-bg-hair);
 }
 
+.infoActions {
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-xs);
+  flex-shrink: 0;
+}
+
 .infoHeaderText {
   flex: 1;
   min-width: 0;
@@ -371,4 +378,25 @@
   color: #ffffff;
   box-shadow: 0 2px 6px rgba(34, 211, 238, 0.5);
   -webkit-tap-highlight-color: transparent;
+}
+
+.followBtn {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--fpl-radius-pill);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--fpl-bg-hair);
+  color: var(--fpl-muted);
+  font-size: 0.75rem;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s, background 0.15s;
+}
+
+.followBtnActive {
+  color: var(--fpl-warn);
+  background: rgba(255, 192, 0, 0.12);
+  border-color: rgba(255, 192, 0, 0.3);
 }

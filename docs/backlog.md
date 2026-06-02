@@ -115,7 +115,7 @@ These features give the app reasons to return every gameweek — essential for g
 | ANA-03 | Price change risers & fallers (global + mini-league) | M | Huge FPL meta driver. Users check this daily during the GW. |
 | ANA-02 | Most popular players (ownership %) screen | S | TopPlayersScreen already exists — extend with ownership sort/filter. |
 | ANA-04 | Top-ranked managers → view their squads | M | Viral / social feature. Re-uses existing squad viewer. |
-| ANA-12 | League participants browser (click league on Stats to see all members) | S | Natural extension of existing leagues screen. |
+| ~~ANA-12~~ | ~~League participants browser (click league on Stats to see all members)~~ | S | → OpenSpec change 2026-06-02-ana-12-league-participants-browser. |
 | ~~MGR-01~~ | ~~Manager Watchlist — follow managers, see their points/transfers in a table~~ | M | ✅ Done — OpenSpec change 2026-06-01-manager-watchlist. localStorage phase, max 5. |
 | MGR-02 | Backend watchlist — migrate MGR-01 from localStorage to backend API | S | Depends on AUTH-01. Swap LocalStorageWatchlistRepository → ApiWatchlistRepository; no UI changes. |
 | MGR-03 | Freemium watchlist limits — 2 entries free, 10 with subscription | S | Depends on MGR-02 + MON-01. `repo.getLimit()` returns tier-specific cap; upsell prompt on `'limit'` response. |

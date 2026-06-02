@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/Button/Button';
 import { PlayerRankRow } from '@/components/ui/PlayerRankRow/PlayerRankRow';
 import { ScreenHeader } from '@/components/ui/ScreenHeader/ScreenHeader';
 import { copy } from '@/lib/copy';
+import { useFollowPlayer } from '@/lib/use-follow-player';
 import type { TopPlayersPlayer } from '@/types';
 import { MAX_GAMEWEEK } from '@/types';
 
@@ -348,7 +349,7 @@ export const TopPlayersScreen: React.FC = () => {
         {!isLoading && !isError && activePlayers.length > 0 && (
           <div className={styles.list}>
             {visible.map((player, i) => (
-              <PlayerRankRow key={player.id} rank={i + 1} player={player} />
+              <FollowableRankRow key={player.id} rank={i + 1} player={player} />
             ))}
             {hasMore && <div ref={sentinelRef} className={styles.sentinel} aria-hidden="true" />}
           </div>
@@ -359,6 +360,24 @@ export const TopPlayersScreen: React.FC = () => {
 };
 
 TopPlayersScreen.displayName = 'TopPlayersScreen';
+
+function FollowableRankRow({
+  rank,
+  player,
+}: {
+  rank: number;
+  player: import('@/types').TopPlayersPlayer;
+}) {
+  const { following, toggle } = useFollowPlayer(player.id);
+  return (
+    <PlayerRankRow
+      rank={rank}
+      player={player}
+      onFollow={() => toggle()}
+      isFollowing={following}
+    />
+  );
+}
 
 function PlayerListSkeleton() {
   return (

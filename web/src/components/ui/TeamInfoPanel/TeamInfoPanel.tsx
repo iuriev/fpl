@@ -21,9 +21,10 @@ export interface TeamInfoPanelProps {
   entry: EntryResponse;
   teamId: number;
   showFollow?: boolean;
+  showNavLinks?: boolean;
 }
 
-export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({ entry, teamId, showFollow = false }) => {
+export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({ entry, teamId, showFollow = false, showNavLinks = true }) => {
   const flag = entry.regionIsoCode ? isoToFlag(entry.regionIsoCode) : null;
   const repo = useWatchlistRepository();
   const [following, setFollowing] = useState(false);
@@ -83,32 +84,37 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({ entry, teamId, sho
         </div>
       </div>
 
-      <div className={styles.navLinks}>
-        <Link to={`/history?teamId=${teamId}`} className={styles.navLink}>
-          {copy.teamInfoGwHistory}
-        </Link>
-        <Link to={`/review?teamId=${teamId}`} className={styles.navLink}>
-          {copy.reviewNavLink}
-        </Link>
-        <Link to={`/stats?teamId=${teamId}`} className={styles.navLink}>
-          {copy.statsMyStats}
-        </Link>
-        <Link to={`/team-of-the-week?teamId=${teamId}`} className={styles.navLink}>
-          {copy.teamOfTheWeekNavLink}
-        </Link>
-        <Link to={`/top-players?teamId=${teamId}`} className={styles.navLink}>
-          {copy.topPlayersNavLink}
-        </Link>
-        <Link to={`/watchlist?teamId=${teamId}`} className={styles.navLink}>
-          {copy.watchlistNavLink}
-        </Link>
-        <Link
-          to={`/transfers?teamId=${teamId}`}
-          className={`${styles.navLink} ${styles.navLinkFeatured}`}
-        >
-          {copy.transfersNavLink}
-        </Link>
-      </div>
+      {showNavLinks && (
+        <div className={styles.navLinks}>
+          <Link to={`/history?teamId=${teamId}`} className={styles.navLink}>
+            {copy.teamInfoGwHistory}
+          </Link>
+          <Link to={`/review?teamId=${teamId}`} className={styles.navLink}>
+            {copy.reviewNavLink}
+          </Link>
+          <Link to={`/stats?teamId=${teamId}`} className={styles.navLink}>
+            {copy.statsMyStats}
+          </Link>
+          <Link to={`/team-of-the-week?teamId=${teamId}`} className={styles.navLink}>
+            {copy.teamOfTheWeekNavLink}
+          </Link>
+          <Link to={`/top-players?teamId=${teamId}`} className={styles.navLink}>
+            {copy.topPlayersNavLink}
+          </Link>
+          <Link to={`/watchlist?teamId=${teamId}`} className={styles.navLink}>
+            {copy.watchlistNavLink}
+          </Link>
+          <Link to={`/player-watchlist?teamId=${teamId}`} className={styles.navLink}>
+            {copy.playerWatchlistNavLink}
+          </Link>
+          <Link
+            to={`/transfers?teamId=${teamId}`}
+            className={`${styles.navLink} ${styles.navLinkFeatured}`}
+          >
+            {copy.transfersNavLink}
+          </Link>
+        </div>
+      )}
 
       {showFollow && (
         <div className={styles.followWrap}>

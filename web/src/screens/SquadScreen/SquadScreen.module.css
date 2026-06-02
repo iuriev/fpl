@@ -132,9 +132,48 @@
 }
 
 .viewToggleWrap {
+  position: relative;
   display: flex;
   justify-content: center;
+  align-items: center;
   padding: 0.125rem var(--fpl-space-xl3) var(--fpl-space-xs);
+}
+
+.followHeaderBtn {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0.3125rem 0.75rem;
+  border: 1px solid var(--fpl-accent);
+  border-radius: var(--fpl-radius-pill);
+  background: none;
+  color: var(--fpl-accent);
+  font-size: var(--fpl-fs-body-s);
+  font-weight: var(--fpl-fw-semibold);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 120ms, color 120ms;
+}
+
+.followHeaderBtn:hover:not(:disabled) {
+  background: var(--fpl-accent);
+  color: var(--fpl-accent-ink);
+}
+
+.followHeaderBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.followHeaderBtn_following {
+  border-color: var(--fpl-negative, #ef4444);
+  color: var(--fpl-negative, #ef4444);
+}
+
+.followHeaderBtn_following:hover:not(:disabled) {
+  background: var(--fpl-negative, #ef4444);
+  color: #fff;
 }
 
 .gwNav {

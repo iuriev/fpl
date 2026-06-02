@@ -1,0 +1,90 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-md);
+  padding: var(--fpl-space-sm) var(--fpl-space-md);
+  width: 100%;
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: inherit;
+  cursor: pointer;
+  font-family: var(--fpl-font-display);
+  font-size: var(--fpl-fs-body-s);
+  text-align: left;
+  transition: background 120ms;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.rank {
+  width: 3ch;
+  flex-shrink: 0;
+  color: var(--fpl-text-soft);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.nameBlock {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.playerName {
+  color: var(--fpl-text);
+  font-weight: var(--fpl-fw-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.entryName {
+  color: var(--fpl-muted);
+  font-size: var(--fpl-fs-body-xs);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gw {
+  width: 4ch;
+  flex-shrink: 0;
+  color: var(--fpl-text-soft);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.total {
+  width: 5ch;
+  flex-shrink: 0;
+  color: var(--fpl-text-soft);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.dir {
+  width: 1rem;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.dirUp {
+  color: var(--fpl-accent);
+}
+
+.dirDown {
+  color: var(--fpl-error);
+}
+
+.dirNeutral {
+  color: var(--fpl-muted-soft);
+}

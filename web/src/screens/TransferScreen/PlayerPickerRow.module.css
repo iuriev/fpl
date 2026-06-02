@@ -80,3 +80,24 @@
   color: var(--fpl-cyan, #00ff87);
   font-weight: 600;
 }
+
+.followBtn {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--fpl-radius-pill);
+  background: transparent;
+  border: 1px solid var(--fpl-bg-hair);
+  color: var(--fpl-muted);
+  font-size: 0.875rem;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s, background 0.15s;
+}
+
+.followBtnActive {
+  color: var(--fpl-warn);
+  background: rgba(255, 192, 0, 0.1);
+  border-color: rgba(255, 192, 0, 0.3);
+}

@@ -1,0 +1,108 @@
+.screen {
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--fpl-bg-deep);
+  color: var(--fpl-text);
+}
+
+.body {
+  flex: 1;
+  overflow: auto;
+  padding: var(--fpl-space-xl) var(--fpl-space-xl3) var(--fpl-space-xl3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--fpl-space-xl);
+}
+
+.standingsList {
+  border-radius: var(--fpl-radius-sm);
+  border: 1px solid var(--fpl-bg-hair);
+  overflow: hidden;
+}
+
+.loadMoreWrap {
+  display: flex;
+  justify-content: center;
+}
+
+/* States */
+.stateCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--fpl-space-md);
+  padding: var(--fpl-space-xl3) var(--fpl-space-xl);
+  min-height: 12rem;
+  text-align: center;
+}
+
+.stateText {
+  color: var(--fpl-muted);
+  font-size: var(--fpl-fs-body);
+}
+
+/* Skeleton */
+.skeletonList {
+  border-radius: var(--fpl-radius-sm);
+  border: 1px solid var(--fpl-bg-hair);
+  overflow: hidden;
+}
+
+.skeletonRow {
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-md);
+  padding: var(--fpl-space-sm) var(--fpl-space-md);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.skeletonRow:last-child {
+  border-bottom: none;
+}
+
+.skeletonCell {
+  height: 0.875rem;
+  border-radius: var(--fpl-radius-xs);
+  background: var(--fpl-bg-hair);
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.skeletonNameBlock {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.skeletonRank {
+  width: 3ch;
+  flex-shrink: 0;
+}
+
+.skeletonName {
+  width: 60%;
+}
+
+.skeletonEntry {
+  width: 40%;
+  height: 0.75rem;
+}
+
+.skeletonNum {
+  width: 4ch;
+  flex-shrink: 0;
+}
+
+@keyframes shimmer {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}

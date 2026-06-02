@@ -110,7 +110,7 @@
   border: none;
   border-radius: var(--fpl-radius-sm);
   background: var(--fpl-accent);
-  color: var(--fpl-on-accent, #fff);
+  color: var(--fpl-accent-ink);
   font: var(--fpl-fw-medium) var(--fpl-fs-body) var(--fpl-font-display);
   cursor: pointer;
   white-space: nowrap;
@@ -481,12 +481,12 @@
 
 .followBtn:hover:not(:disabled) {
   background: var(--fpl-accent);
-  color: var(--fpl-on-accent, #fff);
+  color: var(--fpl-accent-ink);
 }
 
 .followingBtn {
   background: var(--fpl-accent);
-  color: var(--fpl-on-accent, #fff);
+  color: var(--fpl-accent-ink);
   cursor: default;
 }
 

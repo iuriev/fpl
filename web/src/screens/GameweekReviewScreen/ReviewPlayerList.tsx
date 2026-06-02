@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import { PositionBadge } from '@/components/ui/PositionBadge/PositionBadge';
 import { copy } from '@/lib/copy';
+import { useFollowPlayer } from '@/lib/use-follow-player';
 import type { SquadPlayer } from '@/types';
 
 import { getPlayerPointsClass, getStatLabel, type PlayerPointsClass } from './review-helpers';
@@ -27,34 +28,45 @@ function PlayerRow({ player, dimmed }: { player: SquadPlayer; dimmed?: boolean }
   const [expanded, setExpanded] = useState(false);
   const ptsClass = getPlayerPointsClass(player.points);
   const label = getStatLabel(player.stats);
+  const { following, toggle } = useFollowPlayer(player.id);
 
   return (
     <>
-      <button
-        className={`${styles.row} ${PT_CLASS[ptsClass]} ${dimmed ? styles.rowDimmed : ''}`}
-        onClick={() => setExpanded((v) => !v)}
-        aria-expanded={expanded}
-      >
-        <span className={styles.club}>{player.club}</span>
-        <span className={styles.info}>
-          <span className={styles.name}>{player.name}</span>
-          <span className={styles.meta}>
-            <PositionBadge position={player.position} />
-            {player.isCaptain && <span className={styles.capBadge}>{copy.statusCaptain}</span>}
-            {player.isViceCaptain && (
-              <span className={`${styles.capBadge} ${styles.vcBadge}`}>
-                {copy.statusViceCaptain}
-              </span>
-            )}
-            <span className={styles.label}>{label}</span>
-          </span>
-        </span>
-        <span
-          className={`${styles.pts} ${ptsClass === 'great' ? styles.ptsGreat : ''} ${ptsClass === 'bad' ? styles.ptsBad : ''}`}
+      <div className={`${styles.rowWrap}`}>
+        <button
+          className={`${styles.row} ${PT_CLASS[ptsClass]} ${dimmed ? styles.rowDimmed : ''}`}
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
         >
-          {player.points}
-        </span>
-      </button>
+          <span className={styles.club}>{player.club}</span>
+          <span className={styles.info}>
+            <span className={styles.name}>{player.name}</span>
+            <span className={styles.meta}>
+              <PositionBadge position={player.position} />
+              {player.isCaptain && <span className={styles.capBadge}>{copy.statusCaptain}</span>}
+              {player.isViceCaptain && (
+                <span className={`${styles.capBadge} ${styles.vcBadge}`}>
+                  {copy.statusViceCaptain}
+                </span>
+              )}
+              <span className={styles.label}>{label}</span>
+            </span>
+          </span>
+          <span
+            className={`${styles.pts} ${ptsClass === 'great' ? styles.ptsGreat : ''} ${ptsClass === 'bad' ? styles.ptsBad : ''}`}
+          >
+            {player.points}
+          </span>
+        </button>
+        <button
+          className={`${styles.followBtn} ${following ? styles.followBtnActive : ''}`}
+          onClick={() => toggle()}
+          aria-label={following ? copy.playerWatchlistUnfollow : copy.playerWatchlistFollow}
+          aria-pressed={following}
+        >
+          {following ? '★' : '☆'}
+        </button>
+      </div>
       {expanded && (
         <div className={styles.statsRow}>
           {player.stats.minutes > 0 && <span>{player.stats.minutes} mins</span>}

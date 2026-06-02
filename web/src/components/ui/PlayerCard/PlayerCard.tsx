@@ -28,6 +28,8 @@ export interface PlayerCardProps {
   playerInfo?: PlayerInfo;
   hideCaptaincy?: boolean;
   subTourAttr?: string;
+  onFollow?: (playerId: number) => void;
+  isFollowing?: boolean;
 }
 
 function availBadge(status: PlayerStatus): { char: string; variant: 'warn' | 'error' } | null {
@@ -64,6 +66,8 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   playerInfo,
   hideCaptaincy = false,
   subTourAttr,
+  onFollow,
+  isFollowing = false,
 }) => {
   const [showStatus, setShowStatus] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
@@ -243,23 +247,35 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
                 £{(playerInfo.currentPrice / 10).toFixed(1)}m · {playerInfo.ownership}%{playerInfo.expectedPoints ? ` · ${playerInfo.expectedPoints} XP` : ''} · {player.position} / {player.club}
               </span>
             </div>
-            <div
-              className={styles.infoClose}
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowInfo(false);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
+            <div className={styles.infoActions}>
+              {onFollow && (
+                <button
+                  className={`${styles.followBtn} ${isFollowing ? styles.followBtnActive : ''}`}
+                  onClick={(e) => { e.stopPropagation(); onFollow(player.id); }}
+                  aria-label={isFollowing ? copy.playerWatchlistUnfollow : copy.playerWatchlistFollow}
+                  aria-pressed={isFollowing}
+                >
+                  {isFollowing ? '★' : '☆'}
+                </button>
+              )}
+              <div
+                className={styles.infoClose}
+                onClick={(e) => {
+                  e.stopPropagation();
                   setShowInfo(false);
-                }
-              }}
-              role="button"
-              tabIndex={0}
-              aria-label="Close"
-            >
-              ✕
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setShowInfo(false);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                aria-label="Close"
+              >
+                ✕
+              </div>
             </div>
           </div>
           <div className={styles.infoBody}>

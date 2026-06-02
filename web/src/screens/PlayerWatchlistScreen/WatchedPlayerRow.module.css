@@ -1,0 +1,106 @@
+.row {
+  display: flex;
+  align-items: center;
+}
+
+.row > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.removeBtn {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--fpl-radius-pill);
+  background: transparent;
+  border: 1px solid var(--fpl-bg-hair);
+  color: var(--fpl-muted);
+  font-size: 0.625rem;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-right: var(--fpl-space-xl3);
+  transition: color 0.15s, background 0.15s;
+}
+
+.removeBtn:hover {
+  color: var(--fpl-error);
+  background: var(--fpl-error-soft);
+  border-color: transparent;
+}
+
+.skeleton {
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-md);
+  padding: var(--fpl-space-sm) var(--fpl-space-xl3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.skeletonRank {
+  width: 1.5rem;
+  flex-shrink: 0;
+  font-size: var(--fpl-fs-body-s);
+  color: var(--fpl-muted-soft);
+  text-align: right;
+}
+
+.skeletonJersey {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--fpl-radius-sm);
+  background: var(--fpl-bg-hair);
+  flex-shrink: 0;
+}
+
+.skeletonInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.skeletonName {
+  height: 0.875rem;
+  width: 7rem;
+  border-radius: var(--fpl-radius-sm);
+  background: var(--fpl-bg-hair);
+}
+
+.skeletonMeta {
+  height: 0.625rem;
+  width: 4rem;
+  border-radius: var(--fpl-radius-sm);
+  background: var(--fpl-bg-hair);
+}
+
+.skeletonPoints {
+  width: 2rem;
+  height: 1rem;
+  border-radius: var(--fpl-radius-sm);
+  background: var(--fpl-bg-hair);
+  flex-shrink: 0;
+}
+
+.unknown {
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-md);
+  padding: var(--fpl-space-sm) var(--fpl-space-xl3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.unknownRank {
+  width: 1.5rem;
+  flex-shrink: 0;
+  font-size: var(--fpl-fs-body-s);
+  color: var(--fpl-muted-soft);
+  text-align: right;
+}
+
+.unknownId {
+  flex: 1;
+  font-size: var(--fpl-fs-body-s);
+  color: var(--fpl-muted);
+}

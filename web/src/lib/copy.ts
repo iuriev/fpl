@@ -106,6 +106,14 @@ export const copy = {
   statsRetry: 'Try again',
   statsMyStats: 'My Stats',
 
+  // League standings screen
+  leagueStandingsBack: 'Leagues',
+  leagueStandingsLoadError: 'Could not load league standings.',
+  leagueStandingsRetry: 'Retry',
+  leagueStandingsEmpty: 'No participants found.',
+  leagueStandingsLoadMore: 'Load more',
+  leagueStandingsLoading: 'Loading…',
+
   // Team of the Week screen
   teamOfTheWeekTitle: 'Team of the Week',
   teamOfTheWeekBack: 'Squad',
@@ -284,6 +292,11 @@ export const copy = {
   premiumWatchlistFreeLabel: '2 managers',
   premiumWatchlistPremiumLabel: '10 managers',
 
+  premiumPlayerWatchlistTitle: 'Follow more players',
+  premiumPlayerWatchlistDescription: "You've reached the free plan limit. Upgrade to track more players and unlock features.",
+  premiumPlayerWatchlistFreeLabel: '2 players',
+  premiumPlayerWatchlistPremiumLabel: '15 players',
+
   // Transfer help tour
   tourHelpButton: 'Open tour',
   tourSkip: '✕ Skip',
@@ -333,6 +346,23 @@ export const copy = {
   reviewLoadError: "Couldn't load gameweek review",
   reviewRetry: 'Try again',
   reviewNoGw: 'No completed GWs yet',
+
+  // Player Watchlist screen
+  playerWatchlistTitle: 'Player Watchlist',
+  playerWatchlistBack: 'Back',
+  playerWatchlistEmpty: 'No players followed yet.',
+  playerWatchlistEmptySubtext: 'Tap ★ on any player to start tracking them.',
+  playerWatchlistBrowse: 'Browse Top Players',
+  playerWatchlistAddByName: '＋ Add player by name',
+  playerWatchlistSearch: 'Search watched players…',
+  playerWatchlistCapacityBadge: '{count}/{limit} following',
+  playerWatchlistFull: 'Watchlist full ({limit}/{limit})',
+  playerWatchlistFollow: 'Follow',
+  playerWatchlistUnfollow: 'Unfollow',
+  playerWatchlistAddSheetTitle: 'Add player',
+  playerWatchlistAddSearch: 'Search players…',
+  playerWatchlistNavLink: 'Player Watchlist',
+  playerWatchlistRemove: 'Unfollow player',
 };
 
 /**

@@ -111,6 +111,15 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   font-family: var(--fpl-font-display);
   font-size: var(--fpl-fs-body-s);
+  width: 100%;
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background 120ms;
 }
 
 .row:last-child {
@@ -118,7 +127,14 @@
 }
 
 .row:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.chevron {
+  color: var(--fpl-muted);
+  font-size: var(--fpl-fs-body-s);
+  flex-shrink: 0;
+  line-height: 1;
 }
 
 .leagueName {

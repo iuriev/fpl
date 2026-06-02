@@ -65,7 +65,9 @@ export const GameweekHistoryScreen: React.FC<GameweekHistoryScreenProps> = ({ te
           </div>
         )}
 
-        {data && data.gameweeks.length > 0 && <HistoryTable gameweeks={data.gameweeks} />}
+        {data && data.gameweeks.length > 0 && (
+          <HistoryTable gameweeks={data.gameweeks} teamId={teamId} />
+        )}
       </div>
     </div>
   );
@@ -73,7 +75,9 @@ export const GameweekHistoryScreen: React.FC<GameweekHistoryScreenProps> = ({ te
 
 GameweekHistoryScreen.displayName = 'GameweekHistoryScreen';
 
-function HistoryTable({ gameweeks }: { gameweeks: HistoryGameweek[] }) {
+function HistoryTable({ gameweeks, teamId }: { gameweeks: HistoryGameweek[]; teamId: number }) {
+  const navigate = useNavigate();
+
   return (
     <div className={styles.tableWrap}>
       <table className={styles.table}>
@@ -95,7 +99,11 @@ function HistoryTable({ gameweeks }: { gameweeks: HistoryGameweek[] }) {
           {gameweeks.map((row, i) => {
             const prev = gameweeks[i + 1];
             return (
-              <tr key={row.gw}>
+              <tr
+                key={row.gw}
+                className={styles.clickableRow}
+                onClick={() => navigate(`/?teamId=${teamId}&gw=${row.gw}`)}
+              >
                 <td>GW{row.gw}</td>
                 <td>{formatNumber(row.overallRank)}</td>
                 <td>

@@ -1,6 +1,12 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Route, Routes, useSearchParams } from 'react-router-dom';
 
+import { PlayerWatchlistPremiumProvider } from '@/lib/player-watchlist-premium';
+import {
+  LocalStoragePlayerWatchlistRepository,
+  PlayerWatchlistRepositoryContext,
+} from '@/lib/player-watchlist-repository';
+import { ToastProvider } from '@/lib/toast';
 import {
   LocalStorageWatchlistRepository,
   WatchlistRepositoryContext,
@@ -10,6 +16,8 @@ import {
   GameweekHistoryScreen,
   GameweekReviewScreen,
   LeaguesStatsScreen,
+  LeagueStandingsScreen,
+  PlayerWatchlistScreen,
   SquadScreen,
   TeamOfTheWeekScreen,
   TopPlayersScreen,
@@ -19,6 +27,7 @@ import {
 
 const queryClient = new QueryClient();
 const watchlistRepo = new LocalStorageWatchlistRepository();
+const playerWatchlistRepo = new LocalStoragePlayerWatchlistRepository();
 
 function AppContent() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -86,6 +95,8 @@ function AppContent() {
         path="/watchlist"
         element={<WatchlistScreen userTeamId={teamId ?? undefined} />}
       />
+      <Route path="/leagues/:leagueId/standings" element={<LeagueStandingsScreen />} />
+      <Route path="/player-watchlist" element={<PlayerWatchlistScreen />} />
     </Routes>
   );
 }
@@ -94,9 +105,15 @@ export function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <WatchlistRepositoryContext.Provider value={watchlistRepo}>
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
+        <PlayerWatchlistRepositoryContext.Provider value={playerWatchlistRepo}>
+          <ToastProvider>
+            <PlayerWatchlistPremiumProvider>
+              <BrowserRouter>
+                <AppContent />
+              </BrowserRouter>
+            </PlayerWatchlistPremiumProvider>
+          </ToastProvider>
+        </PlayerWatchlistRepositoryContext.Provider>
       </WatchlistRepositoryContext.Provider>
     </QueryClientProvider>
   );

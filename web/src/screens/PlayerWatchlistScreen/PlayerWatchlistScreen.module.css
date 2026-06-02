@@ -1,0 +1,98 @@
+.screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: var(--fpl-bg);
+  color: var(--fpl-text);
+}
+
+.capacityBadge {
+  font: var(--fpl-fw-medium) var(--fpl-fs-body-xs) / 1 var(--fpl-font-display);
+  color: var(--fpl-muted);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--fpl-radius-pill);
+  border: 1px solid var(--fpl-bg-hair);
+  background: var(--fpl-bg-soft);
+}
+
+.capacityBadgeAtLimit {
+  color: var(--fpl-warn);
+  border-color: rgba(255, 192, 0, 0.3);
+  background: rgba(255, 192, 0, 0.08);
+}
+
+.searchWrap {
+  padding: var(--fpl-space-sm) var(--fpl-space-xl3);
+}
+
+.search {
+  width: 100%;
+  background: var(--fpl-bg-soft);
+  border: 1px solid var(--fpl-bg-hair);
+  border-radius: var(--fpl-radius-md);
+  padding: var(--fpl-space-sm) var(--fpl-space-md);
+  color: var(--fpl-text);
+  font: var(--fpl-fw-regular) var(--fpl-fs-body-s) / 1.4 var(--fpl-font-display);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.search::placeholder {
+  color: var(--fpl-muted);
+}
+
+.list {
+  flex: 1;
+}
+
+.emptyState {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--fpl-space-sm);
+  padding: var(--fpl-space-xl3);
+  text-align: center;
+}
+
+.emptyText {
+  font: var(--fpl-fw-semibold) var(--fpl-fs-body) / 1.4 var(--fpl-font-display);
+  color: var(--fpl-text);
+  margin: 0;
+}
+
+.emptySubtext {
+  font: var(--fpl-fw-regular) var(--fpl-fs-body-s) / 1.4 var(--fpl-font-display);
+  color: var(--fpl-muted);
+  margin: 0;
+}
+
+.browseLink {
+  color: var(--fpl-accent);
+  font: var(--fpl-fw-medium) var(--fpl-fs-body-s) / 1 var(--fpl-font-display);
+  text-decoration: none;
+  margin-top: var(--fpl-space-sm);
+}
+
+.browseLink:hover {
+  text-decoration: underline;
+}
+
+.addWrap {
+  padding: var(--fpl-space-md) var(--fpl-space-xl3);
+  border-top: 1px solid var(--fpl-bg-hair);
+}
+
+.addBtn {
+  background: none;
+  border: none;
+  color: var(--fpl-accent);
+  font: var(--fpl-fw-medium) var(--fpl-fs-body-s) / 1 var(--fpl-font-display);
+  cursor: pointer;
+  padding: 0;
+}
+
+.addBtn:hover {
+  text-decoration: underline;
+}
