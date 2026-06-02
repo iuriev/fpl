@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 import { useLeagueStandings } from '@/api/queries';
@@ -45,17 +45,15 @@ export function LeagueStandingsScreen() {
 
   const { data, isLoading, isError, refetch } = useLeagueStandings(leagueIdNum, page);
 
-  const [prevData, setPrevData] = useState(data);
-
-  if (prevData !== data && data) {
-    setPrevData(data);
+  useEffect(() => {
+    if (!data) return;
     if (page === 1) {
       setAllStandings(data.standings);
     } else {
       setAllStandings((prev) => [...prev, ...data.standings]);
       setLoadingMore(false);
     }
-  }
+  }, [data, page]);
 
   const handleLoadMore = useCallback(() => {
     setLoadingMore(true);

@@ -64,12 +64,11 @@ function FollowableResult({
 export const AddPlayerSheet: React.FC<AddPlayerSheetProps> = ({ open, onClose, currentGw }) => {
   const [query, setQuery] = useState('');
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const [prevQuery, setPrevQuery] = useState(query);
-  if (prevQuery !== query) {
-    setPrevQuery(query);
-    setVisibleCount(PAGE_SIZE);
-  }
   const sentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [query]);
 
   const { data: poolData } = usePlayerPool();
   const gwQuery = useTopPlayersGw(currentGw);
