@@ -58,6 +58,22 @@ The proxy serves both the built SPA (`web/dist/`) and all `/api/*` routes from o
 
 Deploy: `fly deploy` from repo root.
 
+## Required secrets (Fly.io)
+
+Set these with `fly secrets set KEY=value` before deploying:
+
+| Secret | Description |
+| --- | --- |
+| `DATABASE_URL` | Supabase Postgres connection string (pooler URL, port 6543) |
+| `BETTER_AUTH_SECRET` | Random 32-byte hex string — used to sign sessions and tokens |
+| `GOOGLE_CLIENT_ID` | OAuth 2.0 client ID from Google Cloud Console |
+| `GOOGLE_CLIENT_SECRET` | OAuth 2.0 client secret from Google Cloud Console |
+| `PUBLIC_APP_URL` | Full origin of the deployed app, e.g. `https://fpl-squad-viewer.fly.dev` |
+
+`DATABASE_URL` and `BETTER_AUTH_SECRET` are required at boot — the proxy exits immediately if
+either is missing. The Google OAuth secrets are optional for local development (social sign-in
+will be unavailable if unset).
+
 ## Status
 
 Early scaffolding. Stack and MVP scope decided (ADR 0001, 0002). Design tooling pipeline and

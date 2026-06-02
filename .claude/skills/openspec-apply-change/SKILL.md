@@ -6,7 +6,7 @@ compatibility: Requires openspec CLI.
 metadata:
   author: openspec
   version: "1.0"
-  generatedBy: "1.3.1"
+  generatedBy: "1.4.0"
 ---
 
 Implement tasks from an OpenSpec change.
@@ -30,6 +30,7 @@ Implement tasks from an OpenSpec change.
    ```
    Parse the JSON to understand:
    - `schemaName`: The workflow being used (e.g., "spec-driven")
+   - `planningHome`, `changeRoot`, and `actionContext`: planning scope and edit constraints
    - Which artifact contains the tasks (typically "tasks" for spec-driven, check status for others)
 
 3. **Get apply instructions**
@@ -49,6 +50,8 @@ Implement tasks from an OpenSpec change.
    - If `state: "all_done"`: congratulate, suggest archive
    - Otherwise: proceed to implementation
 
+   **Workspace guard:** If status JSON reports `actionContext.mode: "workspace-planning"` and `allowedEditRoots` is empty, explain that full workspace apply is not supported in this slice. Treat linked repos and folders as read-only context, ask the user to select an affected area through an explicit implementation workflow, and STOP before editing files.
+
 4. **Read context files**
 
    Read every file path listed under `contextFiles` from the apply instructions output.
@@ -66,35 +69,14 @@ Implement tasks from an OpenSpec change.
 
 6. **Implement tasks (loop until done or blocked)**
 
-   **Agent routing:** Section headings may contain a parenthesized agent label:
-   `## N. Title  (frontend-developer)`. When present, dispatch that section's pending
-   tasks to the named specialized agent via the `Agent` tool instead of implementing directly.
+   For each pending task:
+   - Show which task is being worked on
+   - Make the code changes required
+   - Keep changes minimal and focused
+   - Mark task complete in the tasks file: `- [ ]` → `- [x]`
+   - Continue to next task
 
-   **For each pending section:**
-
-   a) **Check for agent label** in the section heading (e.g., `(frontend-developer)`).
-
-   b) **If agent label present → dispatch to specialized agent:**
-      - Collect all unchecked tasks in this section.
-      - Read all context files (from `contextFiles` in apply instructions output).
-      - Call `Agent(subagent_type: "<agent-type>", prompt: "...")` with a self-contained prompt that includes:
-        - The project root path and change name.
-        - Full content (or file paths) of every context file: proposal, specs, design, tasks.
-        - The specific tasks to implement (copy them verbatim).
-        - Relevant CLAUDE.md rules (English only, no hardcoded design values, rem for lengths, no descriptive comments, modern-web-guidance skill required before HTML/CSS work).
-        - Instruction to mark each task complete (`- [ ]` → `- [x]`) in the tasks file as it finishes.
-        - Instruction to run `openspec-apply-change` (or equivalent) verification after all tasks.
-      - Wait for the agent to finish; check that tasks are marked done in the file.
-      - Report which tasks were completed.
-
-   c) **If no agent label → implement directly:**
-      - Show which task is being worked on.
-      - Make the code changes required.
-      - Keep changes minimal and focused.
-      - Mark task complete in the tasks file: `- [ ]` → `- [x]`.
-      - Continue to next task.
-
-   **Pause (any mode) if:**
+   **Pause if:**
    - Task is unclear → ask for clarification
    - Implementation reveals a design issue → suggest updating artifacts
    - Error or blocker encountered → report and wait for guidance
@@ -162,8 +144,6 @@ What would you like to do?
 **Guardrails**
 - Keep going through tasks until done or blocked
 - Always read context files before starting (from the apply instructions output)
-- **Dispatch to specialized agents** when a section heading has a parenthesized agent label — never implement those tasks yourself
-- Specialized agent prompts must be fully self-contained: the agent has no conversation context
 - If task is ambiguous, pause and ask before implementing
 - If implementation reveals issues, pause and suggest artifact updates
 - Keep code changes minimal and scoped to each task
@@ -177,11 +157,3 @@ This skill supports the "actions on a change" model:
 
 - **Can be invoked anytime**: Before all artifacts are done (if tasks exist), after partial implementation, interleaved with other actions
 - **Allows artifact updates**: If implementation reveals design issues, suggest updating artifacts - not phase-locked, work fluidly
-
-## After completion (optional)
-
-If the user asks to improve the skill from this session:
-
-- Review corrections and repeated manual fixes from the back-and-forth
-- Propose concrete edits to this `SKILL.md`, `CLAUDE.md`, or `AGENTS.md`
-- Do not apply without user approval

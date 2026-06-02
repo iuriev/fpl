@@ -587,7 +587,7 @@ For reference — features that are live in the codebase:
 - **Top Players Screen** — top performers for a GW
 - **Transfer Planner** — pick players to transfer in/out, budget tracking, squad validation
 - **Transfer screen polish** — captain badge right, team abbrev + FDR chip under PlayerCard, outfield picker, position filter tabs, Sort button (UX-01 SwapsStrip scroll, UX-02 next 3 fixtures column, UX-03 %, pts, xPts columns); UX-04 player info popup (fixtures + price); DES-04 FDR colour tokens; VIS-01 goals/assists badges + ownership pill on all card sizes
-- **Fly.io deployment** — single Hono service on `fpl-squad-viewer.fly.dev`; serves SPA + proxy from one Docker image; in-memory cache preserved
+- **Cloudflare migration (INFRA-01)** — OpenSpec change `openspec/changes/infra-01-cloudflare-migration`; moves SPA to Cloudflare Pages and proxy to Cloudflare Workers; Supabase unchanged. Replaces Fly.io deployment.
 - **Active chip display (CHIP-01)** — chip cell replaces AVERAGE+HIGHEST in SummaryStrip when a chip is active; octagonal badge icon + chip name + ACTIVE label; per-chip accent colours (Wildcard gold, Triple Captain red, Free Hit cyan, Bench Boost green)
 - **Fix bugs** — BUG-01 (position limits), BUG-02 (transfer arrows)
 - **Proxy/BFF** — services for squad, entry, gameweeks, history, leagues, dream-team, fixtures, player pool, top players, team

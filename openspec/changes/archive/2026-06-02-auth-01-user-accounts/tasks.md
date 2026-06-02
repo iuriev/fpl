@@ -33,7 +33,7 @@ idempotently, and exposes a typed `db` client — with no auth surface yet.
 - [x] ADR `docs/decisions/0015-database-postgres.md`; mark ADR 0013 as
       `Superseded by ADR-0015`.
 - [x] `docs/db-schema.md` with ER diagram and per-table column tables.
-- [ ] Document required Fly secrets in `docs/architecture.md`.
+- [x] Document required Fly secrets in `docs/architecture.md`.
 
 ---
 
@@ -50,9 +50,9 @@ Google), refresh, and sign out, with sessions persisted in Postgres.
       and setting `c.var.user`.
 - [x] `proxy/src/index.ts`:
       `app.on(['GET','POST'], '/api/auth/*', (c) => auth.handler(c.req.raw))`.
-- [ ] Fly secrets: `BETTER_AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`,
-      `PUBLIC_APP_URL`.
-- [ ] `proxy/src/auth/auth.test.ts`: signup, signin (incl. wrong password), OAuth
+- [x] Fly secrets: `BETTER_AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`,
+      `PUBLIC_APP_URL` — documented in `docs/architecture.md`.
+- [x] `proxy/src/auth/auth.test.ts`: signup, signin (incl. wrong password), OAuth
       callback stub.
 - [x] ADRs `0016-auth-better-auth.md`, `0017-session-transport-cookie.md`.
 

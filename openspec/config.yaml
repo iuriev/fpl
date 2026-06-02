@@ -1,0 +1,72 @@
+schema: spec-driven
+
+context: |
+  # FPL Squad Viewer
+
+  A mobile-first Fantasy Premier League companion web app. No authentication in the MVP:
+  the user enters a public FPL team ID and views their squad, player points, availability
+  statuses, and per-gameweek summary.
+
+  Auth is being added (better-auth + Google OAuth, Supabase Postgres), but the core app
+  remains usable without signing in.
+
+  ## Stack
+
+  - **Frontend:** React 18 + Vite + TypeScript SPA (`web/`). Pure CSS via CSS Modules.
+    Design tokens as CSS variables (`--fpl-*`). `rem` for all layout values; `px` for
+    border widths and shadow offsets only.
+  - **Proxy / BFF:** Hono on Node.js (`proxy/`). Thin layer: fronts the public FPL API
+    (no CORS headers), caches responses, reshapes payloads. Also serves the built SPA.
+  - **Database:** Supabase Postgres via Drizzle ORM. Used for user data (accounts,
+    watchlists, preferences). Schema in `proxy/src/db/schema.ts`; docs in `docs/db-schema.md`.
+  - **Auth:** better-auth with Google OAuth. HttpOnly session cookie. Secrets:
+    `DATABASE_URL`, `BETTER_AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`.
+  - **Deploy:** Fly.io (London), single process — proxy + static SPA. `fly deploy` from root.
+  - **Tests:** Vitest + React Testing Library (unit); Storybook Test (UI component tests).
+  - **Package manager:** npm workspaces monorepo (`web/`, `proxy/`).
+
+  ## Repo layout
+
+  ```
+  web/        React + Vite SPA
+  proxy/      Hono BFF
+  openspec/   OpenSpec specs and change proposals
+  docs/       Architecture overview, ADRs, frontend conventions
+  design/     Claude Design exports
+  .claude/    Claude Code skills and commands
+  ```
+
+  ## Conventions
+
+  - **Spec-first:** propose → apply → archive. No application code until requirements and
+    design are approved.
+  - **English only:** all code, identifiers, docs, UI text, and commit messages.
+  - **No hardcoded design values.** Always use `var(--fpl-*)` tokens.
+  - **No barrel re-exports** (`index.ts` files). Import directly from the file.
+  - **Split context from provider:** `XxxContext.ts` (createContext + hook) and
+    `XxxProvider.tsx` (component only) in a named folder.
+  - **Native CSS primitives first (ADR 0014):** Popover API, `:has()`, `@starting-style`
+    before JS overlay libraries.
+  - **Domain names for components:** `PlayerCard` not `PlayerToken`; no design-system jargon.
+  - **Browser support:** last 3 Chrome versions, last 2 Safari versions.
+  - **ADRs** (`docs/decisions/`) record the *why*. Never delete — supersede with a link.
+  - **Decisions auto-documented:** when a convention changes, update the ADR, affected docs,
+    and CLAUDE.md without being asked.
+
+  ## FPL API endpoints used
+
+  - `bootstrap-static/` — players, teams, gameweek list, current gameweek
+  - `entry/{team_id}/` — manager/team summary
+  - `entry/{team_id}/event/{gw}/picks/` — squad picks for a gameweek
+  - `event/{gw}/live/` — per-player points for a gameweek
+  - `entry/{team_id}/history/` — per-gameweek history
+
+rules:
+  proposal:
+    - Keep proposals under 400 words
+    - Always include a "Non-goals" section
+    - Reference the relevant OpenSpec spec from openspec/specs/ if one exists
+  tasks:
+    - Break tasks into chunks of at most ~2 hours of implementation work
+    - Each task must be independently verifiable (has a clear done condition)
+    - Group tasks by layer: proxy first, then web, then tests
