@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { CHIP_LABELS,ChipIconSvg } from '@/components/ui/ChipBadge/ChipBadge';
+import { ChipIconSvg } from '@/components/ui/ChipBadge/ChipBadge';
+import { CHIP_LABELS } from '@/components/ui/ChipBadge/ChipBadge.constants';
 import { copy } from '@/lib/copy';
 import type { ActiveChip, SquadSummary } from '@/types';
 

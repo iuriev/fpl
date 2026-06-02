@@ -13,7 +13,9 @@
     "build": "npm run --workspaces build",
     "lint": "npm run --workspaces lint",
     "format": "prettier --write \"**/*.{ts,tsx,json,css,md}\" --ignore-path .gitignore",
+    "typecheck": "npm run --workspaces typecheck",
     "test": "npm run --workspaces test",
+    "test:coverage": "npm run --workspaces test:coverage",
     "test:ui": "npm run --workspaces --if-present test:ui",
     "deploy": "fly deploy"
   },

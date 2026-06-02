@@ -20,7 +20,8 @@ export const PlayerWatchlistScreen: React.FC = () => {
   const [search, setSearch] = useState('');
 
   const { data: gameweeksData } = useGameweeks();
-  const currentGw = gameweeksData?.gameweeks.find((gw) => gw.finished)?.id ?? gameweeksData?.current ?? null;
+  const finishedGws = gameweeksData?.gameweeks.filter((gw) => gw.finished) ?? [];
+  const currentGw = finishedGws.length > 0 ? finishedGws[finishedGws.length - 1].id : (gameweeksData?.current ?? null);
 
   const gwQuery = useTopPlayersGw(currentGw);
   const seasonQuery = useTopPlayersSeason();

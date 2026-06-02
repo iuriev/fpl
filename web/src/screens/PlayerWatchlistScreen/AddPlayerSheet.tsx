@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { usePlayerPool, useTopPlayersGw, useTopPlayersSeason } from '@/api/queries';
 import { BottomSheet } from '@/components/ui/BottomSheet/BottomSheet';
@@ -66,9 +66,10 @@ export const AddPlayerSheet: React.FC<AddPlayerSheetProps> = ({ open, onClose, c
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  const handleQueryChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
     setVisibleCount(PAGE_SIZE);
-  }, [query]);
+  }, []);
 
   const { data: poolData } = usePlayerPool();
   const gwQuery = useTopPlayersGw(currentGw);
@@ -121,7 +122,7 @@ export const AddPlayerSheet: React.FC<AddPlayerSheetProps> = ({ open, onClose, c
             type="search"
             placeholder={copy.playerWatchlistAddSearch}
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={handleQueryChange}
             autoFocus
           />
         </div>

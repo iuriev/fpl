@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as cache from './cache';
-import * as teamOfTheWeekService from './team-of-the-week-service';
 import * as fplClient from './fpl-client';
+import * as teamOfTheWeekService from './team-of-the-week-service';
 
 vi.mock('./fpl-client');
 vi.mock('./cache');

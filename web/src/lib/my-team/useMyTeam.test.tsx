@@ -2,8 +2,8 @@ import { act, renderHook } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { MyTeamProvider } from './MyTeamContext';
-import { useMyTeam } from './useMyTeam';
+import { useMyTeam } from './MyTeamContext';
+import { MyTeamProvider } from './MyTeamProvider';
 
 function wrapper({ children }: { children: React.ReactNode }) {
   return <MyTeamProvider>{children}</MyTeamProvider>;

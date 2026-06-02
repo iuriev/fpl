@@ -1,13 +1,8 @@
-import React, { createContext, useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
+
+import { MyTeamContext } from './MyTeamContext';
 
 const KEY = 'fpl-my-team-id';
-
-export interface MyTeamContextValue {
-  myTeamId: number | null;
-  setMyTeamId: (id: number | null) => void;
-}
-
-export const MyTeamContext = createContext<MyTeamContextValue | null>(null);
 
 export function MyTeamProvider({ children }: { children: React.ReactNode }) {
   const [myTeamId, setMyTeamIdState] = useState<number | null>(() => {

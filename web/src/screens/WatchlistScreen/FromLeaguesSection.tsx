@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { useLeagues,useLeagueStandings } from '@/api/queries';
 import { copy } from '@/lib/copy';
@@ -15,8 +15,13 @@ interface StandingsListProps {
 }
 
 function StandingsList({ leagueId, watchedIds, isFull, onFollow, onLimitReached }: StandingsListProps) {
-  const [page, setPage] = useState(1);
-  const { data, isLoading, isError } = useLeagueStandings(leagueId, page);
+  const { data, isLoading, isError, fetchNextPage, isFetchingNextPage, hasNextPage } =
+    useLeagueStandings(leagueId);
+
+  const allStandings = useMemo(
+    () => data?.pages.flatMap((p) => p.standings) ?? [],
+    [data],
+  );
 
   if (isLoading) return <p className={styles.leagueLoading}>{copy.loadingPlaceholder}</p>;
   if (isError) return <p className={styles.leagueError}>{copy.watchlistFromLeaguesStandingsLoadError}</p>;
@@ -24,7 +29,7 @@ function StandingsList({ leagueId, watchedIds, isFull, onFollow, onLimitReached 
 
   return (
     <div className={styles.standingsList}>
-      {data.standings.map((s: StandingEntry) => {
+      {allStandings.map((s: StandingEntry) => {
         const following = watchedIds.has(s.entry);
         return (
           <div key={s.entry} className={styles.standingRow}>
@@ -49,10 +54,11 @@ function StandingsList({ leagueId, watchedIds, isFull, onFollow, onLimitReached 
           </div>
         );
       })}
-      {data.hasNext && (
+      {hasNextPage && (
         <button
           className={styles.loadMoreBtn}
-          onClick={() => setPage((p) => p + 1)}
+          onClick={() => fetchNextPage()}
+          disabled={isFetchingNextPage}
         >
           {copy.watchlistFromLeaguesLoadMore}
         </button>

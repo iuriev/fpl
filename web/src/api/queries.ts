@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
 import { api, ApiError } from './client';
 
@@ -64,6 +64,22 @@ export function useTeamOfTheWeek(gameweek: number | null) {
     },
     enabled: gameweek !== null,
     staleTime: 1000 * 60 * 60 * 24, // 24h — finished GW data is immutable
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && (error.status === 400 || error.status === 404)) return false;
+      return failureCount < 3;
+    },
+  });
+}
+
+export function usePlayersLive(gameweek: number | null, ids: number[]) {
+  return useQuery({
+    queryKey: ['players-live', gameweek, ids],
+    queryFn: () => {
+      if (gameweek === null) throw new Error('Gameweek required');
+      return api.getPlayersLive(gameweek, ids);
+    },
+    enabled: gameweek !== null && ids.length > 0,
+    staleTime: 1000 * 60,
     retry: (failureCount, error) => {
       if (error instanceof ApiError && (error.status === 400 || error.status === 404)) return false;
       return failureCount < 3;
@@ -151,13 +167,16 @@ export function useTransfers(teamId: number | null) {
   });
 }
 
-export function useLeagueStandings(leagueId: number | null, page: number) {
-  return useQuery({
-    queryKey: ['league-standings', leagueId, page],
-    queryFn: () => {
+export function useLeagueStandings(leagueId: number | null) {
+  return useInfiniteQuery({
+    queryKey: ['league-standings', leagueId],
+    queryFn: ({ pageParam }) => {
       if (!leagueId) throw new Error('League ID required');
-      return api.getLeagueStandings(leagueId, page);
+      return api.getLeagueStandings(leagueId, pageParam);
     },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, _allPages, lastPageParam) =>
+      lastPage.hasNext ? lastPageParam + 1 : undefined,
     enabled: !!leagueId,
     staleTime: 1000 * 60 * 10,
     retry: (failureCount, error) => {

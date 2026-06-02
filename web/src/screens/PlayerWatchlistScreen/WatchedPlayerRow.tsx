@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
 
-import { useTopPlayersGw, useTopPlayersSeason } from '@/api/queries';
+import { usePlayerPool, usePlayersLive } from '@/api/queries';
 import { PlayerRankRow } from '@/components/ui/PlayerRankRow/PlayerRankRow';
 import { copy } from '@/lib/copy';
+import type { TopPlayersPlayer } from '@/types';
 
 import styles from './WatchedPlayerRow.module.css';
 
@@ -19,16 +20,28 @@ export const WatchedPlayerRow: React.FC<WatchedPlayerRowProps> = ({
   currentGw,
   onRemove,
 }) => {
-  const gwQuery = useTopPlayersGw(currentGw);
-  const seasonQuery = useTopPlayersSeason();
+  const liveQuery = usePlayersLive(currentGw, [playerId]);
+  const poolQuery = usePlayerPool();
 
-  const player = useMemo(() => {
-    const gwPlayer = gwQuery.data?.players.find((p) => p.id === playerId);
-    if (gwPlayer) return gwPlayer;
-    return seasonQuery.data?.players.find((p) => p.id === playerId) ?? null;
-  }, [gwQuery.data, seasonQuery.data, playerId]);
+  const player = useMemo((): TopPlayersPlayer | null => {
+    const livePlayer = liveQuery.data?.players.find((p) => p.id === playerId);
+    if (livePlayer) return livePlayer;
+    const poolPlayer = poolQuery.data?.players.find((p) => p.id === playerId);
+    if (poolPlayer) {
+      return {
+        id: poolPlayer.id,
+        webName: poolPlayer.webName,
+        position: poolPlayer.position,
+        teamCode: poolPlayer.teamCode,
+        teamShortName: poolPlayer.teamShortName,
+        points: currentGw !== null ? poolPlayer.eventPoints : poolPlayer.totalPoints,
+        selectedByPercent: poolPlayer.selectedByPercent,
+      };
+    }
+    return null;
+  }, [liveQuery.data, poolQuery.data, playerId, currentGw]);
 
-  const isLoading = gwQuery.isLoading || seasonQuery.isLoading;
+  const isLoading = liveQuery.isLoading || poolQuery.isLoading;
 
   if (isLoading && !player) {
     return (
@@ -60,18 +73,7 @@ export const WatchedPlayerRow: React.FC<WatchedPlayerRowProps> = ({
     );
   }
 
-  return (
-    <div className={styles.row}>
-      <PlayerRankRow rank={rank} player={player} />
-      <button
-        className={styles.removeBtn}
-        onClick={onRemove}
-        aria-label={copy.playerWatchlistRemove}
-      >
-        ✕
-      </button>
-    </div>
-  );
+  return <PlayerRankRow rank={rank} player={player} onFollow={onRemove} isFollowing={true} />;
 };
 
 WatchedPlayerRow.displayName = 'WatchedPlayerRow';

@@ -68,6 +68,9 @@ export const api = {
 
   getTopPlayersGw: (gw: number) => request<TopPlayersGwResponse>(`/top-players/gameweek/${gw}`),
 
+  getPlayersLive: (gw: number, ids: number[]) =>
+    request<TopPlayersGwResponse>(`/players/live/${gw}?ids=${ids.join(',')}`),
+
   getTopPlayersSeason: () => request<TopPlayersSeasonResponse>('/top-players/season'),
 
   getTeams: () => request<TeamsResponse>('/teams'),

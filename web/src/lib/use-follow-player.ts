@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { useShowPlayerWatchlistPremium } from './player-watchlist-premium/useShowPlayerWatchlistPremium';
+import { useShowPlayerWatchlistPremium } from './player-watchlist-premium/PlayerWatchlistPremiumContext';
 import { usePlayerWatchlistRepository } from './player-watchlist-repository';
 
 export function useFollowPlayer(playerId: number) {

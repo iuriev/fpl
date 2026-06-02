@@ -3,7 +3,6 @@ import { serveStatic } from '@hono/node-server/serve-static';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 
-import * as teamOfTheWeekService from './team-of-the-week-service';
 import * as entryService from './entry-service';
 import * as fixturesService from './fixtures-service';
 import * as gameweeksService from './gameweeks-service';
@@ -12,6 +11,7 @@ import * as leagueStandingsService from './league-standings-service';
 import * as leaguesService from './leagues-service';
 import * as playerPoolService from './player-pool-service';
 import * as squadService from './squad-service';
+import * as teamOfTheWeekService from './team-of-the-week-service';
 import * as teamService from './team-service';
 import * as topPlayersService from './top-players-service';
 import * as transfersService from './transfers-service';
@@ -239,6 +239,36 @@ app.get('/api/team-players/:teamCode', async (c) => {
     }
     console.error('Error fetching team players:', error);
     return c.json({ error: 'Unable to fetch team players' }, { status: 500 });
+  }
+});
+
+// GET /api/players/live/:gw?ids=1,2,3
+app.get('/api/players/live/:gw', async (c) => {
+  const gw = parseInt(c.req.param('gw'), 10);
+  if (isNaN(gw) || gw < 1 || gw > MAX_GAMEWEEK) {
+    return c.json({ error: 'Invalid gameweek' }, { status: 400 });
+  }
+
+  const idsParam = c.req.query('ids') ?? '';
+  const ids = idsParam
+    .split(',')
+    .map((s) => parseInt(s.trim(), 10))
+    .filter((n) => !isNaN(n) && n > 0);
+
+  if (ids.length === 0) {
+    return c.json({ gw, players: [] });
+  }
+
+  try {
+    const result = await topPlayersService.getPlayersLiveGw(gw, ids);
+    return c.json(result);
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    if (errorMsg.includes('not found')) {
+      return c.json({ error: `Gameweek ${gw} not found` }, { status: 404 });
+    }
+    console.error('Error fetching live player data:', error);
+    return c.json({ error: 'Unable to fetch live player data' }, { status: 500 });
   }
 });
 

@@ -35,9 +35,12 @@ vi.mock('@/api/queries', () => ({
     isError: false,
   })),
   useLeagueStandings: vi.fn(() => ({
-    data: mockStandings,
+    data: { pages: [mockStandings] },
     isLoading: false,
     isError: false,
+    fetchNextPage: vi.fn(),
+    isFetchingNextPage: false,
+    hasNextPage: false,
   })),
 }));
 

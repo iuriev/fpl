@@ -1,6 +1,6 @@
 .row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--fpl-space-md);
   padding: var(--fpl-space-sm) var(--fpl-space-xl3);
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
@@ -17,6 +17,8 @@
   color: var(--fpl-muted-soft);
   text-align: right;
   font-variant-numeric: tabular-nums;
+  align-self: flex-start;
+  padding-top: 0.25rem;
 }
 
 .info {
@@ -53,7 +55,8 @@
   font-variant-numeric: tabular-nums;
   min-width: 2rem;
   text-align: right;
-  padding-top: 0.125rem;
+  align-self: flex-start;
+  padding-top: 0.2rem;
 }
 
 .statChips {

@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { fixtureGameweeks, fixtureTopPlayersGw, fixtureTopPlayersSeason } from '@/fixtures';
+import { fixtureGameweeks, fixtureTopPlayersGw } from '@/fixtures';
 import {
   LocalStoragePlayerWatchlistRepository,
   PlayerWatchlistRepositoryContext,
@@ -12,8 +12,11 @@ import { ToastProvider } from '@/lib/toast';
 
 vi.mock('@/api/queries', () => ({
   useGameweeks: () => ({ data: fixtureGameweeks }),
-  useTopPlayersGw: () => ({ data: fixtureTopPlayersGw, isLoading: false }),
-  useTopPlayersSeason: () => ({ data: fixtureTopPlayersSeason, isLoading: false }),
+  usePlayersLive: (_gw: number, ids: number[]) => ({
+    data: { gw: 36, players: fixtureTopPlayersGw.players.filter((p) => ids.includes(p.id)) },
+    isLoading: false,
+  }),
+  usePlayerPool: () => ({ data: { players: [] }, isLoading: false }),
 }));
 
 function renderRow(playerId: number, onRemove = vi.fn()) {

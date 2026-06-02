@@ -12,7 +12,9 @@
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build",
     "chromatic": "chromatic --exit-zero-on-changes",
+    "typecheck": "tsc --noEmit",
     "test": "vitest",
+    "test:coverage": "vitest --run --coverage",
     "test:ui": "vitest -c vitest.storybook.config.ts"
   },
   "dependencies": {
@@ -41,6 +43,7 @@
     "@vitejs/plugin-react": "^6.0.2",
     "@vitest/browser": "^4.1.7",
     "@vitest/browser-playwright": "^4.1.7",
+    "@vitest/coverage-v8": "^4.1.8",
     "@vitest/ui": "^4.1.7",
     "eslint": "^10.4.0",
     "eslint-config-prettier": "^10.1.8",

@@ -58,11 +58,11 @@ export async function getTopPlayersGameweek(gw: number): Promise<TopPlayersGamew
   const elementMap = new Map(bootstrap.elements.map((e) => [e.id, e]));
 
   const players: TopPlayer[] = liveData.elements
-    .map((live) => {
+    .flatMap((live) => {
       const element = elementMap.get(live.id);
-      if (!element) return null;
+      if (!element) return [];
       const team = teamMap.get(element.team);
-      return {
+      return [{
         id: live.id,
         webName: element.web_name,
         position: POSITION_MAP[element.element_type] ?? 'GK',
@@ -71,11 +71,49 @@ export async function getTopPlayersGameweek(gw: number): Promise<TopPlayersGamew
         points: live.stats.total_points,
         selectedByPercent: element.selected_by_percent,
         statBreakdown: buildStatBreakdown(live.explain),
-      } satisfies TopPlayer;
+      } satisfies TopPlayer];
     })
-    .filter((p): p is TopPlayer => p !== null)
     .sort((a, b) => b.points - a.points)
     .slice(0, TOP_N);
+
+  return { gw, players };
+}
+
+export async function getPlayersLiveGw(gw: number, ids: number[]): Promise<TopPlayersGameweekResponse> {
+  const bootstrap = await getBootstrapWithCache();
+
+  const event = bootstrap.events.find((e) => e.id === gw);
+  if (!event) throw new Error(`Gameweek ${gw} not found`);
+
+  const liveCacheKey = `live:${gw}`;
+  let liveData = cacheLayer.get<fplClient.FPLLive>(liveCacheKey);
+  if (!liveData) {
+    liveData = await fplClient.getLive(gw);
+    const liveTtl = event.finished ? cacheLayer.ttl.SQUAD_FINISHED : cacheLayer.ttl.SQUAD_CURRENT;
+    cacheLayer.set(liveCacheKey, liveData, liveTtl);
+  }
+
+  const idSet = new Set(ids);
+  const teamMap = new Map(bootstrap.teams.map((t) => [t.id, t]));
+  const elementMap = new Map(bootstrap.elements.map((e) => [e.id, e]));
+
+  const players: TopPlayer[] = liveData.elements
+    .filter((live) => idSet.has(live.id))
+    .flatMap((live) => {
+      const element = elementMap.get(live.id);
+      if (!element) return [];
+      const team = teamMap.get(element.team);
+      return [{
+        id: live.id,
+        webName: element.web_name,
+        position: POSITION_MAP[element.element_type] ?? 'GK',
+        teamCode: element.team_code,
+        teamShortName: team?.short_name ?? 'UNK',
+        points: live.stats.total_points,
+        selectedByPercent: element.selected_by_percent,
+        statBreakdown: buildStatBreakdown(live.explain),
+      } satisfies TopPlayer];
+    });
 
   return { gw, players };
 }
