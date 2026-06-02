@@ -109,20 +109,18 @@ These features give the app reasons to return every gameweek — essential for g
 
 | ID | Task | Effort | Why |
 |----|------|--------|-----|
-| ANA-01 | Gameweek review screen ("how did my week go?") | M | High stickiness: users come back to review after each GW deadline. |
+| ~~ANA-01~~ | ~~Gameweek review screen ("how did my week go?")~~ | M | ✅ Done — implemented on feature/ana-01-gameweek-review. |
 | ~~CHIP-01~~ | ~~Display active chip on squad screen + SummaryStrip~~ | S | ✅ Done — chip cell replaces AVERAGE+HIGHEST in SummaryStrip. |
 | ~~CHIP-02~~ | ~~Consider active chip in transfer planner (Wildcard = unlimited free transfers)~~ | S | ✅ Done — Wildcard and Free Hit now zero out transfer costs in the planner. |
-| CHIP-07 | Research + implement Assistant Manager chip (new in 2025/26) | S | New chip visible in FPL chip selection UI; rules and API value unknown — needs research before display/logic work. |
-| LIVE-01 | Live rank tracker — real-time points & rank during gameweek | M | "Watch your rank move live." High-stickiness during match days. |
-| LIVE-02 | Live mini-league standings | M | Real-time rival tracking. Complements LIVE-01. |
 | ANA-03 | Price change risers & fallers (global + mini-league) | M | Huge FPL meta driver. Users check this daily during the GW. |
 | ANA-02 | Most popular players (ownership %) screen | S | TopPlayersScreen already exists — extend with ownership sort/filter. |
 | ANA-04 | Top-ranked managers → view their squads | M | Viral / social feature. Re-uses existing squad viewer. |
 | ANA-12 | League participants browser (click league on Stats to see all members) | S | Natural extension of existing leagues screen. |
-| MGR-01 | Manager Watchlist — follow managers, see their points/transfers in a table | M | ✅ In progress (OpenSpec change 2026-06-01-manager-watchlist). localStorage phase, max 5. |
+| ~~MGR-01~~ | ~~Manager Watchlist — follow managers, see their points/transfers in a table~~ | M | ✅ Done — OpenSpec change 2026-06-01-manager-watchlist. localStorage phase, max 5. |
 | MGR-02 | Backend watchlist — migrate MGR-01 from localStorage to backend API | S | Depends on AUTH-01. Swap LocalStorageWatchlistRepository → ApiWatchlistRepository; no UI changes. |
 | MGR-03 | Freemium watchlist limits — 2 entries free, 10 with subscription | S | Depends on MGR-02 + MON-01. `repo.getLimit()` returns tier-specific cap; upsell prompt on `'limit'` response. |
 | WATCH-01 | Player Watchlist — shortlist of players you're tracking but not yet transferring | S | Low effort; high utility for planning. |
+| AUTH-01 | Login / password + Google OAuth, backend user profile | M | Enables watchlists, saved plans, AI chat. OpenSpec change in progress. |
 
 ### Feature details
 
@@ -500,7 +498,7 @@ Reference: Fantasy Football Scout Chief Scout feature.
 | ANA-05 | "Top 1% feature" (what makes the best managers different) | L | Viral potential. Needs data aggregation from FPL API + analysis layer. |
 | STAT-03 | Three Player Comparison Tool | M | Nice tool. Build after STAT-04 (needs same data source). |
 | STAT-04 | Player xG Data & Heatmaps | L | Requires StatsBomb / OPTA data integration. Research data sources first. |
-| AUTH-01 | Login / password + Google OAuth, backend user profile | M | Enables watchlists, saved plans, AI chat. Moved from P1 — build after core features are stable. |
+| ~~AUTH-01~~ | ~~Login / password + Google OAuth, backend user profile~~ | M | Moved to P2 — OpenSpec change in progress. |
 | AUTH-02 | FPL OAuth / transfer execution | XL | Complex. Needs FPL API capability research first (may not be possible). |
 | START-01 | GW1 draft assistant | L | Seasonal feature (once a year). High viral potential before season start. |
 | DES-03 | FDR screen | M | Good utility but fpl.team already does this well. Differentiate with AI angle instead. |

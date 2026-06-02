@@ -177,75 +177,126 @@
   margin: 0;
 }
 
-/* ── Table ── */
+/* ── Card list ── */
 
-.tableWrapper {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+.cardList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fpl-space-sm);
+}
+
+.card {
   border: 1px solid var(--fpl-bg-hair);
   border-radius: var(--fpl-radius-md);
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font: var(--fpl-fw-regular) var(--fpl-fs-body-s) var(--fpl-font-display);
-  white-space: nowrap;
-}
-
-.th {
-  padding: var(--fpl-space-sm) var(--fpl-space-md);
   background: var(--fpl-bg-card);
-  color: var(--fpl-muted);
-  font: var(--fpl-fw-medium) var(--fpl-fs-label) var(--fpl-font-display);
-  letter-spacing: var(--fpl-tr-head-s);
-  text-align: left;
-  border-bottom: 1px solid var(--fpl-bg-hair);
-}
-
-.row {
-  border-bottom: 1px solid var(--fpl-bg-hair);
+  padding: var(--fpl-space-sm) var(--fpl-space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--fpl-space-xs);
+  cursor: pointer;
   transition: background 80ms;
 }
 
-.row:last-child { border-bottom: none; }
+.card:hover { background: color-mix(in srgb, var(--fpl-bg-card) 85%, var(--fpl-accent) 15%); }
 
-.row:hover { background: var(--fpl-bg-card); }
-
-.cell {
-  padding: var(--fpl-space-sm) var(--fpl-space-md);
-  vertical-align: middle;
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--fpl-space-sm);
 }
 
-.cellSticky {
-  position: sticky;
-  left: 0;
-  background: var(--fpl-bg-deep);
-  z-index: 1;
-  min-width: 10rem;
-}
-
-.row:hover .cellSticky { background: var(--fpl-bg-card); }
-
-.managerCell {
+.cardIdentity {
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
+  min-width: 0;
 }
 
 .managerName {
-  font-weight: var(--fpl-fw-medium);
+  font: var(--fpl-fw-medium) var(--fpl-fs-body-s) var(--fpl-font-display);
   color: var(--fpl-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .teamName {
-  font-size: var(--fpl-fs-label);
+  font: var(--fpl-fw-regular) var(--fpl-fs-label) var(--fpl-font-display);
   color: var(--fpl-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cardStats {
+  display: flex;
+  gap: var(--fpl-space-md);
+}
+
+.statBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.0625rem;
+  min-width: 3.5rem;
+}
+
+.statValue {
+  font: var(--fpl-fw-semibold) var(--fpl-fs-body-s) var(--fpl-font-display);
+  color: var(--fpl-text);
+}
+
+.statLabel {
+  font: var(--fpl-fw-regular) var(--fpl-fs-label) var(--fpl-font-display);
+  color: var(--fpl-muted);
+  letter-spacing: var(--fpl-tr-head-s);
+  text-transform: uppercase;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-xs);
+  flex-wrap: wrap;
+}
+
+.footerItem {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.footerLabel {
+  font: var(--fpl-fw-regular) var(--fpl-fs-label) var(--fpl-font-display);
+  color: var(--fpl-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--fpl-tr-head-s);
+}
+
+.footerValue {
+  font: var(--fpl-fw-medium) var(--fpl-fs-label) var(--fpl-font-display);
+  color: var(--fpl-text-soft);
+}
+
+.footerDivider {
+  width: 1px;
+  height: 0.75rem;
+  background: var(--fpl-bg-hair);
+  flex-shrink: 0;
 }
 
 .rankUp { color: var(--fpl-positive, #22c55e); }
 .rankDown { color: var(--fpl-negative, #ef4444); }
 .rankNeutral { color: var(--fpl-muted); }
+
+.skeletonName {
+  display: block;
+  width: 8rem;
+  height: 1rem;
+  border-radius: var(--fpl-radius-xs, 0.25rem);
+  background: var(--fpl-bg-hair);
+  animation: shimmer 1.2s ease-in-out infinite;
+}
 
 .skeletonCell {
   display: inline-block;
@@ -271,17 +322,21 @@
   border-radius: var(--fpl-radius-xs, 0.25rem);
   line-height: 1;
   transition: color 120ms;
+  flex-shrink: 0;
 }
 
 .removeBtn:hover { color: var(--fpl-negative, #ef4444); }
 
-.rowError {
-  padding: var(--fpl-space-sm) var(--fpl-space-md);
-  color: var(--fpl-muted);
+.cardErrorRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--fpl-space-sm);
+}
+
+.cardErrorText {
+  font: var(--fpl-fw-regular) var(--fpl-fs-body-s) var(--fpl-font-display);
+  color: var(--fpl-muted);
 }
 
 /* ── From My Leagues ── */

@@ -12,6 +12,7 @@ import {
 import { BottomSheet } from '@/components/ui/BottomSheet/BottomSheet';
 import { Button } from '@/components/ui/Button/Button';
 import { PlayerRankRow } from '@/components/ui/PlayerRankRow/PlayerRankRow';
+import { ScreenHeader } from '@/components/ui/ScreenHeader/ScreenHeader';
 import { copy } from '@/lib/copy';
 import type { TopPlayersPlayer } from '@/types';
 import { MAX_GAMEWEEK } from '@/types';
@@ -191,24 +192,13 @@ export const TopPlayersScreen: React.FC = () => {
 
   return (
     <div className={styles.screen}>
-      <header className={styles.header}>
-        <div className={styles.headerNav}>
-          <button className={styles.backBtn} onClick={handleBack} aria-label={copy.topPlayersBack}>
-            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path
-                d="M10 4l-4 4 4 4"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            {copy.topPlayersBack}
-          </button>
-          <span className={styles.title}>{copy.topPlayersTitle}</span>
-        </div>
+      <ScreenHeader
+        backLabel={copy.topPlayersBack}
+        onBack={handleBack}
+        title={copy.topPlayersTitle}
+      />
 
-        <div className={styles.tabs} role="tablist" aria-label={copy.topPlayersTitle}>
+      <div className={styles.tabs} role="tablist" aria-label={copy.topPlayersTitle}>
           <button
             role="tab"
             aria-selected={activeTab === 'gw'}
@@ -234,7 +224,6 @@ export const TopPlayersScreen: React.FC = () => {
             {copy.topPlayersTabTeam}
           </button>
         </div>
-      </header>
 
       {activeTab === 'gw' && (
         <div className={styles.gwNav}>

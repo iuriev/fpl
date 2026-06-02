@@ -69,6 +69,10 @@ The project is built spec-first; application code comes last. Read these before 
   note something, add it to `docs/backlog.md` immediately. The backlog is the single capture
   point for everything not yet in an OpenSpec change. To promote an idea to active work: run
   `/opsx:propose` to turn it into an OpenSpec change proposal, then implement from there.
+- **DB schema documentation.** Whenever `proxy/src/db/schema.ts` is created or modified,
+  update `docs/db-schema.md` in the same change: keep the per-table Markdown column table and
+  the Mermaid ER diagram in sync with the Drizzle schema. This is the non-developer-friendly
+  view of the database and must never lag behind the code.
 - **Single source of truth.** `docs/backlog.md` and `openspec/` are the only places where
   tasks, ideas, specs, and plans may live. Do not create plan files, design specs, or task
   lists anywhere else in the project (e.g. no `docs/superpowers/`, no ad-hoc markdown plans).
