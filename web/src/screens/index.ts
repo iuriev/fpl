@@ -14,5 +14,4 @@ export { TeamOfTheWeekScreen } from './TeamOfTheWeekScreen/TeamOfTheWeekScreen';
 export { TopPlayersScreen } from './TopPlayersScreen/TopPlayersScreen';
 export type { TransferScreenProps } from './TransferScreen/TransferScreen';
 export { TransferScreen } from './TransferScreen/TransferScreen';
-export type { WatchlistScreenProps } from './WatchlistScreen/WatchlistScreen';
 export { WatchlistScreen } from './WatchlistScreen/WatchlistScreen';

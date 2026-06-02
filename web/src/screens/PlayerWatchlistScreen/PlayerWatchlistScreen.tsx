@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { useGameweeks } from '@/api/queries';
 import { useTopPlayersGw, useTopPlayersSeason } from '@/api/queries';
@@ -13,7 +13,6 @@ import { WatchedPlayerRow } from './WatchedPlayerRow';
 
 export const PlayerWatchlistScreen: React.FC = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const repo = usePlayerWatchlistRepository();
 
   const [watchedIds, setWatchedIds] = useState<number[]>([]);
@@ -55,12 +54,11 @@ export const PlayerWatchlistScreen: React.FC = () => {
   const limit = repo.getLimit();
   const atLimit = watchedIds.length >= limit;
 
-  const teamIdParam = searchParams.get('teamId');
   const handleBack = () => {
     if (window.history.length > 1) {
       navigate(-1);
     } else {
-      navigate(teamIdParam ? `/?teamId=${teamIdParam}` : '/');
+      navigate('/');
     }
   };
 

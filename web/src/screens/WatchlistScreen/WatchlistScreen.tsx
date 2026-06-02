@@ -13,9 +13,7 @@ import { FromLeaguesSection } from './FromLeaguesSection';
 import { ManagerRow } from './ManagerRow';
 import styles from './WatchlistScreen.module.css';
 
-export interface WatchlistScreenProps {}
-
-export const WatchlistScreen: React.FC<WatchlistScreenProps> = () => {
+export const WatchlistScreen: React.FC = () => {
   const navigate = useNavigate();
   const { myTeamId } = useMyTeam();
   const repo = useWatchlistRepository();
