@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { useGameweeks } from '@/api/queries';
 import { PremiumSheet } from '@/components/ui/PremiumSheet/PremiumSheet';
 import { ScreenHeader } from '@/components/ui/ScreenHeader/ScreenHeader';
 import { copy, interpolate } from '@/lib/copy';
+import { useMyTeam } from '@/lib/my-team/MyTeamContext';
 import { useWatchlistRepository } from '@/lib/watchlist-repository';
 
 import { AddManagerInput } from './AddManagerInput';
@@ -12,13 +13,11 @@ import { FromLeaguesSection } from './FromLeaguesSection';
 import { ManagerRow } from './ManagerRow';
 import styles from './WatchlistScreen.module.css';
 
-export interface WatchlistScreenProps {
-  userTeamId?: number;
-}
+export interface WatchlistScreenProps {}
 
-export const WatchlistScreen: React.FC<WatchlistScreenProps> = ({ userTeamId }) => {
+export const WatchlistScreen: React.FC<WatchlistScreenProps> = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const { myTeamId } = useMyTeam();
   const repo = useWatchlistRepository();
   const { data: gameweeksData } = useGameweeks();
 
@@ -46,9 +45,7 @@ export const WatchlistScreen: React.FC<WatchlistScreenProps> = ({ userTeamId }) 
   }, [repo, refreshList]);
 
   const handleBack = () => {
-    const gwParam = searchParams.get('gw');
-    const teamIdParam = userTeamId ?? searchParams.get('teamId');
-    navigate(teamIdParam ? `/?teamId=${teamIdParam}${gwParam ? `&gw=${gwParam}` : ''}` : '/');
+    navigate('/');
   };
 
   const currentGw = gameweeksData?.current ?? null;
@@ -85,14 +82,14 @@ export const WatchlistScreen: React.FC<WatchlistScreenProps> = ({ userTeamId }) 
                 teamId={teamId}
                 currentGw={currentGw}
                 onRemove={() => handleRemove(teamId)}
-                isOwnTeam={userTeamId !== undefined && teamId === userTeamId}
+                isOwnTeam={myTeamId !== null && teamId === myTeamId}
               />
             ))}
           </div>
         )}
 
         <FromLeaguesSection
-          userTeamId={userTeamId ?? null}
+          userTeamId={myTeamId}
           watchedIds={watchedSet}
           isFull={isFull}
           onFollow={handleFollow}

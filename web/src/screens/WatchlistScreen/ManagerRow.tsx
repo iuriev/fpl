@@ -42,7 +42,7 @@ export const ManagerRow: React.FC<ManagerRowProps> = ({ teamId, currentGw, onRem
 
   const handleRowClick = () => {
     if (isOwnTeam) {
-      navigate(`/?teamId=${teamId}`);
+      navigate('/');
       return;
     }
     const returnTo = location.pathname + location.search;
