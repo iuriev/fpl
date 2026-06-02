@@ -7,6 +7,7 @@ import { useGameweeks,useTeamOfTheWeek } from '@/api/queries';
 import { Button } from '@/components/ui/Button/Button';
 import { Pitch } from '@/components/ui/Pitch/Pitch';
 import { PlayerCard } from '@/components/ui/PlayerCard/PlayerCard';
+import { ScreenHeader } from '@/components/ui/ScreenHeader/ScreenHeader';
 import { copy } from '@/lib/copy';
 import type { PlayerPosition, PlayerStatus, SquadPlayer,TeamOfTheWeekPlayer } from '@/types';
 import { MAX_GAMEWEEK } from '@/types';
@@ -136,62 +137,47 @@ export const TeamOfTheWeekScreen: React.FC = () => {
 
   return (
     <div className={styles.screen}>
-      <header className={styles.header}>
-        <div className={styles.headerNav}>
-          <button className={styles.backBtn} onClick={handleBack} aria-label={copy.teamOfTheWeekBack}>
-            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path
-                d="M10 4l-4 4 4 4"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            {copy.teamOfTheWeekBack}
-          </button>
+      <ScreenHeader
+        backLabel={copy.teamOfTheWeekBack}
+        onBack={handleBack}
+        title={copy.teamOfTheWeekTitle}
+      />
 
-          <div className={styles.heading}>
-            <span className={styles.title}>{copy.teamOfTheWeekTitle}</span>
-          </div>
-        </div>
-
-        <div className={styles.gwNav}>
-          <button
-            className={styles.navBtn}
-            onClick={() => navigateGw(-1)}
-            disabled={!canGoPrev}
-            aria-label="Previous gameweek"
-          >
-            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path
-                d="M10 4l-4 4 4 4"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-          <span className={styles.gwLabel}>{gwLabel}</span>
-          <button
-            className={styles.navBtn}
-            onClick={() => navigateGw(1)}
-            disabled={!canGoNext}
-            aria-label="Next gameweek"
-          >
-            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" className={styles.chevronRight}>
-              <path
-                d="M10 4l-4 4 4 4"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-        </div>
-      </header>
+      <div className={styles.gwNav}>
+        <button
+          className={styles.navBtn}
+          onClick={() => navigateGw(-1)}
+          disabled={!canGoPrev}
+          aria-label="Previous gameweek"
+        >
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path
+              d="M10 4l-4 4 4 4"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+        <span className={styles.gwLabel}>{gwLabel}</span>
+        <button
+          className={styles.navBtn}
+          onClick={() => navigateGw(1)}
+          disabled={!canGoNext}
+          aria-label="Next gameweek"
+        >
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" className={styles.chevronRight}>
+            <path
+              d="M10 4l-4 4 4 4"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      </div>
 
       {isLoading && <PitchSkeleton />}
 

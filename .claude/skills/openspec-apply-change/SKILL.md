@@ -177,3 +177,11 @@ This skill supports the "actions on a change" model:
 
 - **Can be invoked anytime**: Before all artifacts are done (if tasks exist), after partial implementation, interleaved with other actions
 - **Allows artifact updates**: If implementation reveals design issues, suggest updating artifacts - not phase-locked, work fluidly
+
+## After completion (optional)
+
+If the user asks to improve the skill from this session:
+
+- Review corrections and repeated manual fixes from the back-and-forth
+- Propose concrete edits to this `SKILL.md`, `CLAUDE.md`, or `AGENTS.md`
+- Do not apply without user approval

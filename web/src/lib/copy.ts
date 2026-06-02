@@ -25,13 +25,13 @@ export const copy = {
 
   // Squad screen
   squadChangeTeam: 'Change',
-  squadGameweekLabel: 'Gameweek',
-  squadLoadError: "Couldn't load this gameweek",
+  squadGameweekLabel: 'GW',
+  squadLoadError: "Couldn't load this GW",
   squadRetry: 'Try again',
-  squadEmpty: 'No squad available for Gameweek {GW}',
+  squadEmpty: 'No squad available for GW {GW}',
   squadEmptyHeading: 'No squad yet',
   squadEmptySubtext:
-    'No squad available for Gameweek {GW}. Use the arrows to jump to a later gameweek.',
+    'No squad available for GW {GW}. Use the arrows to jump to a later GW.',
   squadJumpToCurrent: 'Jump to current GW →',
   squadNotFound: "We couldn't find a team with that ID. Please check and try again.",
 
@@ -75,12 +75,12 @@ export const copy = {
   teamInfoOverallRank: 'Overall rank',
   teamInfoGwPts: 'GW pts',
   teamInfoTotalPlayers: 'Total players',
-  teamInfoGwHistory: 'Gameweek History',
+  teamInfoGwHistory: 'GW History',
   teamInfoDrawerLabel: 'Team information',
   teamInfoOpenDrawer: 'Open team info',
 
   // Gameweek history screen
-  historyTitle: 'Gameweek History',
+  historyTitle: 'GW History',
   historyThisSeason: 'This Season',
   historyColGW: 'GW',
   historyColOR: 'OR',
@@ -91,8 +91,8 @@ export const copy = {
   historyColTM: 'TM',
   historyColTC: 'TC',
   historyColValue: '£m',
-  historyEmpty: 'No gameweeks played yet',
-  historyLoadError: "Couldn't load gameweek history",
+  historyEmpty: 'No GWs played yet',
+  historyLoadError: "Couldn't load GW history",
   historyRetry: 'Try again',
   historyBack: 'Squad',
 
@@ -111,7 +111,7 @@ export const copy = {
   teamOfTheWeekBack: 'Squad',
   teamOfTheWeekLoadError: "Couldn't load the Team of the Week",
   teamOfTheWeekRetry: 'Try again',
-  teamOfTheWeekNotAvailable: 'Team of the Week not available yet for this gameweek',
+  teamOfTheWeekNotAvailable: 'Team of the Week not available yet for this GW',
   teamOfTheWeekNavLink: 'Team of the Week',
 
   // Top Players screen
@@ -230,9 +230,9 @@ export const copy = {
   squadGuestBack: 'Back',
 
   // Watchlist screen
-  watchlistTitle: 'Watchlist',
+  watchlistTitle: 'Managers Watchlist',
   watchlistBack: 'Squad',
-  watchlistNavLink: 'Watchlist',
+  watchlistNavLink: 'Managers Watchlist',
   watchlistCapacity: '{n}/{max} following',
   watchlistEmptyHeading: 'No managers followed yet',
   watchlistEmptySubtext: 'Add managers below to track their GW performance.',
@@ -261,11 +261,28 @@ export const copy = {
   watchlistColGwRank: 'GW Rk',
   watchlistColOverallRank: 'OR',
   watchlistColRankDelta: 'Δ Rank',
-  watchlistColTransfers: 'Xfr',
+  watchlistColTransfers: 'Transfers made',
   watchlistColCaptain: 'Cap',
+  watchlistColViceCaptain: 'VC',
   watchlistColLatestIn: 'In',
+  watchlistColXfrCost: 'Transfer fee',
+  watchlistColSquadValue: 'Squad',
+  watchlistColBank: 'Bank',
+  watchlistTransferCostFree: 'Free',
+  watchlistUnfollow: 'Unfollow',
   watchlistLoadError: 'Failed to load',
   watchlistRowErrorRemove: 'Remove',
+
+  // Premium gate sheet
+  premiumSheetUpgrade: 'Upgrade to Premium',
+  premiumSheetComingSoon: 'Coming soon',
+  premiumSheetDismiss: 'Maybe later',
+  premiumSheetFreeTier: 'Free',
+  premiumSheetPremiumTier: 'Premium ✦',
+  premiumWatchlistTitle: 'Follow more managers',
+  premiumWatchlistDescription: "You've reached the free plan limit. Upgrade to track more managers and unlock features.",
+  premiumWatchlistFreeLabel: '2 managers',
+  premiumWatchlistPremiumLabel: '10 managers',
 
   // Transfer help tour
   tourHelpButton: 'Open tour',
@@ -285,6 +302,37 @@ export const copy = {
   tourStep6Text: 'Use the swap icon to move players between your starting XI and the bench.',
   tourStep9Title: 'Save Your Plan',
   tourStep9Text: "These players only score if a starter doesn't play. Order matters for auto-subs! Reset clears your draft. Save Plan stores it in this browser for later.",
+
+  // Gameweek review screen
+  reviewTitle: 'GW Review',
+  reviewBack: 'Squad',
+  reviewNavLink: 'Last GW Review',
+  reviewGwPts: 'GW points',
+  reviewVsAvg: 'vs avg',
+  reviewAvg: 'avg',
+  reviewHighest: 'highest',
+  reviewGwRank: 'GW rank',
+  reviewPlayersSection: 'Players — sorted by points',
+  reviewBenchSection: 'Bench',
+  reviewBenchWasted: '{pts} points left on bench',
+  reviewBenchNone: 'Nothing left on bench',
+  reviewNoAutosubs: 'No automatic substitutions',
+  reviewBenchDivider: 'Bench',
+  reviewTransfersSection: 'Transfers this GW',
+  reviewNoTransfers: 'Rolled transfer — squad unchanged',
+  reviewTransferOut: 'OUT',
+  reviewTransferIn: 'IN',
+  reviewTransferHit: '−{cost} pts transfer hit',
+  reviewWhatIfSection: 'What if you made no transfers?',
+  reviewWhatIfActual: 'Your score',
+  reviewWhatIfWithTransfers: 'with transfers',
+  reviewWhatIfHypothetical: 'Without transfers',
+  reviewWhatIfGain: 'Transfers gained you {n} points',
+  reviewWhatIfLoss: 'Transfers cost you {n} points',
+  reviewWhatIfBreakEven: 'Transfers broke even this week',
+  reviewLoadError: "Couldn't load gameweek review",
+  reviewRetry: 'Try again',
+  reviewNoGw: 'No completed GWs yet',
 };
 
 /**

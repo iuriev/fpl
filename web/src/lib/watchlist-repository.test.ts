@@ -33,12 +33,12 @@ describe('LocalStorageWatchlistRepository', () => {
     expect(await repo.list()).toEqual([123456]);
   });
 
-  it('returns limit when at max capacity (5)', async () => {
-    for (let i = 1; i <= 5; i++) {
+  it('returns limit when at max capacity (2)', async () => {
+    for (let i = 1; i <= 2; i++) {
       await repo.add(i);
     }
-    expect(await repo.add(6)).toBe('limit');
-    expect(await repo.list()).toHaveLength(5);
+    expect(await repo.add(3)).toBe('limit');
+    expect(await repo.list()).toHaveLength(2);
   });
 
   it('removes a team ID', async () => {
@@ -70,8 +70,8 @@ describe('LocalStorageWatchlistRepository', () => {
     expect(await repo2.list()).toEqual([111, 222]);
   });
 
-  it('getLimit returns 5', () => {
-    expect(repo.getLimit()).toBe(5);
+  it('getLimit returns 2', () => {
+    expect(repo.getLimit()).toBe(2);
   });
 
   it('handles corrupt localStorage gracefully', async () => {

@@ -1,9 +1,28 @@
 import * as cacheLayer from './cache';
-import type { FPLBootstrapStatic } from './fpl-client';
+import type { FPLBootstrapStatic, FPLLive } from './fpl-client';
 import * as fplClient from './fpl-client';
-import type { PlayerPosition, TopPlayer, TopPlayersGameweekResponse, TopPlayersSeasonResponse } from './types';
+import type { PlayerPosition, StatEntry, TopPlayer, TopPlayersGameweekResponse, TopPlayersSeasonResponse } from './types';
 
 const TOP_N = 100;
+
+const HIDDEN_STAT_IDENTIFIERS = new Set(['goals_conceded', 'bps']);
+
+function buildStatBreakdown(explain: FPLLive['elements'][0]['explain']): StatEntry[] {
+  const map = new Map<string, StatEntry>();
+  for (const fixture of explain) {
+    for (const stat of fixture.stats) {
+      if (stat.value === 0 || HIDDEN_STAT_IDENTIFIERS.has(stat.identifier)) continue;
+      const existing = map.get(stat.identifier);
+      if (existing) {
+        existing.value += stat.value;
+        existing.points += stat.points;
+      } else {
+        map.set(stat.identifier, { identifier: stat.identifier, value: stat.value, points: stat.points });
+      }
+    }
+  }
+  return Array.from(map.values());
+}
 
 const POSITION_MAP: Record<number, PlayerPosition> = {
   1: 'GK',
@@ -50,6 +69,8 @@ export async function getTopPlayersGameweek(gw: number): Promise<TopPlayersGamew
         teamCode: element.team_code,
         teamShortName: team?.short_name ?? 'UNK',
         points: live.stats.total_points,
+        selectedByPercent: element.selected_by_percent,
+        statBreakdown: buildStatBreakdown(live.explain),
       } satisfies TopPlayer;
     })
     .filter((p): p is TopPlayer => p !== null)
@@ -74,6 +95,7 @@ export async function getTopPlayersSeason(): Promise<TopPlayersSeasonResponse> {
         teamCode: element.team_code,
         teamShortName: team?.short_name ?? 'UNK',
         points: element.total_points,
+        selectedByPercent: element.selected_by_percent,
       } satisfies TopPlayer;
     })
     .sort((a, b) => b.points - a.points)

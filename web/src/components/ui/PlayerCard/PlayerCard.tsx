@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 
 import { copy } from '@/lib/copy';
-import type { FixtureInfo, PlayerStatus, SquadPlayer } from '@/types';
+import { chipColorKey, formatStatLabel, HIDDEN_STATS } from '@/lib/stat-chips';
+import type { FixtureInfo, PlayerStatus, SquadPlayer, StatEntry } from '@/types';
 
 import { FdrChip } from '../FdrChip/FdrChip';
 import { Jersey } from '../Jersey/Jersey';
@@ -12,6 +13,7 @@ export interface PlayerInfo {
   currentPrice: number;
   expectedPoints?: string;
   nextFixtures: FixtureInfo[];
+  statBreakdown?: StatEntry[];
 }
 
 export interface PlayerCardProps {
@@ -261,6 +263,23 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
             </div>
           </div>
           <div className={styles.infoBody}>
+            {playerInfo.statBreakdown && playerInfo.statBreakdown.length > 0 && (() => {
+              const chips = playerInfo.statBreakdown.filter(
+                (s) => !HIDDEN_STATS.has(s.identifier) && s.value !== 0
+              );
+              return chips.length > 0 ? (
+                <div className={styles.infoStatChips}>
+                  {chips.map((s) => (
+                    <span
+                      key={s.identifier}
+                      className={`${styles.infoChip} ${styles[chipColorKey(s.identifier) as keyof typeof styles] ?? styles.infoChipNegative}`}
+                    >
+                      {formatStatLabel(s.identifier, s.value, s.points)}
+                    </span>
+                  ))}
+                </div>
+              ) : null;
+            })()}
             <span className={styles.infoSectionLabel}>{copy.playerInfoUpcomingFixtures}</span>
             {playerInfo.nextFixtures.slice(0, 5).map((f, i) => (
               <div key={i} className={styles.infoFixtureRow}>

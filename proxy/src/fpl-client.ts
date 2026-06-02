@@ -179,6 +179,14 @@ export interface FPLLive {
       saves: number;
       bonus: number;
     };
+    explain: Array<{
+      fixture: number;
+      stats: Array<{
+        identifier: string;
+        points: number;
+        value: number;
+      }>;
+    }>;
   }>;
 }
 

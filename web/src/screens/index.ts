@@ -1,3 +1,5 @@
+export type { GameweekReviewScreenProps } from './GameweekReviewScreen/GameweekReviewScreen';
+export { GameweekReviewScreen } from './GameweekReviewScreen/GameweekReviewScreen';
 export type { EntryScreenProps } from './EntryScreen/EntryScreen';
 export { EntryScreen } from './EntryScreen/EntryScreen';
 export type { GameweekHistoryScreenProps } from './GameweekHistoryScreen/GameweekHistoryScreen';

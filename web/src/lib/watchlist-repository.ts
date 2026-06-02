@@ -11,7 +11,7 @@ export interface WatchlistRepository {
 }
 
 const STORAGE_KEY = 'fpl-watchlist-v1';
-const LIMIT = 5;
+const FREE_LIMIT = 2;
 
 export class LocalStorageWatchlistRepository implements WatchlistRepository {
   private read(): number[] {
@@ -36,7 +36,7 @@ export class LocalStorageWatchlistRepository implements WatchlistRepository {
   async add(teamId: number): Promise<AddResult> {
     const ids = this.read();
     if (ids.includes(teamId)) return 'duplicate';
-    if (ids.length >= LIMIT) return 'limit';
+    if (ids.length >= FREE_LIMIT) return 'limit';
     this.write([...ids, teamId]);
     return 'ok';
   }
@@ -50,7 +50,7 @@ export class LocalStorageWatchlistRepository implements WatchlistRepository {
   }
 
   getLimit(): number {
-    return LIMIT;
+    return FREE_LIMIT;
   }
 }
 

@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import { fixtureEntry } from '@/fixtures';
 
-import { TeamInfoPanel } from './TeamInfoPanel';
+import { TeamInfoPanel, TeamInfoPanelSkeleton } from './TeamInfoPanel';
 
 function renderPanel(overrides: Partial<typeof fixtureEntry> = {}, showFollow = false) {
   const entry = { ...fixtureEntry, ...overrides };
@@ -56,14 +56,14 @@ describe('TeamInfoPanel', () => {
     expect(screen.queryByText('🇺🇦')).toBeNull();
   });
 
-  it('renders Gameweek History link', () => {
+  it('renders GW History link', () => {
     renderPanel();
-    expect(screen.getByRole('link', { name: /Gameweek History/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /GW History/i })).toBeInTheDocument();
   });
 
-  it('Gameweek History link points to /history with teamId', () => {
+  it('GW History link points to /history with teamId', () => {
     renderPanel();
-    const link = screen.getByRole('link', { name: /Gameweek History/i });
+    const link = screen.getByRole('link', { name: /GW History/i });
     expect(link.getAttribute('href')).toBe('/history?teamId=72828');
   });
 
@@ -75,5 +75,14 @@ describe('TeamInfoPanel', () => {
   it('renders Follow button when showFollow=true (guest mode)', () => {
     renderPanel({}, true);
     expect(screen.getByRole('button', { name: /follow/i })).toBeInTheDocument();
+  });
+});
+
+describe('TeamInfoPanelSkeleton', () => {
+  it('renders with aria-busy and aria-label', () => {
+    render(<MemoryRouter><TeamInfoPanelSkeleton /></MemoryRouter>);
+    const el = screen.getByRole('complementary');
+    expect(el).toHaveAttribute('aria-busy', 'true');
+    expect(el).toHaveAttribute('aria-label', 'Loading...');
   });
 });

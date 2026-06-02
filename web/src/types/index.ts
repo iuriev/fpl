@@ -4,6 +4,8 @@ export interface Gameweek {
   id: number;
   name: string;
   finished: boolean;
+  averageScore?: number;
+  highestScore?: number;
 }
 
 export interface GameweeksResponse {
@@ -58,6 +60,7 @@ export interface SquadPlayer {
   chanceOfPlaying?: number | null;
   news?: string;
   stats: PlayerStats;
+  statBreakdown?: StatEntry[];
 }
 
 export interface SquadSummary {
@@ -158,6 +161,12 @@ export interface TeamPlayersResponse {
   players: TopPlayersPlayer[];
 }
 
+export interface StatEntry {
+  identifier: string;
+  value: number;
+  points: number;
+}
+
 export interface TopPlayersPlayer {
   id: number;
   webName: string;
@@ -165,6 +174,8 @@ export interface TopPlayersPlayer {
   teamCode: number;
   teamShortName: string;
   points: number;
+  selectedByPercent: string;
+  statBreakdown?: StatEntry[];
 }
 
 export interface TopPlayersGwResponse {

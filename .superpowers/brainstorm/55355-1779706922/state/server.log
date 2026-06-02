@@ -1,9 +1,0 @@
-{"type":"server-started","port":60656,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:60656","screen_dir":"/Users/ivan.iuriev/dev/work/idp/fpl/.superpowers/brainstorm/55355-1779706922/content","state_dir":"/Users/ivan.iuriev/dev/work/idp/fpl/.superpowers/brainstorm/55355-1779706922/state"}
-{"type":"screen-added","file":"/Users/ivan.iuriev/dev/work/idp/fpl/.superpowers/brainstorm/55355-1779706922/content/transfer-ux-approaches.html"}
-{"type":"screen-added","file":"/Users/ivan.iuriev/dev/work/idp/fpl/.superpowers/brainstorm/55355-1779706922/content/bottom-sheet-mockup.html"}
-{"type":"screen-added","file":"/Users/ivan.iuriev/dev/work/idp/fpl/.superpowers/brainstorm/55355-1779706922/content/bottom-sheet-v2.html"}
-{"type":"screen-added","file":"/Users/ivan.iuriev/dev/work/idp/fpl/.superpowers/brainstorm/55355-1779706922/content/bottom-sheet-v3.html"}
-{"type":"screen-added","file":"/Users/ivan.iuriev/dev/work/idp/fpl/.superpowers/brainstorm/55355-1779706922/content/bottom-sheet-v4.html"}
-{"type":"screen-added","file":"/Users/ivan.iuriev/dev/work/idp/fpl/.superpowers/brainstorm/55355-1779706922/content/full-design.html"}
-{"type":"screen-added","file":"/Users/ivan.iuriev/dev/work/idp/fpl/.superpowers/brainstorm/55355-1779706922/content/waiting.html"}
-{"type":"server-stopped","reason":"owner process exited"}
