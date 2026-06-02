@@ -79,6 +79,30 @@ The project is built spec-first; application code comes last. Read these before 
   Superpowers skills may generate intermediate working documents during a session, but the
   permanent record always goes into backlog or OpenSpec.
 
+## Agent efficiency
+
+Large command output bloats the context window. Keep terminal output small:
+
+- **`git log`:** always `-n 10 --oneline`
+- **`git diff`:** prefer `--stat` first; full diff only for specific paths
+- **`npm install`:** use `--silent` or `--loglevel=error` unless debugging install failures
+- **Search:** use workspace Glob/Grep tools with limits — never unbounded `find`
+- **Tests and lint:** run scoped workspace commands (`-w web`, `-w proxy`); on failure,
+  inspect only the failing output
+
+During work, skip narrating obvious tool steps ("I'll now read the file…"). Prefer scoped
+tool calls over broad exploration. Final responses to the user stay complete: summary, code
+citations where relevant, and test evidence before claiming done.
+
+## Session close
+
+When a task is finished and the user corrected the same issues more than once, offer:
+"What from this session should we bake into `CLAUDE.md`, `AGENTS.md`, or a skill so we don't
+repeat manual fixes?" Propose concrete edits; do not apply without user approval.
+
+When improving a skill from a completed session, review corrections and repeated manual fixes,
+then propose edits to the relevant `SKILL.md` (or this file). Accept only what the user approves.
+
 ## Architecture
 
 Planned (not yet scaffolded): an npm-workspaces monorepo with `web/` (React + Vite SPA) and

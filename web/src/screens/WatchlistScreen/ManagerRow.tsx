@@ -10,6 +10,7 @@ export interface ManagerRowProps {
   teamId: number;
   currentGw: number;
   onRemove: () => void;
+  isOwnTeam?: boolean;
 }
 
 function fmt(n: number): string {
@@ -28,7 +29,7 @@ function RankDelta({ current, prev }: { current: number; prev: number | undefine
   return <span className={styles.deltaNeutral}>—</span>;
 }
 
-export const ManagerRow: React.FC<ManagerRowProps> = ({ teamId, currentGw, onRemove }) => {
+export const ManagerRow: React.FC<ManagerRowProps> = ({ teamId, currentGw, onRemove, isOwnTeam }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -40,8 +41,11 @@ export const ManagerRow: React.FC<ManagerRowProps> = ({ teamId, currentGw, onRem
   const isLoading = entryLoading || squadLoading || historyLoading || transfersLoading;
 
   const handleRowClick = () => {
+    if (isOwnTeam) {
+      navigate(`/?teamId=${teamId}`);
+      return;
+    }
     const returnTo = location.pathname + location.search;
-    try { sessionStorage.setItem('fpl-guest-return-to', returnTo); } catch { /* ignore */ }
     navigate(`/?teamId=${teamId}`, { state: { returnTo } });
   };
 
@@ -187,6 +191,7 @@ export const ManagerRow: React.FC<ManagerRowProps> = ({ teamId, currentGw, onRem
         <button
           className={styles.unfollowBtn}
           onClick={(e) => { e.stopPropagation(); onRemove(); }}
+          disabled={isLoading}
           aria-label={interpolate(copy.watchlistRemoveAriaLabel, {
             name: entry?.managerName ?? String(teamId),
           })}

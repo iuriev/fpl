@@ -51,6 +51,7 @@ export async function getTeamPlayers(teamCode: number): Promise<TeamPlayersRespo
       teamCode: e.team_code,
       teamShortName: teamMap.get(e.team)?.short_name ?? 'UNK',
       points: e.total_points,
+      selectedByPercent: e.selected_by_percent,
     }))
     .sort((a, b) => b.points - a.points);
 

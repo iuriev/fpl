@@ -14,7 +14,27 @@ import type {
   PlayerStatus,
   SquadPlayer,
   SquadResponse,
+  StatEntry,
 } from './types';
+
+const HIDDEN_STAT_IDENTIFIERS = new Set(['goals_conceded', 'bps']);
+
+function buildStatBreakdown(explain: FPLLive['elements'][0]['explain']): StatEntry[] {
+  const map = new Map<string, StatEntry>();
+  for (const fixture of explain) {
+    for (const stat of fixture.stats) {
+      if (stat.value === 0 || HIDDEN_STAT_IDENTIFIERS.has(stat.identifier)) continue;
+      const existing = map.get(stat.identifier);
+      if (existing) {
+        existing.value += stat.value;
+        existing.points += stat.points;
+      } else {
+        map.set(stat.identifier, { identifier: stat.identifier, value: stat.value, points: stat.points });
+      }
+    }
+  }
+  return Array.from(map.values());
+}
 
 const POSITION_MAP: Record<number, PlayerPosition> = {
   1: 'GK',
@@ -147,7 +167,7 @@ export async function getSquad(teamId: number, gameweek: number): Promise<SquadR
   // Build lookup maps for quick access
   const teamMap = new Map(bootstrap.teams.map((t) => [t.id, t.short_name]));
   const playerMap = new Map(bootstrap.elements.map((e) => [e.id, e]));
-  const liveMap = new Map(live.elements.map((e) => [e.id, e.stats]));
+  const liveMap = new Map(live.elements.map((e) => [e.id, e]));
   const pickPositionMap = new Map(picks.picks.map((p) => [p.element, p.position]));
 
   // Build players array
@@ -156,7 +176,8 @@ export async function getSquad(teamId: number, gameweek: number): Promise<SquadR
     if (!playerData) throw new Error(`Player ${pick.element} not found`);
 
     const teamName = teamMap.get(playerData.team) || 'Unknown';
-    const liveStats = liveMap.get(pick.element);
+    const liveElement = liveMap.get(pick.element);
+    const liveStats = liveElement?.stats;
     const stats = {
       total_points: liveStats?.total_points ?? 0,
       minutes: liveStats?.minutes ?? 0,
@@ -173,6 +194,8 @@ export async function getSquad(teamId: number, gameweek: number): Promise<SquadR
       bonus: liveStats?.bonus ?? 0,
     };
 
+    const statBreakdown = liveElement?.explain ? buildStatBreakdown(liveElement.explain) : undefined;
+
     return {
       id: pick.element,
       name: playerData.web_name,
@@ -188,6 +211,7 @@ export async function getSquad(teamId: number, gameweek: number): Promise<SquadR
       chanceOfPlaying: playerData.chance_of_playing_this_round,
       news: playerData.news || undefined,
       stats,
+      statBreakdown,
     } as SquadPlayer;
   });
 

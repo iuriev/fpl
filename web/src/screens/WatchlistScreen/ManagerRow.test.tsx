@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 
+import * as queries from '@/api/queries';
 import { fixtureEntry, fixtureSquad } from '@/fixtures';
 import {
   LocalStorageWatchlistRepository,
@@ -76,6 +77,19 @@ describe('ManagerRow', () => {
     expect(onRemove).toHaveBeenCalledOnce();
   });
 
+
+  it('unfollow button is disabled while loading', () => {
+    vi.mocked(queries.useEntry).mockImplementationOnce(() => ({ data: undefined, isLoading: true, isError: false }) as never);
+    vi.mocked(queries.useSquad).mockImplementationOnce(() => ({ data: undefined, isLoading: true }) as never);
+    vi.mocked(queries.useHistory).mockImplementationOnce(() => ({ data: undefined, isLoading: true }) as never);
+    vi.mocked(queries.useTransfers).mockImplementationOnce(() => ({ data: undefined, isLoading: true }) as never);
+
+    const { container } = renderRow();
+    const unfollowBtn = container.querySelector('button.unfollowBtn') as HTMLButtonElement
+      ?? container.querySelector('[class*="unfollowBtn"]') as HTMLButtonElement;
+    expect(unfollowBtn.disabled).toBe(true);
+  });
+
   it('clicking row navigates to squad view with returnTo state', async () => {
     const user = userEvent.setup();
     renderRow();
@@ -85,6 +99,5 @@ describe('ManagerRow', () => {
       '/?teamId=72828',
       { state: { returnTo: expect.any(String) } },
     );
-    expect(sessionStorage.getItem('fpl-guest-return-to')).toBeTruthy();
   });
 });

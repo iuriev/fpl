@@ -51,14 +51,8 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
   const location = useLocation();
   const [returnTo] = useState<string | null>(() => {
     const stateReturnTo = (location.state as { returnTo?: string } | null)?.returnTo ?? null;
-    if (stateReturnTo) return stateReturnTo;
-    try {
-      const stored = sessionStorage.getItem('fpl-guest-return-to');
-      if (stored) sessionStorage.removeItem('fpl-guest-return-to');
-      return stored;
-    } catch {
-      return null;
-    }
+    try { sessionStorage.removeItem('fpl-guest-return-to'); } catch { /* ignore */ }
+    return stateReturnTo ?? null;
   });
   const isGuestMode = returnTo !== null;
 
@@ -338,6 +332,7 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
                                         ownership: pool.selectedByPercent,
                                         currentPrice: pool.nowCost,
                                         nextFixtures: pool.nextFixtures,
+                                        statBreakdown: player.statBreakdown,
                                       }
                                     : undefined
                                 }
@@ -372,6 +367,7 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
                                   ownership: pool.selectedByPercent,
                                   currentPrice: pool.nowCost,
                                   nextFixtures: pool.nextFixtures,
+                                  statBreakdown: player.statBreakdown,
                                 }
                               : undefined
                           }

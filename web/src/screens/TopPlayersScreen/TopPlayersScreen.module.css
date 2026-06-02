@@ -18,7 +18,7 @@
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
-  padding: var(--fpl-space-sm) 0;
+  padding: var(--fpl-space-base) 0;
   font: var(--fpl-fw-semibold) var(--fpl-fs-body-s) var(--fpl-font-display);
   color: var(--fpl-muted);
   cursor: pointer;

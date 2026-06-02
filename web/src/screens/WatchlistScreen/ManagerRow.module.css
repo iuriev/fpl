@@ -271,9 +271,14 @@
   transition: border-color 120ms, color 120ms;
 }
 
-.unfollowBtn:hover {
+.unfollowBtn:hover:not(:disabled) {
   border-color: var(--fpl-negative, #ef4444);
   color: var(--fpl-negative, #ef4444);
+}
+
+.unfollowBtn:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
 
 /* ── Error state ── */

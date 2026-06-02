@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useGameweeks } from '@/api/queries';
-import { ScreenHeader } from '@/components/ui/ScreenHeader/ScreenHeader';
 import { PremiumSheet } from '@/components/ui/PremiumSheet/PremiumSheet';
+import { ScreenHeader } from '@/components/ui/ScreenHeader/ScreenHeader';
 import { copy, interpolate } from '@/lib/copy';
 import { useWatchlistRepository } from '@/lib/watchlist-repository';
 
@@ -85,6 +85,7 @@ export const WatchlistScreen: React.FC<WatchlistScreenProps> = ({ userTeamId }) 
                 teamId={teamId}
                 currentGw={currentGw}
                 onRemove={() => handleRemove(teamId)}
+                isOwnTeam={userTeamId !== undefined && teamId === userTeamId}
               />
             ))}
           </div>

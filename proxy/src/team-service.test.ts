@@ -18,11 +18,11 @@ const mockBootstrap = {
     { id: 3, name: 'Chelsea', short_name: 'CHE', code: 8 },
   ],
   elements: [
-    { id: 10, web_name: 'Raya', team: 1, team_code: 3, element_type: 1, status: 'a', chance_of_playing_this_round: null, news: '', total_points: 80 },
-    { id: 20, web_name: 'Saliba', team: 1, team_code: 3, element_type: 2, status: 'a', chance_of_playing_this_round: null, news: '', total_points: 100 },
-    { id: 30, web_name: 'Haaland', team: 2, team_code: 43, element_type: 4, status: 'a', chance_of_playing_this_round: null, news: '', total_points: 200 },
-    { id: 40, web_name: 'Saka', team: 1, team_code: 3, element_type: 3, status: 'a', chance_of_playing_this_round: null, news: '', total_points: 150 },
-    { id: 50, web_name: 'Palmer', team: 3, team_code: 8, element_type: 3, status: 'a', chance_of_playing_this_round: null, news: '', total_points: 170 },
+    { id: 10, web_name: 'Raya', team: 1, team_code: 3, element_type: 1, status: 'a', chance_of_playing_this_round: null, news: '', total_points: 80, selected_by_percent: '12.5' },
+    { id: 20, web_name: 'Saliba', team: 1, team_code: 3, element_type: 2, status: 'a', chance_of_playing_this_round: null, news: '', total_points: 100, selected_by_percent: '34.2' },
+    { id: 30, web_name: 'Haaland', team: 2, team_code: 43, element_type: 4, status: 'a', chance_of_playing_this_round: null, news: '', total_points: 200, selected_by_percent: '66.7' },
+    { id: 40, web_name: 'Saka', team: 1, team_code: 3, element_type: 3, status: 'a', chance_of_playing_this_round: null, news: '', total_points: 150, selected_by_percent: '22.1' },
+    { id: 50, web_name: 'Palmer', team: 3, team_code: 8, element_type: 3, status: 'a', chance_of_playing_this_round: null, news: '', total_points: 170, selected_by_percent: '41.3' },
   ],
   element_types: [
     { id: 1, singular_name_short: 'GKP' },
@@ -123,6 +123,16 @@ describe('Team Service — getTeamPlayers', () => {
     (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockBootstrap);
 
     await expect(teamService.getTeamPlayers(999)).rejects.toThrow('not found');
+  });
+
+  it('includes selectedByPercent in team players', async () => {
+    (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
+    (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockBootstrap);
+
+    const result = await teamService.getTeamPlayers(3);
+    const saka = result.players.find((p) => p.webName === 'Saka')!;
+
+    expect(saka.selectedByPercent).toBe('22.1');
   });
 
   it('returns empty players array when team has no elements', async () => {
