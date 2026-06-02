@@ -58,7 +58,7 @@ describe('WatchlistScreen', () => {
   it('shows capacity badge', async () => {
     renderScreen();
     await waitFor(() => {
-      expect(screen.getByText(/0\/5 following/i)).toBeInTheDocument();
+      expect(screen.getByText(/0\/2 following/i)).toBeInTheDocument();
     });
   });
 
@@ -75,7 +75,7 @@ describe('WatchlistScreen', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/1\/5 following/i)).toBeInTheDocument();
+      expect(screen.getByText(/1\/2 following/i)).toBeInTheDocument();
     });
   });
 
@@ -104,14 +104,14 @@ describe('WatchlistScreen', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/1\/5 following/i)).toBeInTheDocument();
+      expect(screen.getByText(/1\/2 following/i)).toBeInTheDocument();
     });
 
     const removeBtn = screen.getByRole('button', { name: /unfollow/i });
     await user.click(removeBtn);
 
     await waitFor(() => {
-      expect(screen.getByText(/0\/5 following/i)).toBeInTheDocument();
+      expect(screen.getByText(/0\/2 following/i)).toBeInTheDocument();
     });
   });
 });

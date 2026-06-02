@@ -41,5 +41,6 @@ storybook-static/
 # Claude Code worktrees (ephemeral)
 .claude/worktrees/
 
-# Superpowers brainstorming artifacts (ephemeral)
+# Superpowers local working files (brainstorms, docs)
 .superpowers/
+docs/superpowers/

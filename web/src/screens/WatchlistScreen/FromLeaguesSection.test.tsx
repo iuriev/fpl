@@ -43,14 +43,14 @@ vi.mock('@/api/queries', () => ({
 
 import { FromLeaguesSection } from './FromLeaguesSection';
 
-function renderSection(props: React.ComponentProps<typeof FromLeaguesSection>) {
+function renderSection(props: Omit<React.ComponentProps<typeof FromLeaguesSection>, 'onLimitReached'> & { onLimitReached?: () => void }) {
   const repo = new LocalStorageWatchlistRepository();
   return {
     repo,
     ...render(
       <WatchlistRepositoryContext.Provider value={repo}>
         <MemoryRouter>
-          <FromLeaguesSection {...props} />
+          <FromLeaguesSection onLimitReached={vi.fn()} {...props} />
         </MemoryRouter>
       </WatchlistRepositoryContext.Provider>
     ),
@@ -70,7 +70,7 @@ describe('FromLeaguesSection', () => {
     expect(screen.getByText(/open your squad first/i)).toBeInTheDocument();
   });
 
-  it('shows leagues when userTeamId is provided and section opened', async () => {
+  it('shows leagues when userTeamId is provided', async () => {
     const user = userEvent.setup();
     renderSection({ userTeamId: 72828, watchedIds: new Set(), isFull: false, onFollow: vi.fn() });
     await user.click(screen.getByRole('button', { name: /from my leagues/i }));
@@ -106,12 +106,14 @@ describe('FromLeaguesSection', () => {
     expect(followingBtns.length).toBeGreaterThan(0);
   });
 
-  it('disables Follow buttons when isFull', async () => {
+  it('calls onLimitReached when Follow is clicked and watchlist is full', async () => {
     const user = userEvent.setup();
-    renderSection({ userTeamId: 72828, watchedIds: new Set(), isFull: true, onFollow: vi.fn() });
+    const onLimitReached = vi.fn();
+    renderSection({ userTeamId: 72828, watchedIds: new Set(), isFull: true, onFollow: vi.fn(), onLimitReached });
     await user.click(screen.getByRole('button', { name: /from my leagues/i }));
     await user.click(screen.getByRole('button', { name: /my mini league/i }));
     const followBtns = screen.getAllByRole('button', { name: /^follow$/i });
-    followBtns.forEach((btn) => expect(btn).toBeDisabled());
+    await user.click(followBtns[0]);
+    expect(onLimitReached).toHaveBeenCalledOnce();
   });
 });

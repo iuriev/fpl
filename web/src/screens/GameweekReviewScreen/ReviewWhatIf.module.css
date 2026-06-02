@@ -1,0 +1,73 @@
+.section {
+  background: var(--fpl-bg-card);
+  padding: 1rem;
+  border-radius: 0 0 0.75rem 0.75rem;
+}
+
+.sectionLabel {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fpl-muted-soft);
+  margin-bottom: 0.5rem;
+}
+
+.card {
+  border-radius: 0.625rem;
+  overflow: hidden;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  padding: 0.625rem 0.75rem;
+  gap: 0.625rem;
+  border-bottom: 1px solid var(--fpl-bg-hair);
+}
+
+.rowActual       { background: var(--fpl-accent-faint); }
+.rowHypothetical { background: var(--fpl-bg-soft); }
+
+.rowLabel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.rowLabel strong {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--fpl-text);
+}
+
+.rowLabel span {
+  font-size: 0.7rem;
+  color: var(--fpl-muted);
+}
+
+.rowPts {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--fpl-accent);
+  font-family: var(--fpl-font-display);
+}
+
+.rowPtsMuted { color: var(--fpl-muted); }
+
+.verdict {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.verdictGood    { background: linear-gradient(90deg, var(--fpl-accent-faint), transparent); color: var(--fpl-accent); }
+.verdictBad     { background: linear-gradient(90deg, var(--fpl-error-soft), transparent); color: var(--fpl-error); }
+.verdictNeutral { background: var(--fpl-bg-soft); color: var(--fpl-muted); }
+
+.verdictIcon { font-size: 1.125rem; }

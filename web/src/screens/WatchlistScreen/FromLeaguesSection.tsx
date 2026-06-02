@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { useLeagueStandings, useLeagues } from '@/api/queries';
+import { useLeagues,useLeagueStandings } from '@/api/queries';
 import { copy } from '@/lib/copy';
 import type { LeagueEntry, StandingEntry } from '@/types';
 
@@ -11,9 +11,10 @@ interface StandingsListProps {
   watchedIds: Set<number>;
   isFull: boolean;
   onFollow: (teamId: number) => void;
+  onLimitReached: () => void;
 }
 
-function StandingsList({ leagueId, watchedIds, isFull, onFollow }: StandingsListProps) {
+function StandingsList({ leagueId, watchedIds, isFull, onFollow, onLimitReached }: StandingsListProps) {
   const [page, setPage] = useState(1);
   const { data, isLoading, isError } = useLeagueStandings(leagueId, page);
 
@@ -35,8 +36,12 @@ function StandingsList({ leagueId, watchedIds, isFull, onFollow }: StandingsList
             <span className={styles.standingEventTotal}>{s.eventTotal}</span>
             <button
               className={`${styles.followBtn} ${following ? styles.followingBtn : ''}`}
-              onClick={() => !following && onFollow(s.entry)}
-              disabled={(!following && isFull) || following}
+              onClick={() => {
+                if (following) return;
+                if (isFull) { onLimitReached(); return; }
+                onFollow(s.entry);
+              }}
+              disabled={following}
               aria-pressed={following}
             >
               {following ? copy.watchlistFollowingButton : copy.watchlistFollowButton}
@@ -61,9 +66,10 @@ interface LeagueItemProps {
   watchedIds: Set<number>;
   isFull: boolean;
   onFollow: (teamId: number) => void;
+  onLimitReached: () => void;
 }
 
-function LeagueItem({ league, watchedIds, isFull, onFollow }: LeagueItemProps) {
+function LeagueItem({ league, watchedIds, isFull, onFollow, onLimitReached }: LeagueItemProps) {
   const [open, setOpen] = useState(false);
   return (
     <div className={styles.leagueItem}>
@@ -73,7 +79,6 @@ function LeagueItem({ league, watchedIds, isFull, onFollow }: LeagueItemProps) {
         aria-expanded={open}
       >
         <span className={styles.leagueName}>{league.name}</span>
-        <span className={styles.leagueRank}>your rank: {league.rank}</span>
         <span className={styles.leagueChevron}>{open ? '▲' : '▼'}</span>
       </button>
       {open && (
@@ -82,6 +87,7 @@ function LeagueItem({ league, watchedIds, isFull, onFollow }: LeagueItemProps) {
           watchedIds={watchedIds}
           isFull={isFull}
           onFollow={onFollow}
+          onLimitReached={onLimitReached}
         />
       )}
     </div>
@@ -93,6 +99,7 @@ export interface FromLeaguesSectionProps {
   watchedIds: Set<number>;
   isFull: boolean;
   onFollow: (teamId: number) => void;
+  onLimitReached: () => void;
 }
 
 export const FromLeaguesSection: React.FC<FromLeaguesSectionProps> = ({
@@ -100,6 +107,7 @@ export const FromLeaguesSection: React.FC<FromLeaguesSectionProps> = ({
   watchedIds,
   isFull,
   onFollow,
+  onLimitReached,
 }) => {
   const [open, setOpen] = useState(false);
   const { data, isLoading, isError } = useLeagues(userTeamId);
@@ -129,6 +137,7 @@ export const FromLeaguesSection: React.FC<FromLeaguesSectionProps> = ({
               watchedIds={watchedIds}
               isFull={isFull}
               onFollow={onFollow}
+              onLimitReached={onLimitReached}
             />
           ))}
         </div>

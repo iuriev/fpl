@@ -325,26 +325,27 @@ function mkTopPlayer(i: number): TopPlayersPlayer {
     teamCode: 3,
     teamShortName: 'ARS',
     points: 100 - i,
+    selectedByPercent: '10.0',
   };
 }
 
 export const fixtureTopPlayersGw: TopPlayersGwResponse = {
   gw: 36,
   players: [
-    { id: 1, webName: 'Haaland', position: 'FWD', teamCode: 43, teamShortName: 'MCI', points: 20 },
-    { id: 2, webName: 'Salah', position: 'MID', teamCode: 14, teamShortName: 'LIV', points: 18 },
-    { id: 3, webName: 'Saka', position: 'MID', teamCode: 3, teamShortName: 'ARS', points: 15 },
-    { id: 4, webName: 'Raya', position: 'GK', teamCode: 3, teamShortName: 'ARS', points: 12 },
-    { id: 5, webName: 'Saliba', position: 'DEF', teamCode: 3, teamShortName: 'ARS', points: 11 },
+    { id: 1, webName: 'Haaland', position: 'FWD', teamCode: 43, teamShortName: 'MCI', points: 20, selectedByPercent: '62.5' },
+    { id: 2, webName: 'Salah', position: 'MID', teamCode: 14, teamShortName: 'LIV', points: 18, selectedByPercent: '50.1' },
+    { id: 3, webName: 'Saka', position: 'MID', teamCode: 3, teamShortName: 'ARS', points: 15, selectedByPercent: '30.4' },
+    { id: 4, webName: 'Raya', position: 'GK', teamCode: 3, teamShortName: 'ARS', points: 12, selectedByPercent: '14.2' },
+    { id: 5, webName: 'Saliba', position: 'DEF', teamCode: 3, teamShortName: 'ARS', points: 11, selectedByPercent: '22.8' },
     ...Array.from({ length: 95 }, (_, i) => mkTopPlayer(i + 5)),
   ],
 };
 
 export const fixtureTopPlayersSeason: TopPlayersSeasonResponse = {
   players: [
-    { id: 1, webName: 'Salah', position: 'MID', teamCode: 14, teamShortName: 'LIV', points: 280 },
-    { id: 2, webName: 'Haaland', position: 'FWD', teamCode: 43, teamShortName: 'MCI', points: 260 },
-    { id: 3, webName: 'Saka', position: 'MID', teamCode: 3, teamShortName: 'ARS', points: 210 },
+    { id: 1, webName: 'Salah', position: 'MID', teamCode: 14, teamShortName: 'LIV', points: 280, selectedByPercent: '50.1' },
+    { id: 2, webName: 'Haaland', position: 'FWD', teamCode: 43, teamShortName: 'MCI', points: 260, selectedByPercent: '62.5' },
+    { id: 3, webName: 'Saka', position: 'MID', teamCode: 3, teamShortName: 'ARS', points: 210, selectedByPercent: '30.4' },
     ...Array.from({ length: 97 }, (_, i) => mkTopPlayer(i + 3)),
   ],
 };
@@ -362,10 +363,10 @@ export const fixtureTeamPlayers: TeamPlayersResponse = {
   teamName: 'Arsenal',
   teamShortName: 'ARS',
   players: [
-    { id: 1, webName: 'Saka', position: 'MID', teamCode: 3, teamShortName: 'ARS', points: 210 },
-    { id: 2, webName: 'Saliba', position: 'DEF', teamCode: 3, teamShortName: 'ARS', points: 180 },
-    { id: 3, webName: 'Raya', position: 'GK', teamCode: 3, teamShortName: 'ARS', points: 150 },
-    { id: 4, webName: 'Havertz', position: 'MID', teamCode: 3, teamShortName: 'ARS', points: 120 },
+    { id: 1, webName: 'Saka', position: 'MID', teamCode: 3, teamShortName: 'ARS', points: 210, selectedByPercent: '30.4' },
+    { id: 2, webName: 'Saliba', position: 'DEF', teamCode: 3, teamShortName: 'ARS', points: 180, selectedByPercent: '22.8' },
+    { id: 3, webName: 'Raya', position: 'GK', teamCode: 3, teamShortName: 'ARS', points: 150, selectedByPercent: '14.2' },
+    { id: 4, webName: 'Havertz', position: 'MID', teamCode: 3, teamShortName: 'ARS', points: 120, selectedByPercent: '18.6' },
   ],
 };
 
