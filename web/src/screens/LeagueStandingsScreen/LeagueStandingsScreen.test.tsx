@@ -43,13 +43,17 @@ let mockStandingsData: LeagueStandingsResponse | null = null;
 let mockIsLoading = false;
 let mockIsError = false;
 const mockRefetch = vi.fn();
+const mockFetchNextPage = vi.fn();
 
 vi.mock('@/api/queries', () => ({
   useLeagueStandings: () => ({
-    data: mockStandingsData,
+    data: mockStandingsData ? { pages: [mockStandingsData] } : undefined,
     isLoading: mockIsLoading,
     isError: mockIsError,
     refetch: mockRefetch,
+    fetchNextPage: mockFetchNextPage,
+    isFetchingNextPage: false,
+    hasNextPage: mockStandingsData?.hasNext ?? false,
   }),
 }));
 
@@ -116,8 +120,12 @@ describe('LeagueStandingsScreen', () => {
     renderScreen('/leagues/42/standings?gw=5');
     const rows = await screen.findAllByText('Player 1');
     await userEvent.click(rows[0].closest('button')!);
-    expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining('teamId=1'));
-    expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining('gw=5'));
+    expect(mockNavigate).toHaveBeenCalledWith(
+      '/?teamId=1',
+      expect.objectContaining({
+        state: expect.objectContaining({ returnTo: expect.any(String) }),
+      }),
+    );
   });
 
   it('shows Load more button when hasNext is true', async () => {

@@ -61,10 +61,10 @@ describe('TeamInfoPanel', () => {
     expect(screen.getByRole('link', { name: /GW History/i })).toBeInTheDocument();
   });
 
-  it('GW History link points to /history with teamId', () => {
+  it('GW History link points to /history', () => {
     renderPanel();
     const link = screen.getByRole('link', { name: /GW History/i });
-    expect(link.getAttribute('href')).toBe('/history?teamId=72828');
+    expect(link.getAttribute('href')).toBe('/history');
   });
 
   it('does not render Follow button by default (own team)', () => {

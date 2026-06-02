@@ -1,9 +1,10 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { fixtureEntry, fixtureGameweeks } from '@/fixtures';
+import { MyTeamProvider } from '@/lib/my-team/MyTeamProvider';
 import {
   LocalStorageWatchlistRepository,
   WatchlistRepositoryContext,
@@ -30,16 +31,18 @@ vi.mock('@/api/client', () => ({
   },
 }));
 
-function renderScreen(userTeamId?: number, repo = new LocalStorageWatchlistRepository()) {
+function renderScreen(repo = new LocalStorageWatchlistRepository()) {
   return render(
-    <WatchlistRepositoryContext.Provider value={repo}>
-      <MemoryRouter initialEntries={['/watchlist']}>
-        <div>
-          {/* lazy import avoids circular deps in test */}
-          <WatchlistScreenLazy userTeamId={userTeamId} />
-        </div>
-      </MemoryRouter>
-    </WatchlistRepositoryContext.Provider>
+    <MyTeamProvider>
+      <WatchlistRepositoryContext.Provider value={repo}>
+        <MemoryRouter initialEntries={['/watchlist']}>
+          <div>
+            {/* lazy import avoids circular deps in test */}
+            <WatchlistScreenLazy />
+          </div>
+        </MemoryRouter>
+      </WatchlistRepositoryContext.Provider>
+    </MyTeamProvider>
   );
 }
 
@@ -47,6 +50,7 @@ import { WatchlistScreen as WatchlistScreenLazy } from './WatchlistScreen';
 
 describe('WatchlistScreen', () => {
   beforeEach(() => localStorage.removeItem('fpl-watchlist-v1'));
+  afterEach(() => localStorage.removeItem('fpl-my-team-id'));
 
   it('renders empty state when watchlist is empty', async () => {
     renderScreen();
@@ -67,11 +71,13 @@ describe('WatchlistScreen', () => {
     await repo.add(72828);
 
     render(
-      <WatchlistRepositoryContext.Provider value={repo}>
-        <MemoryRouter>
-          <WatchlistScreenLazy userTeamId={72828} />
-        </MemoryRouter>
-      </WatchlistRepositoryContext.Provider>
+      <MyTeamProvider>
+        <WatchlistRepositoryContext.Provider value={repo}>
+          <MemoryRouter>
+            <WatchlistScreenLazy />
+          </MemoryRouter>
+        </WatchlistRepositoryContext.Provider>
+      </MyTeamProvider>
     );
 
     await waitFor(() => {
@@ -96,11 +102,13 @@ describe('WatchlistScreen', () => {
     const user = userEvent.setup();
 
     render(
-      <WatchlistRepositoryContext.Provider value={repo}>
-        <MemoryRouter>
-          <WatchlistScreenLazy userTeamId={72828} />
-        </MemoryRouter>
-      </WatchlistRepositoryContext.Provider>
+      <MyTeamProvider>
+        <WatchlistRepositoryContext.Provider value={repo}>
+          <MemoryRouter>
+            <WatchlistScreenLazy />
+          </MemoryRouter>
+        </WatchlistRepositoryContext.Provider>
+      </MyTeamProvider>
     );
 
     await waitFor(() => {
