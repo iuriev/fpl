@@ -47,7 +47,7 @@ function benchLabel(index: number, position: PlayerPosition): string {
   return position === 'GK' ? 'GKP' : `${index}. ${position}`;
 }
 
-export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId }) => {
+export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();

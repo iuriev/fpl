@@ -41,7 +41,7 @@ function AppContent() {
   const { myTeamId, setMyTeamId } = useMyTeam();
   const [searchParams] = useSearchParams();
 
-  const viewedTeamId = searchParams.get('teamId') ? Number(searchParams.get('teamId')) : null;
+  const viewedTeamId = searchParams.get('teamId') !== null ? Number(searchParams.get('teamId')) : null;
 
   const rootElement = () => {
     if (viewedTeamId) {
