@@ -113,6 +113,16 @@ web/src/
   container for now. A **dedicated desktop design is planned** for a future iteration
   (`docs/backlog.md`).
 
+## Environment variables (web)
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `VITE_PREMIUM_UPSELL_ENABLED` | `true` | Set to `false` to disable auto premium upsell dialogs |
+| `VITE_PREMIUM_UPSELL_COOLDOWN_MS` | `86400000` (24h) | Minimum ms between upsell shows per screen (`transfer`, `predictions`) |
+| `VITE_PREMIUM_DEV_IS_PREMIUM` | `false` | Set to `true` to hide upsell during local dev |
+
+See `web/.env.example`. Parsed by `readPremiumUpsellConfig()`.
+
 ## Copy and i18n
 - All user-facing text lives in a centralized copy module (English). Components never inline raw
   strings. The structure is i18n-ready so languages can be added later (backlog). See ADR 0007.

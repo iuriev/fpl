@@ -123,6 +123,26 @@ const mockState = {
   pool: null as { players: PoolPlayer[] } | null,
 };
 
+const mockRequestPremiumUpsell = vi.fn();
+
+vi.mock('@/lib/premium-upsell/PremiumUpsellContext', () => ({
+  useRequestPremiumUpsell: () => mockRequestPremiumUpsell,
+}));
+
+vi.mock('@/lib/my-team/MyTeamContext', () => ({
+  useMyTeam: () => ({
+    myTeamId: 123,
+    isDemoMode: false,
+    setMyTeamId: vi.fn(),
+    setDemoTeamId: vi.fn(),
+    clearDemoMode: vi.fn(),
+  }),
+}));
+
+vi.mock('@/components/ui/TeamNavDrawer/TeamNavDrawer', () => ({
+  TeamNavDrawer: () => null,
+}));
+
 vi.mock('@/api/queries', () => ({
   useGameweeks: () => ({
     data: { current: 5, gameweeks: [{ id: 5, name: 'Gameweek 5', finished: true }] },
@@ -131,6 +151,10 @@ vi.mock('@/api/queries', () => ({
   }),
   useSquad: () => ({ data: mockState.squad, isLoading: false, isError: false }),
   usePlayerPool: () => ({ data: mockState.pool, isLoading: false, isError: false }),
+  useEntry: () => ({
+    data: { teamName: 'Test FC', managerName: 'Tester', regionIsoCode: 'GB' },
+    isError: false,
+  }),
 }));
 
 function renderScreen() {
@@ -148,6 +172,7 @@ describe('TransferScreen', () => {
   beforeEach(() => {
     mockState.squad = null;
     mockState.pool = null;
+    mockRequestPremiumUpsell.mockClear();
     localStorage.setItem('fpl_tour_seen_transfer_v1', 'true');
   });
 
@@ -159,6 +184,20 @@ describe('TransferScreen', () => {
   it('shows empty state when squad is not available', () => {
     renderScreen();
     expect(screen.getByText(/No squad found/i)).toBeInTheDocument();
+  });
+
+  it('requests premium upsell when squad is loaded', async () => {
+    mockState.squad = SQUAD_DATA;
+    mockState.pool = { players: POOL_PLAYERS };
+    renderScreen();
+    await waitFor(() => {
+      expect(mockRequestPremiumUpsell).toHaveBeenCalledWith('transfer');
+    });
+  });
+
+  it('does not request premium upsell without squad', () => {
+    renderScreen();
+    expect(mockRequestPremiumUpsell).not.toHaveBeenCalled();
   });
 
   it('opens the transfers bottom sheet when the Transfers button is clicked', async () => {

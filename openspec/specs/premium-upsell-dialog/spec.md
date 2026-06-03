@@ -1,4 +1,4 @@
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Configure upsell frequency via frontend environment
 
@@ -29,8 +29,8 @@ free-tier user views a loaded squad and the per-screen cooldown has elapsed.
 
 - **WHEN** the user is not premium, upsell is enabled, the Transfer squad has loaded
   successfully, and the transfer-screen cooldown has elapsed
-- **THEN** a modal dialog is shown with transfer-specific headline, lead, three benefits, and
-  free vs premium comparison lines
+- **THEN** a modal dialog is shown with transfer-specific headline, lead, three benefits, and a
+  premium value line
 
 #### Scenario: Premium user never sees dialog
 

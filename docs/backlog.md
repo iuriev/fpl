@@ -223,7 +223,7 @@ Useful for long-term planning — build a shortlist without committing a transfe
 | PRED-02 | Predicted points list screen (free: top 3, locked: rest) | M | Monetisation hook + genuinely useful feature. Needs xPts source. |
 
 | MON-01 | Premium subscription flow (paywall, pricing page) | L | Unlocks revenue. Sequence: build the gate first, then the real feature (PRED-04). |
-| MON-02 | Blocking premium upsell dialog on Transfer (Predicted Points with PRED-02) | S | OpenSpec: `openspec/changes/mon-02-premium-upsell-dialog`. Center modal, env cooldown, free tier only. |
+| ~~MON-02~~ | ~~Blocking premium upsell dialog on Transfer (Predicted Points with PRED-02)~~ | S | ✅ Done — archived `2026-06-03-mon-02-premium-upsell-dialog`; spec `openspec/specs/premium-upsell-dialog/`. |
 | MON-03 | Donations / "Buy me a coffee" link | XS | Zero effort. Add link to About or footer before premium flow is ready. |
 
 ### Feature details
@@ -231,6 +231,7 @@ Useful for long-term planning — build a shortlist without committing a transfe
 #### PRED-02: Predicted points list (freemium)
 A dedicated screen showing all FPL players ranked by xPts for the next GW.
 **Monetisation hook:** first 3 rows are free; the rest are blurred / locked behind a paid subscription.
+On screen load (data ready), call `requestUpsell('predictions')` from `PremiumUpsellProvider` (MON-02).
 
 **Layout (fpl.team reference):**
 - Subtitle: "Click on a player to view their profile and compare predictions."

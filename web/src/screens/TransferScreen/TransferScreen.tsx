@@ -7,6 +7,7 @@ import { HelpTour } from '@/components/ui/HelpTour/HelpTour';
 import { TeamNavDrawer } from '@/components/ui/TeamNavDrawer/TeamNavDrawer';
 import { copy, interpolate } from '@/lib/copy';
 import { useMyTeam } from '@/lib/my-team/MyTeamContext';
+import { useRequestPremiumUpsell } from '@/lib/premium-upsell/PremiumUpsellContext';
 import {
   calcBank,
   calcTransferCost,
@@ -83,6 +84,8 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const draftSourceRef = useRef<'storage' | 'fresh'>('fresh');
   const chipInitializedRef = useRef(false);
+  const upsellRequestedRef = useRef(false);
+  const requestPremiumUpsell = useRequestPremiumUpsell();
 
   // Reset state when team/gw changes
   const [prevId, setPrevId] = useState<number | null>(null);
@@ -113,6 +116,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
 
   useEffect(() => {
     chipInitializedRef.current = false;
+    upsellRequestedRef.current = false;
     draftSourceRef.current = (nextGw !== null && loadDraft(teamId, nextGw)) ? 'storage' : 'fresh';
   }, [teamId, nextGw]);
 
@@ -360,6 +364,13 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
 
   const isLoading = squadLoading || poolLoading || !draft;
   const hasNoSquad = !isLoading && !squadError && !squadData;
+
+  useEffect(() => {
+    if (isLoading || squadError || !squadData || displaySquad.length === 0) return;
+    if (upsellRequestedRef.current) return;
+    upsellRequestedRef.current = true;
+    requestPremiumUpsell('transfer');
+  }, [isLoading, squadError, squadData, displaySquad.length, requestPremiumUpsell]);
 
   const handleCloseTour = () => {
     setShowTour(false);

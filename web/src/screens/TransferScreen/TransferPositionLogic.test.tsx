@@ -53,6 +53,24 @@ const mockState = {
   pool: { players: POOL_PLAYERS },
 };
 
+vi.mock('@/lib/premium-upsell/PremiumUpsellContext', () => ({
+  useRequestPremiumUpsell: () => vi.fn(),
+}));
+
+vi.mock('@/lib/my-team/MyTeamContext', () => ({
+  useMyTeam: () => ({
+    myTeamId: 123,
+    isDemoMode: false,
+    setMyTeamId: vi.fn(),
+    setDemoTeamId: vi.fn(),
+    clearDemoMode: vi.fn(),
+  }),
+}));
+
+vi.mock('@/components/ui/TeamNavDrawer/TeamNavDrawer', () => ({
+  TeamNavDrawer: () => null,
+}));
+
 vi.mock('@/api/queries', () => ({
   useGameweeks: () => ({
     data: { current: 5, gameweeks: [{ id: 5, name: 'Gameweek 5', finished: true }] },
@@ -60,6 +78,10 @@ vi.mock('@/api/queries', () => ({
   }),
   useSquad: () => ({ data: mockState.squad, isLoading: false, isError: false }),
   usePlayerPool: () => ({ data: mockState.pool, isLoading: false, isError: false }),
+  useEntry: () => ({
+    data: { teamName: 'Test FC', managerName: 'Tester', regionIsoCode: 'GB' },
+    isError: false,
+  }),
 }));
 
 function renderScreen() {

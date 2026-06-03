@@ -12,6 +12,7 @@ import {
   ApiPlayerWatchlistRepository,
   PlayerWatchlistRepositoryContext,
 } from '@/lib/player-watchlist-repository';
+import { PremiumUpsellProvider } from '@/lib/premium-upsell/PremiumUpsellProvider';
 import { ToastProvider } from '@/lib/toast';
 import {
   ApiWatchlistRepository,
@@ -164,7 +165,9 @@ export function App() {
               <BrowserRouter>
                 <AuthProvider>
                   <MyTeamProvider>
-                    <AppContent />
+                    <PremiumUpsellProvider>
+                      <AppContent />
+                    </PremiumUpsellProvider>
                   </MyTeamProvider>
                 </AuthProvider>
               </BrowserRouter>

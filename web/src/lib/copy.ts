@@ -148,13 +148,13 @@ export const copy = {
   teamInfoOverallRank: 'Overall rank',
   teamInfoGwPts: 'GW pts',
   teamInfoTotalPlayers: 'Total players',
-  teamInfoGwHistory: 'GW History',
+  teamInfoGwHistory: 'My GW history',
   squadNavLink: 'My Squad',
   teamInfoDrawerLabel: 'Team information',
   teamInfoOpenDrawer: 'Open team info',
 
   // Gameweek history screen
-  historyTitle: 'GW History',
+  historyTitle: 'My GW history',
   historyThisSeason: 'This Season',
   historyColGW: 'GW',
   historyColOR: 'OR',
@@ -408,6 +408,28 @@ export const copy = {
   premiumPlayerWatchlistDescription: "You've reached the free plan limit. Upgrade to track more players and unlock features.",
   premiumPlayerWatchlistFreeLabel: '2 players',
   premiumPlayerWatchlistPremiumLabel: '15 players',
+
+  premiumUpsellCta: 'Get Premium',
+  premiumUpsellDismiss: 'Not this gameweek',
+  premiumUpsellClose: 'Close',
+  premiumUpsellAriaLabel: 'Premium upgrade offer',
+  premiumUpsellTransferTitle: "Don't leave points on the table",
+  premiumUpsellTransferLead:
+    "Your rivals are already using projections and chip timing — you're still guessing.",
+  premiumUpsellTransferBenefit1:
+    "Every player's predicted points for the next GW — not just the obvious top 3",
+  premiumUpsellTransferBenefit2:
+    'Know when to Wildcard, Free Hit, Bench Boost or Triple Captain — not just whether',
+  premiumUpsellTransferBenefit3:
+    'Track 10 managers and 15 players on your watchlist while you plan moves',
+  premiumUpsellTransferPremium: "Premium: every player's xPts · 10 managers · 15 players",
+  premiumUpsellPredictionsTitle: "The haulers aren't in the top 3",
+  premiumUpsellPredictionsLead:
+    "The differentials that win mini-leagues sit further down the list — you can't see them on free.",
+  premiumUpsellPredictionsBenefit1: 'Full xPts ranking for every player before the deadline',
+  premiumUpsellPredictionsBenefit2:
+    'Spot price rises and template traps before they hit your rank',
+  premiumUpsellPredictionsBenefit3: "Projected lineups so you don't captain a bench risk",
 
   // Transfer help tour
   tourHelpButton: 'Open tour',
