@@ -36,6 +36,30 @@ export const copy = {
   signInNoAccount: "Don't have an account?",
   signInSignUp: 'Sign up',
   signInTryDemo: 'Try Demo',
+  signInForgotPassword: 'Forgot password?',
+  signInPasswordResetBanner: 'Password updated — sign in with your new password.',
+
+  // Forgot password screen
+  forgotPasswordHeadline: 'Forgot password?',
+  forgotPasswordSubtitle: "Enter your email and we'll send you a reset link.",
+  forgotPasswordEmailLabel: 'Email',
+  forgotPasswordEmailPlaceholder: 'you@example.com',
+  forgotPasswordSubmit: 'Send reset link',
+  forgotPasswordBackToSignIn: 'Back to Sign In',
+  forgotPasswordSuccessMessage: 'Check your inbox — we sent a reset link to {email}.',
+  forgotPasswordError: 'Something went wrong. Please try again.',
+
+  // Reset password screen
+  resetPasswordHeadline: 'Set new password',
+  resetPasswordSubtitle: 'Choose a strong password for your account.',
+  resetPasswordNewLabel: 'New password',
+  resetPasswordNewPlaceholder: 'New password',
+  resetPasswordConfirmLabel: 'Confirm password',
+  resetPasswordConfirmPlaceholder: 'Confirm password',
+  resetPasswordSubmit: 'Update password',
+  resetPasswordMismatchError: "Passwords don't match.",
+  resetPasswordInvalidToken: 'This reset link is invalid or has expired.',
+  resetPasswordRequestNew: 'Request a new one',
 
   // Demo gate dialog
   demoGateTitle: 'Sign in to unlock',
@@ -112,6 +136,10 @@ export const copy = {
 
   // Common actions
   closeButton: 'Close',
+
+  // Drawer account actions
+  drawerChangeTeam: 'Change team',
+  drawerSignOut: 'Sign out',
 
   // Team info panel
   teamInfoOverallPts: 'Overall pts',
