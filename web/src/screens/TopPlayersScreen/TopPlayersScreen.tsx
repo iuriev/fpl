@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 import {
   useGameweeks,
@@ -67,7 +67,6 @@ function useProgressiveList(items: TopPlayersPlayer[]) {
 }
 
 export const TopPlayersScreen: React.FC = () => {
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const { data: gameweeksData } = useGameweeks();
@@ -160,10 +159,6 @@ export const TopPlayersScreen: React.FC = () => {
 
   const { visible, sentinelRef, hasMore } = useProgressiveList(activePlayers);
 
-  const handleBack = () => {
-    navigate('/');
-  };
-
   const gwLabel = selectedGw !== null ? `GW ${selectedGw}` : '';
 
   const isLoading =
@@ -189,11 +184,7 @@ export const TopPlayersScreen: React.FC = () => {
 
   return (
     <div className={styles.screen}>
-      <ScreenHeader
-        backLabel={copy.topPlayersBack}
-        onBack={handleBack}
-        title={copy.topPlayersTitle}
-      />
+      <ScreenHeader title={copy.topPlayersTitle} />
 
       <div className={styles.tabs} role="tablist" aria-label={copy.topPlayersTitle}>
           <button

@@ -92,10 +92,6 @@ export const LeaguesStatsScreen: React.FC<LeaguesStatsScreenProps> = ({ teamId }
 
   const gwParam = searchParams.get('gw');
 
-  const handleBack = () => {
-    navigate('/');
-  };
-
   const handleLeagueClick = useCallback(
     (league: LeagueEntry) => {
       navigate(`/leagues/${league.id}/standings${gwParam ? `?gw=${gwParam}` : ''}`);
@@ -105,7 +101,7 @@ export const LeaguesStatsScreen: React.FC<LeaguesStatsScreenProps> = ({ teamId }
 
   return (
     <div className={styles.screen}>
-      <ScreenHeader backLabel={copy.statsBack} onBack={handleBack} title={copy.statsTitle} />
+      <ScreenHeader title={copy.statsTitle} teamId={teamId} />
 
       <div className={styles.body}>
         {isLoading && <LeaguesSkeleton />}

@@ -87,7 +87,13 @@ describe('TeamInfoPanel', () => {
 describe('TeamInfoPanel — navLinksMode', () => {
   it('full mode renders nav links as <Link> elements', () => {
     renderPanel({}, 'full');
+    expect(screen.getByRole('link', { name: /My Squad/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /GW History/i })).toBeInTheDocument();
+  });
+
+  it('full mode My Squad link points to /', () => {
+    renderPanel({}, 'full');
+    expect(screen.getByRole('link', { name: /My Squad/i }).getAttribute('href')).toBe('/');
   });
 
   it('full mode GW History link points to /history', () => {

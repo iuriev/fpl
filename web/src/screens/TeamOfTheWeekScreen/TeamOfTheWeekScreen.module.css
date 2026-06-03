@@ -16,10 +16,13 @@
 }
 
 .gwLabel {
+  view-transition-name: gw-label;
   font-size: var(--fpl-fs-title);
   font-weight: var(--fpl-fw-bold);
   color: var(--fpl-text);
   letter-spacing: var(--fpl-tr-head-s);
+  text-align: center;
+  min-width: 7rem;
 }
 
 .navBtn {
@@ -60,6 +63,7 @@
 }
 
 .pitchWrap {
+  view-transition-name: totw-content;
   flex: 1;
   min-height: 0;
   overflow: hidden;

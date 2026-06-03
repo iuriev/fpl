@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
 import { api, ApiError } from './client';
 
@@ -194,6 +194,7 @@ export function useSquad(teamId: number | null, gameweek: number | null) {
       return api.getSquad(teamId, gameweek);
     },
     enabled: !!teamId && gameweek !== null,
+    placeholderData: keepPreviousData,
     staleTime: 1000 * 60,
     retry: (failureCount, error) => {
       if (error instanceof ApiError && error.status === 404) return false;

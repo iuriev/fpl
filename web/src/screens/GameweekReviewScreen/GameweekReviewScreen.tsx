@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { useGameweeks, useHistory, usePlayerPool, useSquad } from '@/api/queries';
 import { Button } from '@/components/ui/Button/Button';
@@ -24,8 +23,6 @@ export interface GameweekReviewScreenProps {
 }
 
 export const GameweekReviewScreen: React.FC<GameweekReviewScreenProps> = ({ teamId }) => {
-  const navigate = useNavigate();
-
   const { data: gameweeksData } = useGameweeks();
   const { data: historyData, isLoading: historyLoading, isError: historyError, refetch } =
     useHistory(teamId);
@@ -105,16 +102,11 @@ export const GameweekReviewScreen: React.FC<GameweekReviewScreenProps> = ({ team
     reviewGw,
   ]);
 
-  const handleBack = () => {
-    navigate('/');
-  };
-
   return (
     <div className={styles.screen}>
       <ScreenHeader
-        backLabel={copy.reviewBack}
-        onBack={handleBack}
         title={copy.reviewTitle}
+        teamId={teamId}
         right={reviewGw ? <span className={styles.gwBadge}>GW {reviewGw}</span> : undefined}
       />
 

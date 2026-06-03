@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { useGameweeks } from '@/api/queries';
 import { useTopPlayersGw, useTopPlayersSeason } from '@/api/queries';
@@ -12,7 +12,6 @@ import styles from './PlayerWatchlistScreen.module.css';
 import { WatchedPlayerRow } from './WatchedPlayerRow';
 
 export const PlayerWatchlistScreen: React.FC = () => {
-  const navigate = useNavigate();
   const repo = usePlayerWatchlistRepository();
 
   const [watchedIds, setWatchedIds] = useState<number[]>([]);
@@ -55,14 +54,6 @@ export const PlayerWatchlistScreen: React.FC = () => {
   const limit = repo.getLimit();
   const atLimit = watchedIds.length >= limit;
 
-  const handleBack = () => {
-    if (window.history.length > 1) {
-      navigate(-1);
-    } else {
-      navigate('/');
-    }
-  };
-
   const capacityBadge = interpolate(copy.playerWatchlistCapacityBadge, {
     count: watchedIds.length,
     limit,
@@ -71,8 +62,6 @@ export const PlayerWatchlistScreen: React.FC = () => {
   return (
     <div className={styles.screen}>
       <ScreenHeader
-        backLabel={copy.playerWatchlistBack}
-        onBack={handleBack}
         title={copy.playerWatchlistTitle}
         right={
           <span className={`${styles.capacityBadge} ${atLimit ? styles.capacityBadgeAtLimit : ''}`}>

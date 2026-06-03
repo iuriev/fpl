@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { flushSync } from 'react-dom';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 import { ApiError } from '@/api/client';
 import { useGameweeks,useTeamOfTheWeek } from '@/api/queries';
@@ -66,7 +66,6 @@ function groupByPosition(players: TeamOfTheWeekPlayer[]): Record<PlayerPosition,
 }
 
 export const TeamOfTheWeekScreen: React.FC = () => {
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const { data: gameweeksData } = useGameweeks();
@@ -92,7 +91,7 @@ export const TeamOfTheWeekScreen: React.FC = () => {
     [finishedGws, selectedGw]
   );
 
-  const { data, isLoading, isError, error, refetch } = useTeamOfTheWeek(
+  const { data, isPending, isError, error, refetch } = useTeamOfTheWeek(
     selectedGwFinished ? selectedGw : null
   );
 
@@ -120,10 +119,6 @@ export const TeamOfTheWeekScreen: React.FC = () => {
     );
   };
 
-  const handleBack = () => {
-    navigate('/');
-  };
-
   const positionGroups = useMemo(() => {
     if (!data) return null;
     return groupByPosition(data.players);
@@ -131,13 +126,13 @@ export const TeamOfTheWeekScreen: React.FC = () => {
 
   const gwLabel = selectedGw !== null ? `GW ${selectedGw}` : '';
 
+  const showPitch =
+    selectedGwFinished && !isRealError && !(isNotAvailable || is400);
+  const pitchLoading = showPitch && isPending;
+
   return (
     <div className={styles.screen}>
-      <ScreenHeader
-        backLabel={copy.teamOfTheWeekBack}
-        onBack={handleBack}
-        title={copy.teamOfTheWeekTitle}
-      />
+      <ScreenHeader title={copy.teamOfTheWeekTitle} />
 
       <div className={styles.gwNav}>
         <button
@@ -175,8 +170,6 @@ export const TeamOfTheWeekScreen: React.FC = () => {
         </button>
       </div>
 
-      {isLoading && <PitchSkeleton />}
-
       {isRealError && (
         <div className={styles.stateCenter}>
           <p className={styles.stateText}>{copy.teamOfTheWeekLoadError}</p>
@@ -192,18 +185,29 @@ export const TeamOfTheWeekScreen: React.FC = () => {
         </div>
       )}
 
-      {data && positionGroups && (
-        <div className={styles.pitchWrap}>
+      {showPitch && (
+        <div
+          className={styles.pitchWrap}
+          aria-busy={pitchLoading}
+          aria-label={pitchLoading ? copy.loadingPlaceholder : undefined}
+        >
           <Pitch className={styles.pitchFill} preserveAspectRatio="none">
-            <div className={styles.pitchRows}>
-              {POSITION_ORDER.map((pos) => (
-                <div key={pos} className={styles.playerRow}>
-                  {positionGroups[pos].map((player) => (
-                    <PlayerCard key={player.id} player={toSquadPlayer(player)} size="large" />
+            {pitchLoading ? (
+              <PitchSkeletonContent />
+            ) : (
+              data &&
+              positionGroups && (
+                <div className={styles.pitchRows}>
+                  {POSITION_ORDER.map((pos) => (
+                    <div key={pos} className={styles.playerRow}>
+                      {positionGroups[pos].map((player) => (
+                        <PlayerCard key={player.id} player={toSquadPlayer(player)} size="large" />
+                      ))}
+                    </div>
                   ))}
                 </div>
-              ))}
-            </div>
+              )
+            )}
           </Pitch>
         </div>
       )}
@@ -213,22 +217,20 @@ export const TeamOfTheWeekScreen: React.FC = () => {
 
 TeamOfTheWeekScreen.displayName = 'TeamOfTheWeekScreen';
 
-function PitchSkeleton() {
+function PitchSkeletonContent() {
   return (
-    <div className={styles.pitchWrap} aria-label={copy.loadingPlaceholder} aria-busy="true">
-      <Pitch className={styles.pitchFill} preserveAspectRatio="none">
-        <div className={styles.skeletonVeil} />
-        <div className={styles.pitchRows}>
-          {[1, 3, 4, 3].map((count, rowIdx) => (
-            <div key={rowIdx} className={styles.playerRow}>
-              {Array.from({ length: count }).map((_, i) => (
-                <PlayerSkeleton key={i} />
-              ))}
-            </div>
-          ))}
-        </div>
-      </Pitch>
-    </div>
+    <>
+      <div className={styles.skeletonVeil} />
+      <div className={styles.pitchRows}>
+        {[1, 3, 4, 3].map((count, rowIdx) => (
+          <div key={rowIdx} className={styles.playerRow}>
+            {Array.from({ length: count }).map((_, i) => (
+              <PlayerSkeleton key={i} />
+            ))}
+          </div>
+        ))}
+      </div>
+    </>
   );
 }
 

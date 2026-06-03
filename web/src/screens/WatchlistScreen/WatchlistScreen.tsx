@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { useGameweeks } from '@/api/queries';
 import { PremiumSheet } from '@/components/ui/PremiumSheet/PremiumSheet';
@@ -14,7 +13,6 @@ import { ManagerRow } from './ManagerRow';
 import styles from './WatchlistScreen.module.css';
 
 export const WatchlistScreen: React.FC = () => {
-  const navigate = useNavigate();
   const { myTeamId } = useMyTeam();
   const repo = useWatchlistRepository();
   const { data: gameweeksData } = useGameweeks();
@@ -42,10 +40,6 @@ export const WatchlistScreen: React.FC = () => {
     else if (result === 'limit') setPremiumOpen(true);
   }, [repo, refreshList]);
 
-  const handleBack = () => {
-    navigate('/');
-  };
-
   const currentGw = gameweeksData?.current ?? null;
   const limit = repo.getLimit();
   const isFull = watchedManagers.length >= limit;
@@ -54,9 +48,8 @@ export const WatchlistScreen: React.FC = () => {
   return (
     <div className={styles.screen}>
       <ScreenHeader
-        backLabel={copy.watchlistBack}
-        onBack={handleBack}
         title={copy.watchlistTitle}
+        teamId={myTeamId}
         right={
           <span className={styles.capacity}>
             {interpolate(copy.watchlistCapacity, { n: watchedManagers.length, max: limit })}

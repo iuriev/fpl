@@ -138,9 +138,9 @@ describe('TopPlayersScreen', () => {
     expect(screen.queryByRole('button', { name: /previous gameweek/i })).not.toBeInTheDocument();
   });
 
-  it('renders a back button', () => {
+  it('renders a menu button', () => {
     renderScreen();
-    expect(screen.getByRole('button', { name: /squad/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /open team info/i })).toBeInTheDocument();
   });
 });
 

@@ -17,6 +17,7 @@
 
 .header {
   flex-shrink: 0;
+  contain: layout style;
   background: transparent;
   padding: 0 var(--fpl-space-xl3) var(--fpl-space-xs);
   display: flex;
@@ -199,7 +200,6 @@
 }
 
 .gwLabel {
-  view-transition-name: gw-label;
   font-size: var(--fpl-fs-title);
   font-weight: var(--fpl-fw-bold);
   color: var(--fpl-text);
@@ -246,13 +246,17 @@
 }
 
 .summaryWrap {
-  view-transition-name: squad-summary;
   flex-shrink: 0;
+  min-height: 2.75rem;
   padding: var(--fpl-space-xs) var(--fpl-space-md);
+  transition: opacity 180ms ease;
+}
+
+.summaryWrap_fetching {
+  opacity: 0.72;
 }
 
 .summaryPlaceholder {
-  view-transition-name: squad-summary;
   flex-shrink: 0;
   height: 2.75rem;
   margin: var(--fpl-space-xs) var(--fpl-space-xl);
@@ -267,13 +271,22 @@
   animation: fplShimmer 1.4s linear infinite;
 }
 
+.squadContent,
 .pitchBench {
-  view-transition-name: squad-content;
   flex: 1;
   min-height: 0;
+  overflow: hidden;
+  transition: opacity 180ms ease;
+}
+
+.pitchBench {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+}
+
+.squadContent_fetching {
+  opacity: 0.72;
+  pointer-events: none;
 }
 
 .pitchWrap {
@@ -501,6 +514,17 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .squadContent_fetching,
+  .summaryWrap_fetching {
+    opacity: 1;
+  }
+
+  .squadContent,
+  .pitchBench,
+  .summaryWrap {
+    transition: none;
+  }
+
   .summaryPlaceholder,
   .skeletonJersey,
   .skeletonNameBar {

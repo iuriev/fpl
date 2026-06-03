@@ -15,7 +15,7 @@ export interface TransferHeaderProps {
   planChip: PlanChip;
   chipStatuses: ChipStatuses;
   nextGw: number | null;
-  onBack: () => void;
+  onMenuOpen: () => void;
   onChipToggle: (chip: PlanChip) => void;
   onHelp: () => void;
 }
@@ -27,7 +27,7 @@ export const TransferHeader: React.FC<TransferHeaderProps> = ({
   planChip,
   chipStatuses,
   nextGw,
-  onBack,
+  onMenuOpen,
   onChipToggle,
   onHelp,
 }) => {
@@ -78,17 +78,20 @@ export const TransferHeader: React.FC<TransferHeaderProps> = ({
   return (
     <div className={styles.header} data-tour="header">
       <div className={styles.topRow}>
-        <button className={styles.backBtn} onClick={onBack}>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <button
+          type="button"
+          className={styles.menuBtn}
+          onClick={onMenuOpen}
+          aria-label={copy.teamInfoOpenDrawer}
+        >
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
             <path
-              d="M10 4l-4 4 4 4"
+              d="M3 5h14M3 10h14M3 15h14"
               stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
-              strokeLinejoin="round"
             />
           </svg>
-          {copy.transfersBack}
         </button>
 
         <span className={styles.title}>{copy.transfersTitle}</span>

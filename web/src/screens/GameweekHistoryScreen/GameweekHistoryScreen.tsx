@@ -32,17 +32,11 @@ function RankDir({ current, previous }: { current: number; previous: number | un
 }
 
 export const GameweekHistoryScreen: React.FC<GameweekHistoryScreenProps> = ({ teamId }) => {
-  const navigate = useNavigate();
-
   const { data, isLoading, isError, refetch } = useHistory(teamId);
-
-  const handleBack = () => {
-    navigate('/');
-  };
 
   return (
     <div className={styles.screen}>
-      <ScreenHeader backLabel={copy.historyBack} onBack={handleBack} title={copy.historyTitle} />
+      <ScreenHeader title={copy.historyTitle} teamId={teamId} />
 
       <div className={styles.body}>
         <span className={styles.sectionLabel}>{copy.historyThisSeason}</span>

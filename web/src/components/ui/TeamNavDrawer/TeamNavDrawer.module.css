@@ -1,0 +1,38 @@
+.drawerHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.0625rem;
+  min-width: 0;
+}
+
+.teamNameRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.teamName {
+  font-size: var(--fpl-fs-body-l);
+  font-weight: var(--fpl-fw-bold);
+  color: var(--fpl-text);
+  letter-spacing: var(--fpl-tr-head-m);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.teamManager {
+  font-size: var(--fpl-fs-body-s);
+  color: var(--fpl-muted);
+  white-space: nowrap;
+}
+
+.teamId {
+  font-family: var(--fpl-font-mono), serif;
+  font-size: var(--fpl-fs-micro);
+  color: var(--fpl-muted-soft);
+  font-weight: var(--fpl-fw-medium);
+  letter-spacing: var(--fpl-tr-cap-s);
+}

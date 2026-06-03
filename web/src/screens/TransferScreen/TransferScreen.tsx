@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { useGameweeks, usePlayerPool, useSquad } from '@/api/queries';
 import { BottomSheet } from '@/components/ui/BottomSheet/BottomSheet';
 import { Button } from '@/components/ui/Button/Button';
 import { HelpTour } from '@/components/ui/HelpTour/HelpTour';
+import { TeamNavDrawer } from '@/components/ui/TeamNavDrawer/TeamNavDrawer';
 import { copy, interpolate } from '@/lib/copy';
+import { useMyTeam } from '@/lib/my-team/MyTeamContext';
 import {
   calcBank,
   calcTransferCost,
@@ -57,7 +58,9 @@ const DEFAULT_CHIP_STATUSES: ChipStatuses = {
 };
 
 export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
-  const navigate = useNavigate();
+  const { isDemoMode } = useMyTeam();
+  const navLinksMode = isDemoMode ? 'demo' : 'full';
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const { data: gameweeks } = useGameweeks();
   const currentGw = gameweeks?.current ?? null;
   const nextGw = currentGw !== null ? currentGw + 1 : null;
@@ -370,6 +373,13 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
 
   return (
     <div className={`${styles.screen}${showTour ? ` ${styles.screen_tourOpen}` : ''}`}>
+      <TeamNavDrawer
+        teamId={teamId}
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        navLinksMode={navLinksMode}
+      />
+
       {draft && (
           <TransferHeader
             bank={currentBank}
@@ -378,7 +388,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
             planChip={planChip}
             chipStatuses={squadData?.chipStatuses ?? DEFAULT_CHIP_STATUSES}
             nextGw={nextGw}
-            onBack={() => navigate('/')}
+            onMenuOpen={() => setDrawerOpen(true)}
             onChipToggle={handleChipToggle}
             onHelp={() => setShowTour(true)}
           />

@@ -1,17 +1,15 @@
 import React, { useMemo, useState } from 'react';
-import { flushSync } from 'react-dom';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 import { ApiError } from '@/api/client';
 import { useEntry, useGameweeks, usePlayerPool, useSquad } from '@/api/queries';
 import { Button } from '@/components/ui/Button/Button';
-import { Drawer } from '@/components/ui/Drawer/Drawer';
 import { ListView, ListViewSkeleton } from '@/components/ui/ListView/ListView';
 import { Pitch } from '@/components/ui/Pitch/Pitch';
 import { PlayerCard } from '@/components/ui/PlayerCard/PlayerCard';
 import { SummaryStrip } from '@/components/ui/SummaryStrip/SummaryStrip';
 import type { NavLinksMode } from '@/components/ui/TeamInfoPanel/TeamInfoPanel';
-import { TeamInfoPanel, TeamInfoPanelSkeleton } from '@/components/ui/TeamInfoPanel/TeamInfoPanel';
+import { TeamNavDrawer } from '@/components/ui/TeamNavDrawer/TeamNavDrawer';
 import { type ViewMode, ViewToggle } from '@/components/ui/ViewToggle/ViewToggle';
 import { copy, interpolate } from '@/lib/copy';
 import { useMyTeam } from '@/lib/my-team/MyTeamContext';
@@ -29,14 +27,6 @@ export interface SquadScreenProps {
 
 const POSITION_ORDER: PlayerPosition[] = ['FWD', 'MID', 'DEF', 'GK'];
 
-function withTransition(update: () => void): void {
-  if (!document.startViewTransition) {
-    update();
-    return;
-  }
-  document.startViewTransition(() => flushSync(update));
-}
-
 function groupByPosition(players: SquadPlayer[]): Record<PlayerPosition, SquadPlayer[]> {
   const groups: Record<PlayerPosition, SquadPlayer[]> = { GK: [], DEF: [], MID: [], FWD: [] };
   for (const p of players) {
@@ -52,14 +42,10 @@ function benchLabel(index: number, position: PlayerPosition): string {
 export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
   const { isDemoMode } = useMyTeam();
   const isGuestMode = isGuest ?? false;
 
   const navLinksMode: NavLinksMode = isDemoMode ? 'demo' : isGuestMode ? 'hidden' : 'full';
-  const returnTo = (location.state as { returnTo?: string } | null)?.returnTo ?? '/';
-
   const { following: followingTeam, limitReached: followLimitReached, toggle: toggleFollowTeam } = useFollowTeam(teamId, isGuestMode);
 
   const { data: gameweeksData } = useGameweeks();
@@ -83,10 +69,14 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
   const {
     data: squad,
     isLoading,
+    isFetching,
+    isPlaceholderData,
     isError: squadIsError,
     error: squadError,
     refetch,
   } = useSquad(entryIsError ? null : teamId, selectedGw);
+
+  const isGwTransition = isFetching && isPlaceholderData && !!squad;
 
   const { data: poolData } = usePlayerPool();
 
@@ -102,13 +92,11 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
 
   const jumpToCurrent = () => {
     if (currentGw === null) return;
-    withTransition(() =>
-      setSearchParams((prev) => {
-        const p = new URLSearchParams(prev);
-        p.set('gw', String(currentGw));
-        return p;
-      })
-    );
+    setSearchParams((prev) => {
+      const p = new URLSearchParams(prev);
+      p.set('gw', String(currentGw));
+      return p;
+    });
   };
 
   const canGoPrev = selectedGw !== null && selectedGw > 1;
@@ -117,13 +105,11 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
   const navigateGw = (delta: number) => {
     if (selectedGw === null) return;
     const next = selectedGw + delta;
-    withTransition(() =>
-      setSearchParams((prev) => {
-        const p = new URLSearchParams(prev);
-        p.set('gw', String(next));
-        return p;
-      })
-    );
+    setSearchParams((prev) => {
+      const p = new URLSearchParams(prev);
+      p.set('gw', String(next));
+      return p;
+    });
   };
 
   const handleViewChange = (mode: ViewMode) => {
@@ -142,54 +128,20 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
   const gwLabel =
     selectedGw !== null ? `${copy.squadGameweekLabel} ${selectedGw}` : copy.squadGameweekLabel;
 
-  const flag = entry?.regionIsoCode
-    ? [...entry.regionIsoCode.toUpperCase()].map((c) => String.fromCodePoint(c.codePointAt(0)! - 65 + 0x1f1e6)).join('')
-    : null;
-
-  const drawerHeader = entry ? (
-    <div className={styles.teamInfo}>
-      <div className={styles.teamNameRow}>
-        <span className={styles.teamName}>{entry.teamName}</span>
-        <span className={styles.teamManager}>
-          {flag && <span aria-hidden="true">{flag} </span>}
-          {entry.managerName}
-        </span>
-      </div>
-      <span className={styles.teamId}>{'ID · ' + teamId}</span>
-    </div>
-  ) : null;
-
   return (
     <div className={styles.screen}>
-      <Drawer
+      <TeamNavDrawer
+        teamId={teamId}
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        ariaLabel={copy.teamInfoDrawerLabel}
-        header={drawerHeader}
-      >
-        {entry
-          ? <TeamInfoPanel entry={entry} teamId={teamId} showFollow={isGuestMode} navLinksMode={navLinksMode} />
-          : !entryIsError && <TeamInfoPanelSkeleton />}
-      </Drawer>
+        showFollow={isGuestMode}
+        navLinksMode={navLinksMode}
+      />
 
       <div className={styles.squadCol}>
         <header className={styles.header}>
           <div className={styles.headerMain}>
             <div className={styles.headerLeft}>
-              {isGuestMode && (
-                <button className={styles.backBtn} onClick={() => navigate(returnTo)} aria-label={copy.squadGuestBack}>
-                  <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <path
-                      d="M10 4l-4 4 4 4"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  {copy.squadGuestBack}
-                </button>
-              )}
               <button
                 className={styles.burgerBtn}
                 onClick={() => setDrawerOpen(true)}
@@ -276,7 +228,9 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
         </header>
 
         {squad && (
-          <div className={styles.summaryWrap}>
+          <div
+            className={`${styles.summaryWrap} ${isGwTransition ? styles.summaryWrap_fetching : ''}`}
+          >
             <SummaryStrip summary={squad.summary} activeChip={squad.activeChip} />
           </div>
         )}
@@ -321,10 +275,18 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
         {squad &&
           squad.starters.length > 0 &&
           (view === 'list' ? (
-            <ListView starters={squad.starters} bench={squad.bench} />
+            <div
+              className={`${styles.squadContent} ${isGwTransition ? styles.squadContent_fetching : ''}`}
+              aria-busy={isGwTransition}
+            >
+              <ListView starters={squad.starters} bench={squad.bench} />
+            </div>
           ) : (
             positionGroups && (
-              <div className={styles.pitchBench}>
+              <div
+                className={`${styles.pitchBench} ${isGwTransition ? styles.squadContent_fetching : ''}`}
+                aria-busy={isGwTransition}
+              >
                 <div className={styles.pitchWrap}>
                   <Pitch className={styles.pitchFill}>
                     <div className={styles.pitchRows}>

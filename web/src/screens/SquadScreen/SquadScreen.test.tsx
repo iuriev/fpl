@@ -42,14 +42,10 @@ describe('SquadScreen header navigation', () => {
     expect(screen.queryByRole('button', { name: /back/i })).toBeNull();
   });
 
-  it('shows Back button when isGuest=true (guest mode)', () => {
+  it('shows burger menu when isGuest=true (guest mode)', () => {
     renderScreen(true, { returnTo: '/watchlist?teamId=72828' });
-    expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
-  });
-
-  it('shows Back button when returnTo is in location state', () => {
-    renderScreen(true, { returnTo: '/watchlist?teamId=72828' });
-    expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /open team info/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /back/i })).toBeNull();
   });
 });
 

@@ -23,7 +23,7 @@ describe('TransferHeader', () => {
         planChip="none"
         chipStatuses={mockChipStatuses}
         nextGw={15}
-        onBack={() => {}}
+        onMenuOpen={() => {}}
         onChipToggle={() => {}}
         onHelp={() => {}}
       />

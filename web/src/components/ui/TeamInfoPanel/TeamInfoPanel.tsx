@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 
 import { authClient } from '@/auth/auth-client';
@@ -23,7 +23,7 @@ export interface TeamInfoPanelProps {
   navLinksMode?: NavLinksMode;
 }
 
-const NAV_LINKS: { to: string; label: () => string; featured?: boolean }[] = [
+const NAV_LINKS: { to: string; label: () => string; featured?: boolean; end?: boolean }[] = [
   { to: '/review', label: () => copy.reviewNavLink },
   { to: '/stats', label: () => copy.statsMyStats },
   { to: '/transfers', label: () => copy.transfersNavLink, featured: true },
@@ -66,6 +66,14 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({
   const [limitReached, setLimitReached] = useState(false);
   const [demoGateOpen, setDemoGateOpen] = useState(false);
   const openDemoGate = useCallback(() => setDemoGateOpen(true), []);
+
+  const navLinks = useMemo(() => {
+    const squadTo = showFollow ? `/?teamId=${teamId}` : '/';
+    return [
+      { to: squadTo, label: () => copy.squadNavLink, end: true },
+      ...NAV_LINKS,
+    ];
+  }, [showFollow, teamId]);
 
   useEffect(() => {
     if (!showFollow) return;
@@ -135,10 +143,11 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({
 
       {navLinksMode === 'full' && (
         <div className={styles.navLinks}>
-          {NAV_LINKS.map(({ to, label, featured }) => (
+          {navLinks.map(({ to, label, featured, end }) => (
             <NavLink
               key={to}
               to={to}
+              end={end}
               className={({ isActive }) =>
                 [
                   styles.navLink,
@@ -157,7 +166,7 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({
 
       {navLinksMode === 'demo' && (
         <div className={styles.navLinks}>
-          {NAV_LINKS.map(({ to, label, featured }) => (
+          {navLinks.map(({ to, label, featured }) => (
             <button
               key={to}
               type="button"

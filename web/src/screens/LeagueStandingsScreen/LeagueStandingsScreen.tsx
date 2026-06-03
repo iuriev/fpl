@@ -34,7 +34,6 @@ export function LeagueStandingsScreen() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const backParam = searchParams.get('back') ?? '/stats';
   const leagueIdNum = leagueId ? Number(leagueId) : null;
 
   const {
@@ -56,10 +55,6 @@ export function LeagueStandingsScreen() {
     fetchNextPage();
   }, [fetchNextPage]);
 
-  const handleBack = useCallback(() => {
-    navigate(backParam);
-  }, [navigate, backParam]);
-
   const handleRowClick = useCallback(
     (entry: number) => {
       const returnTo = `/leagues/${leagueId}/standings${searchParams.toString() ? `?${searchParams}` : ''}`;
@@ -72,7 +67,7 @@ export function LeagueStandingsScreen() {
 
   return (
     <div className={styles.screen}>
-      <ScreenHeader backLabel={copy.leagueStandingsBack} onBack={handleBack} title={leagueName} />
+      <ScreenHeader title={leagueName} />
 
       <div className={styles.body}>
         {isLoading && <LeagueStandingsSkeleton />}

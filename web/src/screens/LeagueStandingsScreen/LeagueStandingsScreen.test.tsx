@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { AuthContext, type AuthContextValue } from '@/auth/AuthContext';
+import { MyTeamProvider } from '@/lib/my-team/MyTeamProvider';
 import type { LeagueStandingsResponse, StandingEntry } from '@/types';
 
 const mockNavigate = vi.fn();
@@ -46,6 +48,7 @@ const mockRefetch = vi.fn();
 const mockFetchNextPage = vi.fn();
 
 vi.mock('@/api/queries', () => ({
+  useEntry: () => ({ data: null, isError: false }),
   useLeagueStandings: () => ({
     data: mockStandingsData ? { pages: [mockStandingsData] } : undefined,
     isLoading: mockIsLoading,
@@ -57,10 +60,20 @@ vi.mock('@/api/queries', () => ({
   }),
 }));
 
+const mockAuthContext: AuthContextValue = {
+  user: null,
+  loading: false,
+  refetch: vi.fn(),
+};
+
 function renderScreen(path = '/leagues/42/standings') {
   return render(
     <MemoryRouter initialEntries={[path]}>
-      <LeagueStandingsScreenLazy />
+      <AuthContext.Provider value={mockAuthContext}>
+        <MyTeamProvider>
+          <LeagueStandingsScreenLazy />
+        </MyTeamProvider>
+      </AuthContext.Provider>
     </MemoryRouter>,
   );
 }
@@ -144,11 +157,9 @@ describe('LeagueStandingsScreen', () => {
     });
   });
 
-  it('navigates back to /stats when back button is pressed', async () => {
+  it('renders a menu button in the header', async () => {
     mockStandingsData = PAGE_1;
     renderScreen();
-    const backBtn = await screen.findByRole('button', { name: /leagues/i });
-    await userEvent.click(backBtn);
-    expect(mockNavigate).toHaveBeenCalledWith('/stats');
+    expect(await screen.findByRole('button', { name: /open team info/i })).toBeInTheDocument();
   });
 });

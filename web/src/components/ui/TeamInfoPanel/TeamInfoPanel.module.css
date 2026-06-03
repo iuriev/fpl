@@ -76,8 +76,8 @@
 }
 
 .navLinkActive.navLinkFeatured {
-  animation: none;
-  background: rgba(0, 255, 135, 0.08);
+  border-color: var(--fpl-accent);
+  color: var(--fpl-text);
 }
 
 .navLinkDemo {

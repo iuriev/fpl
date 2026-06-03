@@ -8,7 +8,7 @@ vi.mock('@/api/queries', () => ({
   useGameweeks: () => ({ data: fixtureGameweeks }),
   useTeamOfTheWeek: () => ({
     data: fixtureDreamTeam,
-    isLoading: false,
+    isPending: false,
     isError: false,
     error: null,
     refetch: vi.fn(),
@@ -43,9 +43,9 @@ describe('TeamOfTheWeekScreen', () => {
     expect(screen.getByText('Trossard')).toBeInTheDocument();
   });
 
-  it('renders a back button', () => {
+  it('renders a menu button', () => {
     renderScreen();
-    expect(screen.getByRole('button', { name: /squad/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /open team info/i })).toBeInTheDocument();
   });
 
   it('renders prev/next gameweek nav buttons', () => {

@@ -149,6 +149,7 @@ export const copy = {
   teamInfoGwPts: 'GW pts',
   teamInfoTotalPlayers: 'Total players',
   teamInfoGwHistory: 'GW History',
+  squadNavLink: 'My Squad',
   teamInfoDrawerLabel: 'Team information',
   teamInfoOpenDrawer: 'Open team info',
 
