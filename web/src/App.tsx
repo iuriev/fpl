@@ -19,11 +19,13 @@ import {
 } from '@/lib/watchlist-repository';
 import {
   EntryScreen,
+  ForgotPasswordScreen,
   GameweekHistoryScreen,
   GameweekReviewScreen,
   LeaguesStatsScreen,
   LeagueStandingsScreen,
   PlayerWatchlistScreen,
+  ResetPasswordScreen,
   SignInScreen,
   SignUpScreen,
   SquadScreen,
@@ -74,6 +76,8 @@ function AppContent() {
       <Route path="/" element={rootElement()} />
       <Route path="/sign-in" element={<SignInScreen />} />
       <Route path="/sign-up" element={<SignUpScreen />} />
+      <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
+      <Route path="/reset-password" element={<ResetPasswordScreen />} />
       <Route path="/entry" element={<EntryScreen />} />
       <Route
         path="/history"
