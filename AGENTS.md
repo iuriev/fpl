@@ -70,6 +70,8 @@ Verify changes before claiming done: run relevant `lint` and `test` for touched 
    `.claude/skills/openspec-apply-change/SKILL.md`
 3. **Archive** — move completed change to `openspec/changes/archive/`. Skill:
    `.claude/skills/openspec-archive-change/SKILL.md`
+4. **Finalize** — verify, backlog, docs, archive, propose commit. Skill:
+   `.claude/skills/finalize-task/SKILL.md` (also `.cursor/skills/finalize-task/`)
 
 Do not write application code until requirements and design are approved.
 
@@ -81,6 +83,7 @@ Do not write application code until requirements and design are approved.
 | `.claude/skills/openspec-propose/` | Starting a new change proposal |
 | `.claude/skills/openspec-apply-change/` | Implementing an approved change |
 | `.claude/skills/openspec-archive-change/` | Finalizing a completed change |
+| `.claude/skills/finalize-task/` | **End-of-task wrap-up**: lint/test/build, backlog, docs, archive, propose commit |
 | `.claude/skills/openspec-explore/` | Exploring ideas before committing to a change |
 
 ## Subagent roles (`.claude/agents/`)
