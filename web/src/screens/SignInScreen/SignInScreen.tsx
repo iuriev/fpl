@@ -198,6 +198,7 @@ export const SignInScreen: React.FC = () => {
               if (error) setError(null);
             }}
             disabled={isSubmitting}
+            showPasswordToggle
             required
           />
 

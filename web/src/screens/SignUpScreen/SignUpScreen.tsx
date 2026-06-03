@@ -100,6 +100,7 @@ export const SignUpScreen: React.FC = () => {
               if (error) setError(null);
             }}
             disabled={isSubmitting}
+            showPasswordToggle
             required
           />
 

@@ -79,6 +79,7 @@ export const ResetPasswordScreen: React.FC = () => {
               if (error) setError(null);
             }}
             disabled={isSubmitting}
+            showPasswordToggle
             required
           />
 
@@ -94,7 +95,9 @@ export const ResetPasswordScreen: React.FC = () => {
               setConfirmPassword(e.target.value);
               if (error) setError(null);
             }}
+            error={confirmPassword && newPassword !== confirmPassword ? copy.resetPasswordMismatchError : undefined}
             disabled={isSubmitting}
+            showPasswordToggle
             required
           />
 
