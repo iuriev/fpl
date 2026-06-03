@@ -31,12 +31,12 @@ export function set<T>(key: string, data: T, ttlSeconds: number): void {
 }
 
 export const ttl = {
-  BOOTSTRAP: 3600,
-  ENTRY: 3600,
-  SQUAD_FINISHED: 86400,
+  BOOTSTRAP: 7200,
+  ENTRY: 86400,
+  SQUAD_FINISHED: 604800,
   SQUAD_CURRENT: 300,
-  HISTORY_FINISHED: 86400,
+  HISTORY_FINISHED: 604800,
   HISTORY_CURRENT: 300,
   FIXTURES: 3600,
-  PLAYER_POOL: 600,
+  PLAYER_POOL: 3600,
 };

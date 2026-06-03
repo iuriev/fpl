@@ -219,7 +219,10 @@ async function fetchFPL<T>(path: string): Promise<T> {
   }
 
   const url = `${FPL_BASE_URL}${path}`;
+  const t0 = Date.now();
   const response = await fetch(url);
+  const ms = Date.now() - t0;
+  console.log(`[fpl] ${new Date().toISOString()} ${response.status} ${ms}ms ${path}`);
   if (!response.ok) {
     throw new Error(`FPL API error: ${response.status} ${response.statusText}`);
   }
