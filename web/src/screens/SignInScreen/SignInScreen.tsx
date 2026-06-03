@@ -15,6 +15,7 @@ interface LocationState {
   returnTo?: string;
   verificationSent?: boolean;
   verificationEmail?: string;
+  passwordReset?: boolean;
 }
 
 export const SignInScreen: React.FC = () => {
@@ -24,6 +25,7 @@ export const SignInScreen: React.FC = () => {
   const { clearDemoMode } = useMyTeam();
 
   const locationState = location.state as LocationState | null;
+  const passwordResetSuccess = locationState?.passwordReset ?? false;
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -156,6 +158,9 @@ export const SignInScreen: React.FC = () => {
     </BottomSheet>
     <div className={styles.container}>
       <div className={styles.content}>
+        {passwordResetSuccess && (
+          <div className={styles.successMessage}>{copy.signInPasswordResetBanner}</div>
+        )}
         <h1 className={styles.headline}>
           {copy.signInHeadline || 'Sign In'}
         </h1>
@@ -202,6 +207,10 @@ export const SignInScreen: React.FC = () => {
             {copy.signInSubmit || 'Sign In'}
           </Button>
         </form>
+
+        <Link to="/forgot-password" className={styles.forgotLink}>
+          {copy.signInForgotPassword}
+        </Link>
 
         <div className={styles.divider}>
           <span>{copy.signInDivider || 'or'}</span>

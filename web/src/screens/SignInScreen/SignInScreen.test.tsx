@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import { beforeEach,describe, expect, it, vi } from 'vitest';
 
 import * as authClient from '@/auth/auth-client';
@@ -160,5 +160,25 @@ describe('SignInScreen', () => {
     await waitFor(() => {
       expect(submitButton).not.toBeDisabled();
     });
+  });
+
+  it('renders Forgot password link pointing to /forgot-password', () => {
+    renderSignIn();
+    const link = screen.getByRole('link', { name: /forgot password/i }) as HTMLAnchorElement;
+    expect(link).toBeInTheDocument();
+    expect(link.href).toContain('/forgot-password');
+  });
+
+  it('shows password reset success banner when locationState.passwordReset is true', () => {
+    render(
+      <MemoryRouter initialEntries={[{ pathname: '/sign-in', state: { passwordReset: true } }]}>
+        <AuthContext.Provider value={mockAuthContext}>
+          <MyTeamContext.Provider value={mockMyTeamContext}>
+            <SignInScreen />
+          </MyTeamContext.Provider>
+        </AuthContext.Provider>
+      </MemoryRouter>
+    );
+    expect(screen.getByText(/password updated/i)).toBeInTheDocument();
   });
 });

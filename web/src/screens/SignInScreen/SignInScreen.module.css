@@ -145,6 +145,19 @@
   color: var(--fpl-muted);
 }
 
+.forgotLink {
+  color: var(--fpl-accent);
+  font-size: var(--fpl-fs-body-s);
+  text-decoration: none;
+  text-align: center;
+  display: block;
+  transition: color 150ms;
+}
+
+.forgotLink:hover {
+  color: var(--fpl-accent-deep);
+}
+
 @media (min-width: 48rem) {
   .headline {
     font-size: var(--fpl-fs-h1-l);
