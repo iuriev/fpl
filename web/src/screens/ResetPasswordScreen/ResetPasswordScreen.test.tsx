@@ -8,6 +8,16 @@ import { ResetPasswordScreen } from './ResetPasswordScreen';
 
 vi.mock('@/auth/auth-client');
 
+const mockNavigate = vi.fn();
+
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
+
 function renderScreen(search = '') {
   return render(
     <MemoryRouter initialEntries={[`/reset-password${search}`]}>
@@ -78,6 +88,27 @@ describe('ResetPasswordScreen', () => {
 
     await waitFor(() =>
       expect(screen.getByText(/token expired/i)).toBeInTheDocument()
+    );
+  });
+
+  it('navigates to /sign-in with passwordReset state on success', async () => {
+    const mockReset = vi.fn().mockResolvedValue(undefined);
+    vi.spyOn(authClientModule, 'authClient', 'get').mockReturnValue({
+      ...authClientModule.authClient,
+      resetPassword: mockReset,
+    });
+
+    renderScreen('?token=abc123');
+    const [newPw, confirmPw] = document.querySelectorAll('input[type="password"]') as NodeListOf<HTMLInputElement>;
+    fireEvent.change(newPw, { target: { value: 'newpass1' } });
+    fireEvent.change(confirmPw, { target: { value: 'newpass1' } });
+    fireEvent.click(screen.getByRole('button', { name: /update password/i }));
+
+    await waitFor(() =>
+      expect(mockNavigate).toHaveBeenCalledWith('/sign-in', {
+        replace: true,
+        state: { passwordReset: true },
+      })
     );
   });
 });
