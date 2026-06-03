@@ -2,6 +2,7 @@ import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { logger } from 'hono/logger';
 
 import { auth } from './auth/auth';
 import { runMigrations } from './db/client';
@@ -32,10 +33,16 @@ if (!process.env.BETTER_AUTH_SECRET) {
 
 await runMigrations();
 
+const isDev = process.env.NODE_ENV !== 'production';
+
 const app = new Hono();
 
 // Enable CORS to allow the web app to call this proxy
 app.use('*', cors());
+
+if (isDev) {
+  app.use('*', logger());
+}
 
 // Health check
 app.get('/health', (c) => {
@@ -328,8 +335,10 @@ app.get('/api/top-players/season', async (c) => {
 app.on(['GET', 'POST'], '/api/auth/*', (c) => auth.handler(c.req.raw));
 app.route('/api/me', me);
 
-app.use('*', serveStatic({ root: './web/dist' }));
-app.get('*', serveStatic({ path: './web/dist/index.html' }));
+if (process.env.NODE_ENV === 'production') {
+  app.use('*', serveStatic({ root: './web/dist' }));
+  app.get('*', serveStatic({ path: './web/dist/index.html' }));
+}
 
 const port = Number(process.env.PORT ?? 3001);
 

@@ -11,7 +11,7 @@ const mockRefetch = vi.fn().mockResolvedValue(undefined);
 
 function makeAuthContext(fplTeamId: number | null = null): AuthContextValue {
   return {
-    user: { id: '1', email: 'test@test.com', name: 'Test', fplTeamId },
+    user: { id: '1', email: 'test@test.com', name: 'Test', fplTeamId, emailVerified: true },
     loading: false,
     refetch: mockRefetch,
   };

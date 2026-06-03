@@ -8,6 +8,7 @@ export interface AuthUser {
   email: string;
   name: string;
   fplTeamId: number | null;
+  emailVerified: boolean;
 }
 
 export interface AuthError {

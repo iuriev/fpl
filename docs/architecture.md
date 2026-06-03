@@ -69,10 +69,12 @@ Set these with `fly secrets set KEY=value` before deploying:
 | `GOOGLE_CLIENT_ID` | OAuth 2.0 client ID from Google Cloud Console |
 | `GOOGLE_CLIENT_SECRET` | OAuth 2.0 client secret from Google Cloud Console |
 | `PUBLIC_APP_URL` | Full origin of the deployed app, e.g. `https://fpl-squad-viewer.fly.dev` |
+| `RESEND_API_KEY` | Resend API key for transactional email (email verification) |
+| `FROM_EMAIL` | Sender address for verification emails, e.g. `noreply@fpl-squad-viewer.fly.dev` |
 
 `DATABASE_URL` and `BETTER_AUTH_SECRET` are required at boot — the proxy exits immediately if
-either is missing. The Google OAuth secrets are optional for local development (social sign-in
-will be unavailable if unset).
+either is missing. The Google OAuth secrets and `RESEND_API_KEY` are optional for local
+development (social sign-in and email verification will be unavailable if unset).
 
 ## Status
 

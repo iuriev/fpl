@@ -62,6 +62,7 @@ function AppContent() {
     }
 
     if (!user && !isDemoMode) return <Navigate to="/sign-in" replace />;
+    if (user && !user.emailVerified) return <Navigate to="/sign-in" replace />;
     if (isDemoMode && !myTeamId) return <Navigate to="/entry" state={{ demo: true }} replace />;
     if (isDemoMode && myTeamId) return <SquadScreen teamId={myTeamId} />;
     if (user && !user.fplTeamId) return <EntryScreen />;

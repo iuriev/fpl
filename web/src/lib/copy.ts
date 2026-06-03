@@ -44,6 +44,14 @@ export const copy = {
   demoGateSignUp: 'Create Account',
   demoGateDismiss: 'Dismiss',
 
+  // Verify email sheet / screen
+  verifyEmailHeadline: 'Check your inbox',
+  verifyEmailBody: 'We sent a verification link to {email}. Open it to activate your account.',
+  verifyEmailResend: 'Resend email',
+  verifyEmailResent: 'Email sent!',
+  verifyEmailWrongEmail: 'Wrong email? Sign up again',
+  signInUnverifiedEmailError: "Your email hasn't been verified yet. Check your inbox for the link we sent when you signed up.",
+
   // Sign up screen
   signUpHeadline: 'Create Account',
   signUpSubtitle: 'Join FPL Squad Viewer',

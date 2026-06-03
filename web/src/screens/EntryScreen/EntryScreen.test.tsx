@@ -68,7 +68,7 @@ describe('EntryScreen — demo mode', () => {
 
 describe('EntryScreen — authenticated mode', () => {
   const authUser: AuthContextValue = {
-    user: { id: '1', email: 'u@test.com', name: 'U', fplTeamId: null },
+    user: { id: '1', email: 'u@test.com', name: 'U', fplTeamId: null, emailVerified: true },
     loading: false,
     refetch: vi.fn(),
   };

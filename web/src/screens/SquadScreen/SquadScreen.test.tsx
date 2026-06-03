@@ -36,16 +36,15 @@ function renderScreen(isGuest?: boolean, state?: Record<string, unknown>) {
 }
 
 describe('SquadScreen header navigation', () => {
-  it('shows Change button when no returnTo state (own team)', () => {
+  it('does not show Change button (own team)', () => {
     renderScreen(false);
-    expect(screen.getByRole('button', { name: /change/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /change/i })).toBeNull();
     expect(screen.queryByRole('button', { name: /back/i })).toBeNull();
   });
 
   it('shows Back button when isGuest=true (guest mode)', () => {
     renderScreen(true, { returnTo: '/watchlist?teamId=72828' });
     expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /change/i })).toBeNull();
   });
 
   it('shows Back button when returnTo is in location state', () => {

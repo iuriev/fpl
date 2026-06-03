@@ -13,6 +13,10 @@ vi.mock('../db/client', () => ({
   runMigrations: vi.fn(),
 }));
 
+vi.mock('resend', () => ({
+  Resend: vi.fn(() => ({ emails: { send: vi.fn() } })),
+}));
+
 import { auth } from './auth';
 
 const mockHandler = vi.mocked(auth.handler);
@@ -97,5 +101,25 @@ describe('GET /api/auth/sign-in/social/google', () => {
 
     expect(mockHandler).toHaveBeenCalledOnce();
     expect(res.status).toBe(302);
+  });
+});
+
+describe('POST /api/auth/send-verification-email', () => {
+  it('delegates to auth handler', async () => {
+    mockHandler.mockResolvedValue(
+      new Response(JSON.stringify({ status: 'ok' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+
+    const res = await makeApp().request('/api/auth/send-verification-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'user@example.com' }),
+    });
+
+    expect(mockHandler).toHaveBeenCalledOnce();
+    expect(res.status).toBe(200);
   });
 });

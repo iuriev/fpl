@@ -134,14 +134,6 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
     });
   };
 
-  const handleChangeTeam = () => {
-    if (isDemoMode) {
-      navigate('/entry', { state: { demo: true } });
-    } else {
-      navigate('/entry');
-    }
-  };
-
   const positionGroups = useMemo(() => {
     if (!squad) return null;
     return groupByPosition(squad.starters);
@@ -217,11 +209,6 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
                 <span className={styles.teamId}>{'ID · ' + teamId}</span>
               </div>
             )}
-            {!isGuestMode && (
-              <Button variant="link" onClick={handleChangeTeam}>
-                {copy.squadChangeTeam}
-              </Button>
-            )}
           </div>
 
           <div className={styles.viewToggleWrap}>
@@ -292,9 +279,6 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
         {entryIsError && (
           <div className={styles.stateCenter}>
             <p className={styles.stateText}>{copy.squadNotFound}</p>
-            <Button variant="secondary" onClick={handleChangeTeam}>
-              {copy.squadChangeTeam}
-            </Button>
           </div>
         )}
 

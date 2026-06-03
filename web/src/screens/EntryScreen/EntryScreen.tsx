@@ -24,7 +24,7 @@ export const EntryScreen: React.FC<EntryScreenProps> = ({
   _storyInputValue,
   _storyIsSubmitting,
 }) => {
-  const { user } = useCurrentUser();
+  const { user, refetch } = useCurrentUser();
   const { setDemoTeamId } = useMyTeam();
   const navigate = useNavigate();
   const location = useLocation();
@@ -77,9 +77,8 @@ export const EntryScreen: React.FC<EntryScreenProps> = ({
       }
 
       if (user && !user.fplTeamId) {
-        authClient.saveTeam(id).catch(() => {
-          // Fire-and-forget, don't block on error
-        });
+        await authClient.saveTeam(id).catch(() => {});
+        await refetch();
       }
 
       onSubmit?.(id);

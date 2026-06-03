@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { authClient, AuthError } from '@/auth/auth-client';
-import { useCurrentUser } from '@/auth/AuthContext';
 import { Button } from '@/components/ui/Button/Button';
 import { Input } from '@/components/ui/Input/Input';
 import { copy } from '@/lib/copy';
@@ -12,7 +11,6 @@ import styles from './SignUpScreen.module.css';
 
 export const SignUpScreen: React.FC = () => {
   const navigate = useNavigate();
-  const { refetch } = useCurrentUser();
   const { clearDemoMode } = useMyTeam();
 
   const [name, setName] = useState('');
@@ -29,8 +27,7 @@ export const SignUpScreen: React.FC = () => {
     try {
       await authClient.signUp(email, password, name);
       clearDemoMode();
-      await refetch();
-      navigate('/', { replace: true });
+      navigate('/sign-in', { replace: true, state: { verificationSent: true, verificationEmail: email } });
     } catch (err) {
       const authErr = err as AuthError;
       setError(authErr.message || 'Sign up failed');
@@ -39,8 +36,14 @@ export const SignUpScreen: React.FC = () => {
     }
   };
 
-  const handleGoogleSignUp = () => {
-    window.location.href = `/api/auth/sign-in/social/google?callbackURL=${window.location.origin}/`;
+  const handleGoogleSignUp = async () => {
+    const res = await fetch('/api/auth/sign-in/social', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ provider: 'google', callbackURL: `${window.location.origin}/` }),
+    });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
   };
 
   return (
@@ -121,9 +124,9 @@ export const SignUpScreen: React.FC = () => {
 
         <p className={styles.footer}>
           {copy.signUpHaveAccount || 'Already have an account?'}{' '}
-          <a href="/sign-in" className={styles.link}>
+          <Link to="/sign-in" viewTransition className={styles.link}>
             {copy.signUpSignIn || 'Sign in'}
-          </a>
+          </Link>
         </p>
       </div>
     </div>

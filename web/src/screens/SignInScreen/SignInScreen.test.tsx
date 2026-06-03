@@ -98,7 +98,7 @@ describe('SignInScreen', () => {
 
   it('has sign up link', () => {
     renderSignIn();
-    const signUpLink = screen.getByText(/sign up/i) as HTMLAnchorElement;
+    const signUpLink = screen.getByText("Sign up") as HTMLAnchorElement;
     expect(signUpLink.href).toContain('/sign-up');
   });
 

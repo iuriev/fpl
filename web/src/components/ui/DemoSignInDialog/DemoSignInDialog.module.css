@@ -72,6 +72,10 @@
   margin-top: var(--fpl-space-sm);
 }
 
+.actions > * {
+  width: 100%;
+}
+
 .dismissBtn {
   position: absolute;
   top: var(--fpl-space-md);
