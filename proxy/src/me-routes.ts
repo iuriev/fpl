@@ -1,11 +1,13 @@
-import { eq } from 'drizzle-orm';
+import { and, count, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 
 import { auth } from './auth/auth';
 import { type AuthVars, requireUser } from './auth/middleware';
 import { db } from './db/client';
-import { user } from './db/schema';
+import { playerWatchlistEntry, user, watchlistEntry } from './db/schema';
 import * as entryService from './entry-service';
+
+const FREE_LIMIT = 2;
 
 const isDev = process.env.NODE_ENV !== 'production';
 
@@ -43,6 +45,107 @@ me.put('/team', requireUser, async (c) => {
   if (isDev) console.log('[me] fplTeamId saved:', teamId, 'for user:', c.var.user.email);
 
   return c.json({ fplTeamId: teamId });
+});
+
+me.get('/watchlist', requireUser, async (c) => {
+  const rows = await db
+    .select({ teamId: watchlistEntry.teamId })
+    .from(watchlistEntry)
+    .where(eq(watchlistEntry.userId, c.var.user.id))
+    .orderBy(watchlistEntry.createdAt);
+  return c.json({ teamIds: rows.map((r) => r.teamId) });
+});
+
+me.post('/watchlist', requireUser, async (c) => {
+  const body = await c.req.json<{ teamId: unknown }>();
+  const teamId = Number(body?.teamId);
+  if (!Number.isInteger(teamId) || teamId <= 0) {
+    return c.json({ error: 'Invalid team ID' }, 400);
+  }
+
+  const [{ total }] = await db
+    .select({ total: count() })
+    .from(watchlistEntry)
+    .where(eq(watchlistEntry.userId, c.var.user.id));
+  if (total >= FREE_LIMIT) {
+    return c.json({ error: 'limit' }, 409);
+  }
+
+  try {
+    await db.insert(watchlistEntry).values({
+      id: crypto.randomUUID(),
+      userId: c.var.user.id,
+      teamId,
+    });
+  } catch {
+    return c.json({ error: 'duplicate' }, 409);
+  }
+
+  return c.json({ teamId });
+});
+
+me.delete('/watchlist/:teamId', requireUser, async (c) => {
+  const teamId = Number(c.req.param('teamId'));
+  if (!Number.isInteger(teamId) || teamId <= 0) {
+    return c.json({ error: 'Invalid team ID' }, 400);
+  }
+  await db
+    .delete(watchlistEntry)
+    .where(and(eq(watchlistEntry.userId, c.var.user.id), eq(watchlistEntry.teamId, teamId)));
+  return new Response(null, { status: 204 });
+});
+
+me.get('/player-watchlist', requireUser, async (c) => {
+  const rows = await db
+    .select({ playerId: playerWatchlistEntry.playerId })
+    .from(playerWatchlistEntry)
+    .where(eq(playerWatchlistEntry.userId, c.var.user.id))
+    .orderBy(playerWatchlistEntry.createdAt);
+  return c.json({ playerIds: rows.map((r) => r.playerId) });
+});
+
+me.post('/player-watchlist', requireUser, async (c) => {
+  const body = await c.req.json<{ playerId: unknown }>();
+  const playerId = Number(body?.playerId);
+  if (!Number.isInteger(playerId) || playerId <= 0) {
+    return c.json({ error: 'Invalid player ID' }, 400);
+  }
+
+  const [{ total }] = await db
+    .select({ total: count() })
+    .from(playerWatchlistEntry)
+    .where(eq(playerWatchlistEntry.userId, c.var.user.id));
+  if (total >= FREE_LIMIT) {
+    return c.json({ error: 'limit' }, 409);
+  }
+
+  try {
+    await db.insert(playerWatchlistEntry).values({
+      id: crypto.randomUUID(),
+      userId: c.var.user.id,
+      playerId,
+    });
+  } catch {
+    return c.json({ error: 'duplicate' }, 409);
+  }
+
+  return c.json({ playerId });
+});
+
+me.delete('/player-watchlist/:playerId', requireUser, async (c) => {
+  const playerId = Number(c.req.param('playerId'));
+  if (!Number.isInteger(playerId) || playerId <= 0) {
+    return c.json({ error: 'Invalid player ID' }, 400);
+  }
+  await db
+    .delete(playerWatchlistEntry)
+    .where(
+      and(
+        eq(playerWatchlistEntry.userId, c.var.user.id),
+        eq(playerWatchlistEntry.playerId, playerId),
+      ),
+    );
+  return new Response(null, { status: 204 });
 });
 
 me.post('/logout', async (c) => {

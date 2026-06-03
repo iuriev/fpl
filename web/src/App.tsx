@@ -9,12 +9,12 @@ import { useMyTeam } from '@/lib/my-team/MyTeamContext';
 import { MyTeamProvider } from '@/lib/my-team/MyTeamProvider';
 import { PlayerWatchlistPremiumProvider } from '@/lib/player-watchlist-premium/PlayerWatchlistPremiumProvider';
 import {
-  LocalStoragePlayerWatchlistRepository,
+  ApiPlayerWatchlistRepository,
   PlayerWatchlistRepositoryContext,
 } from '@/lib/player-watchlist-repository';
 import { ToastProvider } from '@/lib/toast';
 import {
-  LocalStorageWatchlistRepository,
+  ApiWatchlistRepository,
   WatchlistRepositoryContext,
 } from '@/lib/watchlist-repository';
 import {
@@ -36,8 +36,8 @@ import {
 } from '@/screens';
 
 const queryClient = new QueryClient();
-const watchlistRepo = new LocalStorageWatchlistRepository();
-const playerWatchlistRepo = new LocalStoragePlayerWatchlistRepository();
+const watchlistRepo = new ApiWatchlistRepository();
+const playerWatchlistRepo = new ApiPlayerWatchlistRepository();
 
 function AuthAndTeamProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useCurrentUser();

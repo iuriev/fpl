@@ -113,14 +113,12 @@ These features give the app reasons to return every gameweek — essential for g
 | ~~CHIP-01~~ | ~~Display active chip on squad screen + SummaryStrip~~ | S | ✅ Done — chip cell replaces AVERAGE+HIGHEST in SummaryStrip. |
 | ~~CHIP-02~~ | ~~Consider active chip in transfer planner (Wildcard = unlimited free transfers)~~ | S | ✅ Done — Wildcard and Free Hit now zero out transfer costs in the planner. |
 | ANA-03 | Price change risers & fallers (global + mini-league) | M | Huge FPL meta driver. Users check this daily during the GW. |
-| ANA-02 | Most popular players (ownership %) screen | S | TopPlayersScreen already exists — extend with ownership sort/filter. |
-| ANA-04 | Top-ranked managers → view their squads | M | Viral / social feature. Re-uses existing squad viewer. |
-| ~~ANA-12~~ | ~~League participants browser (click league on Stats to see all members)~~ | S | → OpenSpec change 2026-06-02-ana-12-league-participants-browser. |
+| ~~ANA-12~~ | ~~League participants browser (click league on Stats to see all members)~~ | S | ✅ Done — OpenSpec change 2026-06-02-ana-12-league-participants-browser. |
 | ~~MGR-01~~ | ~~Manager Watchlist — follow managers, see their points/transfers in a table~~ | M | ✅ Done — OpenSpec change 2026-06-01-manager-watchlist. localStorage phase, max 5. |
 | MGR-02 | Backend watchlist — migrate MGR-01 from localStorage to backend API | S | Depends on AUTH-01. Swap LocalStorageWatchlistRepository → ApiWatchlistRepository; no UI changes. |
 | ~~MGR-03~~ | ~~Freemium watchlist limits — 2 entries free, 10 with subscription~~ | S | ✅ Done — limits implemented in LocalStorageWatchlistRepository (2 managers) and LocalStoragePlayerWatchlistRepository (2 players); upsell PremiumSheet wired via use-follow-team / use-follow-player. |
 | ~~WATCH-01~~ | ~~Player Watchlist — shortlist of players you're tracking but not yet transferring~~ | S | ✅ Done. |
-| AUTH-01 | Login / password + Google OAuth, backend user profile | M | Enables watchlists, saved plans, AI chat. OpenSpec change in progress. |
+| ~~AUTH-01~~ | ~~Login / password + Google OAuth, backend user profile~~ | M | ✅ Done — OpenSpec change 2026-06-02-auth-01-user-accounts. |
 
 ### Feature details
 
@@ -131,22 +129,12 @@ A post-gameweek screen or panel showing:
 - "What-if you hadn't transferred anyone" comparison
 Research what similar services do (fpl.team, fplukraine.com, etc.) and design accordingly.
 
-#### ANA-02: Most popular players (ownership%)
-Show a list or widget of the most widely-owned players across all FPL managers —
-effectively the global ownership%, sortable and filterable.
-Already partially covered by `TopPlayersScreen` — consider extending it.
-
 #### ANA-03: Price change risers & fallers
 Show players whose price has changed the most (up and down) — scoped to:
 - Global (all FPL)
 - Within the user's mini-league
 
 Reference: fpl.team league tab with price filter.
-
-#### ANA-04: Top-ranked managers — view their squads
-Surface the top-N ranked managers in the overall leaderboard with a one-tap link to view their
-squad in the app (re-using the existing squad viewer with a different team ID).
-Motivates competitive users to see what the best managers are doing.
 
 #### ANA-06: Captain Poll
 Community vote for the best captain pick each gameweek.
@@ -166,14 +154,6 @@ total captain points earned, success rate per pick, best/worst calls.
 Show the user's historical transfers:
 net transfer points (total pts gained vs. cost of hits), which moves succeeded, which hurt.
 
-#### ANA-10: FPL Head-to-Head comparison
-Compare two managers head-to-head across ranks, captain points, transfer efficiency,
-and other key stats. Select from mini-league or by entering any team ID.
-
-#### ANA-11: Hindsight Dream Team
-Show the user what their optimal squad would have been for each completed gameweek —
-viewing missed points, potential totals, and efficiency rating.
-
 #### ANA-12: League participants browser
 On the Stats / Leagues screen, click a league to see all participants.
 Scroll the list; click a manager to view their squad using the existing squad viewer.
@@ -182,28 +162,6 @@ Scroll the list; click a manager to view their squad using the existing squad vi
 When a user has an active chip (Wildcard, Free Hit, Triple Captain, Bench Boost), show a visible
 indicator on the SquadScreen / SummaryStrip. Learn the official FPL chip lifecycle rules and
 implement them correctly (when each chip can be played, once-per-season constraints, etc.).
-
-#### CHIP-07: Assistant Manager chip (research + implement)
-
-New chip introduced in FPL 2025/26 season. Visible in the official FPL chip selection UI
-alongside Wildcard, Triple Captain, Free Hit, and Bench Boost.
-
-**What needs to be researched before implementation:**
-- Official FPL API value for `active_chip` (likely `"assistant-manager"` or `"am"` — not yet confirmed)
-- Game rules: when can it be played, how many times per season, what does it actually do
-  (initial understanding: selects a real-world manager/coach who earns bonus points based on
-  their team's performance, but needs verification against FPL official rules)
-- Whether the proxy's `toActiveChip()` allowlist needs extending
-- Whether the chip affects squad composition or just scoring
-
-**Implementation path (once rules are known):**
-1. Add the new API string value to `ActiveChip` type and `toActiveChip()` allowlist.
-2. Add icon SVG (same octagonal badge shape — already established in ChipBadge).
-3. Add display name and CSS token to the existing chip palette.
-4. If it affects transfers: extend CHIP-02 logic.
-
-Reference: official FPL chip selection screen (image confirmed, icon shows person/silhouette
-inside the octagonal badge).
 
 #### CHIP-02: Consider chips in transfer planner
 The transfer planner should know whether a chip is active or can be played this GW:
@@ -411,10 +369,7 @@ Reference: fpl.team Transfer Solver.
 | ID | Task | Effort | Why |
 |----|------|--------|-----|
 | FIX-02 | Full-season Fixtures Calendar (FDR heatmap, DGW/BGW, Recovery views) | L | One of fpl.team's most-used features. Long build but very high utility. |
-| FIX-03 | Customisable Fixture Ticker | M | Lightweight version of FIX-02 for quick fixture scanning. |
 | ANA-06 | Captain Poll (community vote each GW) | M | Social feature; drives pre-deadline engagement and return visits. |
-| SOC-01 | Squad comparison (side-by-side vs. another manager) | M | Fun social feature; re-uses squad viewer. |
-| SOC-02 | Mini-league invite link | M | Viral acquisition channel for mini-league groups. |
 | APP-01 | About page | S | Builds trust. Needed before wider launch. |
 
 ### Feature details
@@ -428,18 +383,6 @@ Full-season fixture calendar with multiple view modes:
 
 Filter tabs: Custom | Official | Rest Days | Overall | Defensive | Attacking
 Reference: fpl.team Fixtures Calendar feature.
-
-#### FIX-03: Customisable Fixture Ticker
-Compact, scrollable fixture ticker the user can configure — select which teams to watch,
-filter by position, show only upcoming N gameweeks.
-Reference: Fantasy Football Scout Chief Scout feature.
-
-#### SOC-01: Squad comparison
-Compare your squad side by side with any other manager's squad:
-- Two-panel pitch view showing both squads with kit colours
-- Stats per squad: budget, total pts, GW points, bench value
-- Select opponent from your mini-league or enter any team ID
-Reference: fplukraine.com squad comparison feature.
 
 #### SOC-02: Mini-league invite link
 Register a custom mini-league within the app with a shareable invite link.
@@ -456,11 +399,8 @@ Write original copy (do not copy fpl.team text); use https://fpl.team/about/ as 
 | ID | Task | Effort | Why |
 |----|------|--------|-----|
 | STAT-01 | DEFCON / BPS leaderboard screen | S | Unique FPL insight. Data source needs research (cheatography API?). |
-| STAT-02 | Per-match points breakdown in player info popup | S | Users want to know *why* a player scored what they scored. |
 | ANA-08 | Captain Picks Analyzer | M | Helps users see if their captaincy decisions are paying off. |
 | ANA-09 | Transfer Analyzer | M | Net transfer points history — was each transfer worth it? |
-| ANA-10 | FPL Head-to-Head comparison | M | Competitive social feature for mini-league rivalries. |
-| ANA-11 | Hindsight Dream Team ("what could I have scored?") | M | Gamification of reflection; drives discussion. |
 | ANA-07 | All-time rank tracker | S | Career view. Simple chart over time. |
 
 ### Feature details
@@ -472,19 +412,6 @@ Two-sided ranking of players by in-match performance:
 
 Can be integrated into the player info popup or as a standalone screen.
 
-#### STAT-02: Per-match points breakdown in player info view
-In the player info popup (ⓘ), add a tab or expandable section showing:
-how many points the player earned in each recent game and what for
-(goals, assists, clean sheet, bonus, deductions).
-
-#### STAT-03: Three Player Comparison Tool
-Compare up to 3 players side by side across key stats:
-xPts, form, price, ownership%, upcoming fixtures FDR.
-Reference: Fantasy Football Scout Chief Scout feature.
-
-#### STAT-04: Player xG Data & Heatmaps
-Visualise a player's xG (expected goals) over time and positional heatmap on the pitch.
-Reference: Fantasy Football Scout Chief Scout feature.
 
 ---
 
@@ -495,15 +422,10 @@ Reference: Fantasy Football Scout Chief Scout feature.
 | INF-03 | Redis cache + фонова prefetch-стратегія для масштабу 5000+ юзерів | L | Замінює in-memory кеш на Redis; фонові jobs тягнуть популярні squad IDs заздалегідь. Потрібно тільки після валідації попиту. |
 | PRED-04 | Full AI prediction engine | XL | The big bet. Do this after PRED-02/03 validate demand and after MON-01 is live. |
 | AI-01 | Personal FPL AI analyst chat (free 2-3 Qs, then paid) | XL | Build after AUTH-01 and PRED-04 are live. |
-| ANA-05 | "Top 1% feature" (what makes the best managers different) | L | Viral potential. Needs data aggregation from FPL API + analysis layer. |
-| STAT-03 | Three Player Comparison Tool | M | Nice tool. Build after STAT-04 (needs same data source). |
-| STAT-04 | Player xG Data & Heatmaps | L | Requires StatsBomb / OPTA data integration. Research data sources first. |
-| ~~AUTH-01~~ | ~~Login / password + Google OAuth, backend user profile~~ | M | Moved to P2 — OpenSpec change in progress. |
 | AUTH-02 | FPL OAuth / transfer execution | XL | Complex. Needs FPL API capability research first (may not be possible). |
 | START-01 | GW1 draft assistant | L | Seasonal feature (once a year). High viral potential before season start. |
-| DES-03 | FDR screen | M | Good utility but fpl.team already does this well. Differentiate with AI angle instead. |
 | DES-01 | Desktop responsive layout | L | Low priority while the app is pre-launch / mobile-first. |
-| DES-02 | i18n (multi-language) | M | Opens new markets (Ukrainian FPL community, etc.). Do after core features are stable. |
+| SOC-02 | Mini-league invite link | M | Viral acquisition channel. Deprioritised — revisit after core analytics features are done. |
 | *(backlog)* | Player detail stats (points breakdown) | M | Nice-to-have. FPL app does this — we can differentiate with AI commentary. |
 | *(backlog)* | Live in-match scoring | L | Complex edge cases. Research spikes needed. |
 | *(backlog)* | Team of the Week badge on squad screen | S | Polish feature. Simple once data source is confirmed. |
@@ -524,12 +446,6 @@ queue if the rate limiter (INF-02) needs a persistent queue too.
 
 **Trigger:** only when INF-01 + INF-02 are insufficient (i.e. sustained 5000+ concurrent users).
 Do not build before demand is validated — premature complexity.
-
-#### AUTH-01: User accounts (login + Google OAuth)
-Add authentication so users can save preferences across sessions:
-- Login / password + "Sign in with Google"
-- Backend stores: selected teams, followed managers, watchlists, custom settings
-- Enables all personalised features (watchlist, custom plans, AI chat history)
 
 #### PRED-04: Full AI prediction engine (long-term research)
 Deep research + build a prediction model that scores players for the next GW using:
@@ -553,11 +469,6 @@ Team-aware AI chat assistant embedded in the app:
 - **Free tier:** 2–3 questions per GW; **Paid tier:** unlimited with larger context window
 - UI: floating chat bubble → modal with chat history, input field
 - Reference: fplukraine.com "FPL Помічник" + fpl.team AI assistant
-
-#### ANA-05: "Top 1% feature"
-Research https://fpl.team/top/ and plan an equivalent:
-what makes top 1% managers different — analyse their squads, captain picks, chip usage,
-and transfer patterns. Show insights that help users emulate the best.
 
 #### AUTH-02: FPL OAuth / transfer execution integration
 Research whether the official FPL API supports OAuth or credential-based authentication
@@ -589,6 +500,8 @@ For reference — features that are live in the codebase:
 - **Transfer screen polish** — captain badge right, team abbrev + FDR chip under PlayerCard, outfield picker, position filter tabs, Sort button (UX-01 SwapsStrip scroll, UX-02 next 3 fixtures column, UX-03 %, pts, xPts columns); UX-04 player info popup (fixtures + price); DES-04 FDR colour tokens; VIS-01 goals/assists badges + ownership pill on all card sizes
 - **Cloudflare migration (INFRA-01)** — OpenSpec change `openspec/changes/infra-01-cloudflare-migration`; moves SPA to Cloudflare Pages and proxy to Cloudflare Workers; Supabase unchanged. Replaces Fly.io deployment.
 - **Active chip display (CHIP-01)** — chip cell replaces AVERAGE+HIGHEST in SummaryStrip when a chip is active; octagonal badge icon + chip name + ACTIVE label; per-chip accent colours (Wildcard gold, Triple Captain red, Free Hit cyan, Bench Boost green)
+- **Auth (AUTH-01)** — login/password + Google OAuth, backend user profile; OpenSpec change 2026-06-02-auth-01-user-accounts.
+- **League participants browser (ANA-12)** — click a league in Stats to browse all participants and view their squads; OpenSpec change 2026-06-02-ana-12-league-participants-browser.
 - **Fix bugs** — BUG-01 (position limits), BUG-02 (transfer arrows)
 - **Proxy/BFF** — services for squad, entry, gameweeks, history, leagues, dream-team, fixtures, player pool, top players, team
 
@@ -598,13 +511,12 @@ For reference — features that are live in the codebase:
 
 The recommended order is:
 
-1. **Finish Transfer screen polish** — the transfer planner is the app's deepest feature and the one users spend the most time with.
-2. **Gameweek review + chip display + live rank** — creates weekly return habit before we build premium features.
+1. **Finish Transfer screen polish** — done ✅
+2. **Auth + watchlists + manager tracking** — done ✅; MGR-02 (backend watchlist) follows when AUTH-01 is in prod.
 3. **xPts + predicted points + premium gate** — builds the monetisation foundation.
-4. **Watchlists + manager tracking + squad comparison** — social layer that drives virality.
+4. **Gameweek review + live rank** — creates weekly return habit.
 5. **Multi-GW planner + transfer solver** — advanced planning tools, partly monetised.
-6. **User accounts** (AUTH-01) — enables all personalised features; build when personalisation becomes a bottleneck.
-7. **Full AI engine + chat assistant** — only after demand is validated and revenue is flowing.
+6. **Full AI engine + chat assistant** — only after demand is validated and revenue is flowing.
 
 ---
 

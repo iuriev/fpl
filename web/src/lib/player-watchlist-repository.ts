@@ -54,6 +54,53 @@ export class LocalStoragePlayerWatchlistRepository implements PlayerWatchlistRep
   }
 }
 
+export class ApiPlayerWatchlistRepository implements PlayerWatchlistRepository {
+  private _cache: Promise<number[]> | null = null;
+
+  async list(): Promise<number[]> {
+    if (!this._cache) {
+      this._cache = fetch('/api/me/player-watchlist', { credentials: 'include' }).then((res) => {
+        if (!res.ok) { this._cache = null; throw new Error(`Player watchlist fetch failed: ${res.status}`); }
+        return res.json().then((data: { playerIds: number[] }) => data.playerIds);
+      });
+    }
+    return this._cache;
+  }
+
+  async add(playerId: number): Promise<PlayerWatchlistAddResult> {
+    const res = await fetch('/api/me/player-watchlist', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ playerId }),
+    });
+    if (res.ok) { this._cache = null; return 'ok'; }
+    if (res.status === 409) {
+      const body = (await res.json()) as { error: string };
+      return body.error === 'duplicate' ? 'duplicate' : 'limit';
+    }
+    throw new Error(`Player watchlist add failed: ${res.status}`);
+  }
+
+  async remove(playerId: number): Promise<void> {
+    const res = await fetch(`/api/me/player-watchlist/${playerId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+    if (!res.ok && res.status !== 204) throw new Error(`Player watchlist remove failed: ${res.status}`);
+    this._cache = null;
+  }
+
+  async has(playerId: number): Promise<boolean> {
+    const ids = await this.list();
+    return ids.includes(playerId);
+  }
+
+  getLimit(): number {
+    return 2;
+  }
+}
+
 export const PlayerWatchlistRepositoryContext = createContext<PlayerWatchlistRepository>(
   new LocalStoragePlayerWatchlistRepository(),
 );

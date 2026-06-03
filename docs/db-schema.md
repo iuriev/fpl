@@ -69,6 +69,32 @@ Email verification tokens.
 | `created_at` | timestamp | YES | |
 | `updated_at` | timestamp | YES | |
 
+### `watchlist_entry`
+
+Manager team IDs followed by a user (manager watchlist).
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| `id` | text | NO | Primary key (`crypto.randomUUID()`) |
+| `user_id` | text | NO | FK → `user.id` (cascade delete) |
+| `team_id` | integer | NO | FPL team ID being followed |
+| `created_at` | timestamp | NO | Default now() |
+
+Unique index on `(user_id, team_id)` prevents duplicates.
+
+### `player_watchlist_entry`
+
+Player IDs shortlisted by a user (player watchlist).
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| `id` | text | NO | Primary key (`crypto.randomUUID()`) |
+| `user_id` | text | NO | FK → `user.id` (cascade delete) |
+| `player_id` | integer | NO | FPL player ID being tracked |
+| `created_at` | timestamp | NO | Default now() |
+
+Unique index on `(user_id, player_id)` prevents duplicates.
+
 ## ER Diagram
 
 ```mermaid
@@ -117,6 +143,21 @@ erDiagram
         timestamp updated_at
     }
 
+    watchlist_entry {
+        text id PK
+        text user_id FK
+        integer team_id
+        timestamp created_at
+    }
+    player_watchlist_entry {
+        text id PK
+        text user_id FK
+        integer player_id
+        timestamp created_at
+    }
+
     user ||--o{ session : "has"
     user ||--o{ account : "has"
+    user ||--o{ watchlist_entry : "follows"
+    user ||--o{ player_watchlist_entry : "shortlists"
 ```
