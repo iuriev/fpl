@@ -390,12 +390,15 @@ Write original copy (do not copy fpl.team text); use https://fpl.team/about/ as 
 
 | ID | Task | Effort | Why |
 |----|------|--------|-----|
-| STAT-01 | DEFCON / BPS leaderboard screen | S | Unique FPL insight. Data source needs research (cheatography API?). |
+| ~~STAT-01~~ | ~~DEFCON / BPS leaderboard screen~~ | S | ✅ Done — `/leaderboard` GW + Season tabs; `GET /api/leaderboard/gw/:gw` and `/api/leaderboard/season`. |
 | ANA-08 | Captain Picks Analyzer | M | Helps users see if their captaincy decisions are paying off. |
 | ANA-09 | Transfer Analyzer | M | Net transfer points history — was each transfer worth it? |
 ### Feature details
 
-#### STAT-01: DEFCON / BPS leaderboard
+#### STAT-01: DEFCON / BPS leaderboard [SHIPPED]
+Shipped on `/leaderboard`: GW and Season tabs, DEFCON + BPS columns, player info sheet; proxy
+`leaderboard-service` backed by live FPL fixture stats.
+
 Two-sided ranking of players by in-match performance:
 - **DEFCON** (worst performers): `{Player} {scored}/{possible}` e.g. Mount 13/12 — Red badges, sorted worst first
 - **BPS** (best performers): `{Player} {bps}({game count})` e.g. Dorgu 50(3) — Green badges, sorted best first
@@ -494,6 +497,7 @@ For reference — features that are live in the codebase:
 - **Auth (AUTH-01)** — login/password + Google OAuth, backend user profile; OpenSpec change 2026-06-02-auth-01-user-accounts.
 - **League participants browser (ANA-12)** — click a league in Stats to browse all participants and view their squads; OpenSpec change 2026-06-02-ana-12-league-participants-browser.
 - **Price changes & predictions (ANA-03, PRED-06)** — `/price-changes` screen: Actual (GW/season risers/fallers) + Tonight predictions; All FPL free, My squad premium; player profile sheet; OpenSpec `ana-03-pred-06-price-changes`.
+- **DEFCON / BPS leaderboard (STAT-01)** — `/leaderboard` screen with GW and Season tabs; DEFCON worst-first, BPS best-first; `GET /api/leaderboard/gw/:gw` and `/api/leaderboard/season`.
 - **Fix bugs** — BUG-01 (position limits), BUG-02 (transfer arrows)
 - **Proxy/BFF** — services for squad, entry, gameweeks, history, leagues, dream-team, fixtures, player pool, top players, team
 

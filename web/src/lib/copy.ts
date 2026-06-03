@@ -210,8 +210,7 @@ export const copy = {
   topPlayersNavLink: 'Top Players',
 
   // Leaderboard screen
-  leaderboardTitle: 'Leaderboard',
-  leaderboardNavLink: 'Leaderboard',
+  leaderboardNavLink: 'DEFCON/BPS leaders',
   leaderboardBack: 'Squad',
   leaderboardLoadError: 'Failed to load leaderboard',
   leaderboardRetry: 'Retry',
