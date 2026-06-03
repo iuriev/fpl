@@ -62,6 +62,7 @@ describe('GET /api/me', () => {
       email: 'test@example.com',
       name: 'Test User',
       fplTeamId: 42,
+      emailVerified: false,
     });
   });
 

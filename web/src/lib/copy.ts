@@ -68,7 +68,6 @@ export const copy = {
   signUpSignIn: 'Sign in',
 
   // Squad screen
-  squadChangeTeam: 'Change',
   squadGameweekLabel: 'GW',
   squadLoadError: "Couldn't load this GW",
   squadRetry: 'Try again',
