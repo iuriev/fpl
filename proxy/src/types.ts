@@ -330,6 +330,7 @@ export interface LeaderboardPlayer {
   teamCode: number;
   teamShortName: string;
   value: number;
+  avg?: number;
 }
 
 export interface LeaderboardGwResponse {

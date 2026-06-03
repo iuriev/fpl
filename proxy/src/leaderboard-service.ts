@@ -71,7 +71,7 @@ export async function getLeaderboardGw(gw: number): Promise<LeaderboardGwRespons
       position: (POSITION_MAP[element.element_type] ?? 'GK') as PlayerPosition,
       teamCode: element.team_code,
       teamShortName: team?.short_name ?? 'UNK',
-      bps: live.stats.bps,
+      bps: live.stats.bonus,
       defcon: sumDefcon(live.explain),
     }];
   });
@@ -104,21 +104,31 @@ export async function getLeaderboardSeason(): Promise<LeaderboardSeasonResponse>
 
   const bpsAgg = new Map<number, number>();
   const defconAgg = new Map<number, number>();
+  const gamesPlayedAgg = new Map<number, number>();
 
   for (const liveData of liveDataArr) {
     for (const live of liveData.elements) {
-      bpsAgg.set(live.id, (bpsAgg.get(live.id) ?? 0) + live.stats.bps);
+      bpsAgg.set(live.id, (bpsAgg.get(live.id) ?? 0) + live.stats.bonus);
       defconAgg.set(live.id, (defconAgg.get(live.id) ?? 0) + sumDefcon(live.explain));
+      if (live.stats.minutes > 0) {
+        gamesPlayedAgg.set(live.id, (gamesPlayedAgg.get(live.id) ?? 0) + 1);
+      }
     }
   }
 
-  function buildList(valueMap: Map<number, number>, excludeZero: boolean): LeaderboardPlayer[] {
+  function buildList(
+    valueMap: Map<number, number>,
+    excludeZero: boolean,
+    gamesPlayedMap?: Map<number, number>
+  ): LeaderboardPlayer[] {
     const players: LeaderboardPlayer[] = [];
     for (const [id, value] of valueMap) {
       if (excludeZero && value === 0) continue;
       const element = elementMap.get(id);
       if (!element) continue;
       const team = teamMap.get(element.team);
+      const gamesPlayed = gamesPlayedMap?.get(id) ?? 0;
+      const avg = gamesPlayed > 0 ? Math.round((value / gamesPlayed) * 10) / 10 : undefined;
       players.push({
         id,
         webName: element.web_name,
@@ -126,6 +136,7 @@ export async function getLeaderboardSeason(): Promise<LeaderboardSeasonResponse>
         teamCode: element.team_code,
         teamShortName: team?.short_name ?? 'UNK',
         value,
+        ...(avg !== undefined ? { avg } : {}),
       });
     }
     return players.sort((a, b) => b.value - a.value).slice(0, TOP_N);
@@ -133,6 +144,6 @@ export async function getLeaderboardSeason(): Promise<LeaderboardSeasonResponse>
 
   return {
     bps: buildList(bpsAgg, false),
-    defcon: buildList(defconAgg, true),
+    defcon: buildList(defconAgg, true, gamesPlayedAgg),
   };
 }

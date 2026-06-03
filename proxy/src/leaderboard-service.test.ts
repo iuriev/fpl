@@ -27,11 +27,11 @@ const mockBootstrap = {
   chips: [],
 };
 
-function mkLive(elements: Array<{ id: number; bps: number; defcon: number }>) {
+function mkLive(elements: Array<{ id: number; bonus: number; defcon: number }>) {
   return {
-    elements: elements.map(({ id, bps, defcon }) => ({
+    elements: elements.map(({ id, bonus, defcon }) => ({
       id,
-      stats: { total_points: 5, minutes: 90, goals_scored: 0, assists: 0, clean_sheets: 0, goals_conceded: 0, own_goals: 0, penalties_saved: 0, penalties_missed: 0, yellow_cards: 0, red_cards: 0, saves: 0, bonus: 0, bps },
+      stats: { total_points: 5, minutes: 90, goals_scored: 0, assists: 0, clean_sheets: 0, goals_conceded: 0, own_goals: 0, penalties_saved: 0, penalties_missed: 0, yellow_cards: 0, red_cards: 0, saves: 0, bonus, bps: 0 },
       explain: [{ fixture: 1, stats: defcon > 0 ? [{ identifier: 'defensive_contribution', value: defcon, points: 2 }] : [] }],
     })),
   };
@@ -44,12 +44,12 @@ describe('getLeaderboardGw', () => {
     vi.mocked(fplClient.getBootstrapStatic).mockResolvedValue(mockBootstrap as any);
   });
 
-  it('returns top players sorted by bps desc', async () => {
+  it('returns top players sorted by bonus desc', async () => {
     vi.mocked(fplClient.getLive).mockResolvedValue(
       mkLive([
-        { id: 10, bps: 30, defcon: 5 },
-        { id: 20, bps: 50, defcon: 0 },
-        { id: 30, bps: 20, defcon: 8 },
+        { id: 10, bonus: 30, defcon: 5 },
+        { id: 20, bonus: 50, defcon: 0 },
+        { id: 30, bonus: 20, defcon: 8 },
       ]) as any
     );
 
@@ -65,9 +65,9 @@ describe('getLeaderboardGw', () => {
   it('returns top players sorted by defensive_contribution desc', async () => {
     vi.mocked(fplClient.getLive).mockResolvedValue(
       mkLive([
-        { id: 10, bps: 30, defcon: 5 },
-        { id: 20, bps: 50, defcon: 0 },
-        { id: 30, bps: 20, defcon: 8 },
+        { id: 10, bonus: 30, defcon: 5 },
+        { id: 20, bonus: 50, defcon: 0 },
+        { id: 30, bonus: 20, defcon: 8 },
       ]) as any
     );
 
@@ -82,8 +82,8 @@ describe('getLeaderboardGw', () => {
   it('excludes players with defcon = 0 from the DEFCON list', async () => {
     vi.mocked(fplClient.getLive).mockResolvedValue(
       mkLive([
-        { id: 10, bps: 30, defcon: 5 },
-        { id: 20, bps: 50, defcon: 0 },
+        { id: 10, bonus: 30, defcon: 5 },
+        { id: 20, bonus: 50, defcon: 0 },
       ]) as any
     );
 
@@ -94,7 +94,7 @@ describe('getLeaderboardGw', () => {
   });
 
   it('caps both lists at 50 players', async () => {
-    const many = Array.from({ length: 60 }, (_, i) => ({ id: i + 1, bps: 60 - i, defcon: i + 1 }));
+    const many = Array.from({ length: 60 }, (_, i) => ({ id: i + 1, bonus: 60 - i, defcon: i + 1 }));
     const bootstrapWithMany = {
       ...mockBootstrap,
       elements: many.map((p) => ({
@@ -131,7 +131,7 @@ describe('getLeaderboardGw', () => {
   });
 
   it('uses finished GW cache TTL for a finished GW', async () => {
-    vi.mocked(fplClient.getLive).mockResolvedValue(mkLive([{ id: 10, bps: 10, defcon: 5 }]) as any);
+    vi.mocked(fplClient.getLive).mockResolvedValue(mkLive([{ id: 10, bonus: 10, defcon: 5 }]) as any);
 
     await leaderboardService.getLeaderboardGw(1);
 
@@ -148,6 +148,23 @@ describe('getLeaderboardGw', () => {
     expect(result.bps).toHaveLength(0);
     expect(result.defcon).toHaveLength(0);
   });
+
+  it('sums defcon across multiple fixtures for a single player', async () => {
+    vi.mocked(fplClient.getLive).mockResolvedValue({
+      elements: [{
+        id: 10,
+        stats: { total_points: 5, minutes: 90, goals_scored: 0, assists: 0, clean_sheets: 1, goals_conceded: 0, own_goals: 0, penalties_saved: 0, penalties_missed: 0, yellow_cards: 0, red_cards: 0, saves: 0, bonus: 0, bps: 20 },
+        explain: [
+          { fixture: 1, stats: [{ identifier: 'defensive_contribution', value: 6, points: 2 }] },
+          { fixture: 2, stats: [{ identifier: 'defensive_contribution', value: 4, points: 1 }, { identifier: 'minutes', value: 90, points: 2 }] },
+        ],
+      }],
+    } as any);
+
+    const result = await leaderboardService.getLeaderboardGw(1);
+
+    expect(result.defcon[0].value).toBe(10);
+  });
 });
 
 describe('getLeaderboardSeason', () => {
@@ -160,8 +177,8 @@ describe('getLeaderboardSeason', () => {
 
   it('aggregates bps and defcon across all finished GWs only', async () => {
     vi.mocked(fplClient.getLive)
-      .mockResolvedValueOnce(mkLive([{ id: 10, bps: 10, defcon: 5 }, { id: 20, bps: 30, defcon: 0 }]) as any)
-      .mockResolvedValueOnce(mkLive([{ id: 10, bps: 20, defcon: 8 }, { id: 20, bps: 15, defcon: 0 }]) as any);
+      .mockResolvedValueOnce(mkLive([{ id: 10, bonus: 10, defcon: 5 }, { id: 20, bonus: 30, defcon: 0 }]) as any)
+      .mockResolvedValueOnce(mkLive([{ id: 10, bonus: 20, defcon: 8 }, { id: 20, bonus: 15, defcon: 0 }]) as any);
 
     const result = await leaderboardService.getLeaderboardSeason();
 
@@ -172,6 +189,7 @@ describe('getLeaderboardSeason', () => {
 
     expect(result.defcon[0].id).toBe(10);
     expect(result.defcon[0].value).toBe(13);
+    expect(result.defcon[0].avg).toBe(6.5);
     expect(result.defcon).toHaveLength(1);
 
     expect(fplClient.getLive).toHaveBeenCalledTimes(2);
