@@ -137,7 +137,16 @@ describe('getLeaderboardGw', () => {
 
     const setCalls = vi.mocked(cache.set).mock.calls;
     const liveCall = setCalls.find(([key]) => key === 'live:1');
-    expect(liveCall?.[2]).toBe(cache.ttl.SQUAD_FINISHED);
+    expect(liveCall?.[2]).toBe(cache.ttl.LEADERBOARD_GW_FINISHED);
+  });
+
+  it('returns empty lists when FPL API throws (404 / no data)', async () => {
+    vi.mocked(fplClient.getLive).mockRejectedValue(new Error('FPL API error: 404 Not Found'));
+
+    const result = await leaderboardService.getLeaderboardGw(1);
+
+    expect(result.bps).toHaveLength(0);
+    expect(result.defcon).toHaveLength(0);
   });
 });
 

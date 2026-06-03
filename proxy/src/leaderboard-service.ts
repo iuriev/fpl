@@ -29,8 +29,13 @@ async function getLiveWithCache(gw: number, finished: boolean): Promise<FPLLive>
   const key = `live:${gw}`;
   const cached = cacheLayer.get<FPLLive>(key);
   if (cached) return cached;
-  const data = await fplClient.getLive(gw);
-  const ttl = finished ? cacheLayer.ttl.SQUAD_FINISHED : cacheLayer.ttl.LEADERBOARD_GW_LIVE;
+  let data: FPLLive;
+  try {
+    data = await fplClient.getLive(gw);
+  } catch {
+    return { elements: [] };
+  }
+  const ttl = finished ? cacheLayer.ttl.LEADERBOARD_GW_FINISHED : cacheLayer.ttl.LEADERBOARD_GW_LIVE;
   cacheLayer.set(key, data, ttl);
   return data;
 }
