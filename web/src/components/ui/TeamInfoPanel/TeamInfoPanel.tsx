@@ -24,14 +24,14 @@ export interface TeamInfoPanelProps {
 }
 
 const NAV_LINKS: { to: string; label: () => string; featured?: boolean }[] = [
-  { to: '/history', label: () => copy.teamInfoGwHistory },
   { to: '/review', label: () => copy.reviewNavLink },
   { to: '/stats', label: () => copy.statsMyStats },
-  { to: '/team-of-the-week', label: () => copy.teamOfTheWeekNavLink },
-  { to: '/top-players', label: () => copy.topPlayersNavLink },
+  { to: '/transfers', label: () => copy.transfersNavLink, featured: true },
   { to: '/watchlist', label: () => copy.watchlistNavLink },
   { to: '/player-watchlist', label: () => copy.playerWatchlistNavLink },
-  { to: '/transfers', label: () => copy.transfersNavLink, featured: true },
+  { to: '/top-players', label: () => copy.topPlayersNavLink },
+  { to: '/team-of-the-week', label: () => copy.teamOfTheWeekNavLink },
+  { to: '/history', label: () => copy.teamInfoGwHistory },
 ];
 
 export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({
