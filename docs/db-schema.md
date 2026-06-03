@@ -96,6 +96,22 @@ Player IDs shortlisted by a user (player watchlist).
 
 Unique index on `(user_id, player_id)` prevents duplicates.
 
+### `transfer_draft`
+
+One transfer planner draft per user (upsert on `user_id`).
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| `user_id` | text | NO | PK, FK → `user.id` (cascade delete) |
+| `team_id` | integer | NO | User's FPL team when saved |
+| `target_gw` | integer | NO | Gameweek the plan targets |
+| `saved_at` | timestamp | NO | Client `savedAt` |
+| `free_transfers` | integer | NO | FT count at save time |
+| `chip` | text | NO | `none`, `wildcard`, or `freehit` |
+| `swaps` | jsonb | NO | `TransferSwap[]` |
+| `subs` | jsonb | NO | `SubSwap[]` |
+| `updated_at` | timestamp | NO | Server write time |
+
 ## ER Diagram
 
 ```mermaid
@@ -157,9 +173,21 @@ erDiagram
         integer player_id
         timestamp created_at
     }
+    transfer_draft {
+        text user_id PK
+        integer team_id
+        integer target_gw
+        timestamp saved_at
+        integer free_transfers
+        text chip
+        jsonb swaps
+        jsonb subs
+        timestamp updated_at
+    }
 
     user ||--o{ session : "has"
     user ||--o{ account : "has"
     user ||--o{ watchlist_entry : "follows"
     user ||--o{ player_watchlist_entry : "shortlists"
+    user ||--o| transfer_draft : "has"
 ```

@@ -4,9 +4,14 @@ import { Hono } from 'hono';
 import { auth } from './auth/auth';
 import { type AuthVars, requireUser } from './auth/middleware';
 import { db } from './db/client';
-import { playerWatchlistEntry, user, watchlistEntry } from './db/schema';
+import { playerWatchlistEntry, transferDraft, user, watchlistEntry } from './db/schema';
 import * as entryService from './entry-service';
 import { resolveSubscriptionTier } from './subscription';
+import {
+  draftToRow,
+  parseTransferDraftBody,
+  rowToTransferDraft,
+} from './transfer-draft';
 
 const FREE_LIMIT = 2;
 
@@ -72,10 +77,66 @@ me.put('/team', requireUser, async (c) => {
     return c.json({ error: 'Team not found' }, 400);
   }
 
+  await db.delete(transferDraft).where(eq(transferDraft.userId, c.var.user.id));
+
   await db.update(user).set({ fplTeamId: teamId }).where(eq(user.id, c.var.user.id));
   if (isDev) console.log('[me] fplTeamId saved:', teamId, 'for user:', c.var.user.email);
 
   return c.json({ fplTeamId: teamId });
+});
+
+async function getUserFplTeamId(userId: string): Promise<number | null> {
+  const [row] = await db
+    .select({ fplTeamId: user.fplTeamId })
+    .from(user)
+    .where(eq(user.id, userId))
+    .limit(1);
+  return row?.fplTeamId ?? null;
+}
+
+me.get('/transfer-draft', requireUser, async (c) => {
+  const [row] = await db
+    .select()
+    .from(transferDraft)
+    .where(eq(transferDraft.userId, c.var.user.id))
+    .limit(1);
+  if (!row) return c.json({ error: 'Not found' }, 404);
+  return c.json(rowToTransferDraft(row));
+});
+
+me.put('/transfer-draft', requireUser, async (c) => {
+  const body = await c.req.json().catch(() => null);
+  const draft = parseTransferDraftBody(body);
+  if (!draft) return c.json({ error: 'Invalid draft' }, 400);
+
+  const fplTeamId = await getUserFplTeamId(c.var.user.id);
+  if (fplTeamId === null) return c.json({ error: 'No linked team' }, 400);
+  if (draft.teamId !== fplTeamId) return c.json({ error: 'Team mismatch' }, 400);
+
+  const row = draftToRow(c.var.user.id, draft);
+  await db
+    .insert(transferDraft)
+    .values(row)
+    .onConflictDoUpdate({
+      target: transferDraft.userId,
+      set: {
+        teamId: row.teamId,
+        targetGw: row.targetGw,
+        savedAt: row.savedAt,
+        freeTransfers: row.freeTransfers,
+        chip: row.chip,
+        swaps: row.swaps,
+        subs: row.subs,
+        updatedAt: row.updatedAt,
+      },
+    });
+
+  return c.json(draft);
+});
+
+me.delete('/transfer-draft', requireUser, async (c) => {
+  await db.delete(transferDraft).where(eq(transferDraft.userId, c.var.user.id));
+  return new Response(null, { status: 204 });
 });
 
 me.get('/managers-watchlist', requireUser, async (c) => {

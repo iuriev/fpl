@@ -1,4 +1,4 @@
-import { boolean, integer, pgTable, text, timestamp, uniqueIndex } from 'drizzle-orm/pg-core';
+import { boolean, integer, jsonb, pgTable, text, timestamp, uniqueIndex } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
@@ -77,3 +77,17 @@ export const playerWatchlistEntry = pgTable(
   },
   (t) => [uniqueIndex('player_watchlist_entry_user_player_idx').on(t.userId, t.playerId)],
 );
+
+export const transferDraft = pgTable('transfer_draft', {
+  userId: text('user_id')
+    .primaryKey()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  teamId: integer('team_id').notNull(),
+  targetGw: integer('target_gw').notNull(),
+  savedAt: timestamp('saved_at').notNull(),
+  freeTransfers: integer('free_transfers').notNull(),
+  chip: text('chip').notNull(),
+  swaps: jsonb('swaps').notNull(),
+  subs: jsonb('subs').notNull(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});

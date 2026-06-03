@@ -180,6 +180,7 @@ describe('PUT /api/me/team', () => {
   it('updates fplTeamId and returns 200 on valid team', async () => {
     mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
     mockGetEntry.mockResolvedValue({} as never);
+    makeDeleteChain();
     const mockChain = { set: vi.fn().mockReturnThis(), where: vi.fn().mockResolvedValue([]) };
     vi.mocked(db.update).mockReturnValue(mockChain as never);
 
@@ -191,6 +192,7 @@ describe('PUT /api/me/team', () => {
     expect(res.status).toBe(200);
     const body = (await res.json()) as { fplTeamId: number };
     expect(body).toEqual({ fplTeamId: 123 });
+    expect(mockDb.delete).toHaveBeenCalled();
   });
 });
 
@@ -226,6 +228,48 @@ function makeInsertChain(shouldThrow = false) {
   mockDb.insert.mockReturnValue(chain as never);
   return chain;
 }
+
+function makeUpsertChain() {
+  const chain = {
+    values: vi.fn().mockReturnValue({
+      onConflictDoUpdate: vi.fn().mockResolvedValue([]),
+    }),
+  };
+  mockDb.insert.mockReturnValue(chain as never);
+  return chain;
+}
+
+function makeSelectLimitChain(rows: unknown[]) {
+  const chain = {
+    from: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockResolvedValue(rows),
+  };
+  mockDb.select.mockReturnValue(chain as never);
+  return chain;
+}
+
+const validDraftBody = {
+  teamId: 42,
+  targetGw: 6,
+  savedAt: '2026-06-01T12:00:00.000Z',
+  freeTransfers: 1,
+  chip: 'none',
+  swaps: [],
+  subs: [],
+};
+
+const draftRow = {
+  userId: 'user-1',
+  teamId: 42,
+  targetGw: 6,
+  savedAt: new Date('2026-06-01T12:00:00.000Z'),
+  freeTransfers: 1,
+  chip: 'none',
+  swaps: [],
+  subs: [],
+  updatedAt: new Date(),
+};
 
 function makeDeleteChain() {
   const chain = { where: vi.fn().mockResolvedValue([]) };
@@ -482,6 +526,103 @@ describe('DELETE /api/me/player-watchlist/:playerId', () => {
     mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
     makeDeleteChain();
     const res = await app.request('/api/me/player-watchlist/9999', { method: 'DELETE' });
+    expect(res.status).toBe(204);
+  });
+});
+
+describe('GET /api/me/transfer-draft', () => {
+  it('returns 401 when not authenticated', async () => {
+    mockGetSession.mockResolvedValue(null);
+    const res = await app.request('/api/me/transfer-draft');
+    expect(res.status).toBe(401);
+  });
+
+  it('returns 404 when no draft', async () => {
+    mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
+    makeSelectLimitChain([]);
+    const res = await app.request('/api/me/transfer-draft');
+    expect(res.status).toBe(404);
+  });
+
+  it('returns draft when present', async () => {
+    mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
+    makeSelectLimitChain([draftRow]);
+    const res = await app.request('/api/me/transfer-draft');
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { teamId: number; savedAt: string };
+    expect(body.teamId).toBe(42);
+    expect(body.savedAt).toBe('2026-06-01T12:00:00.000Z');
+  });
+});
+
+describe('PUT /api/me/transfer-draft', () => {
+  it('returns 401 when not authenticated', async () => {
+    mockGetSession.mockResolvedValue(null);
+    const res = await app.request('/api/me/transfer-draft', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(validDraftBody),
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it('returns 400 for invalid body', async () => {
+    mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
+    const res = await app.request('/api/me/transfer-draft', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ teamId: 'bad' }),
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it('returns 400 when user has no linked team', async () => {
+    mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
+    makeSelectLimitChain([{ fplTeamId: null }]);
+    const res = await app.request('/api/me/transfer-draft', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(validDraftBody),
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it('returns 400 when teamId does not match linked team', async () => {
+    mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
+    makeSelectLimitChain([{ fplTeamId: 99 }]);
+    const res = await app.request('/api/me/transfer-draft', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(validDraftBody),
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it('returns 200 and upserts on valid draft', async () => {
+    mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
+    makeSelectLimitChain([{ fplTeamId: 42 }]);
+    makeUpsertChain();
+    const res = await app.request('/api/me/transfer-draft', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(validDraftBody),
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual(validDraftBody);
+  });
+});
+
+describe('DELETE /api/me/transfer-draft', () => {
+  it('returns 401 when not authenticated', async () => {
+    mockGetSession.mockResolvedValue(null);
+    const res = await app.request('/api/me/transfer-draft', { method: 'DELETE' });
+    expect(res.status).toBe(401);
+  });
+
+  it('returns 204', async () => {
+    mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
+    makeDeleteChain();
+    const res = await app.request('/api/me/transfer-draft', { method: 'DELETE' });
     expect(res.status).toBe(204);
   });
 });

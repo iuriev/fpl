@@ -5,10 +5,9 @@ import type { PoolPlayer, SquadPlayer, TransferDraft } from '@/types';
 import {
   calcBank,
   calcTransferCost,
-  clearDraft,
-  loadDraft,
   poolPlayerToSquadPlayer,
-  saveDraft,
+  readLocalDraft,
+  removeLocalDraft,
   wouldExceedClubLimit,
 } from './transfer-draft';
 
@@ -51,29 +50,21 @@ describe('transfer-draft', () => {
   beforeEach(() => localStorage.removeItem('fpl-transfer-draft-123'));
   afterEach(() => localStorage.removeItem('fpl-transfer-draft-123'));
 
-  describe('saveDraft / loadDraft', () => {
-    it('persists and retrieves a draft', () => {
+  describe('readLocalDraft / removeLocalDraft', () => {
+    it('reads a draft from localStorage', () => {
       const draft = makeDraft();
-      saveDraft(draft);
-      expect(loadDraft(123, 5)).toEqual(draft);
+      localStorage.setItem('fpl-transfer-draft-123', JSON.stringify(draft));
+      expect(readLocalDraft(123)).toEqual(draft);
     });
 
     it('returns null when no draft exists', () => {
-      expect(loadDraft(123, 5)).toBeNull();
+      expect(readLocalDraft(123)).toBeNull();
     });
 
-    it('returns null and clears when targetGw does not match', () => {
-      saveDraft(makeDraft({ targetGw: 4 }));
-      expect(loadDraft(123, 5)).toBeNull();
+    it('removes the draft key', () => {
+      localStorage.setItem('fpl-transfer-draft-123', JSON.stringify(makeDraft()));
+      removeLocalDraft(123);
       expect(localStorage.getItem('fpl-transfer-draft-123')).toBeNull();
-    });
-  });
-
-  describe('clearDraft', () => {
-    it('removes the draft from localStorage', () => {
-      saveDraft(makeDraft());
-      clearDraft(123);
-      expect(loadDraft(123, 5)).toBeNull();
     });
   });
 

@@ -328,16 +328,16 @@ Tell the user the optimal gameweek to play Bench Boost, based on:
 
 | ID | Task | Effort | Why |
 |----|------|--------|-----|
-| PLAN-00 | Backend transfer draft — migrate `fpl-transfer-draft-*` from localStorage to Postgres (1 draft per user; delete on team change or stale GW) | S | Cross-device persistence. OpenSpec `transfer-draft-backend`. |
+| ~~PLAN-00~~ | ~~Backend transfer draft — migrate `fpl-transfer-draft-*` from localStorage to Postgres~~ | S | ✅ Done — `/api/me/transfer-draft`; one draft per user (OpenSpec `archive/2026-06-03-transfer-draft-backend`). |
 | PLAN-01 | Multi-GW transfer planner with saved plans (1 free, more = paid) | L | "Plan transfers before your rivals do." Strong monetisation anchor. |
 | PLAN-02 | Transfer solver / AI optimizer | L | Suggests optimal transfers automatically. High perceived value. |
 
 ### Feature details
 
-#### PLAN-00: Backend transfer draft
-Migrate transfer planner persistence from `localStorage` (`fpl-transfer-draft-{teamId}`) to
-`/api/me/transfer-draft`. One draft per user; deleting draft when GW passes or user changes
-`fpl_team_id`; one-shot import from localStorage. See OpenSpec `transfer-draft-backend`.
+#### PLAN-00: Backend transfer draft [SHIPPED]
+Transfer planner drafts persist in Postgres via `GET/PUT/DELETE /api/me/transfer-draft` (one per
+user). Stale GW and team change clear the draft; one-shot import from `fpl-transfer-draft-*`
+localStorage keys. OpenSpec `archive/2026-06-03-transfer-draft-backend`.
 
 #### PLAN-01: Multi-GW transfer planner with saved plans
 Extend the transfer planner to support:
@@ -487,7 +487,7 @@ For reference — features that are live in the codebase:
 - **Gameweek History Screen** — per-GW points history chart/table
 - **Leagues Stats Screen** — mini-league standings
 - **Top Players Screen** — top performers for a GW
-- **Transfer Planner** — pick players to transfer in/out, budget tracking, squad validation
+- **Transfer Planner** — pick players to transfer in/out, budget tracking, squad validation; saved draft syncs to account via `/api/me/transfer-draft` (PLAN-00)
 - **Transfer screen polish** — captain badge right, team abbrev + FDR chip under PlayerCard, outfield picker, position filter tabs, Sort button (UX-01 SwapsStrip scroll, UX-02 next 3 fixtures column, UX-03 %, pts, xPts columns); UX-04 player info popup (fixtures + price); DES-04 FDR colour tokens; VIS-01 goals/assists badges + ownership pill on all card sizes
 - **Cloudflare migration (INFRA-01)** — OpenSpec change `openspec/changes/infra-01-cloudflare-migration`; moves SPA to Cloudflare Pages and proxy to Cloudflare Workers; Supabase unchanged. Replaces Fly.io deployment.
 - **Active chip display (CHIP-01)** — chip cell replaces AVERAGE+HIGHEST in SummaryStrip when a chip is active; octagonal badge icon + chip name + ACTIVE label; per-chip accent colours (Wildcard gold, Triple Captain red, Free Hit cyan, Bench Boost green)

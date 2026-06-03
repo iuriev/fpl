@@ -2,27 +2,18 @@ import type { PoolPlayer, SquadPlayer, TransferChip, TransferDraft, TransferSwap
 
 const DRAFT_KEY = (teamId: number) => `fpl-transfer-draft-${teamId}`;
 
-export function saveDraft(draft: TransferDraft): void {
-  localStorage.setItem(DRAFT_KEY(draft.teamId), JSON.stringify(draft));
-}
-
-export function loadDraft(teamId: number, currentNextGw: number): TransferDraft | null {
+export function readLocalDraft(teamId: number): TransferDraft | null {
   const raw = localStorage.getItem(DRAFT_KEY(teamId));
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw) as Partial<TransferDraft>;
-    if (parsed.targetGw !== currentNextGw) {
-      localStorage.removeItem(DRAFT_KEY(teamId));
-      return null;
-    }
     return { ...(parsed as TransferDraft), subs: parsed.subs ?? [] };
   } catch {
-    localStorage.removeItem(DRAFT_KEY(teamId));
     return null;
   }
 }
 
-export function clearDraft(teamId: number): void {
+export function removeLocalDraft(teamId: number): void {
   localStorage.removeItem(DRAFT_KEY(teamId));
 }
 

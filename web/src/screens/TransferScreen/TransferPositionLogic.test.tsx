@@ -1,8 +1,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { PoolPlayer, SquadPlayer, SquadResponse } from '@/types';
 
@@ -73,7 +73,7 @@ vi.mock('@/components/ui/TeamNavDrawer/TeamNavDrawer', () => ({
 
 vi.mock('@/api/queries', () => ({
   useGameweeks: () => ({
-    data: { current: 5, gameweeks: [{ id: 5, name: 'Gameweek 5', finished: true }] },
+    data: { current: 5, next: 6, gameweeks: [{ id: 5, name: 'Gameweek 5', finished: true }] },
     isLoading: false, isError: false,
   }),
   useSquad: () => ({ data: mockState.squad, isLoading: false, isError: false }),
@@ -95,19 +95,30 @@ function renderScreen() {
   );
 }
 
+const mockFetch = vi.fn();
+
 describe('Transfer Position Logic', () => {
   beforeEach(() => {
     localStorage.setItem('fpl_tour_seen_transfer_v1', 'true');
+    mockFetch.mockReset();
+    mockFetch.mockResolvedValue(new Response(null, { status: 404 }));
+    vi.stubGlobal('fetch', mockFetch);
     HTMLDivElement.prototype.showPopover = vi.fn();
     HTMLDivElement.prototype.hidePopover = vi.fn();
     Element.prototype.scrollIntoView = vi.fn();
   });
 
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it('does NOT show DEF candidates when replacing a MID (CORRECT)', async () => {
     const user = userEvent.setup();
     renderScreen();
+    await waitFor(() => {
+      expect(screen.getByLabelText(/^Saka/)).toBeInTheDocument();
+    });
 
-    // Click Saka (MID)
     const sakaBtn = screen.getByLabelText(/^Saka/);
     await user.click(sakaBtn);
 
@@ -122,6 +133,9 @@ describe('Transfer Position Logic', () => {
   it('does NOT show position tabs when replacing a MID (CORRECT)', async () => {
     const user = userEvent.setup();
     renderScreen();
+    await waitFor(() => {
+      expect(screen.getByLabelText(/^Saka/)).toBeInTheDocument();
+    });
 
     const sakaBtn = screen.getByLabelText(/^Saka/);
     await user.click(sakaBtn);

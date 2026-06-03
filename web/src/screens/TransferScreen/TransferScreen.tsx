@@ -8,13 +8,12 @@ import { TeamNavDrawer } from '@/components/ui/TeamNavDrawer/TeamNavDrawer';
 import { copy, interpolate } from '@/lib/copy';
 import { useMyTeam } from '@/lib/my-team/MyTeamContext';
 import { useRequestPremiumUpsell } from '@/lib/premium-upsell/PremiumUpsellContext';
+import { calcBank, calcTransferCost, poolPlayerToSquadPlayer } from '@/lib/transfer-draft';
 import {
-  calcBank,
-  calcTransferCost,
-  loadDraft,
-  poolPlayerToSquadPlayer,
-  saveDraft,
-} from '@/lib/transfer-draft';
+  ApiTransferDraftRepository,
+  resolveTransferDraft,
+  type TransferDraftRepository,
+} from '@/lib/transfer-draft-repository';
 import type {
   ChipStatuses,
   PlayerPosition,
@@ -58,13 +57,15 @@ const DEFAULT_CHIP_STATUSES: ChipStatuses = {
   '3xc':    { status: 'available' },
 };
 
+const draftRepo: TransferDraftRepository = new ApiTransferDraftRepository();
+
 export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   const { isDemoMode } = useMyTeam();
   const navLinksMode = isDemoMode ? 'demo' : 'full';
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { data: gameweeks } = useGameweeks();
   const currentGw = gameweeks?.current ?? null;
-  const nextGw = currentGw !== null ? currentGw + 1 : null;
+  const nextGw = gameweeks?.next ?? null;
 
   const {
     data: squadData,
@@ -75,6 +76,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   const { data: poolData, isLoading: poolLoading } = usePlayerPool();
 
   const [draft, setDraft] = useState<TransferDraft | null>(null);
+  const [draftReady, setDraftReady] = useState(false);
   const [planChip, setPlanChip] = useState<PlanChip>('none');
   const [selectedPlayerId, setSelectedPlayerId] = useState<number | null>(null);
   const [isTransfersOpen, setIsTransfersOpen] = useState(false);
@@ -82,43 +84,66 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   const [toast, setToast] = useState<string | null>(null);
   const [showTour, setShowTour] = useState(false);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const draftSourceRef = useRef<'storage' | 'fresh'>('fresh');
+  const draftSourceRef = useRef<'saved' | 'fresh'>('fresh');
   const chipInitializedRef = useRef(false);
   const upsellRequestedRef = useRef(false);
   const requestPremiumUpsell = useRequestPremiumUpsell();
 
-  // Reset state when team/gw changes
-  const [prevId, setPrevId] = useState<number | null>(null);
-  const [prevGw, setPrevGw] = useState<number | null>(null);
-
-  if (teamId !== prevId || nextGw !== prevGw) {
-    setPrevId(teamId);
-    setPrevGw(nextGw);
-    if (nextGw !== null) {
-      const saved = loadDraft(teamId, nextGw);
-      if (saved) {
-        setDraft(saved);
-        setPlanChip(saved.chip);
-      } else {
-        const prevRaw = localStorage.getItem(`fpl-transfer-draft-${teamId}`);
-        if (prevRaw && typeof window !== 'undefined') {
-          try {
-            const prev = JSON.parse(prevRaw) as TransferDraft;
-            setToast(interpolate(copy.transfersStaleToast, { n: prev.targetGw }));
-          } catch {
-            // ignore
-          }
-        }
-        setDraft(makeDefaultDraft(teamId, nextGw));
-      }
-    }
-  }
-
   useEffect(() => {
+    let cancelled = false;
     chipInitializedRef.current = false;
     upsellRequestedRef.current = false;
-    draftSourceRef.current = (nextGw !== null && loadDraft(teamId, nextGw)) ? 'storage' : 'fresh';
-  }, [teamId, nextGw]);
+
+    const load = async () => {
+      if (nextGw === null) {
+        if (!cancelled) {
+          setDraft(null);
+          setDraftReady(false);
+        }
+        return;
+      }
+
+      if (!cancelled) setDraftReady(false);
+
+      if (isDemoMode) {
+        if (!cancelled) {
+          setDraft(makeDefaultDraft(teamId, nextGw));
+          setPlanChip('none');
+          draftSourceRef.current = 'fresh';
+          setDraftReady(true);
+        }
+        return;
+      }
+
+      const { draft: resolved, staleGw, fromSaved } = await resolveTransferDraft(
+        teamId,
+        nextGw,
+        draftRepo,
+      );
+
+      if (cancelled) return;
+
+      if (staleGw !== null) {
+        setToast(interpolate(copy.transfersStaleToast, { n: staleGw }));
+      }
+
+      if (resolved) {
+        setDraft(resolved);
+        setPlanChip(resolved.chip);
+        draftSourceRef.current = fromSaved ? 'saved' : 'fresh';
+      } else {
+        setDraft(makeDefaultDraft(teamId, nextGw));
+        setPlanChip('none');
+        draftSourceRef.current = 'fresh';
+      }
+      setDraftReady(true);
+    };
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [teamId, nextGw, isDemoMode]);
 
   useEffect(() => {
     if (!toast) return;
@@ -126,11 +151,16 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
     return () => clearTimeout(t);
   }, [toast]);
 
-
-  const persistDraft = useCallback((d: TransferDraft) => {
-    clearTimeout(saveTimerRef.current);
-    saveTimerRef.current = setTimeout(() => saveDraft(d), 300);
-  }, []);
+  const persistDraft = useCallback(
+    (d: TransferDraft) => {
+      if (isDemoMode) return;
+      clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = setTimeout(() => {
+        void draftRepo.save(d).catch(() => {});
+      }, 300);
+    },
+    [isDemoMode],
+  );
 
   const updateDraft = useCallback(
     (updater: (prev: TransferDraft) => TransferDraft, silent = false) => {
@@ -344,10 +374,8 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   };
 
   const handleSave = () => {
-    if (draft) {
-      saveDraft(draft);
-      setIsDirty(false);
-    }
+    if (!draft || isDemoMode) return;
+    void draftRepo.save(draft).then(() => setIsDirty(false));
   };
 
   const handleChipToggle = (chip: PlanChip) => {
@@ -362,7 +390,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
     });
   };
 
-  const isLoading = squadLoading || poolLoading || !draft;
+  const isLoading = squadLoading || poolLoading || !draftReady || !draft;
   const hasNoSquad = !isLoading && !squadError && !squadData;
 
   useEffect(() => {

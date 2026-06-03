@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { copy } from '@/lib/copy';
 import type { PoolPlayer, SquadPlayer, SquadResponse } from '@/types';
@@ -124,6 +124,7 @@ const mockState = {
 };
 
 const mockRequestPremiumUpsell = vi.fn();
+const mockFetch = vi.fn();
 
 vi.mock('@/lib/premium-upsell/PremiumUpsellContext', () => ({
   useRequestPremiumUpsell: () => mockRequestPremiumUpsell,
@@ -145,7 +146,7 @@ vi.mock('@/components/ui/TeamNavDrawer/TeamNavDrawer', () => ({
 
 vi.mock('@/api/queries', () => ({
   useGameweeks: () => ({
-    data: { current: 5, gameweeks: [{ id: 5, name: 'Gameweek 5', finished: true }] },
+    data: { current: 5, next: 6, gameweeks: [{ id: 5, name: 'Gameweek 5', finished: true }] },
     isLoading: false,
     isError: false,
   }),
@@ -174,16 +175,27 @@ describe('TransferScreen', () => {
     mockState.pool = null;
     mockRequestPremiumUpsell.mockClear();
     localStorage.setItem('fpl_tour_seen_transfer_v1', 'true');
+    mockFetch.mockReset();
+    mockFetch.mockResolvedValue(new Response(null, { status: 404 }));
+    vi.stubGlobal('fetch', mockFetch);
   });
 
-  it('shows the Transfers heading', () => {
-    renderScreen();
-    expect(screen.getByText('Transfers')).toBeInTheDocument();
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
-  it('shows empty state when squad is not available', () => {
+  it('shows the Transfers heading', async () => {
     renderScreen();
-    expect(screen.getByText(/No squad found/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Transfers')).toBeInTheDocument();
+    });
+  });
+
+  it('shows empty state when squad is not available', async () => {
+    renderScreen();
+    await waitFor(() => {
+      expect(screen.getByText(/No squad found/i)).toBeInTheDocument();
+    });
   });
 
   it('requests premium upsell when squad is loaded', async () => {
@@ -205,8 +217,10 @@ describe('TransferScreen', () => {
     mockState.squad = SQUAD_DATA;
     mockState.pool = { players: [...POOL_PLAYERS, EXTRA_PLAYER] };
     renderScreen();
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Hart/i })).toBeInTheDocument();
+    });
 
-    // Make a swap first to enable the button
     const playerCard = screen.getByRole('button', { name: /Hart/i });
     await user.click(playerCard);
     
@@ -224,10 +238,13 @@ describe('TransferScreen', () => {
     expect(screen.getAllByText(/Extra/).length).toBeGreaterThan(0);
   });
 
-  it('disables the footer buttons when no transfers are planned', () => {
+  it('disables the footer buttons when no transfers are planned', async () => {
     mockState.squad = SQUAD_DATA;
     mockState.pool = { players: POOL_PLAYERS };
     renderScreen();
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Transfers' })).toBeDisabled();
+    });
 
     expect(screen.getByRole('button', { name: 'Transfers' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Reset' })).toBeDisabled();
@@ -239,6 +256,9 @@ describe('TransferScreen chip statuses', () => {
   beforeEach(() => {
     localStorage.removeItem('fpl-transfer-draft-123');
     localStorage.setItem('fpl_tour_seen_transfer_v1', 'true');
+    mockFetch.mockReset();
+    mockFetch.mockResolvedValue(new Response(null, { status: 404 }));
+    vi.stubGlobal('fetch', mockFetch);
   });
 
   it('pre-selects wildcard when chipStatuses.wildcard === active', async () => {
@@ -273,6 +293,9 @@ describe('TransferScreen chip statuses', () => {
     };
     mockState.pool = { players: POOL_PLAYERS };
     renderScreen();
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'FH' })).toBeInTheDocument();
+    });
     const fhBtn = screen.getByRole('button', { name: 'FH' });
     expect(fhBtn).not.toBeDisabled();
     await user.click(fhBtn);
@@ -285,6 +308,9 @@ describe('TransferScreen help tour', () => {
     mockState.squad = SQUAD_DATA;
     mockState.pool = { players: POOL_PLAYERS };
     localStorage.clear();
+    mockFetch.mockReset();
+    mockFetch.mockResolvedValue(new Response(null, { status: 404 }));
+    vi.stubGlobal('fetch', mockFetch);
   });
 
   it('does not start the tour automatically even if not seen', async () => {
@@ -303,6 +329,9 @@ describe('TransferScreen help tour', () => {
     const user = userEvent.setup();
     localStorage.setItem('fpl_tour_seen_transfer_v1', 'true');
     renderScreen();
+    await waitFor(() => {
+      expect(screen.getByLabelText('Open tour')).toBeInTheDocument();
+    });
 
     const helpBtn = screen.getByLabelText('Open tour');
     await user.click(helpBtn);
@@ -313,8 +342,10 @@ describe('TransferScreen help tour', () => {
   it('navigates through the tour steps', async () => {
     const user = userEvent.setup();
     renderScreen();
+    await waitFor(() => {
+      expect(screen.getByLabelText('Open tour')).toBeInTheDocument();
+    });
 
-    // Start manually
     const helpBtn = screen.getByLabelText('Open tour');
     await user.click(helpBtn);
 
@@ -343,6 +374,9 @@ describe('TransferScreen Reset button', () => {
   beforeEach(() => {
     localStorage.clear();
     localStorage.setItem('fpl_tour_seen_transfer_v1', 'true');
+    mockFetch.mockReset();
+    mockFetch.mockResolvedValue(new Response(null, { status: 404 }));
+    vi.stubGlobal('fetch', mockFetch);
   });
 
   it('enables Reset button when a chip is toggled', async () => {
@@ -351,6 +385,9 @@ describe('TransferScreen Reset button', () => {
     mockState.pool = { players: POOL_PLAYERS };
 
     renderScreen();
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Reset' })).toBeInTheDocument();
+    });
 
     const resetBtn = screen.getByRole('button', { name: 'Reset' });
     expect(resetBtn).toBeDisabled();
@@ -371,6 +408,9 @@ describe('TransferScreen Reset button', () => {
     mockState.pool = { players: POOL_PLAYERS };
 
     renderScreen();
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Reset' })).toBeInTheDocument();
+    });
 
     const resetBtn = screen.getByRole('button', { name: 'Reset' });
     expect(resetBtn).toBeDisabled();
@@ -396,13 +436,18 @@ describe('TransferScreen auto-close modal', () => {
     mockState.squad = SQUAD_DATA;
     mockState.pool = { players: [...POOL_PLAYERS, EXTRA_PLAYER] };
     localStorage.setItem('fpl_tour_seen_transfer_v1', 'true');
+    mockFetch.mockReset();
+    mockFetch.mockResolvedValue(new Response(null, { status: 404 }));
+    vi.stubGlobal('fetch', mockFetch);
   });
 
   it('closes the transfers modal automatically when the last swap is removed', async () => {
     const user = userEvent.setup();
     renderScreen();
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Hart/i })).toBeInTheDocument();
+    });
 
-    // 1. Make a swap
     const hartCard = screen.getByRole('button', { name: /Hart/i });
     await user.click(hartCard);
     const replacementBtn = screen.getAllByRole('button', { name: /Extra/i })[0];

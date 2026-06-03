@@ -140,7 +140,7 @@ export const copy = {
   closeButton: 'Close',
 
   // Drawer account actions
-  drawerChangeTeam: 'Change team',
+  drawerChangeTeam: 'Change your team ID',
   drawerSignOut: 'Sign out',
 
   // Team info panel
