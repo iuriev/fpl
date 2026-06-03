@@ -17,7 +17,7 @@ export default defineConfig({
       provider: 'v8',
       include: ['src/**/*.{ts,tsx}'],
       exclude: ['src/**/*.test.{ts,tsx}', 'src/test/**', 'src/**/*.stories.{ts,tsx}'],
-      reporter: ['text', 'lcov'],
+      reporter: ['lcov'],
     },
   },
   plugins: [react()],

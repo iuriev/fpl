@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { beforeEach,describe, expect, it, vi } from 'vitest';
 
 import * as authClientModule from '@/auth/auth-client';
+import { copy } from '@/lib/copy';
 
 import { ResetPasswordScreen } from './ResetPasswordScreen';
 
@@ -50,9 +51,9 @@ describe('ResetPasswordScreen', () => {
     fireEvent.change(newPw, { target: { value: 'password1' } });
     fireEvent.change(confirmPw, { target: { value: 'password2' } });
     fireEvent.click(screen.getByRole('button', { name: /update password/i }));
-    await waitFor(() =>
-      expect(screen.getByText(/passwords don't match/i)).toBeInTheDocument()
-    );
+    await waitFor(() => {
+      expect(screen.getAllByText(copy.resetPasswordMismatchError).length).toBeGreaterThan(0);
+    });
   });
 
   it('calls resetPassword with token and new password when passwords match', async () => {

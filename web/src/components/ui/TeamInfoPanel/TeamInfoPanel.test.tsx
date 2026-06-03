@@ -88,7 +88,7 @@ describe('TeamInfoPanel — navLinksMode', () => {
   it('full mode renders nav links as <Link> elements', () => {
     renderPanel({}, 'full');
     expect(screen.getByRole('link', { name: /My Squad/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /GW History/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /My GW history/i })).toBeInTheDocument();
   });
 
   it('full mode My Squad link points to /', () => {
@@ -98,24 +98,24 @@ describe('TeamInfoPanel — navLinksMode', () => {
 
   it('full mode GW History link points to /history', () => {
     renderPanel({}, 'full');
-    expect(screen.getByRole('link', { name: /GW History/i }).getAttribute('href')).toBe('/history');
+    expect(screen.getByRole('link', { name: /My GW history/i }).getAttribute('href')).toBe('/history');
   });
 
   it('hidden mode renders no nav links', () => {
     renderPanel({}, 'hidden');
-    expect(screen.queryByRole('link', { name: /GW History/i })).toBeNull();
-    expect(screen.queryByRole('button', { name: /GW History/i })).toBeNull();
+    expect(screen.queryByRole('link', { name: /My GW history/i })).toBeNull();
+    expect(screen.queryByRole('button', { name: /My GW history/i })).toBeNull();
   });
 
   it('demo mode renders nav links as buttons', () => {
     renderPanel({}, 'demo');
-    expect(screen.queryByRole('link', { name: /GW History/i })).toBeNull();
-    expect(screen.getByRole('button', { name: /GW History/i })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /My GW history/i })).toBeNull();
+    expect(screen.getByRole('button', { name: /My GW history/i })).toBeInTheDocument();
   });
 
   it('demo mode nav link button opens the sign-in dialog when clicked', () => {
     renderPanel({}, 'demo');
-    const historyBtn = screen.getByRole('button', { name: /GW History/i });
+    const historyBtn = screen.getByRole('button', { name: /My GW history/i });
     fireEvent.click(historyBtn);
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByText(/sign in to unlock/i)).toBeInTheDocument();
@@ -123,7 +123,7 @@ describe('TeamInfoPanel — navLinksMode', () => {
 
   it('defaults to full mode when navLinksMode is not specified', () => {
     renderPanel();
-    expect(screen.getByRole('link', { name: /GW History/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /My GW history/i })).toBeInTheDocument();
   });
 });
 
