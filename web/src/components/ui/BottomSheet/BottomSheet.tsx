@@ -19,7 +19,12 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({ open, onClose, title, 
   const draggingRef = useRef(false);
 
   useEffect(() => {
-    if (open) panelRef.current?.focus();
+    if (open) {
+      panelRef.current?.focus();
+    } else {
+      const focused = panelRef.current?.querySelector<HTMLElement>(':focus');
+      focused?.blur();
+    }
   }, [open]);
 
   useEffect(() => {

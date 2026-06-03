@@ -224,6 +224,7 @@ export async function getSquad(teamId: number, gameweek: number): Promise<SquadR
       news: playerData.news || undefined,
       stats,
       statBreakdown,
+      isWatchlisted: false,
     } as SquadPlayer;
   });
 

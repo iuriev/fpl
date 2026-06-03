@@ -17,8 +17,6 @@
   color: var(--fpl-muted-soft);
   text-align: right;
   font-variant-numeric: tabular-nums;
-  align-self: flex-start;
-  padding-top: 0.25rem;
 }
 
 .info {
@@ -55,8 +53,6 @@
   font-variant-numeric: tabular-nums;
   min-width: 2rem;
   text-align: right;
-  align-self: flex-start;
-  padding-top: 0.2rem;
 }
 
 .statChips {

@@ -170,34 +170,48 @@ function makeDeleteChain() {
   return chain;
 }
 
-describe('GET /api/me/watchlist', () => {
+const mockEntry = {
+  teamId: 100,
+  teamName: 'Test FC',
+  managerName: 'Test Manager',
+  overallPoints: 2000,
+  overallRank: 100000,
+  eventPoints: 65,
+  eventRank: 200000,
+  totalPlayers: 10000000,
+};
+
+describe('GET /api/me/managers-watchlist', () => {
   it('returns 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
-    const res = await app.request('/api/me/watchlist');
+    const res = await app.request('/api/me/managers-watchlist');
     expect(res.status).toBe(401);
   });
 
-  it('returns empty teamIds when no entries', async () => {
+  it('returns empty managers when no entries', async () => {
     mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
     makeSelectChain([]);
-    const res = await app.request('/api/me/watchlist');
+    const res = await app.request('/api/me/managers-watchlist');
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ teamIds: [] });
+    expect(await res.json()).toEqual({ managers: [] });
   });
 
-  it('returns teamIds when entries exist', async () => {
+  it('returns enriched manager data when entries exist', async () => {
     mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
-    makeSelectChain([{ teamId: 100 }, { teamId: 200 }]);
-    const res = await app.request('/api/me/watchlist');
+    makeSelectChain([{ teamId: 100 }]);
+    mockGetEntry.mockResolvedValue(mockEntry);
+    const res = await app.request('/api/me/managers-watchlist');
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ teamIds: [100, 200] });
+    const body = (await res.json()) as { managers: unknown[] };
+    expect(body.managers).toHaveLength(1);
+    expect(body.managers[0]).toMatchObject({ teamId: 100, managerName: 'Test Manager' });
   });
 });
 
-describe('POST /api/me/watchlist', () => {
+describe('POST /api/me/managers-watchlist', () => {
   it('returns 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
-    const res = await app.request('/api/me/watchlist', {
+    const res = await app.request('/api/me/managers-watchlist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ teamId: 123 }),
@@ -207,7 +221,7 @@ describe('POST /api/me/watchlist', () => {
 
   it('returns 400 for invalid teamId', async () => {
     mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
-    const res = await app.request('/api/me/watchlist', {
+    const res = await app.request('/api/me/managers-watchlist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ teamId: -1 }),
@@ -219,7 +233,7 @@ describe('POST /api/me/watchlist', () => {
     mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
     makeCountChain(0);
     makeInsertChain(false);
-    const res = await app.request('/api/me/watchlist', {
+    const res = await app.request('/api/me/managers-watchlist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ teamId: 123 }),
@@ -231,7 +245,7 @@ describe('POST /api/me/watchlist', () => {
   it('returns 409 limit when at FREE_LIMIT', async () => {
     mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
     makeCountChain(2);
-    const res = await app.request('/api/me/watchlist', {
+    const res = await app.request('/api/me/managers-watchlist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ teamId: 123 }),
@@ -244,7 +258,7 @@ describe('POST /api/me/watchlist', () => {
     mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
     makeCountChain(0);
     makeInsertChain(true);
-    const res = await app.request('/api/me/watchlist', {
+    const res = await app.request('/api/me/managers-watchlist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ teamId: 123 }),
@@ -254,30 +268,30 @@ describe('POST /api/me/watchlist', () => {
   });
 });
 
-describe('DELETE /api/me/watchlist/:teamId', () => {
+describe('DELETE /api/me/managers-watchlist/:teamId', () => {
   it('returns 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
-    const res = await app.request('/api/me/watchlist/123', { method: 'DELETE' });
+    const res = await app.request('/api/me/managers-watchlist/123', { method: 'DELETE' });
     expect(res.status).toBe(401);
   });
 
   it('returns 400 for invalid teamId', async () => {
     mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
-    const res = await app.request('/api/me/watchlist/abc', { method: 'DELETE' });
+    const res = await app.request('/api/me/managers-watchlist/abc', { method: 'DELETE' });
     expect(res.status).toBe(400);
   });
 
   it('returns 204 on success', async () => {
     mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
     makeDeleteChain();
-    const res = await app.request('/api/me/watchlist/123', { method: 'DELETE' });
+    const res = await app.request('/api/me/managers-watchlist/123', { method: 'DELETE' });
     expect(res.status).toBe(204);
   });
 
   it('returns 204 even when entry did not exist', async () => {
     mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
     makeDeleteChain();
-    const res = await app.request('/api/me/watchlist/9999', { method: 'DELETE' });
+    const res = await app.request('/api/me/managers-watchlist/9999', { method: 'DELETE' });
     expect(res.status).toBe(204);
   });
 });

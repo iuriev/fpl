@@ -2,8 +2,20 @@ import { createContext, useContext } from 'react';
 
 export type AddResult = 'ok' | 'duplicate' | 'limit';
 
+export interface WatchedManager {
+  teamId: number;
+  teamName?: string;
+  managerName?: string;
+  overallPoints?: number;
+  overallRank?: number;
+  eventPoints?: number;
+  eventRank?: number;
+  totalPlayers?: number;
+  regionIsoCode?: string;
+}
+
 export interface WatchlistRepository {
-  list(): Promise<number[]>;
+  list(): Promise<WatchedManager[]>;
   add(teamId: number): Promise<AddResult>;
   remove(teamId: number): Promise<void>;
   has(teamId: number): Promise<boolean>;
@@ -29,8 +41,8 @@ export class LocalStorageWatchlistRepository implements WatchlistRepository {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
   }
 
-  async list(): Promise<number[]> {
-    return this.read();
+  async list(): Promise<WatchedManager[]> {
+    return this.read().map((teamId) => ({ teamId }));
   }
 
   async add(teamId: number): Promise<AddResult> {
@@ -55,20 +67,20 @@ export class LocalStorageWatchlistRepository implements WatchlistRepository {
 }
 
 export class ApiWatchlistRepository implements WatchlistRepository {
-  private _cache: Promise<number[]> | null = null;
+  private _cache: Promise<WatchedManager[]> | null = null;
 
-  async list(): Promise<number[]> {
+  async list(): Promise<WatchedManager[]> {
     if (!this._cache) {
-      this._cache = fetch('/api/me/watchlist', { credentials: 'include' }).then((res) => {
+      this._cache = fetch('/api/me/managers-watchlist', { credentials: 'include' }).then((res) => {
         if (!res.ok) { this._cache = null; throw new Error(`Watchlist fetch failed: ${res.status}`); }
-        return res.json().then((data: { teamIds: number[] }) => data.teamIds);
+        return res.json().then((data: { managers: WatchedManager[] }) => data.managers);
       });
     }
     return this._cache;
   }
 
   async add(teamId: number): Promise<AddResult> {
-    const res = await fetch('/api/me/watchlist', {
+    const res = await fetch('/api/me/managers-watchlist', {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
@@ -83,7 +95,7 @@ export class ApiWatchlistRepository implements WatchlistRepository {
   }
 
   async remove(teamId: number): Promise<void> {
-    const res = await fetch(`/api/me/watchlist/${teamId}`, {
+    const res = await fetch(`/api/me/managers-watchlist/${teamId}`, {
       method: 'DELETE',
       credentials: 'include',
     });
@@ -92,8 +104,8 @@ export class ApiWatchlistRepository implements WatchlistRepository {
   }
 
   async has(teamId: number): Promise<boolean> {
-    const ids = await this.list();
-    return ids.includes(teamId);
+    const managers = await this.list();
+    return managers.some((m) => m.teamId === teamId);
   }
 
   getLimit(): number {

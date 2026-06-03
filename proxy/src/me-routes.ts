@@ -47,16 +47,17 @@ me.put('/team', requireUser, async (c) => {
   return c.json({ fplTeamId: teamId });
 });
 
-me.get('/watchlist', requireUser, async (c) => {
+me.get('/managers-watchlist', requireUser, async (c) => {
   const rows = await db
     .select({ teamId: watchlistEntry.teamId })
     .from(watchlistEntry)
     .where(eq(watchlistEntry.userId, c.var.user.id))
     .orderBy(watchlistEntry.createdAt);
-  return c.json({ teamIds: rows.map((r) => r.teamId) });
+  const managers = await Promise.all(rows.map((r) => entryService.getEntry(r.teamId)));
+  return c.json({ managers });
 });
 
-me.post('/watchlist', requireUser, async (c) => {
+me.post('/managers-watchlist', requireUser, async (c) => {
   const body = await c.req.json<{ teamId: unknown }>();
   const teamId = Number(body?.teamId);
   if (!Number.isInteger(teamId) || teamId <= 0) {
@@ -84,7 +85,7 @@ me.post('/watchlist', requireUser, async (c) => {
   return c.json({ teamId });
 });
 
-me.delete('/watchlist/:teamId', requireUser, async (c) => {
+me.delete('/managers-watchlist/:teamId', requireUser, async (c) => {
   const teamId = Number(c.req.param('teamId'));
   if (!Number.isInteger(teamId) || teamId <= 0) {
     return c.json({ error: 'Invalid team ID' }, 400);

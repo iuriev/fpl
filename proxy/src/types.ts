@@ -61,6 +61,7 @@ export interface SquadPlayer {
   news?: string;
   stats: PlayerStats;
   statBreakdown?: StatEntry[];
+  isWatchlisted: boolean;
 }
 
 export interface SquadSummary {
@@ -213,6 +214,7 @@ export interface PoolPlayer {
   expectedPoints: string;
   form: string;
   nextFixtures: FixtureInfo[];
+  isWatchlisted: boolean;
 }
 
 export interface PlayerPoolResponse {

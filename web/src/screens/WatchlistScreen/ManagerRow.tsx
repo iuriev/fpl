@@ -1,13 +1,15 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { useEntry, useHistory, useSquad, useTransfers } from '@/api/queries';
+import { useHistory, useSquad, useTransfers } from '@/api/queries';
 import { copy, interpolate } from '@/lib/copy';
+import type { WatchedManager } from '@/lib/watchlist-repository';
 
 import styles from './ManagerRow.module.css';
 
 export interface ManagerRowProps {
   teamId: number;
+  entryData: WatchedManager;
   currentGw: number;
   onRemove: () => void;
   isOwnTeam?: boolean;
@@ -29,16 +31,22 @@ function RankDelta({ current, prev }: { current: number; prev: number | undefine
   return <span className={styles.deltaNeutral}>—</span>;
 }
 
-export const ManagerRow: React.FC<ManagerRowProps> = ({ teamId, currentGw, onRemove, isOwnTeam }) => {
+export const ManagerRow: React.FC<ManagerRowProps> = ({
+  teamId,
+  entryData,
+  currentGw,
+  onRemove,
+  isOwnTeam,
+}) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { data: entry, isLoading: entryLoading, isError: entryError } = useEntry(teamId);
   const { data: squad, isLoading: squadLoading } = useSquad(teamId, currentGw);
   const { data: history, isLoading: historyLoading } = useHistory(teamId);
   const { data: transfersData, isLoading: transfersLoading } = useTransfers(teamId);
 
-  const isLoading = entryLoading || squadLoading || historyLoading || transfersLoading;
+  const isLoading = squadLoading || historyLoading || transfersLoading;
+  const hasEntryData = Boolean(entryData.managerName);
 
   const handleRowClick = () => {
     if (isOwnTeam) {
@@ -48,23 +56,6 @@ export const ManagerRow: React.FC<ManagerRowProps> = ({ teamId, currentGw, onRem
     const returnTo = location.pathname + location.search;
     navigate(`/?teamId=${teamId}`, { state: { returnTo } });
   };
-
-  if (entryError) {
-    return (
-      <div className={styles.card}>
-        <div className={styles.errorRow}>
-          <span className={styles.errorText}>Team {teamId} — {copy.watchlistLoadError}</span>
-          <button
-            className={styles.unfollowBtn}
-            onClick={(e) => { e.stopPropagation(); onRemove(); }}
-            aria-label={copy.watchlistRowErrorRemove}
-          >
-            {copy.watchlistUnfollow}
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   const allPlayers = squad ? [...squad.starters, ...squad.bench] : [];
   const captain = allPlayers.find((p) => p.isCaptain);
@@ -85,27 +76,29 @@ export const ManagerRow: React.FC<ManagerRowProps> = ({ teamId, currentGw, onRem
       role="button"
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && handleRowClick()}
-      aria-label={entry ? `${entry.managerName} — view squad` : undefined}
+      aria-label={hasEntryData ? `${entryData.managerName} — view squad` : undefined}
     >
       <div className={styles.top}>
         <div className={styles.scoreBlock}>
-          {isLoading && !entry ? (
+          {!hasEntryData ? (
             <span className={styles.skeletonScore} aria-hidden="true" />
           ) : (
             <>
-              <span className={styles.pts}>{entry ? fmt(entry.eventPoints) : '—'}</span>
+              <span className={styles.pts}>
+                {entryData.eventPoints !== undefined ? fmt(entryData.eventPoints) : '—'}
+              </span>
               <span className={styles.ptsLabel}>{copy.watchlistColGwPts}</span>
             </>
           )}
         </div>
 
         <div className={styles.identity}>
-          {isLoading && !entry ? (
+          {!hasEntryData ? (
             <span className={styles.skeletonName} aria-hidden="true" />
           ) : (
             <>
-              <span className={styles.managerName}>{entry?.managerName}</span>
-              <span className={styles.teamName}>{entry?.teamName}</span>
+              <span className={styles.managerName}>{entryData.managerName}</span>
+              <span className={styles.teamName}>{entryData.teamName}</span>
             </>
           )}
         </div>
@@ -115,9 +108,14 @@ export const ManagerRow: React.FC<ManagerRowProps> = ({ teamId, currentGw, onRem
             <span className={styles.skeletonCell} aria-hidden="true" />
           ) : (
             <>
-              <span className={styles.or}>{entry ? fmt(entry.overallRank) : '—'}</span>
+              <span className={styles.or}>
+                {entryData.overallRank !== undefined ? fmt(entryData.overallRank) : '—'}
+              </span>
               <span className={styles.orLabel}>{copy.watchlistColOverallRank}</span>
-              <RankDelta current={entry?.overallRank ?? 0} prev={prevHistoryGw?.overallRank} />
+              <RankDelta
+                current={entryData.overallRank ?? 0}
+                prev={prevHistoryGw?.overallRank}
+              />
             </>
           )}
         </div>
@@ -127,11 +125,15 @@ export const ManagerRow: React.FC<ManagerRowProps> = ({ teamId, currentGw, onRem
         <>
           <div className={styles.statsGrid}>
             <div className={styles.statItem}>
-              <span className={styles.statVal}>{entry ? fmt(entry.eventRank) : '—'}</span>
+              <span className={styles.statVal}>
+                {entryData.eventRank !== undefined ? fmt(entryData.eventRank) : '—'}
+              </span>
               <span className={styles.statLbl}>{copy.watchlistColGwRank}</span>
             </div>
             <div className={styles.statItem}>
-              <span className={`${styles.statVal} ${historyGw?.transferCost ? styles.statValNeg : styles.statValPos}`}>
+              <span
+                className={`${styles.statVal} ${historyGw?.transferCost ? styles.statValNeg : styles.statValPos}`}
+              >
                 {historyGw?.transferCost ? `−${historyGw.transferCost} pts` : copy.watchlistTransferCostFree}
               </span>
               <span className={styles.statLbl}>{copy.watchlistColXfrCost}</span>
@@ -190,10 +192,13 @@ export const ManagerRow: React.FC<ManagerRowProps> = ({ teamId, currentGw, onRem
       <div className={styles.actions}>
         <button
           className={styles.unfollowBtn}
-          onClick={(e) => { e.stopPropagation(); onRemove(); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
           disabled={isLoading}
           aria-label={interpolate(copy.watchlistRemoveAriaLabel, {
-            name: entry?.managerName ?? String(teamId),
+            name: entryData.managerName ?? String(teamId),
           })}
         >
           {copy.watchlistUnfollow}

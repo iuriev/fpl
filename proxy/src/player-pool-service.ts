@@ -52,6 +52,7 @@ export async function getPlayerPool(): Promise<PlayerPoolResponse> {
     expectedPoints: el.ep_next,
     form: el.form,
     nextFixtures: fixtures[el.team] ?? [],
+    isWatchlisted: false,
   }));
 
   const result: PlayerPoolResponse = { players };

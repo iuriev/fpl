@@ -20,7 +20,7 @@ describe('LocalStorageWatchlistRepository', () => {
 
   it('adds a team ID', async () => {
     await repo.add(123456);
-    expect(await repo.list()).toEqual([123456]);
+    expect(await repo.list()).toEqual([{ teamId: 123456 }]);
   });
 
   it('returns ok on successful add', async () => {
@@ -30,7 +30,7 @@ describe('LocalStorageWatchlistRepository', () => {
   it('returns duplicate when adding the same ID twice', async () => {
     await repo.add(123456);
     expect(await repo.add(123456)).toBe('duplicate');
-    expect(await repo.list()).toEqual([123456]);
+    expect(await repo.list()).toEqual([{ teamId: 123456 }]);
   });
 
   it('returns limit when at max capacity (2)', async () => {
@@ -45,13 +45,13 @@ describe('LocalStorageWatchlistRepository', () => {
     await repo.add(111);
     await repo.add(222);
     await repo.remove(111);
-    expect(await repo.list()).toEqual([222]);
+    expect(await repo.list()).toEqual([{ teamId: 222 }]);
   });
 
   it('remove is a no-op for unknown ID', async () => {
     await repo.add(111);
     await repo.remove(999);
-    expect(await repo.list()).toEqual([111]);
+    expect(await repo.list()).toEqual([{ teamId: 111 }]);
   });
 
   it('has() returns true for followed team', async () => {
@@ -67,7 +67,7 @@ describe('LocalStorageWatchlistRepository', () => {
     await repo.add(111);
     await repo.add(222);
     const repo2 = new LocalStorageWatchlistRepository();
-    expect(await repo2.list()).toEqual([111, 222]);
+    expect(await repo2.list()).toEqual([{ teamId: 111 }, { teamId: 222 }]);
   });
 
   it('getLimit returns 2', () => {
@@ -101,13 +101,16 @@ describe('ApiWatchlistRepository', () => {
     } as Response);
   }
 
-  it('list() returns teamIds from API', async () => {
-    mockFetch(200, { teamIds: [100, 200] });
-    expect(await repo.list()).toEqual([100, 200]);
+  const m100 = { teamId: 100, managerName: 'A', teamName: 'FC A', overallPoints: 1000, overallRank: 50000, eventPoints: 60, eventRank: 100000, totalPlayers: 10000000 };
+  const m200 = { teamId: 200, managerName: 'B', teamName: 'FC B', overallPoints: 900, overallRank: 80000, eventPoints: 50, eventRank: 200000, totalPlayers: 10000000 };
+
+  it('list() returns managers from API', async () => {
+    mockFetch(200, { managers: [m100, m200] });
+    expect(await repo.list()).toEqual([m100, m200]);
   });
 
   it('list() returns empty array when API returns empty', async () => {
-    mockFetch(200, { teamIds: [] });
+    mockFetch(200, { managers: [] });
     expect(await repo.list()).toEqual([]);
   });
 
@@ -129,16 +132,16 @@ describe('ApiWatchlistRepository', () => {
   it('remove() calls DELETE endpoint', async () => {
     mockFetch(204, null);
     await repo.remove(123);
-    expect(fetch).toHaveBeenCalledWith('/api/me/watchlist/123', expect.objectContaining({ method: 'DELETE' }));
+    expect(fetch).toHaveBeenCalledWith('/api/me/managers-watchlist/123', expect.objectContaining({ method: 'DELETE' }));
   });
 
   it('has() returns true when teamId is in list', async () => {
-    mockFetch(200, { teamIds: [100, 200] });
+    mockFetch(200, { managers: [m100, m200] });
     expect(await repo.has(100)).toBe(true);
   });
 
   it('has() returns false when teamId is not in list', async () => {
-    mockFetch(200, { teamIds: [100, 200] });
+    mockFetch(200, { managers: [m100, m200] });
     expect(await repo.has(999)).toBe(false);
   });
 
@@ -147,13 +150,13 @@ describe('ApiWatchlistRepository', () => {
   });
 
   it('list() deduplicates concurrent calls — only one fetch', async () => {
-    mockFetch(200, { teamIds: [100] });
+    mockFetch(200, { managers: [m100] });
     await Promise.all([repo.list(), repo.list(), repo.list()]);
     expect(fetch).toHaveBeenCalledTimes(1);
   });
 
   it('list() returns cached result on repeated calls', async () => {
-    mockFetch(200, { teamIds: [100] });
+    mockFetch(200, { managers: [m100] });
     await repo.list();
     await repo.list();
     expect(fetch).toHaveBeenCalledTimes(1);
@@ -161,25 +164,25 @@ describe('ApiWatchlistRepository', () => {
 
   it('cache is invalidated after add()', async () => {
     vi.mocked(fetch)
-      .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ teamIds: [] }) } as Response)
+      .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ managers: [] }) } as Response)
       .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ teamId: 100 }) } as Response)
-      .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ teamIds: [100] }) } as Response);
+      .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ managers: [m100] }) } as Response);
     await repo.list();
     await repo.add(100);
-    const ids = await repo.list();
+    const managers = await repo.list();
     expect(fetch).toHaveBeenCalledTimes(3);
-    expect(ids).toEqual([100]);
+    expect(managers).toEqual([m100]);
   });
 
   it('cache is invalidated after remove()', async () => {
     vi.mocked(fetch)
-      .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ teamIds: [100] }) } as Response)
-      .mockResolvedValueOnce({ ok: false, status: 204, json: () => Promise.resolve(null) } as Response)
-      .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ teamIds: [] }) } as Response);
+      .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ managers: [m100] }) } as Response)
+      .mockResolvedValueOnce({ ok: true, status: 204, json: () => Promise.resolve(null) } as Response)
+      .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ managers: [] }) } as Response);
     await repo.list();
     await repo.remove(100);
-    const ids = await repo.list();
+    const managers = await repo.list();
     expect(fetch).toHaveBeenCalledTimes(3);
-    expect(ids).toEqual([]);
+    expect(managers).toEqual([]);
   });
 });

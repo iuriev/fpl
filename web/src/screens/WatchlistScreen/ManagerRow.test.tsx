@@ -4,11 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 
 import * as queries from '@/api/queries';
-import { fixtureEntry, fixtureSquad } from '@/fixtures';
-import {
-  LocalStorageWatchlistRepository,
-  WatchlistRepositoryContext,
-} from '@/lib/watchlist-repository';
+import { fixtureSquad } from '@/fixtures';
 
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
@@ -17,7 +13,6 @@ vi.mock('react-router-dom', async () => {
 });
 
 vi.mock('@/api/queries', () => ({
-  useEntry: vi.fn(() => ({ data: fixtureEntry, isLoading: false, isError: false })),
   useSquad: vi.fn(() => ({ data: fixtureSquad, isLoading: false })),
   useHistory: vi.fn(() => ({
     data: { teamId: 72828, gameweeks: [{ gw: 37, overallRank: 142000, overallPoints: 2156, gwRank: 200000, gwPoints: 67, pointsOnBench: 6, transfers: 1, transferCost: 0, teamValue: 102.3 }, { gw: 36, overallRank: 148000, overallPoints: 2089, gwRank: 300000, gwPoints: 55, pointsOnBench: 2, transfers: 0, transferCost: 0, teamValue: 101.8 }] },
@@ -31,14 +26,22 @@ vi.mock('@/api/queries', () => ({
 
 import { ManagerRow } from './ManagerRow';
 
+const defaultEntryData = {
+  teamId: 72828,
+  managerName: 'Ivan Iuriev',
+  teamName: 'Amorim_out',
+  overallPoints: 2156,
+  overallRank: 142000,
+  eventPoints: 67,
+  eventRank: 200000,
+  totalPlayers: 10000000,
+};
+
 function renderRow(overrides?: Partial<React.ComponentProps<typeof ManagerRow>>) {
-  const repo = new LocalStorageWatchlistRepository();
   return render(
-    <WatchlistRepositoryContext.Provider value={repo}>
-      <MemoryRouter>
-        <ManagerRow teamId={72828} currentGw={37} onRemove={vi.fn()} {...overrides} />
-      </MemoryRouter>
-    </WatchlistRepositoryContext.Provider>
+    <MemoryRouter>
+      <ManagerRow teamId={72828} entryData={defaultEntryData} currentGw={37} onRemove={vi.fn()} {...overrides} />
+    </MemoryRouter>
   );
 }
 
@@ -79,7 +82,6 @@ describe('ManagerRow', () => {
 
 
   it('unfollow button is disabled while loading', () => {
-    vi.mocked(queries.useEntry).mockImplementationOnce(() => ({ data: undefined, isLoading: true, isError: false }) as never);
     vi.mocked(queries.useSquad).mockImplementationOnce(() => ({ data: undefined, isLoading: true }) as never);
     vi.mocked(queries.useHistory).mockImplementationOnce(() => ({ data: undefined, isLoading: true }) as never);
     vi.mocked(queries.useTransfers).mockImplementationOnce(() => ({ data: undefined, isLoading: true }) as never);

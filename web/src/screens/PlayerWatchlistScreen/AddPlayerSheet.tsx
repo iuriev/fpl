@@ -65,6 +65,12 @@ export const AddPlayerSheet: React.FC<AddPlayerSheetProps> = ({ open, onClose, c
   const [query, setQuery] = useState('');
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (open) searchRef.current?.focus();
+    else setQuery('');
+  }, [open]);
 
   const handleQueryChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
@@ -118,12 +124,12 @@ export const AddPlayerSheet: React.FC<AddPlayerSheetProps> = ({ open, onClose, c
       <div className={styles.sheet}>
         <div className={styles.searchWrap}>
           <input
+            ref={searchRef}
             className={styles.search}
             type="search"
             placeholder={copy.playerWatchlistAddSearch}
             value={query}
             onChange={handleQueryChange}
-            autoFocus
           />
         </div>
         <div className={styles.results}>

@@ -1,11 +1,15 @@
 import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
+import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 
 import { auth } from './auth/auth';
+import { optionalUser } from './auth/middleware';
 import { runMigrations } from './db/client';
+import { db } from './db/client';
+import { playerWatchlistEntry } from './db/schema';
 import * as entryService from './entry-service';
 import * as fixturesService from './fixtures-service';
 import * as gameweeksService from './gameweeks-service';
@@ -138,7 +142,7 @@ app.get('/api/entry/:teamId/history', async (c) => {
 });
 
 // GET /api/squad/:teamId/:gw
-app.get('/api/squad/:teamId/:gw', async (c) => {
+app.get('/api/squad/:teamId/:gw', optionalUser, async (c) => {
   try {
     const teamId = parseInt(c.req.param('teamId'), 10);
     const gw = parseInt(c.req.param('gw'), 10);
@@ -147,8 +151,25 @@ app.get('/api/squad/:teamId/:gw', async (c) => {
       return c.json({ error: 'Invalid team ID or gameweek' }, { status: 400 });
     }
 
-    const result = await squadService.getSquad(teamId, gw);
-    return c.json(result);
+    const user = c.var.user;
+    const [result, watchlistedIds] = await Promise.all([
+      squadService.getSquad(teamId, gw),
+      user
+        ? db
+            .select({ playerId: playerWatchlistEntry.playerId })
+            .from(playerWatchlistEntry)
+            .where(eq(playerWatchlistEntry.userId, user.id))
+            .then((rows) => new Set(rows.map((r) => r.playerId)))
+        : Promise.resolve(new Set<number>()),
+    ]);
+
+    const withWatchlist = {
+      ...result,
+      starters: result.starters.map((p) => ({ ...p, isWatchlisted: watchlistedIds.has(p.id) })),
+      bench: result.bench.map((p) => ({ ...p, isWatchlisted: watchlistedIds.has(p.id) })),
+    };
+
+    return c.json(withWatchlist);
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
     if (errorMsg.includes('No picks available')) {
@@ -177,10 +198,23 @@ app.get('/api/fixtures/upcoming', async (c) => {
 });
 
 // GET /api/player-pool
-app.get('/api/player-pool', async (c) => {
+app.get('/api/player-pool', optionalUser, async (c) => {
   try {
-    const result = await playerPoolService.getPlayerPool();
-    return c.json(result);
+    const user = c.var.user;
+    const [result, watchlistedIds] = await Promise.all([
+      playerPoolService.getPlayerPool(),
+      user
+        ? db
+            .select({ playerId: playerWatchlistEntry.playerId })
+            .from(playerWatchlistEntry)
+            .where(eq(playerWatchlistEntry.userId, user.id))
+            .then((rows) => new Set(rows.map((r) => r.playerId)))
+        : Promise.resolve(new Set<number>()),
+    ]);
+
+    return c.json({
+      players: result.players.map((p) => ({ ...p, isWatchlisted: watchlistedIds.has(p.id) })),
+    });
   } catch (error) {
     console.error('Error fetching player pool:', error);
     return c.json({ error: 'Unable to fetch player pool' }, { status: 500 });

@@ -6,7 +6,7 @@ import { PremiumSheet } from '@/components/ui/PremiumSheet/PremiumSheet';
 import { ScreenHeader } from '@/components/ui/ScreenHeader/ScreenHeader';
 import { copy, interpolate } from '@/lib/copy';
 import { useMyTeam } from '@/lib/my-team/MyTeamContext';
-import { useWatchlistRepository } from '@/lib/watchlist-repository';
+import { useWatchlistRepository,type WatchedManager } from '@/lib/watchlist-repository';
 
 import { AddManagerInput } from './AddManagerInput';
 import { FromLeaguesSection } from './FromLeaguesSection';
@@ -19,16 +19,16 @@ export const WatchlistScreen: React.FC = () => {
   const repo = useWatchlistRepository();
   const { data: gameweeksData } = useGameweeks();
 
-  const [watchedIds, setWatchedIds] = useState<number[]>([]);
+  const [watchedManagers, setWatchedManagers] = useState<WatchedManager[]>([]);
   const [premiumOpen, setPremiumOpen] = useState(false);
 
   const refreshList = useCallback(async () => {
-    const ids = await repo.list();
-    setWatchedIds(ids);
+    const managers = await repo.list();
+    setWatchedManagers(managers);
   }, [repo]);
 
   useEffect(() => {
-    repo.list().then((ids) => setWatchedIds(ids));
+    repo.list().then(setWatchedManagers);
   }, [repo]);
 
   const handleRemove = useCallback(async (teamId: number) => {
@@ -48,8 +48,8 @@ export const WatchlistScreen: React.FC = () => {
 
   const currentGw = gameweeksData?.current ?? null;
   const limit = repo.getLimit();
-  const isFull = watchedIds.length >= limit;
-  const watchedSet = new Set(watchedIds);
+  const isFull = watchedManagers.length >= limit;
+  const watchedSet = new Set(watchedManagers.map((m) => m.teamId));
 
   return (
     <div className={styles.screen}>
@@ -59,7 +59,7 @@ export const WatchlistScreen: React.FC = () => {
         title={copy.watchlistTitle}
         right={
           <span className={styles.capacity}>
-            {interpolate(copy.watchlistCapacity, { n: watchedIds.length, max: limit })}
+            {interpolate(copy.watchlistCapacity, { n: watchedManagers.length, max: limit })}
           </span>
         }
       />
@@ -67,20 +67,21 @@ export const WatchlistScreen: React.FC = () => {
       <div className={styles.body}>
         <AddManagerInput onAdded={refreshList} onLimitReached={() => setPremiumOpen(true)} />
 
-        {watchedIds.length === 0 ? (
+        {watchedManagers.length === 0 ? (
           <div className={styles.emptyState}>
             <p className={styles.emptyHeading}>{copy.watchlistEmptyHeading}</p>
             <p className={styles.emptySubtext}>{copy.watchlistEmptySubtext}</p>
           </div>
         ) : (
           <div className={styles.cardList}>
-            {currentGw !== null && watchedIds.map((teamId) => (
+            {currentGw !== null && watchedManagers.map((manager) => (
               <ManagerRow
-                key={teamId}
-                teamId={teamId}
+                key={manager.teamId}
+                teamId={manager.teamId}
+                entryData={manager}
                 currentGw={currentGw}
-                onRemove={() => handleRemove(teamId)}
-                isOwnTeam={myTeamId !== null && teamId === myTeamId}
+                onRemove={() => handleRemove(manager.teamId)}
+                isOwnTeam={myTeamId !== null && manager.teamId === myTeamId}
               />
             ))}
           </div>
