@@ -8,40 +8,6 @@
   padding: var(--fpl-space-xl) var(--fpl-space-xl3);
 }
 
-/* ── Identity ──────────────────────────────────────────────── */
-
-.avatarWrap {
-  display: flex;
-  justify-content: center;
-}
-
-.avatar {
-  width: 4rem;
-  height: 4rem;
-  border-radius: var(--fpl-radius-pill);
-  background: var(--fpl-bg-hair);
-}
-
-.identity {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.125rem;
-  text-align: center;
-}
-
-.teamName {
-  font-size: var(--fpl-fs-body-l);
-  font-weight: var(--fpl-fw-bold);
-  color: var(--fpl-text);
-  letter-spacing: var(--fpl-tr-head-m);
-}
-
-.manager {
-  font-size: var(--fpl-fs-body-s);
-  color: var(--fpl-muted);
-}
-
 /* ── Stats grid ────────────────────────────────────────────── */
 
 .stats {
@@ -199,28 +165,6 @@
   animation: fplShimmer 1.6s ease-in-out infinite;
 }
 
-.skeletonAvatar {
-  composes: skeletonBase;
-  width: 4rem;
-  height: 4rem;
-  border-radius: var(--fpl-radius-pill);
-  align-self: center;
-}
-
-.skeletonBar {
-  composes: skeletonBase;
-  height: 1rem;
-  width: 9rem;
-  align-self: center;
-}
-
-.skeletonBarShort {
-  composes: skeletonBase;
-  height: 0.75rem;
-  width: 6rem;
-  align-self: center;
-}
-
 .skeletonStat {
   composes: skeletonBase;
   border-radius: var(--fpl-radius-md);
@@ -236,9 +180,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .skeletonBase,
-  .skeletonAvatar,
-  .skeletonBar,
-  .skeletonBarShort,
   .skeletonStat,
   .skeletonNavBar {
     animation: none;
@@ -246,19 +187,110 @@
   }
 }
 
+/* ── User block ────────────────────────────────────────────── */
+
+.userBlock {
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-md);
+  padding: var(--fpl-space-sm) var(--fpl-space-md);
+  background: rgba(0, 255, 135, 0.04);
+  border: 1px solid rgba(0, 255, 135, 0.12);
+  border-radius: var(--fpl-radius-md);
+}
+
+.userAvatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--fpl-radius-pill);
+  background: var(--fpl-accent);
+  color: var(--fpl-accent-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fpl-fs-body-s);
+  font-weight: var(--fpl-fw-bold);
+  flex-shrink: 0;
+}
+
+.userInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.0625rem;
+}
+
+.userName {
+  font-size: var(--fpl-fs-body-s);
+  font-weight: var(--fpl-fw-semibold);
+  color: var(--fpl-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.userEmail {
+  font-size: var(--fpl-fs-micro);
+  color: var(--fpl-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.signOutBtn {
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid rgba(255, 77, 109, 0.35);
+  border-radius: var(--fpl-radius-sm);
+  color: var(--fpl-error);
+  font-size: var(--fpl-fs-micro);
+  font-weight: var(--fpl-fw-medium);
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  transition: background 120ms, color 120ms;
+}
+
+.signOutBtn:hover:not(:disabled) {
+  background: var(--fpl-error);
+  color: #fff;
+}
+
+.signOutBtn:disabled {
+  opacity: 0.5;
+}
+
+.changeTeamRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: 1px solid var(--fpl-bg-hair);
+  border-radius: var(--fpl-radius-md);
+  padding: var(--fpl-space-sm) var(--fpl-space-md);
+  color: var(--fpl-muted);
+  font-size: var(--fpl-fs-body-s);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 120ms, color 120ms;
+}
+
+.changeTeamRow::after {
+  content: '→';
+  color: var(--fpl-accent);
+  font-size: var(--fpl-fs-body-s);
+}
+
+.changeTeamRow:hover {
+  border-color: var(--fpl-accent);
+  color: var(--fpl-text);
+}
+
 /* ── Desktop sidebar ───────────────────────────────────────── */
 
 @media (min-width: 56.25rem) {
   .panel {
     padding: var(--fpl-space-xl3);
-  }
-
-  .identity {
-    align-items: flex-start;
-    text-align: left;
-  }
-
-  .avatarWrap {
-    justify-content: flex-start;
   }
 }

@@ -1,18 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
+import { authClient } from '@/auth/auth-client';
+import { useCurrentUser } from '@/auth/AuthContext';
 import { DemoSignInDialog } from '@/components/ui/DemoSignInDialog/DemoSignInDialog';
 import { copy, interpolate } from '@/lib/copy';
 import { useWatchlistRepository } from '@/lib/watchlist-repository';
 import type { EntryResponse } from '@/types';
 
 import styles from './TeamInfoPanel.module.css';
-
-function isoToFlag(code: string): string {
-  return [...code.toUpperCase()]
-    .map((c) => String.fromCodePoint(c.codePointAt(0)! - 65 + 0x1f1e6))
-    .join('');
-}
 
 function fmt(n: number): string {
   return n.toLocaleString('en-GB');
@@ -44,7 +40,27 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({
   showFollow = false,
   navLinksMode = 'full',
 }) => {
-  const flag = entry.regionIsoCode ? isoToFlag(entry.regionIsoCode) : null;
+  const navigate = useNavigate();
+  const { user, refetch } = useCurrentUser();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    try {
+      await authClient.signOut();
+      await refetch();
+      navigate('/', { replace: true });
+    } catch {
+      setIsSigningOut(false);
+    }
+  };
+
+  const handleChangeTeam = () => {
+    navigate('/entry');
+  };
+
+  const userInitial = user ? (user.name || user.email).charAt(0).toUpperCase() : '';
+
   const repo = useWatchlistRepository();
   const [following, setFollowing] = useState(false);
   const [limitReached, setLimitReached] = useState(false);
@@ -74,19 +90,29 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({
 
   return (
     <aside className={styles.panel}>
+      {navLinksMode === 'full' && user && (
+        <>
+          <div className={styles.userBlock}>
+            <div className={styles.userAvatar}>{userInitial}</div>
+            <div className={styles.userInfo}>
+              <span className={styles.userName}>{user.name || user.email}</span>
+              <span className={styles.userEmail}>{user.email}</span>
+            </div>
+            <button
+              className={styles.signOutBtn}
+              onClick={handleSignOut}
+              disabled={isSigningOut}
+            >
+              {copy.drawerSignOut}
+            </button>
+          </div>
+          <button className={styles.changeTeamRow} onClick={handleChangeTeam}>
+            {copy.drawerChangeTeam}
+          </button>
+        </>
+      )}
+
       <DemoSignInDialog open={demoGateOpen} onClose={() => setDemoGateOpen(false)} />
-
-      <div className={styles.avatarWrap} aria-hidden="true">
-        <div className={styles.avatar} />
-      </div>
-
-      <div className={styles.identity}>
-        <span className={styles.teamName}>{entry.teamName}</span>
-        <span className={styles.manager}>
-          {flag && <span aria-hidden="true">{flag} </span>}
-          {entry.managerName}
-        </span>
-      </div>
 
       <div className={styles.stats}>
         <div className={styles.stat}>
@@ -164,15 +190,6 @@ export const TeamInfoPanelSkeleton: React.FC = () => (
     aria-busy="true"
     aria-label={copy.loadingPlaceholder}
   >
-    <div className={styles.avatarWrap} aria-hidden="true">
-      <div className={styles.skeletonAvatar} />
-    </div>
-
-    <div className={styles.identity} aria-hidden="true">
-      <div className={styles.skeletonBar} />
-      <div className={styles.skeletonBarShort} />
-    </div>
-
     <div className={styles.stats} aria-hidden="true">
       <div className={styles.skeletonStat} />
       <div className={styles.skeletonStat} />

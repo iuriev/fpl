@@ -123,6 +123,20 @@
   text-overflow: ellipsis;
 }
 
+.teamNameRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.teamManager {
+  font-size: var(--fpl-fs-body-s);
+  color: var(--fpl-muted);
+  white-space: nowrap;
+}
+
 .teamId {
   font-family: var(--fpl-font-mono), serif;
   font-size: var(--fpl-fs-micro);

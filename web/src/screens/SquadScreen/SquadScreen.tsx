@@ -142,13 +142,21 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
   const gwLabel =
     selectedGw !== null ? `${copy.squadGameweekLabel} ${selectedGw}` : copy.squadGameweekLabel;
 
+  const flag = entry?.regionIsoCode
+    ? [...entry.regionIsoCode.toUpperCase()].map((c) => String.fromCodePoint(c.codePointAt(0)! - 65 + 0x1f1e6)).join('')
+    : null;
+
   const drawerHeader = entry ? (
-    <>
-      <div className={styles.teamInfo}>
+    <div className={styles.teamInfo}>
+      <div className={styles.teamNameRow}>
         <span className={styles.teamName}>{entry.teamName}</span>
-        <span className={styles.teamId}>{'ID · ' + teamId}</span>
+        <span className={styles.teamManager}>
+          {flag && <span aria-hidden="true">{flag} </span>}
+          {entry.managerName}
+        </span>
       </div>
-    </>
+      <span className={styles.teamId}>{'ID · ' + teamId}</span>
+    </div>
   ) : null;
 
   return (

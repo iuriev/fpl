@@ -1,10 +1,16 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import * as authClientModule from '@/auth/auth-client';
+import { AuthContext, type AuthContextValue } from '@/auth/AuthContext';
 import { fixtureEntry } from '@/fixtures';
 
 import { TeamInfoPanel, TeamInfoPanelSkeleton } from './TeamInfoPanel';
+
+vi.mock('@/auth/auth-client');
+
+const nullAuthCtx: AuthContextValue = { user: null, loading: false, refetch: vi.fn() };
 
 function renderPanel(
   overrides: Partial<typeof fixtureEntry> = {},
@@ -14,22 +20,39 @@ function renderPanel(
   const entry = { ...fixtureEntry, ...overrides };
   return render(
     <MemoryRouter>
-      <TeamInfoPanel entry={entry} teamId={entry.teamId} showFollow={showFollow} navLinksMode={navLinksMode} />
+      <AuthContext.Provider value={nullAuthCtx}>
+        <TeamInfoPanel entry={entry} teamId={entry.teamId} showFollow={showFollow} navLinksMode={navLinksMode} />
+      </AuthContext.Provider>
+    </MemoryRouter>
+  );
+}
+
+const mockUser = {
+  id: '1',
+  email: 'ivan.iuriev@gmail.com',
+  name: 'Ivan Iuriev',
+  fplTeamId: 72828,
+  emailVerified: true,
+};
+const mockRefetch = vi.fn();
+
+function renderPanelWithUser(
+  overrides: Partial<typeof fixtureEntry> = {},
+  navLinksMode: 'full' | 'hidden' | 'demo' = 'full',
+  user: AuthContextValue['user'] = mockUser
+) {
+  const entry = { ...fixtureEntry, ...overrides };
+  const authCtx: AuthContextValue = { user, loading: false, refetch: mockRefetch };
+  return render(
+    <MemoryRouter>
+      <AuthContext.Provider value={authCtx}>
+        <TeamInfoPanel entry={entry} teamId={entry.teamId} navLinksMode={navLinksMode} />
+      </AuthContext.Provider>
     </MemoryRouter>
   );
 }
 
 describe('TeamInfoPanel', () => {
-  it('renders team name', () => {
-    renderPanel();
-    expect(screen.getByText('Amorim_out')).toBeInTheDocument();
-  });
-
-  it('renders manager name', () => {
-    renderPanel();
-    expect(screen.getByText(/Ivan Iuriev/)).toBeInTheDocument();
-  });
-
   it('renders overall points formatted', () => {
     renderPanel({ overallPoints: 2156 });
     expect(screen.getByText('2,156')).toBeInTheDocument();
@@ -48,16 +71,6 @@ describe('TeamInfoPanel', () => {
   it('renders total players formatted', () => {
     renderPanel({ totalPlayers: 10500000 });
     expect(screen.getByText('10,500,000')).toBeInTheDocument();
-  });
-
-  it('renders flag emoji when regionIsoCode is present', () => {
-    renderPanel({ regionIsoCode: 'UA' });
-    expect(screen.getByText('🇺🇦')).toBeInTheDocument();
-  });
-
-  it('omits flag when regionIsoCode is absent', () => {
-    renderPanel({ regionIsoCode: undefined });
-    expect(screen.queryByText('🇺🇦')).toBeNull();
   });
 
   it('does not render Follow button by default (own team)', () => {
@@ -105,6 +118,57 @@ describe('TeamInfoPanel — navLinksMode', () => {
   it('defaults to full mode when navLinksMode is not specified', () => {
     renderPanel();
     expect(screen.getByRole('link', { name: /GW History/i })).toBeInTheDocument();
+  });
+});
+
+describe('TeamInfoPanel — user block', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('shows user name and email in full mode', () => {
+    renderPanelWithUser();
+    expect(screen.getByText('Ivan Iuriev')).toBeInTheDocument();
+    expect(screen.getByText('ivan.iuriev@gmail.com')).toBeInTheDocument();
+  });
+
+  it('shows Sign out button in full mode', () => {
+    renderPanelWithUser();
+    expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument();
+  });
+
+  it('shows Change team button in full mode', () => {
+    renderPanelWithUser();
+    expect(screen.getByRole('button', { name: /change team/i })).toBeInTheDocument();
+  });
+
+  it('does not show user block in demo mode', () => {
+    renderPanelWithUser({}, 'demo');
+    expect(screen.queryByRole('button', { name: /sign out/i })).toBeNull();
+  });
+
+  it('does not show user block in hidden mode', () => {
+    renderPanelWithUser({}, 'hidden');
+    expect(screen.queryByRole('button', { name: /sign out/i })).toBeNull();
+  });
+
+  it('does not show user block when user is null', () => {
+    renderPanelWithUser({}, 'full', null);
+    expect(screen.queryByRole('button', { name: /sign out/i })).toBeNull();
+  });
+
+  it('calls signOut and refetch on Sign out click', async () => {
+    const mockSignOut = vi.fn().mockResolvedValue(undefined);
+    vi.spyOn(authClientModule, 'authClient', 'get').mockReturnValue({
+      ...authClientModule.authClient,
+      signOut: mockSignOut,
+    });
+
+    renderPanelWithUser();
+    fireEvent.click(screen.getByRole('button', { name: /sign out/i }));
+
+    await waitFor(() => expect(mockSignOut).toHaveBeenCalled());
+    await waitFor(() => expect(mockRefetch).toHaveBeenCalled());
   });
 });
 
