@@ -3,6 +3,15 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('react-router-dom')>();
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
+
 import { fixtureEntry, fixtureGameweeks } from '@/fixtures';
 
 vi.mock('@/api/queries', () => ({
@@ -42,10 +51,30 @@ describe('SquadScreen header navigation', () => {
     expect(screen.queryByRole('button', { name: /back/i })).toBeNull();
   });
 
-  it('shows burger menu when isGuest=true (guest mode)', () => {
-    renderScreen(true, { returnTo: '/watchlist?teamId=72828' });
+  it('shows back button when isGuest with returnTo state', () => {
+    renderScreen(true, { returnTo: '/leagues/42/standings' });
+    expect(screen.getByRole('button', { name: /^back$/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /open team info/i })).toBeNull();
+  });
+
+  it('shows burger menu when isGuest without returnTo', () => {
+    renderScreen(true);
     expect(screen.getByRole('button', { name: /open team info/i })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /back/i })).toBeNull();
+    expect(screen.queryByRole('button', { name: /^back$/i })).toBeNull();
+  });
+
+  it('navigates to returnTo when back is clicked', async () => {
+    mockNavigate.mockClear();
+    const user = userEvent.setup();
+    renderScreen(true, { returnTo: '/leagues/42/standings?gw=5' });
+    await user.click(screen.getByRole('button', { name: /^back$/i }));
+    expect(mockNavigate).toHaveBeenCalledWith('/leagues/42/standings?gw=5');
+  });
+
+  it('shows custom back label from location state', () => {
+    renderScreen(false, { returnTo: '/history', backLabel: 'History' });
+    expect(screen.getByRole('button', { name: /^history$/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /open team info/i })).toBeNull();
   });
 });
 

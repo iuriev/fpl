@@ -16,7 +16,6 @@
 }
 
 .gwLabel {
-  view-transition-name: gw-label;
   font-size: var(--fpl-fs-title);
   font-weight: var(--fpl-fw-bold);
   color: var(--fpl-text);
@@ -63,7 +62,6 @@
 }
 
 .pitchWrap {
-  view-transition-name: totw-content;
   flex: 1;
   min-height: 0;
   overflow: hidden;
@@ -71,6 +69,12 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
+  transition: opacity 180ms ease;
+}
+
+.pitchWrap_fetching {
+  opacity: 0.72;
+  pointer-events: none;
 }
 
 .pitchFill {
@@ -178,6 +182,14 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .pitchWrap_fetching {
+    opacity: 1;
+  }
+
+  .pitchWrap {
+    transition: none;
+  }
+
   .skeletonJersey,
   .skeletonNameBar {
     animation: none;

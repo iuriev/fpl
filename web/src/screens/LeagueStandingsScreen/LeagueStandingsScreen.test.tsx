@@ -157,9 +157,17 @@ describe('LeagueStandingsScreen', () => {
     });
   });
 
-  it('renders a menu button in the header', async () => {
+  it('renders a back button to the leagues list', async () => {
     mockStandingsData = PAGE_1;
     renderScreen();
-    expect(await screen.findByRole('button', { name: /open team info/i })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: /^leagues$/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /open team info/i })).toBeNull();
+  });
+
+  it('navigates to stats when back is clicked', async () => {
+    mockStandingsData = PAGE_1;
+    renderScreen('/leagues/42/standings?gw=5');
+    await userEvent.click(await screen.findByRole('button', { name: /^leagues$/i }));
+    expect(mockNavigate).toHaveBeenCalledWith('/stats?gw=5');
   });
 });

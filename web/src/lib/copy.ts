@@ -169,6 +169,7 @@ export const copy = {
   historyLoadError: "Couldn't load GW history",
   historyRetry: 'Try again',
   historyBack: 'Squad',
+  squadBackToHistory: 'History',
 
   // Leagues stats screen
   statsTitle: 'My Stats',

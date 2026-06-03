@@ -95,7 +95,11 @@ function HistoryTable({ gameweeks }: { gameweeks: HistoryGameweek[] }) {
               <tr
                 key={row.gw}
                 className={styles.clickableRow}
-                onClick={() => navigate(`/?gw=${row.gw}`)}
+                onClick={() =>
+                  navigate(`/?gw=${row.gw}`, {
+                    state: { returnTo: '/history', backLabel: copy.squadBackToHistory },
+                  })
+                }
               >
                 <td>GW{row.gw}</td>
                 <td>{formatNumber(row.overallRank)}</td>

@@ -235,6 +235,21 @@ describe('GET /api/me/managers-watchlist', () => {
     expect(body.managers).toHaveLength(1);
     expect(body.managers[0]).toMatchObject({ teamId: 100, managerName: 'Test Manager' });
   });
+
+  it('returns teamId-only stubs when FPL enrichment fails', async () => {
+    mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
+    makeSelectChain([{ teamId: 100 }, { teamId: 999999 }]);
+    mockGetEntry
+      .mockResolvedValueOnce(mockEntry)
+      .mockRejectedValueOnce(new Error('FPL API error: 404 Not Found'));
+    const res = await app.request('/api/me/managers-watchlist');
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { managers: unknown[] };
+    expect(body.managers).toEqual([
+      mockEntry,
+      { teamId: 999999 },
+    ]);
+  });
 });
 
 describe('POST /api/me/managers-watchlist', () => {

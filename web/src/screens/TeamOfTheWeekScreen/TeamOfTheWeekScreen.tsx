@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { flushSync } from 'react-dom';
 import { useSearchParams } from 'react-router-dom';
 
 import { ApiError } from '@/api/client';
@@ -15,14 +14,6 @@ import { MAX_GAMEWEEK } from '@/types';
 import styles from './TeamOfTheWeekScreen.module.css';
 
 const POSITION_ORDER: PlayerPosition[] = ['GK', 'DEF', 'MID', 'FWD'];
-
-function withTransition(update: () => void): void {
-  if (!document.startViewTransition) {
-    update();
-    return;
-  }
-  document.startViewTransition(() => flushSync(update));
-}
 
 function toSquadPlayer(p: TeamOfTheWeekPlayer): SquadPlayer {
   return {
@@ -91,9 +82,11 @@ export const TeamOfTheWeekScreen: React.FC = () => {
     [finishedGws, selectedGw]
   );
 
-  const { data, isPending, isError, error, refetch } = useTeamOfTheWeek(
-    selectedGwFinished ? selectedGw : null
-  );
+  const { data, isPending, isFetching, isPlaceholderData, isError, error, refetch } =
+    useTeamOfTheWeek(selectedGwFinished ? selectedGw : null);
+
+  const isGwTransition = isFetching && isPlaceholderData && !!data;
+  const showInitialSkeleton = isPending && !data;
 
   const isNotAvailable = !selectedGwFinished && selectedGw !== null;
   const is400 = isError && error instanceof ApiError && error.status === 400;
@@ -110,13 +103,11 @@ export const TeamOfTheWeekScreen: React.FC = () => {
   const navigateGw = (delta: number) => {
     if (selectedGw === null) return;
     const next = selectedGw + delta;
-    withTransition(() =>
-      setSearchParams((prev) => {
-        const p = new URLSearchParams(prev);
-        p.set('gw', String(next));
-        return p;
-      })
-    );
+    setSearchParams((prev) => {
+      const p = new URLSearchParams(prev);
+      p.set('gw', String(next));
+      return p;
+    });
   };
 
   const positionGroups = useMemo(() => {
@@ -128,7 +119,6 @@ export const TeamOfTheWeekScreen: React.FC = () => {
 
   const showPitch =
     selectedGwFinished && !isRealError && !(isNotAvailable || is400);
-  const pitchLoading = showPitch && isPending;
 
   return (
     <div className={styles.screen}>
@@ -187,12 +177,12 @@ export const TeamOfTheWeekScreen: React.FC = () => {
 
       {showPitch && (
         <div
-          className={styles.pitchWrap}
-          aria-busy={pitchLoading}
-          aria-label={pitchLoading ? copy.loadingPlaceholder : undefined}
+          className={`${styles.pitchWrap} ${isGwTransition ? styles.pitchWrap_fetching : ''}`}
+          aria-busy={showInitialSkeleton || isGwTransition}
+          aria-label={showInitialSkeleton ? copy.loadingPlaceholder : undefined}
         >
           <Pitch className={styles.pitchFill} preserveAspectRatio="none">
-            {pitchLoading ? (
+            {showInitialSkeleton ? (
               <PitchSkeletonContent />
             ) : (
               data &&

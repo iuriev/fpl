@@ -81,7 +81,15 @@ me.get('/managers-watchlist', requireUser, async (c) => {
     .from(watchlistEntry)
     .where(eq(watchlistEntry.userId, c.var.user.id))
     .orderBy(watchlistEntry.createdAt);
-  const managers = await Promise.all(rows.map((r) => entryService.getEntry(r.teamId)));
+  const managers = await Promise.all(
+    rows.map(async (r) => {
+      try {
+        return await entryService.getEntry(r.teamId);
+      } catch {
+        return { teamId: r.teamId };
+      }
+    }),
+  );
   return c.json({ managers });
 });
 

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { ApiError } from '@/api/client';
 import { useEntry, useGameweeks, usePlayerPool, useSquad } from '@/api/queries';
@@ -25,6 +25,11 @@ export interface SquadScreenProps {
   isGuest?: boolean;
 }
 
+type SquadLocationState = {
+  returnTo?: string;
+  backLabel?: string;
+};
+
 const POSITION_ORDER: PlayerPosition[] = ['FWD', 'MID', 'DEF', 'GK'];
 
 function groupByPosition(players: SquadPlayer[]): Record<PlayerPosition, SquadPlayer[]> {
@@ -41,9 +46,15 @@ function benchLabel(index: number, position: PlayerPosition): string {
 
 export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { isDemoMode } = useMyTeam();
   const isGuestMode = isGuest ?? false;
+
+  const locationState = location.state as SquadLocationState | null;
+  const returnTo = locationState?.returnTo;
+  const backLabel = locationState?.backLabel ?? copy.squadGuestBack;
 
   const navLinksMode: NavLinksMode = isDemoMode ? 'demo' : isGuestMode ? 'hidden' : 'full';
   const { following: followingTeam, limitReached: followLimitReached, toggle: toggleFollowTeam } = useFollowTeam(teamId, isGuestMode);
@@ -128,6 +139,10 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
   const gwLabel =
     selectedGw !== null ? `${copy.squadGameweekLabel} ${selectedGw}` : copy.squadGameweekLabel;
 
+  const handleBack = () => {
+    if (returnTo) navigate(returnTo);
+  };
+
   return (
     <div className={styles.screen}>
       <TeamNavDrawer
@@ -142,20 +157,41 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
         <header className={styles.header}>
           <div className={styles.headerMain}>
             <div className={styles.headerLeft}>
-              <button
-                className={styles.burgerBtn}
-                onClick={() => setDrawerOpen(true)}
-                aria-label={copy.teamInfoOpenDrawer}
-              >
-                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                  <path
-                    d="M3 5h14M3 10h14M3 15h14"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </button>
+              {returnTo ? (
+                <button
+                  type="button"
+                  className={styles.backBtn}
+                  onClick={handleBack}
+                  aria-label={backLabel}
+                >
+                  <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path
+                      d="M10 4l-4 4 4 4"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  {backLabel}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className={styles.burgerBtn}
+                  onClick={() => setDrawerOpen(true)}
+                  aria-label={copy.teamInfoOpenDrawer}
+                >
+                  <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path
+                      d="M3 5h14M3 10h14M3 15h14"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </button>
+              )}
               {!isGuestMode && (
                 <div className={styles.teamInfo}>
                   <span className={styles.teamName}>{entry?.teamName ?? ' '}</span>

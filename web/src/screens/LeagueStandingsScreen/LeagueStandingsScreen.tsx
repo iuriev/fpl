@@ -65,9 +65,16 @@ export function LeagueStandingsScreen() {
 
   const leagueName = data?.pages[0]?.leagueName ?? copy.leagueStandingsBack;
 
+  const gwParam = searchParams.get('gw');
+  const statsPath = `/stats${gwParam ? `?gw=${gwParam}` : ''}`;
+
   return (
     <div className={styles.screen}>
-      <ScreenHeader title={leagueName} />
+      <ScreenHeader
+        title={leagueName}
+        backTo={statsPath}
+        backLabel={copy.leagueStandingsBack}
+      />
 
       <div className={styles.body}>
         {isLoading && <LeagueStandingsSkeleton />}

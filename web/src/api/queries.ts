@@ -63,6 +63,7 @@ export function useTeamOfTheWeek(gameweek: number | null) {
       return api.getTeamOfTheWeek(gameweek);
     },
     enabled: gameweek !== null,
+    placeholderData: keepPreviousData,
     staleTime: 1000 * 60 * 60 * 24, // 24h — finished GW data is immutable
     retry: (failureCount, error) => {
       if (error instanceof ApiError && (error.status === 400 || error.status === 404)) return false;

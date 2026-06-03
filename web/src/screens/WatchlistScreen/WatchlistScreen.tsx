@@ -26,7 +26,7 @@ export const WatchlistScreen: React.FC = () => {
   }, [repo]);
 
   useEffect(() => {
-    repo.list().then(setWatchedManagers);
+    repo.list().then(setWatchedManagers).catch(() => setWatchedManagers([]));
   }, [repo]);
 
   const handleRemove = useCallback(async (teamId: number) => {
