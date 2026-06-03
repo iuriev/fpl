@@ -7,6 +7,8 @@ import {
   EntryResponse,
   GameweeksResponse,
   HistoryResponse,
+  LeaderboardGwResponse,
+  LeaderboardSeasonResponse,
   LeaguesResponse,
   LeagueStandingsResponse,
   PlayerPoolResponse,
@@ -148,4 +150,8 @@ export const api = {
     request<PlayerProfileResponse>(
       gw != null ? `/players/${playerId}/profile?gw=${gw}` : `/players/${playerId}/profile`
     ),
+
+  getLeaderboardGw: (gw: number) => request<LeaderboardGwResponse>(`/leaderboard/gw/${gw}`),
+
+  getLeaderboardSeason: () => request<LeaderboardSeasonResponse>('/leaderboard/season'),
 };

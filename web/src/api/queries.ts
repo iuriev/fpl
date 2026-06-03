@@ -1,6 +1,8 @@
 import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
 import type {
+  LeaderboardGwResponse,
+  LeaderboardSeasonResponse,
   PositionFilter,
   PriceChangeDirection,
   PriceChangePeriod,
@@ -255,5 +257,33 @@ export function usePlayerProfile(playerId: number | null) {
     },
     enabled: playerId != null,
     staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function useLeaderboardGw(gw: number | null) {
+  return useQuery({
+    queryKey: ['leaderboard-gw', gw],
+    queryFn: () => {
+      if (gw === null) throw new Error('Gameweek required');
+      return api.getLeaderboardGw(gw);
+    },
+    enabled: gw !== null,
+    staleTime: 1000 * 60 * 60,
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && (error.status === 400 || error.status === 404)) return false;
+      return failureCount < 3;
+    },
+  });
+}
+
+export function useLeaderboardSeason() {
+  return useQuery({
+    queryKey: ['leaderboard-season'],
+    queryFn: () => api.getLeaderboardSeason(),
+    staleTime: 1000 * 60 * 30,
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && (error.status === 400 || error.status === 404)) return false;
+      return failureCount < 3;
+    },
   });
 }
