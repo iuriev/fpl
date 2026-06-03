@@ -14,6 +14,7 @@ import * as entryService from './entry-service';
 import * as fixturesService from './fixtures-service';
 import * as gameweeksService from './gameweeks-service';
 import * as historyService from './history-service';
+import * as leaderboardService from './leaderboard-service';
 import * as leagueStandingsService from './league-standings-service';
 import * as leaguesService from './leagues-service';
 import { me } from './me-routes';
@@ -364,6 +365,32 @@ app.get('/api/top-players/season', async (c) => {
   } catch (error) {
     console.error('Error fetching top players for season:', error);
     return c.json({ error: 'Unable to fetch top players' }, { status: 500 });
+  }
+});
+
+// GET /api/leaderboard/gw/:gw
+app.get('/api/leaderboard/gw/:gw', async (c) => {
+  try {
+    const gw = parseInt(c.req.param('gw'), 10);
+    if (isNaN(gw) || gw < 1 || gw > MAX_GAMEWEEK) {
+      return c.json({ error: 'Invalid gameweek' }, { status: 400 });
+    }
+    const result = await leaderboardService.getLeaderboardGw(gw);
+    return c.json(result);
+  } catch (error) {
+    console.error('Error fetching leaderboard GW:', error);
+    return c.json({ error: 'Unable to fetch leaderboard' }, { status: 500 });
+  }
+});
+
+// GET /api/leaderboard/season
+app.get('/api/leaderboard/season', async (c) => {
+  try {
+    const result = await leaderboardService.getLeaderboardSeason();
+    return c.json(result);
+  } catch (error) {
+    console.error('Error fetching season leaderboard:', error);
+    return c.json({ error: 'Unable to fetch season leaderboard' }, { status: 500 });
   }
 });
 
