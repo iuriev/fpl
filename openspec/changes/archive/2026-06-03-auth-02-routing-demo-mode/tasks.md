@@ -41,7 +41,7 @@ and authenticated states route correctly; `MyTeamProtectedRoute` is replaced by
       if user but no `fplTeamId`.
 - [x] `web/src/App.tsx`: add explicit `/entry` route rendering `EntryScreen`.
 - [x] `web/src/App.tsx`: remove `MyTeamProtectedRoute` function.
-- [ ] Update `web/src/App.test.tsx` (or integration test) to cover each routing state.
+- [x] Update `web/src/App.test.tsx` (or integration test) to cover each routing state.
 
 ---
 
@@ -108,11 +108,11 @@ mode nav links are rendered but redirect to `/sign-in`.
 - [x] Run `npm run test -w web` — all tests pass.
 - [x] Run `npm run typecheck -w web` — no type errors.
 - [x] Run `npm run lint -w web` — no lint errors.
-- [ ] Manual smoke test (dev server):
+- [x] Manual smoke test (dev server):
   - Unauthenticated → `/` redirects to `/sign-in`.
   - "Try Demo" → `EntryScreen` → team ID → `SquadScreen` (demo mode).
   - Demo `SquadScreen` drawer: nav links visible, clicking any → `/sign-in`.
   - Demo "Change" → `EntryScreen` with demo flag, new team ID works.
   - Sign in → no `fplTeamId` → `EntryScreen` gate shown, URL manipulation blocked.
   - Sign in with `fplTeamId` → `SquadScreen` (full mode), all nav links work.
-- [ ] Archive this OpenSpec change via `openspec-archive-change` once all steps pass.
+- [x] Archive this OpenSpec change via `openspec-archive-change` once all steps pass.

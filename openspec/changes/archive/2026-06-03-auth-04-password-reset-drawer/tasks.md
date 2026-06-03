@@ -117,7 +117,7 @@
 
 - [x] `npm run test -w web` — 376 tests pass.
 - [x] `npm run test -w proxy` — 287 tests pass.
-- [ ] Manual smoke test (requires running proxy + Resend key):
+- [x] Manual smoke test (requires running proxy + Resend key):
   - "Forgot password?" link visible on `SignInScreen`.
   - Submit `ForgotPasswordScreen` → success message shown, no navigation.
   - Email arrives with reset link; clicking it lands on `ResetPasswordScreen?token=`.
@@ -126,4 +126,4 @@
   - Open `/reset-password` with no token → error message + link to `/forgot-password`.
   - Authenticated user: Sign out button in drawer → signs out, redirects to `/`.
   - Authenticated user: "Change team →" in drawer → navigates to `/entry`.
-- [ ] Archive this OpenSpec change via `openspec-archive-change` once all steps pass.
+- [x] Archive this OpenSpec change via `openspec-archive-change` once all steps pass.

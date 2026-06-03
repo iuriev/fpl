@@ -118,7 +118,7 @@ These features give the app reasons to return every gameweek — essential for g
 | ~~ANA-12~~ | ~~League participants browser (click league on Stats to see all members)~~ | S | → OpenSpec change 2026-06-02-ana-12-league-participants-browser. |
 | ~~MGR-01~~ | ~~Manager Watchlist — follow managers, see their points/transfers in a table~~ | M | ✅ Done — OpenSpec change 2026-06-01-manager-watchlist. localStorage phase, max 5. |
 | MGR-02 | Backend watchlist — migrate MGR-01 from localStorage to backend API | S | Depends on AUTH-01. Swap LocalStorageWatchlistRepository → ApiWatchlistRepository; no UI changes. |
-| MGR-03 | Freemium watchlist limits — 2 entries free, 10 with subscription | S | Depends on MGR-02 + MON-01. `repo.getLimit()` returns tier-specific cap; upsell prompt on `'limit'` response. |
+| ~~MGR-03~~ | ~~Freemium watchlist limits — 2 entries free, 10 with subscription~~ | S | ✅ Done — limits implemented in LocalStorageWatchlistRepository (2 managers) and LocalStoragePlayerWatchlistRepository (2 players); upsell PremiumSheet wired via use-follow-team / use-follow-player. |
 | ~~WATCH-01~~ | ~~Player Watchlist — shortlist of players you're tracking but not yet transferring~~ | S | ✅ Done. |
 | AUTH-01 | Login / password + Google OAuth, backend user profile | M | Enables watchlists, saved plans, AI chat. OpenSpec change in progress. |
 

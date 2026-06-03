@@ -68,7 +68,7 @@ sign-up, navigation goes to `/verify-email`.
 
 - [x] Run `npm run test` in `proxy/` and `web/` — all tests pass.
 - [x] Run `npm run typecheck -w web` — no type errors.
-- [ ] Manual smoke test (requires a real Resend API key in `.env`):
+- [x] Manual smoke test (requires a real Resend API key in `.env`):
   - Sign up with email/password → redirected to `VerifyEmailScreen`.
   - Click "Resend" → confirmation shown, no duplicate error.
   - Click link in email → lands on `/` authenticated with `emailVerified = true` →
@@ -77,4 +77,4 @@ sign-up, navigation goes to `/verify-email`.
   - Authenticated user with `emailVerified = false` navigating to `/history` → redirected
     to `VerifyEmailScreen`.
 - [x] `docs/architecture.md`: confirm Fly secrets table is up to date.
-- [ ] Archive this OpenSpec change via `openspec-archive-change` once all steps pass.
+- [x] Archive this OpenSpec change via `openspec-archive-change` once all steps pass.
