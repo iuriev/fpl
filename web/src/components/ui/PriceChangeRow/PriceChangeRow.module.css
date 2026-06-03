@@ -1,0 +1,57 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-sm);
+  width: 100%;
+  padding: var(--fpl-space-sm) var(--fpl-space-xl3);
+  border: none;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.rank {
+  width: 1.5rem;
+  font: var(--fpl-fw-bold) var(--fpl-fs-body-s) var(--fpl-font-mono);
+  color: var(--fpl-muted);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.name {
+  font: var(--fpl-fw-semibold) var(--fpl-fs-body-s) var(--fpl-font-display);
+  color: var(--fpl-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-xs);
+}
+
+.club {
+  font-size: var(--fpl-fs-micro);
+  color: var(--fpl-muted);
+}
+
+.transfers {
+  font-size: var(--fpl-fs-micro);
+  color: var(--fpl-text-soft);
+}
+

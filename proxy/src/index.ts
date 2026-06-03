@@ -18,6 +18,7 @@ import * as leagueStandingsService from './league-standings-service';
 import * as leaguesService from './leagues-service';
 import { me } from './me-routes';
 import * as playerPoolService from './player-pool-service';
+import { priceRoutes } from './price-routes';
 import * as squadService from './squad-service';
 import * as teamOfTheWeekService from './team-of-the-week-service';
 import * as teamService from './team-service';
@@ -365,6 +366,8 @@ app.get('/api/top-players/season', async (c) => {
     return c.json({ error: 'Unable to fetch top players' }, { status: 500 });
   }
 });
+
+app.route('/api', priceRoutes);
 
 app.on(['GET', 'POST'], '/api/auth/*', (c) => auth.handler(c.req.raw));
 app.route('/api/me', me);

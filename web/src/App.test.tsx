@@ -200,6 +200,7 @@ const baseUser: AuthUser = {
   email: 'user@test.com',
   fplTeamId: null,
   emailVerified: true,
+  subscriptionTier: 'free',
 };
 
 function renderAt(path: string, authCtx: AuthContextValue, myTeamCtx: MyTeamContextValue) {

@@ -46,6 +46,11 @@ export interface FPLBootstrapStatic {
     form: string;
     selected_by_percent: string;
     ep_next: string;
+    cost_change_event: number;
+    cost_change_start: number;
+    transfers_in_event: number;
+    transfers_out_event: number;
+    price_change_percent: string;
   }>;
   element_types: Array<{
     id: number;
@@ -267,4 +272,29 @@ export async function getDreamTeam(gameweek: number): Promise<FPLDreamTeam> {
 
 export async function getFixtures(gameweek: number): Promise<FPLFixture[]> {
   return fetchFPL(`/fixtures/?event=${gameweek}`);
+}
+
+export interface FPLElementSummary {
+  history: Array<{
+    round: number;
+    total_points: number;
+    minutes: number;
+    goals_scored: number;
+    assists: number;
+    clean_sheets: number;
+    goals_conceded: number;
+    own_goals: number;
+    penalties_saved: number;
+    penalties_missed: number;
+    yellow_cards: number;
+    red_cards: number;
+    saves: number;
+    bonus: number;
+    bps: number;
+    defensive_contribution: number;
+  }>;
+}
+
+export async function getElementSummary(elementId: number): Promise<FPLElementSummary> {
+  return fetchFPL(`/element-summary/${elementId}/`);
 }

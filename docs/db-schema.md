@@ -18,6 +18,7 @@ Stores registered user accounts. Extended from better-auth's base schema with `f
 | `email_verified` | boolean | NO | Default false |
 | `image` | text | YES | Avatar URL |
 | `fpl_team_id` | integer | YES | User's saved FPL team ID |
+| `subscription_tier` | text | NO | `free` (default) or `premium` — gates squad-scoped price views |
 | `created_at` | timestamp | NO | |
 | `updated_at` | timestamp | NO | |
 
@@ -106,6 +107,7 @@ erDiagram
         boolean email_verified
         text image
         integer fpl_team_id
+        text subscription_tier
         timestamp created_at
         timestamp updated_at
     }

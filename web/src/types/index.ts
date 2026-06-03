@@ -235,6 +235,75 @@ export interface TransfersResponse {
   transfers: Transfer[];
 }
 
+export type SubscriptionTier = 'free' | 'premium';
+export type PriceChangePeriod = 'gw' | 'season';
+export type PriceChangeDirection = 'rise' | 'fall';
+export type PricePredictionDirection = 'rise' | 'fall';
+export type PredictionLikelihood = 'unlikely' | 'likely' | 'very_likely';
+export type PositionFilter = 'all' | PlayerPosition;
+
+export interface PriceChangePlayer {
+  id: number;
+  webName: string;
+  position: PlayerPosition;
+  teamCode: number;
+  teamShortName: string;
+  nowCost: number;
+  changeAmount: number;
+  transfersInEvent: number;
+  transfersOutEvent: number;
+  selectedByPercent: string;
+}
+
+export interface PriceChangesResponse {
+  period: PriceChangePeriod;
+  direction: PriceChangeDirection;
+  players: PriceChangePlayer[];
+}
+
+export interface PricePredictionPlayer {
+  id: number;
+  webName: string;
+  position: PlayerPosition;
+  teamCode: number;
+  teamShortName: string;
+  nowCost: number;
+  transfersInEvent: number;
+  transfersOutEvent: number;
+  selectedByPercent: string;
+  netTransfersEvent: number;
+  transferInPercent: number | null;
+  likelihood: PredictionLikelihood;
+}
+
+export interface PricePredictionsResponse {
+  direction: PricePredictionDirection;
+  players: PricePredictionPlayer[];
+}
+
+export interface PlayerProfileStat {
+  identifier: string;
+  value: number;
+}
+
+export interface PlayerProfileResponse {
+  player: {
+    id: number;
+    webName: string;
+    position: PlayerPosition;
+    teamCode: number;
+    teamShortName: string;
+    nowCost: number;
+    selectedByPercent: string;
+    status: PlayerStatus;
+    news: string;
+  };
+  gw: number | null;
+  gwPoints: number | null;
+  gwStats: PlayerProfileStat[];
+  nextFixtures: FixtureInfo[];
+}
+
 export interface StandingEntry {
   entry: number;
   entryName: string;

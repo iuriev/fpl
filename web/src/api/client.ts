@@ -10,7 +10,15 @@ import {
   LeaguesResponse,
   LeagueStandingsResponse,
   PlayerPoolResponse,
+  PlayerProfileResponse,
+  PositionFilter,
+  PriceChangeDirection,
+  PriceChangePeriod,
+  PriceChangesResponse,
+  PricePredictionDirection,
+  PricePredictionsResponse,
   SquadResponse,
+  SubscriptionTier,
   TeamOfTheWeekResponse,
   TeamPlayersResponse,
   TeamsResponse,
@@ -32,13 +40,19 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(endpoint: string): Promise<T> {
+async function request<T>(endpoint: string, init?: RequestInit): Promise<T> {
   try {
-    const response = await fetch(`${API_BASE}${endpoint}`);
+    const response = await fetch(`${API_BASE}${endpoint}`, {
+      credentials: init?.credentials ?? 'same-origin',
+      ...init,
+    });
 
     if (!response.ok) {
       if (response.status === 404) {
         throw new ApiError(404, 'not-found', 'Not found');
+      }
+      if (response.status === 403) {
+        throw new ApiError(403, 'error', 'premium_required');
       }
       throw new ApiError(response.status, 'error', `API error: ${response.status}`);
     }
@@ -52,8 +66,22 @@ async function request<T>(endpoint: string): Promise<T> {
   }
 }
 
+function priceQuery(
+  params: Record<string, string>
+): string {
+  return new URLSearchParams(params).toString();
+}
+
 export const api = {
-  getMe: () => request<{ id: string; email: string; name: string; fplTeamId: number | null }>('/me'),
+  getMe: () =>
+    request<{
+      id: string;
+      email: string;
+      name: string;
+      fplTeamId: number | null;
+      emailVerified: boolean;
+      subscriptionTier: SubscriptionTier;
+    }>('/me'),
 
   getGameweeks: () => request<GameweeksResponse>('/gameweeks'),
 
@@ -85,4 +113,39 @@ export const api = {
 
   getLeagueStandings: (leagueId: number, page: number) =>
     request<LeagueStandingsResponse>(`/leagues/${leagueId}/standings?page=${page}`),
+
+  getPriceChanges: (
+    period: PriceChangePeriod,
+    direction: PriceChangeDirection,
+    position: PositionFilter
+  ) =>
+    request<PriceChangesResponse>(
+      `/price-changes?${priceQuery({ period, direction, position })}`
+    ),
+
+  getPriceChangesSquad: (
+    period: PriceChangePeriod,
+    direction: PriceChangeDirection,
+    position: PositionFilter
+  ) =>
+    request<PriceChangesResponse>(
+      `/price-changes/squad?${priceQuery({ period, direction, position })}`,
+      { credentials: 'include' }
+    ),
+
+  getPricePredictions: (direction: PricePredictionDirection, position: PositionFilter) =>
+    request<PricePredictionsResponse>(
+      `/price-predictions?${priceQuery({ direction, position })}`
+    ),
+
+  getPricePredictionsSquad: (direction: PricePredictionDirection, position: PositionFilter) =>
+    request<PricePredictionsResponse>(
+      `/price-predictions/squad?${priceQuery({ direction, position })}`,
+      { credentials: 'include' }
+    ),
+
+  getPlayerProfile: (playerId: number, gw?: number) =>
+    request<PlayerProfileResponse>(
+      gw != null ? `/players/${playerId}/profile?gw=${gw}` : `/players/${playerId}/profile`
+    ),
 };

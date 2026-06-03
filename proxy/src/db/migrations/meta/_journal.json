@@ -15,6 +15,13 @@
       "when": 1780479709441,
       "tag": "0001_furry_shriek",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780491307019,
+      "tag": "0002_productive_bloodaxe",
+      "breakpoints": true
     }
   ]
 }

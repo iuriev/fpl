@@ -1,5 +1,12 @@
 import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
+import type {
+  PositionFilter,
+  PriceChangeDirection,
+  PriceChangePeriod,
+  PricePredictionDirection,
+} from '@/types';
+
 import { api, ApiError } from './client';
 
 export function useGameweeks() {
@@ -201,5 +208,52 @@ export function useSquad(teamId: number | null, gameweek: number | null) {
       if (error instanceof ApiError && error.status === 404) return false;
       return failureCount < 3;
     },
+  });
+}
+
+export function usePriceChanges(
+  period: PriceChangePeriod,
+  direction: PriceChangeDirection,
+  position: PositionFilter,
+  squad: boolean,
+  enabled: boolean
+) {
+  return useQuery({
+    queryKey: ['price-changes', period, direction, position, squad],
+    queryFn: () =>
+      squad
+        ? api.getPriceChangesSquad(period, direction, position)
+        : api.getPriceChanges(period, direction, position),
+    enabled,
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function usePricePredictions(
+  direction: PricePredictionDirection,
+  position: PositionFilter,
+  squad: boolean,
+  enabled: boolean
+) {
+  return useQuery({
+    queryKey: ['price-predictions', direction, position, squad],
+    queryFn: () =>
+      squad
+        ? api.getPricePredictionsSquad(direction, position)
+        : api.getPricePredictions(direction, position),
+    enabled,
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function usePlayerProfile(playerId: number | null) {
+  return useQuery({
+    queryKey: ['player-profile', playerId],
+    queryFn: () => {
+      if (!playerId) throw new Error('Player ID required');
+      return api.getPlayerProfile(playerId);
+    },
+    enabled: playerId != null,
+    staleTime: 1000 * 60 * 10,
   });
 }

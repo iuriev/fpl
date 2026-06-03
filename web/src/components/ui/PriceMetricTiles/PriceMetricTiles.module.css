@@ -1,0 +1,59 @@
+.group {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: var(--fpl-space-xs);
+  flex-shrink: 0;
+}
+
+.tilePrice,
+.tileChange,
+.tileSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.25rem;
+  padding: var(--fpl-space-xs) var(--fpl-space-sm);
+  border-radius: var(--fpl-radius-md);
+  border: 1px solid var(--fpl-bg-hair);
+  font: var(--fpl-fw-bold) var(--fpl-fs-title) / 1 var(--fpl-font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--fpl-tr-head-s);
+}
+
+.tilePrice {
+  color: var(--fpl-text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.tileChange {
+  color: var(--fpl-text-soft);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.tileChangeUp {
+  color: var(--fpl-fdr-1);
+  background: rgba(34, 197, 94, 0.14);
+  border-color: rgba(34, 197, 94, 0.45);
+}
+
+.tileChangeDown {
+  color: var(--fpl-fdr-5);
+  background: rgba(190, 24, 93, 0.14);
+  border-color: rgba(190, 24, 93, 0.4);
+}
+
+.tileSecondary {
+  font: var(--fpl-fw-bold) var(--fpl-fs-micro) var(--fpl-font-display);
+  min-width: 0;
+  padding: var(--fpl-space-xs);
+  color: var(--fpl-fdr-1);
+  background: rgba(34, 197, 94, 0.14);
+  border-color: rgba(34, 197, 94, 0.35);
+  white-space: nowrap;
+}
+
+.tileSecondaryStrong {
+  background: rgba(74, 222, 128, 0.22);
+  border-color: rgba(74, 222, 128, 0.5);
+}

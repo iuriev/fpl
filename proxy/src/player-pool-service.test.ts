@@ -72,7 +72,7 @@ describe('player-pool-service', () => {
         expectedPoints: '5.5',
         nextFixtures: [{ gw: 3, opponent: 'MCI', home: true, difficulty: 4 }],
       });
-      expect(cache.set).toHaveBeenCalledWith('player-pool', expect.any(Object), 600);
+      expect(cache.set).toHaveBeenCalledWith('player-pool', expect.any(Object), 3600);
     });
 
     it('returns cached result without hitting FPL', async () => {

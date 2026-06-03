@@ -6,6 +6,7 @@ import { type AuthVars, requireUser } from './auth/middleware';
 import { db } from './db/client';
 import { playerWatchlistEntry, user, watchlistEntry } from './db/schema';
 import * as entryService from './entry-service';
+import { resolveSubscriptionTier } from './subscription';
 
 const FREE_LIMIT = 2;
 
@@ -22,6 +23,7 @@ me.get('/', requireUser, async (c) => {
       name: user.name,
       fplTeamId: user.fplTeamId,
       emailVerified: user.emailVerified,
+      subscriptionTier: user.subscriptionTier,
     })
     .from(user)
     .where(eq(user.id, sessionUser.id))
@@ -50,6 +52,7 @@ me.get('/', requireUser, async (c) => {
     name: dbUser.name,
     fplTeamId: dbUser.fplTeamId ?? null,
     emailVerified: dbUser.emailVerified,
+    subscriptionTier: resolveSubscriptionTier(dbUser.subscriptionTier, dbUser.email),
   });
 });
 

@@ -55,6 +55,7 @@ describe('SignUpScreen', () => {
       email: 'newuser@test.com',
       name: 'New User',
       fplTeamId: null,
+      subscriptionTier: 'free' as const,
     });
     vi.spyOn(authClient, 'authClient', 'get').mockReturnValue({
       ...authClient.authClient,

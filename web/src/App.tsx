@@ -25,6 +25,7 @@ import {
   LeaguesStatsScreen,
   LeagueStandingsScreen,
   PlayerWatchlistScreen,
+  PriceChangesScreen,
   ResetPasswordScreen,
   SignInScreen,
   SignUpScreen,
@@ -116,6 +117,14 @@ function AppContent() {
         element={
           <AuthAndTeamProtectedRoute>
             <TopPlayersScreen />
+          </AuthAndTeamProtectedRoute>
+        }
+      />
+      <Route
+        path="/price-changes"
+        element={
+          <AuthAndTeamProtectedRoute>
+            <PriceChangesScreen />
           </AuthAndTeamProtectedRoute>
         }
       />

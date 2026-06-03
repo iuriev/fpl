@@ -30,7 +30,9 @@ The catalogue. Top-level keys: `events`, `teams`, `elements`, `element_types`, `
 - `teams[]`: `id`, `code`, `name`, `short_name` ("ARS"), strength ratings.
 - `elements[]` (players): `id`, `code`, `web_name`, `first_name`, `second_name`, `team`,
   `team_code`, `element_type`, `now_cost`, `total_points`, `event_points`, `status`,
-  `chance_of_playing_this_round`, `news`, `news_added`, `selected_by_percent`.
+  `chance_of_playing_this_round`, `news`, `news_added`, `selected_by_percent`,
+  `cost_change_event`, `cost_change_start`, `transfers_in_event`, `transfers_out_event`,
+  `price_change_percent`.
 - `element_types[]`: `id`, `singular_name`, `singular_name_short` (GKP/DEF/MID/FWD), squad rules.
 
 Used for: player metadata (name/position/club/status), the gameweek list and current gameweek,
@@ -65,7 +67,9 @@ Used for: each player's points in the selected gameweek (`stats.total_points`).
 ## Other endpoints (not in the MVP, for reference)
 
 - `GET /entry/{teamId}/history/` — `current[]` per-gameweek history, `past[]`, `chips[]`.
-- `GET /element-summary/{elementId}/` — a player's per-fixture history.
+- `GET /element-summary/{elementId}/` — a player's per-fixture history (`history[]` includes
+  per-GW stats: `round`, `total_points`, `goals_scored`, `assists`, etc.). Used by
+  `GET /api/players/:playerId/profile`.
 - `GET /fixtures/?event={gw}` — fixtures for a gameweek. Each object: `id`, `event`,
   `team_h`, `team_a`, `team_h_difficulty`, `team_a_difficulty` (integer 1–5),
   `kickoff_time`, `finished`. Used for FDR chips in the Transfer Planner.

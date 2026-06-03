@@ -1,0 +1,113 @@
+.headerMeta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--fpl-space-sm);
+  margin-bottom: var(--fpl-space-md);
+}
+
+.metaLine {
+  font: var(--fpl-fw-regular) var(--fpl-fs-body-s) var(--fpl-font-display);
+  color: var(--fpl-text-soft);
+  flex: 1;
+}
+
+.followBtn {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--fpl-radius-pill);
+  border: 1px solid var(--fpl-bg-hair);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--fpl-muted);
+  font-size: var(--fpl-fs-body);
+  cursor: pointer;
+}
+
+.followBtnActive {
+  color: var(--fpl-accent);
+  border-color: var(--fpl-accent);
+}
+
+.gwHeading {
+  font: var(--fpl-fw-bold) var(--fpl-fs-body-s) var(--fpl-font-display);
+  color: var(--fpl-text);
+  margin: 0 0 var(--fpl-space-sm);
+}
+
+.statChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--fpl-space-xs);
+  margin-bottom: var(--fpl-space-md);
+}
+
+.chip {
+  font-size: var(--fpl-fs-micro);
+  font-weight: var(--fpl-fw-semibold);
+  padding: 0.125rem var(--fpl-space-xs);
+  border-radius: var(--fpl-radius-xs);
+}
+
+.chipGoal {
+  background: rgba(22, 101, 52, 0.5);
+  color: var(--fpl-fdr-1);
+}
+
+.chipAssist {
+  background: rgba(14, 116, 144, 0.5);
+  color: var(--fpl-fdr-2);
+}
+
+.chipDefensive {
+  background: rgba(30, 64, 175, 0.45);
+  color: var(--fpl-text-soft);
+}
+
+.chipBonus {
+  background: rgba(161, 98, 7, 0.45);
+  color: var(--fpl-accent-warm);
+}
+
+.chipPositive {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--fpl-text-soft);
+}
+
+.chipNegative {
+  background: rgba(127, 29, 29, 0.45);
+  color: var(--fpl-fdr-5);
+}
+
+.chipDefault {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--fpl-text-soft);
+}
+
+.sectionLabel {
+  display: block;
+  font: var(--fpl-fw-semibold) var(--fpl-fs-micro) var(--fpl-font-display);
+  color: var(--fpl-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--fpl-tr-head-s);
+  margin-bottom: var(--fpl-space-sm);
+}
+
+.fixtureRow {
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-sm);
+  margin-bottom: var(--fpl-space-xs);
+}
+
+.gwNum {
+  font: var(--fpl-fw-semibold) var(--fpl-fs-micro) var(--fpl-font-mono);
+  color: var(--fpl-muted);
+  width: 2.5rem;
+}
+
+.status {
+  font: var(--fpl-fw-regular) var(--fpl-fs-body-s) var(--fpl-font-display);
+  color: var(--fpl-muted);
+  margin: 0;
+}

@@ -1,0 +1,92 @@
+.screen {
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--fpl-bg-deep);
+  color: var(--fpl-text);
+}
+
+.tabs {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.tab {
+  flex: 1;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: var(--fpl-space-base) 0;
+  font: var(--fpl-fw-semibold) var(--fpl-fs-body-s) var(--fpl-font-display);
+  color: var(--fpl-muted);
+  cursor: pointer;
+  transition:
+    color 120ms,
+    border-color 120ms;
+}
+
+.tabActive {
+  color: var(--fpl-accent);
+  border-bottom-color: var(--fpl-accent);
+}
+
+.subTabs {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--fpl-space-xs);
+  padding: var(--fpl-space-sm) var(--fpl-space-xl3);
+  border-bottom: 1px solid var(--fpl-bg-hair);
+}
+
+.subTab {
+  flex: 1;
+  border: 1px solid var(--fpl-bg-hair);
+  border-radius: var(--fpl-radius-pill);
+  padding: var(--fpl-space-xs) var(--fpl-space-sm);
+  background: rgba(255, 255, 255, 0.04);
+  font: var(--fpl-fw-semibold) var(--fpl-fs-micro) var(--fpl-font-display);
+  color: var(--fpl-muted);
+  cursor: pointer;
+}
+
+.subTabActive {
+  color: var(--fpl-text);
+  border-color: var(--fpl-text-soft);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.listWrap {
+  position: relative;
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: var(--fpl-space-xl3);
+}
+
+.message {
+  padding: var(--fpl-space-xl3);
+  text-align: center;
+  font: var(--fpl-fw-regular) var(--fpl-fs-body-s) var(--fpl-font-display);
+  color: var(--fpl-muted);
+  margin: 0;
+}
+
+.retry {
+  margin-top: var(--fpl-space-sm);
+  border: 1px solid var(--fpl-bg-hair);
+  border-radius: var(--fpl-radius-pill);
+  padding: var(--fpl-space-xs) var(--fpl-space-lg);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--fpl-text);
+  cursor: pointer;
+  font: var(--fpl-fw-semibold) var(--fpl-fs-body-s) var(--fpl-font-display);
+}
+
+.disclaimer {
+  flex-shrink: 0;
+  padding: var(--fpl-space-sm) var(--fpl-space-xl3) var(--fpl-space-lg);
+  font: var(--fpl-fw-regular) var(--fpl-fs-micro) var(--fpl-font-display);
+  color: var(--fpl-muted);
+  text-align: center;
+  margin: 0;
+}

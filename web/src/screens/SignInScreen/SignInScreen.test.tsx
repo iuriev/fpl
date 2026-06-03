@@ -55,6 +55,7 @@ describe('SignInScreen', () => {
       email: 'user@test.com',
       name: 'Test User',
       fplTeamId: null,
+      subscriptionTier: 'free' as const,
     });
     vi.spyOn(authClient, 'authClient', 'get').mockReturnValue({
       ...authClient.authClient,
@@ -113,6 +114,7 @@ describe('SignInScreen', () => {
       email: 'user@test.com',
       name: 'Test User',
       fplTeamId: null,
+      subscriptionTier: 'free' as const,
     });
     vi.spyOn(authClient, 'authClient', 'get').mockReturnValue({
       ...authClient.authClient,

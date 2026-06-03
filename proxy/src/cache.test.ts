@@ -51,11 +51,12 @@ describe('Cache', () => {
 
   describe('TTL constants', () => {
     it('defines correct TTL values', () => {
-      expect(cache.ttl.BOOTSTRAP).toBe(3600);
-      expect(cache.ttl.ENTRY).toBe(3600);
-      expect(cache.ttl.SQUAD_FINISHED).toBe(86400);
+      expect(cache.ttl.BOOTSTRAP).toBe(7200);
+      expect(cache.ttl.ENTRY).toBe(86400);
+      expect(cache.ttl.SQUAD_FINISHED).toBe(604800);
       expect(cache.ttl.SQUAD_CURRENT).toBe(300);
       expect(cache.ttl.HISTORY_CURRENT).toBe(300);
+      expect(cache.ttl.PLAYER_POOL).toBe(3600);
     });
   });
 });

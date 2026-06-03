@@ -3,12 +3,15 @@
  * Direct async functions; no React dependency.
  */
 
+export type SubscriptionTier = 'free' | 'premium';
+
 export interface AuthUser {
   id: string;
   email: string;
   name: string;
   fplTeamId: number | null;
   emailVerified: boolean;
+  subscriptionTier: SubscriptionTier;
 }
 
 export interface AuthError {

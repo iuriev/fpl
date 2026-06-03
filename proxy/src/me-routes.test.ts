@@ -69,6 +69,7 @@ describe('GET /api/me', () => {
         name: 'Test User',
         fplTeamId: 42,
         emailVerified: false,
+        subscriptionTier: 'free',
       },
     ]);
     const mockWhere = vi.fn().mockReturnValue({ limit: mockLimit });
@@ -84,6 +85,7 @@ describe('GET /api/me', () => {
       name: 'Test User',
       fplTeamId: 42,
       emailVerified: false,
+      subscriptionTier: 'free',
     });
   });
 
@@ -99,6 +101,7 @@ describe('GET /api/me', () => {
         name: 'Test User',
         fplTeamId: null,
         emailVerified: false,
+        subscriptionTier: 'premium',
       },
     ]);
     const mockWhere = vi.fn().mockReturnValue({ limit: mockLimit });
@@ -106,8 +109,39 @@ describe('GET /api/me', () => {
     vi.mocked(db.select).mockReturnValue({ from: mockFrom } as never);
 
     const res = await app.request('/api/me');
-    const body = (await res.json()) as { fplTeamId: null };
+    const body = (await res.json()) as { fplTeamId: null; subscriptionTier: string };
     expect(body.fplTeamId).toBeNull();
+  });
+
+  it('returns premium when PREMIUM_OVERRIDE_EMAIL matches', async () => {
+    const prev = process.env.PREMIUM_OVERRIDE_EMAIL;
+    process.env.PREMIUM_OVERRIDE_EMAIL = 'vip@test.com';
+    try {
+      mockGetSession.mockResolvedValue({
+        user: { ...mockUser, email: 'vip@test.com' },
+        session: {} as never,
+      });
+      const mockLimit = vi.fn().mockResolvedValue([
+        {
+          id: 'user-1',
+          email: 'vip@test.com',
+          name: 'Test User',
+          fplTeamId: 42,
+          emailVerified: false,
+          subscriptionTier: 'free',
+        },
+      ]);
+      const mockWhere = vi.fn().mockReturnValue({ limit: mockLimit });
+      const mockFrom = vi.fn().mockReturnValue({ where: mockWhere });
+      vi.mocked(db.select).mockReturnValue({ from: mockFrom } as never);
+
+      const res = await app.request('/api/me');
+      const body = (await res.json()) as { subscriptionTier: string };
+      expect(body.subscriptionTier).toBe('premium');
+    } finally {
+      if (prev === undefined) delete process.env.PREMIUM_OVERRIDE_EMAIL;
+      else process.env.PREMIUM_OVERRIDE_EMAIL = prev;
+    }
   });
 });
 

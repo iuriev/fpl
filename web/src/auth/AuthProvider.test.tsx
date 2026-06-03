@@ -10,7 +10,14 @@ vi.mock('./auth-client');
 
 describe('AuthProvider', () => {
   it('loads user from getMe on mount', async () => {
-    const mockUser = { id: '1', email: 'user@test.com', name: 'Test User', fplTeamId: null };
+    const mockUser = {
+      id: '1',
+      email: 'user@test.com',
+      name: 'Test User',
+      fplTeamId: null,
+      emailVerified: true,
+      subscriptionTier: 'free' as const,
+    };
     vi.spyOn(authClient, 'authClient', 'get').mockReturnValue({
       ...authClient.authClient,
       getMe: vi.fn().mockResolvedValue(mockUser),

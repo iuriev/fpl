@@ -7,6 +7,7 @@ export const user = pgTable('user', {
   emailVerified: boolean('email_verified').notNull().default(false),
   image: text('image'),
   fplTeamId: integer('fpl_team_id'),
+  subscriptionTier: text('subscription_tier').notNull().default('free'),
   createdAt: timestamp('created_at').notNull(),
   updatedAt: timestamp('updated_at').notNull(),
 });

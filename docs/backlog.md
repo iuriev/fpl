@@ -112,7 +112,7 @@ These features give the app reasons to return every gameweek — essential for g
 | ~~ANA-01~~ | ~~Gameweek review screen ("how did my week go?")~~ | M | ✅ Done — implemented on feature/ana-01-gameweek-review. |
 | ~~CHIP-01~~ | ~~Display active chip on squad screen + SummaryStrip~~ | S | ✅ Done — chip cell replaces AVERAGE+HIGHEST in SummaryStrip. |
 | ~~CHIP-02~~ | ~~Consider active chip in transfer planner (Wildcard = unlimited free transfers)~~ | S | ✅ Done — Wildcard and Free Hit now zero out transfer costs in the planner. |
-| ANA-03 | Price change risers & fallers | M | Huge FPL meta driver. Users check this daily during the GW. |
+| ~~ANA-03~~ | ~~Price change risers & fallers~~ | M | ✅ Done — combined with PRED-06 on `/price-changes` (OpenSpec `ana-03-pred-06-price-changes`). |
 | ~~ANA-12~~ | ~~League participants browser (click league on Stats to see all members)~~ | S | ✅ Done — OpenSpec change 2026-06-02-ana-12-league-participants-browser. |
 | ~~MGR-01~~ | ~~Manager Watchlist — follow managers, see their points/transfers in a table~~ | M | ✅ Done — OpenSpec change 2026-06-01-manager-watchlist. localStorage phase, max 5. |
 | MGR-02 | Backend watchlist — migrate MGR-01 from localStorage to backend API | S | Depends on AUTH-01. Swap LocalStorageWatchlistRepository → ApiWatchlistRepository; no UI changes. |
@@ -129,10 +129,9 @@ A post-gameweek screen or panel showing:
 - "What-if you hadn't transferred anyone" comparison
 Research what similar services do (fpl.team, fplukraine.com, etc.) and design accordingly.
 
-#### ANA-03: Price change risers & fallers
-Show players whose price has changed the most (up and down) globally across all FPL.
-
-Reference: fpl.team league tab with price filter.
+#### ANA-03: Price change risers & fallers [SHIPPED]
+Shipped on `/price-changes` (Actual tab): GW and Season risers/fallers, position filter, top 50.
+Combined with PRED-06 in OpenSpec `archive/2026-06-03-ana-03-pred-06-price-changes`.
 
 #### ANA-06: Captain Poll
 Community vote for the best captain pick each gameweek.
@@ -217,14 +216,14 @@ Useful for long-term planning — build a shortlist without committing a transfe
 
 | ID | Task | Effort | Why |
 |----|------|--------|-----|
-| PRED-06 | FPL Price Change Predictions table | M | Users obsess over price changes. Clear monetisation gate candidate. |
+| ~~PRED-06~~ | ~~FPL Price Change Predictions table~~ | M | ✅ Done — Tonight tab on `/price-changes` (OpenSpec `ana-03-pred-06-price-changes`). |
 | PRED-05 | Clean sheet probability & xG/xA market screen (per-team stats) | M | Unique angle. Helps evaluate defenders and attackers efficiently. |
 | PRED-07 | Predicted goals & assists screen | M | Complement to PRED-05; popular FPL decision-making tool. |
 | PRED-08 | Predicted lineups for all 20 PL teams | L | Data-heavy. Needs reliable lineup data source research. |
 | PRED-02 | Predicted points list screen (free: top 3, locked: rest) | M | Monetisation hook + genuinely useful feature. Needs xPts source. |
 
 | MON-01 | Premium subscription flow (paywall, pricing page) | L | Unlocks revenue. Sequence: build the gate first, then the real feature (PRED-04). |
-| MON-02 | Inline premium upsell banners in Transfer / Predicted Points screens | S | Low-friction conversion nudge. Just HTML/CSS banners. |
+| MON-02 | Blocking premium upsell dialog on Transfer (Predicted Points with PRED-02) | S | OpenSpec: `openspec/changes/mon-02-premium-upsell-dialog`. Center modal, env cooldown, free tier only. |
 | MON-03 | Donations / "Buy me a coffee" link | XS | Zero effort. Add link to About or footer before premium flow is ready. |
 
 ### Feature details
@@ -245,10 +244,9 @@ Per-team market screen inspired by fplukraine.com:
 Helps users identify clean sheet defenders and high-xG attackers at a glance.
 Reference: fplukraine.com "Market" tab.
 
-#### PRED-06: FPL Price Change Predictions
-Table showing players with predicted price change direction and probability:
-Columns: Player | Team | Current Price | Transfer In % | Price Δ% | Likelihood (Unlikely / Likely / Very Likely)
-Green progress bars for "in" probability; colour-coded likelihood badge.
+#### PRED-06: FPL Price Change Predictions [SHIPPED]
+Shipped as Tonight tab on `/price-changes`: heuristic likelihood (Likely / Very Likely),
+transfer-in %, premium-gated My squad filter. OpenSpec `archive/2026-06-03-ana-03-pred-06-price-changes`.
 
 #### PRED-07: Predicted goals & assists screen
 Separate ranked lists for Goals and Assists with probability values per player:
@@ -279,12 +277,11 @@ The free tier gives: squad viewer, transfers, basic stats. The paid tier unlocks
 - **Annual (Chief Scout):** £4.17/mo — AI tools, OPTA data, transfer planners, captaincy matrix, xG heatmaps
 - **Monthly (Chief Scout):** £10.00/mo — same features, no annual commitment
 
-#### MON-02: Premium upsell banners
-Add inline promo banners inside key screens (Transfer planner, Predicted points, Lineups)
-motivating free users to upgrade:
-- Dark purple/teal: "TEAM | LINEUPS / SUGGESTION TOOLS"
-- "PLAYER PROJECTIONS / REMOVE ADS"
-Reference: fpl.team inline premium promotion banners.
+#### MON-02: Premium upsell dialog
+Blocking center modal for **free-tier** users on high-intent screens (Transfer now;
+Predicted Points when PRED-02 ships). Shared `PremiumUpsellProvider`; cooldown from
+`VITE_PREMIUM_UPSELL_COOLDOWN_MS` (default 24h). Primary CTA closes only until MON-01.
+Reference: fpl.team promotion tone; implementation in `mon-02-premium-upsell-dialog`.
 
 #### MON-03: Donations / "Buy me a coffee"
 Add a donate button alongside the subscription flow.
@@ -488,6 +485,7 @@ For reference — features that are live in the codebase:
 - **Active chip display (CHIP-01)** — chip cell replaces AVERAGE+HIGHEST in SummaryStrip when a chip is active; octagonal badge icon + chip name + ACTIVE label; per-chip accent colours (Wildcard gold, Triple Captain red, Free Hit cyan, Bench Boost green)
 - **Auth (AUTH-01)** — login/password + Google OAuth, backend user profile; OpenSpec change 2026-06-02-auth-01-user-accounts.
 - **League participants browser (ANA-12)** — click a league in Stats to browse all participants and view their squads; OpenSpec change 2026-06-02-ana-12-league-participants-browser.
+- **Price changes & predictions (ANA-03, PRED-06)** — `/price-changes` screen: Actual (GW/season risers/fallers) + Tonight predictions; All FPL free, My squad premium; player profile sheet; OpenSpec `ana-03-pred-06-price-changes`.
 - **Fix bugs** — BUG-01 (position limits), BUG-02 (transfer arrows)
 - **Proxy/BFF** — services for squad, entry, gameweeks, history, leagues, dream-team, fixtures, player pool, top players, team
 
