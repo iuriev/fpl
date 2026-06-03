@@ -23,6 +23,17 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
+    sendResetPasswordEmail: async ({ user, url }: { user: { email: string }; url: string }) => {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const { error } = await resend.emails.send({
+        from: process.env.FROM_EMAIL ?? 'noreply@fpl-squad-viewer.fly.dev',
+        to: user.email,
+        subject: 'Reset your FPL Squad Viewer password',
+        text: `Click the link to reset your password:\n\n${url}\n\nIf you didn't request this, ignore this email.`,
+      });
+      if (error) console.error('[Resend] Failed to send reset email:', error);
+    },
+    resetPasswordTokenExpiresIn: 3600,
   },
   emailVerification: {
     sendOnSignUp: true,
