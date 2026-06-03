@@ -69,6 +69,17 @@
     color 120ms;
 }
 
+.navLinkActive {
+  border-color: var(--fpl-accent);
+  color: var(--fpl-accent);
+  background: rgba(0, 255, 135, 0.08);
+}
+
+.navLinkActive.navLinkFeatured {
+  animation: none;
+  background: rgba(0, 255, 135, 0.08);
+}
+
 .navLinkDemo {
   opacity: 0.6;
   cursor: pointer;

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 import { authClient } from '@/auth/auth-client';
 import { useCurrentUser } from '@/auth/AuthContext';
@@ -136,13 +136,21 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({
       {navLinksMode === 'full' && (
         <div className={styles.navLinks}>
           {NAV_LINKS.map(({ to, label, featured }) => (
-            <Link
+            <NavLink
               key={to}
               to={to}
-              className={`${styles.navLink}${featured ? ` ${styles.navLinkFeatured}` : ''}`}
+              className={({ isActive }) =>
+                [
+                  styles.navLink,
+                  featured ? styles.navLinkFeatured : '',
+                  isActive ? styles.navLinkActive : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')
+              }
             >
               {label()}
-            </Link>
+            </NavLink>
           ))}
         </div>
       )}
