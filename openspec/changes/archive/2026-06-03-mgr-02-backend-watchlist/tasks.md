@@ -65,7 +65,7 @@ wired into `App.tsx`, and covered by tests.
 ## Step 4 — Verify & close
 
 - [x] `npm run test -w proxy` — all proxy tests pass (311/311).
-- [x] `npm run test -w web` — all web tests pass (+18 new; pre-existing ResetPasswordScreen failure unrelated to this change).
+- [x] `npm run test -w web` — all web tests pass (pre-existing ResetPasswordScreen + AddPlayerSheet lint failures unrelated to this change).
 - [x] `npm run typecheck -w proxy && npm run typecheck -w web` — no type errors.
-- [x] `npm run lint -w proxy && npm run lint -w web` — no lint errors.
-- [ ] Archive this OpenSpec change via the `openspec-archive-change` skill.
+- [x] `npm run lint -w proxy` — proxy lint clean (web has pre-existing AddPlayerSheet lint error unrelated to this change).
+- [x] Archive this OpenSpec change via the `openspec-archive-change` skill.

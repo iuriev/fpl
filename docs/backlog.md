@@ -112,7 +112,7 @@ These features give the app reasons to return every gameweek — essential for g
 | ~~ANA-01~~ | ~~Gameweek review screen ("how did my week go?")~~ | M | ✅ Done — implemented on feature/ana-01-gameweek-review. |
 | ~~CHIP-01~~ | ~~Display active chip on squad screen + SummaryStrip~~ | S | ✅ Done — chip cell replaces AVERAGE+HIGHEST in SummaryStrip. |
 | ~~CHIP-02~~ | ~~Consider active chip in transfer planner (Wildcard = unlimited free transfers)~~ | S | ✅ Done — Wildcard and Free Hit now zero out transfer costs in the planner. |
-| ANA-03 | Price change risers & fallers (global + mini-league) | M | Huge FPL meta driver. Users check this daily during the GW. |
+| ANA-03 | Price change risers & fallers | M | Huge FPL meta driver. Users check this daily during the GW. |
 | ~~ANA-12~~ | ~~League participants browser (click league on Stats to see all members)~~ | S | ✅ Done — OpenSpec change 2026-06-02-ana-12-league-participants-browser. |
 | ~~MGR-01~~ | ~~Manager Watchlist — follow managers, see their points/transfers in a table~~ | M | ✅ Done — OpenSpec change 2026-06-01-manager-watchlist. localStorage phase, max 5. |
 | MGR-02 | Backend watchlist — migrate MGR-01 from localStorage to backend API | S | Depends on AUTH-01. Swap LocalStorageWatchlistRepository → ApiWatchlistRepository; no UI changes. |
@@ -130,9 +130,7 @@ A post-gameweek screen or panel showing:
 Research what similar services do (fpl.team, fplukraine.com, etc.) and design accordingly.
 
 #### ANA-03: Price change risers & fallers
-Show players whose price has changed the most (up and down) — scoped to:
-- Global (all FPL)
-- Within the user's mini-league
+Show players whose price has changed the most (up and down) globally across all FPL.
 
 Reference: fpl.team league tab with price filter.
 
@@ -141,10 +139,6 @@ Community vote for the best captain pick each gameweek.
 Poll format: "Who is the best GW{N} captain?" with top candidate options showing their fixture
 e.g. `Haaland (MCI) vs AVL (H)`, `M.Salah (LIV) vs BRE (H)`.
 Drives daily engagement before the deadline.
-
-#### ANA-07: All-time rank tracker
-"What's My All-Time Rank?" — view the user's all-time FPL rank history and compare
-their career trajectory with top managers worldwide.
 
 #### ANA-08: Captain Picks Analyzer
 Show the user's historical captain pick record:
@@ -228,8 +222,8 @@ Useful for long-term planning — build a shortlist without committing a transfe
 | PRED-07 | Predicted goals & assists screen | M | Complement to PRED-05; popular FPL decision-making tool. |
 | PRED-08 | Predicted lineups for all 20 PL teams | L | Data-heavy. Needs reliable lineup data source research. |
 | PRED-02 | Predicted points list screen (free: top 3, locked: rest) | M | Monetisation hook + genuinely useful feature. Needs xPts source. |
-| PRED-03 | "Sort by AI" button in picker (UI gate only, no AI yet) | S | Creates premium upsell pressure with zero backend cost. Just a modal. |
-| MON-01 | Premium subscription flow (paywall, pricing page) | L | Unlocks revenue. Sequence: build the gate first (PRED-03), then the real feature (PRED-04). |
+
+| MON-01 | Premium subscription flow (paywall, pricing page) | L | Unlocks revenue. Sequence: build the gate first, then the real feature (PRED-04). |
 | MON-02 | Inline premium upsell banners in Transfer / Predicted Points screens | S | Low-friction conversion nudge. Just HTML/CSS banners. |
 | MON-03 | Donations / "Buy me a coffee" link | XS | Zero effort. Add link to About or footer before premium flow is ready. |
 
@@ -243,12 +237,6 @@ A dedicated screen showing all FPL players ranked by xPts for the next GW.
 - Subtitle: "Click on a player to view their profile and compare predictions."
 - Free rows: `[club badge] [player photo] {Name} {price}m {pos}/{team}/{ownership%}` → `xPts {value}` large right-aligned
 - Locked rows: blurred photo + name, "🔒 Become a seasoned veteran to see all players", blurred xPts
-
-#### PRED-03: AI sort in transfer picker (premium gate)
-Add a "Sort by AI" button in the player picker sheet that re-orders candidates by a proprietary
-AI score. Tapping it shows a modal explaining it's a premium feature (requires subscription).
-The button is visible but disabled for free users — creates upsell pressure.
-Do **not** implement the underlying AI yet; just the UI gate.
 
 #### PRED-05: Clean sheet probability & xG/xA market screen
 Per-team market screen inspired by fplukraine.com:
@@ -401,8 +389,6 @@ Write original copy (do not copy fpl.team text); use https://fpl.team/about/ as 
 | STAT-01 | DEFCON / BPS leaderboard screen | S | Unique FPL insight. Data source needs research (cheatography API?). |
 | ANA-08 | Captain Picks Analyzer | M | Helps users see if their captaincy decisions are paying off. |
 | ANA-09 | Transfer Analyzer | M | Net transfer points history — was each transfer worth it? |
-| ANA-07 | All-time rank tracker | S | Career view. Simple chart over time. |
-
 ### Feature details
 
 #### STAT-01: DEFCON / BPS leaderboard
@@ -426,9 +412,9 @@ Can be integrated into the player info popup or as a standalone screen.
 | START-01 | GW1 draft assistant | L | Seasonal feature (once a year). High viral potential before season start. |
 | DES-01 | Desktop responsive layout | L | Low priority while the app is pre-launch / mobile-first. |
 | SOC-02 | Mini-league invite link | M | Viral acquisition channel. Deprioritised — revisit after core analytics features are done. |
-| *(backlog)* | Player detail stats (points breakdown) | M | Nice-to-have. FPL app does this — we can differentiate with AI commentary. |
-| *(backlog)* | Live in-match scoring | L | Complex edge cases. Research spikes needed. |
-| *(backlog)* | Team of the Week badge on squad screen | S | Polish feature. Simple once data source is confirmed. |
+| ANA-10 | Player detail stats (points breakdown) | M | Nice-to-have. FPL app does this — we can differentiate with AI commentary. |
+| LIVE-03 | Live in-match scoring | L | Complex edge cases. Research spikes needed. |
+| VIS-02 | Team of the Week badge on squad screen | S | Polish feature. Simple once data source is confirmed. |
 
 ### Feature details
 

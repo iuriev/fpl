@@ -131,7 +131,7 @@ describe('WatchlistScreen', () => {
       expect(screen.getByText(/1\/2 following/i)).toBeInTheDocument();
     });
 
-    const removeBtn = screen.getByRole('button', { name: /unfollow/i });
+    const removeBtn = screen.getByRole('button', { name: /unfollow 72828/i });
     await user.click(removeBtn);
 
     await waitFor(() => {
