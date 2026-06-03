@@ -121,9 +121,9 @@ export const LeaderboardScreen: React.FC = () => {
 
   return (
     <div className={styles.screen}>
-      <ScreenHeader backTo="/" backLabel={copy.leaderboardBack} title={copy.leaderboardTitle} />
+      <ScreenHeader backTo="/" backLabel={copy.leaderboardBack} title={copy.leaderboardNavLink} />
 
-      <div className={styles.tabs} role="tablist" aria-label={copy.leaderboardTitle}>
+      <div className={styles.tabs} role="tablist" aria-label={copy.leaderboardNavLink}>
         <button
           role="tab"
           aria-selected={activeTab === 'gw'}
@@ -251,7 +251,9 @@ function PlayerRow({
     >
       <span className={styles.rank}>{rank}</span>
       <span className={styles.name}>{player.webName}</span>
-      <span className={`${styles.value} ${valueClass}`}>{player.value}</span>
+      <span className={`${styles.value} ${valueClass}`}>
+        {player.avg !== undefined ? `${player.value} / ${player.avg}` : player.value}
+      </span>
     </button>
   );
 }
