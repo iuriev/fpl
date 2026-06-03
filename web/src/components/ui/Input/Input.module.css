@@ -12,7 +12,14 @@
   letter-spacing: var(--fpl-tr-cap-m);
 }
 
+.inputRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
 .input {
+  width: 100%;
   height: var(--fpl-size-input-h);
   padding: 0 var(--fpl-space-xl);
   background: var(--fpl-bg-soft);
@@ -85,6 +92,36 @@
 .input.hasError::placeholder {
   color: var(--fpl-error);
   opacity: 0.6;
+}
+
+.hasToggle {
+  padding-right: calc(var(--fpl-space-xl) + 2.25rem);
+}
+
+.toggleButton {
+  position: absolute;
+  right: var(--fpl-space-xl);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--fpl-text-soft);
+  border-radius: var(--fpl-radius-s);
+  transition: color 150ms ease;
+}
+
+.toggleButton:hover {
+  color: var(--fpl-text);
+}
+
+.toggleButton:focus-visible {
+  outline: 2px solid var(--fpl-accent);
+  outline-offset: 2px;
 }
 
 .error {
