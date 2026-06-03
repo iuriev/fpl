@@ -153,6 +153,9 @@ export const copy = {
   teamInfoDrawerLabel: 'Team information',
   teamInfoOpenDrawer: 'Open team info',
 
+  donationBannerTitle: 'Support the project',
+  donationBannerSubtitle: 'Donate via Monobank',
+
   // Gameweek history screen
   historyTitle: 'My GW history',
   historyThisSeason: 'This Season',
@@ -448,7 +451,7 @@ export const copy = {
   tourStep6Title: 'Substitutions',
   tourStep6Text: 'Use the swap icon to move players between your starting XI and the bench.',
   tourStep9Title: 'Save Your Plan',
-  tourStep9Text: "These players only score if a starter doesn't play. Order matters for auto-subs! Reset clears your draft. Save Plan stores it in this browser for later.",
+  tourStep9Text: "These players only score if a starter doesn't play. Order matters for auto-subs! Reset clears your draft. Save Plan stores it to your account for later.",
 
   // Gameweek review screen
   reviewTitle: 'GW Review',

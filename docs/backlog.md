@@ -224,7 +224,7 @@ Useful for long-term planning — build a shortlist without committing a transfe
 
 | MON-01 | Premium subscription flow (paywall, pricing page) | L | Unlocks revenue. Sequence: build the gate first, then the real feature (PRED-04). |
 | ~~MON-02~~ | ~~Blocking premium upsell dialog on Transfer (Predicted Points with PRED-02)~~ | S | ✅ Done — archived `2026-06-03-mon-02-premium-upsell-dialog`; spec `openspec/specs/premium-upsell-dialog/`. |
-| MON-03 | Donations / "Buy me a coffee" link | XS | Zero effort. Add link to About or footer before premium flow is ready. |
+| ~~MON-03~~ | ~~Donations / Monobank jar link in sidebar~~ | XS | ✅ Done — sidebar banner → `https://send.monobank.ua/jar/7UQvnCDwx8`; override via `VITE_DONATION_URL`. |
 
 ### Feature details
 
@@ -284,10 +284,10 @@ Predicted Points when PRED-02 ships). Shared `PremiumUpsellProvider`; cooldown f
 `VITE_PREMIUM_UPSELL_COOLDOWN_MS` (default 24h). Primary CTA closes only until MON-01.
 Reference: fpl.team promotion tone; implementation in `mon-02-premium-upsell-dialog`.
 
-#### MON-03: Donations / "Buy me a coffee"
-Add a donate button alongside the subscription flow.
-Options: Buy Me a Coffee link, Stripe, Monobank (Ukrainian users), or similar.
-Note: legal check needed before launch.
+#### MON-03: Donations / Monobank jar [SHIPPED]
+Sidebar footer banner links to the Monobank jar (`send.monobank.ua`). Default jar URL is
+built in; override with `VITE_DONATION_URL`, disable with `VITE_DONATION_ENABLED=false`.
+Note: legal check needed before public launch.
 
 ---
 
@@ -328,10 +328,16 @@ Tell the user the optimal gameweek to play Bench Boost, based on:
 
 | ID | Task | Effort | Why |
 |----|------|--------|-----|
+| PLAN-00 | Backend transfer draft — migrate `fpl-transfer-draft-*` from localStorage to Postgres (1 draft per user; delete on team change or stale GW) | S | Cross-device persistence. OpenSpec `transfer-draft-backend`. |
 | PLAN-01 | Multi-GW transfer planner with saved plans (1 free, more = paid) | L | "Plan transfers before your rivals do." Strong monetisation anchor. |
 | PLAN-02 | Transfer solver / AI optimizer | L | Suggests optimal transfers automatically. High perceived value. |
 
 ### Feature details
+
+#### PLAN-00: Backend transfer draft
+Migrate transfer planner persistence from `localStorage` (`fpl-transfer-draft-{teamId}`) to
+`/api/me/transfer-draft`. One draft per user; deleting draft when GW passes or user changes
+`fpl_team_id`; one-shot import from localStorage. See OpenSpec `transfer-draft-backend`.
 
 #### PLAN-01: Multi-GW transfer planner with saved plans
 Extend the transfer planner to support:
@@ -476,6 +482,7 @@ For reference — features that are live in the codebase:
 - **Chips in Planner (CHIP-02)** — Wildcard/Free Hit zero out transfer costs; chip selection in TransferHeader
 - **Summary Strip** — GW total, average, highest score, rank, transfers made
 - **Team Info Panel** — drawer with team/manager stats
+- **Monobank donation banner (MON-03)** — pinned footer in team sidebar → Monobank jar; OpenSpec `archive/2026-06-03-mon-03-monobank-donation-banner`
 - **Team of the Week Screen** — best XI for a GW
 - **Gameweek History Screen** — per-GW points history chart/table
 - **Leagues Stats Screen** — mini-league standings

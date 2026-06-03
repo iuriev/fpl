@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as authClientModule from '@/auth/auth-client';
 import { AuthContext, type AuthContextValue } from '@/auth/AuthContext';
 import { fixtureEntry } from '@/fixtures';
+import * as readDonationUrlModule from '@/lib/donation/readDonationUrl';
 
 import { TeamInfoPanel, TeamInfoPanelSkeleton } from './TeamInfoPanel';
 
@@ -175,6 +176,22 @@ describe('TeamInfoPanel — user block', () => {
 
     await waitFor(() => expect(mockSignOut).toHaveBeenCalled());
     await waitFor(() => expect(mockRefetch).toHaveBeenCalled());
+  });
+});
+
+describe('TeamInfoPanel — donation banner', () => {
+  it('shows donation link when URL is configured', () => {
+    vi.spyOn(readDonationUrlModule, 'readDonationUrl').mockReturnValue(
+      'https://send.monobank.ua/jar/7UQvnCDwx8'
+    );
+    renderPanel();
+    expect(screen.getByRole('link', { name: /support the project/i })).toBeInTheDocument();
+  });
+
+  it('hides donation banner when URL is not configured', () => {
+    vi.spyOn(readDonationUrlModule, 'readDonationUrl').mockReturnValue(null);
+    renderPanel();
+    expect(screen.queryByRole('link', { name: /support the project/i })).toBeNull();
   });
 });
 

@@ -4,7 +4,9 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { authClient } from '@/auth/auth-client';
 import { useCurrentUser } from '@/auth/AuthContext';
 import { DemoSignInDialog } from '@/components/ui/DemoSignInDialog/DemoSignInDialog';
+import { DonationBanner } from '@/components/ui/DonationBanner/DonationBanner';
 import { copy, interpolate } from '@/lib/copy';
+import { readDonationUrl } from '@/lib/donation/readDonationUrl';
 import { useWatchlistRepository } from '@/lib/watchlist-repository';
 import type { EntryResponse } from '@/types';
 
@@ -99,6 +101,7 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({
 
   return (
     <aside className={styles.panel}>
+      <div className={styles.panelBody}>
       {navLinksMode === 'full' && user && (
         <>
           <div className={styles.userBlock}>
@@ -196,6 +199,13 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({
           </button>
         </div>
       )}
+      </div>
+
+      {readDonationUrl() && (
+        <div className={styles.donationWrap}>
+          <DonationBanner />
+        </div>
+      )}
     </aside>
   );
 };
@@ -208,18 +218,26 @@ export const TeamInfoPanelSkeleton: React.FC = () => (
     aria-busy="true"
     aria-label={copy.loadingPlaceholder}
   >
-    <div className={styles.stats} aria-hidden="true">
-      <div className={styles.skeletonStat} />
-      <div className={styles.skeletonStat} />
-      <div className={styles.skeletonStat} />
-      <div className={styles.skeletonStat} />
+    <div className={styles.panelBody}>
+      <div className={styles.stats} aria-hidden="true">
+        <div className={styles.skeletonStat} />
+        <div className={styles.skeletonStat} />
+        <div className={styles.skeletonStat} />
+        <div className={styles.skeletonStat} />
+      </div>
+
+      <div className={styles.navLinks} aria-hidden="true">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div key={i} className={styles.skeletonNavBar} />
+        ))}
+      </div>
     </div>
 
-    <div className={styles.navLinks} aria-hidden="true">
-      {Array.from({ length: 7 }).map((_, i) => (
-        <div key={i} className={styles.skeletonNavBar} />
-      ))}
-    </div>
+    {readDonationUrl() && (
+      <div className={styles.donationWrap} aria-hidden="true">
+        <DonationBanner />
+      </div>
+    )}
   </aside>
 );
 

@@ -1,6 +1,14 @@
 .panel {
   flex: 1;
   min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.panelBody {
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -298,10 +306,23 @@
   color: var(--fpl-text);
 }
 
+/* ── Donation banner ───────────────────────────────────────── */
+
+.donationWrap {
+  flex-shrink: 0;
+  padding: var(--fpl-space-md) var(--fpl-space-xl3) var(--fpl-space-xl);
+  border-top: 1px solid var(--fpl-bg-hair);
+  background: var(--fpl-bg-deep);
+}
+
 /* ── Desktop sidebar ───────────────────────────────────────── */
 
 @media (min-width: 56.25rem) {
-  .panel {
-    padding: var(--fpl-space-xl3);
+  .panelBody {
+    padding: var(--fpl-space-xl3) var(--fpl-space-xl3) var(--fpl-space-xl);
+  }
+
+  .donationWrap {
+    padding: var(--fpl-space-md) var(--fpl-space-xl3) var(--fpl-space-xl3);
   }
 }
