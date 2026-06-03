@@ -1,6 +1,9 @@
 import type {
   EntryResponse,
   GameweeksResponse,
+  LeaderboardGwResponse,
+  LeaderboardPlayer,
+  LeaderboardSeasonResponse,
   PlayerStats,
   SquadResponse,
   TeamOfTheWeekPlayer,
@@ -401,5 +404,39 @@ export const fixtureDreamTeam: TeamOfTheWeekResponse = {
     }),
     mkDtPlayer({ id: 110, webName: 'Jesus', position: 'FWD', pitchPosition: 10, points: 16 }),
     mkDtPlayer({ id: 111, webName: 'Trossard', position: 'FWD', pitchPosition: 11, points: 8 }),
+  ],
+};
+
+function mkLeaderboardPlayer(
+  id: number,
+  webName: string,
+  value: number,
+  position: LeaderboardPlayer['position'] = 'MID'
+): LeaderboardPlayer {
+  return { id, webName, position, teamCode: 3, teamShortName: 'ARS', value };
+}
+
+export const fixtureLeaderboardGw: LeaderboardGwResponse = {
+  gw: 36,
+  defcon: [
+    mkLeaderboardPlayer(1, 'Alexander-Arnold', 28, 'DEF'),
+    mkLeaderboardPlayer(2, 'Trippier', 24, 'DEF'),
+    mkLeaderboardPlayer(3, 'Gabriel', 21, 'DEF'),
+  ],
+  bps: [
+    mkLeaderboardPlayer(10, 'Dorgu', 50, 'FWD'),
+    mkLeaderboardPlayer(6, 'Salah', 44, 'MID'),
+    mkLeaderboardPlayer(9, 'Haaland', 41, 'FWD'),
+  ],
+};
+
+export const fixtureLeaderboardSeason: LeaderboardSeasonResponse = {
+  defcon: [
+    mkLeaderboardPlayer(1, 'Alexander-Arnold', 280, 'DEF'),
+    mkLeaderboardPlayer(3, 'Gabriel', 210, 'DEF'),
+  ],
+  bps: [
+    mkLeaderboardPlayer(6, 'Salah', 1100, 'MID'),
+    mkLeaderboardPlayer(9, 'Haaland', 980, 'FWD'),
   ],
 };
