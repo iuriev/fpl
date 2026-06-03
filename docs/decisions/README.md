@@ -34,6 +34,7 @@ it behaves. Avoid duplicating: link between them instead.
 | [0015](0015-database-postgres.md) | Adopt Postgres (Supabase) as the user-data store | Accepted |
 | [0016](0016-auth-better-auth.md) | Use better-auth for authentication | Accepted |
 | [0017](0017-session-transport-cookie.md) | Session transport — HttpOnly cookie | Accepted |
+| [0018](0018-fpl-persistent-db-cache.md) | FPL persistent DB cache to minimise FPL API calls | Accepted |
 
 ## Template
 

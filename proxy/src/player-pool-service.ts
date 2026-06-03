@@ -1,7 +1,7 @@
 import * as cacheLayer from './cache';
+import { db } from './db/client';
 import * as fixturesService from './fixtures-service';
-import type { FPLBootstrapStatic } from './fpl-client';
-import * as fplClient from './fpl-client';
+import { getOrFetchBootstrap } from './fpl-cache/db-cache';
 import type { PlayerPoolResponse, PlayerPosition, PlayerStatus, PoolPlayer } from './types';
 
 const POSITION_MAP: Record<number, PlayerPosition> = {
@@ -11,26 +11,18 @@ const POSITION_MAP: Record<number, PlayerPosition> = {
   4: 'FWD',
 };
 
-async function getBootstrapWithCache(): Promise<FPLBootstrapStatic> {
-  const cached = cacheLayer.get<FPLBootstrapStatic>('bootstrap-static');
-  if (cached) return cached;
-  const bootstrap = await fplClient.getBootstrapStatic();
-  cacheLayer.set('bootstrap-static', bootstrap, cacheLayer.ttl.BOOTSTRAP);
-  return bootstrap;
-}
-
 export async function getPlayerPool(): Promise<PlayerPoolResponse> {
   const cacheKey = 'player-pool';
   const cached = cacheLayer.get<PlayerPoolResponse>(cacheKey);
   if (cached) return cached;
 
   const [bootstrap, fixtures] = await Promise.all([
-    getBootstrapWithCache(),
+    getOrFetchBootstrap(db),
     fixturesService.getUpcomingFixtures(),
   ]);
 
   const teamMap = new Map(
-    bootstrap.teams.map((t) => [t.id, { shortName: t.short_name, code: t.code }])
+    bootstrap.teams.map((t) => [t.id, { shortName: t.short_name, code: t.code }]),
   );
 
   const players: PoolPlayer[] = bootstrap.elements.map((el) => ({

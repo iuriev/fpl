@@ -1,6 +1,7 @@
-import * as cacheLayer from './cache';
-import type { FPLBootstrapStatic, FPLLive } from './fpl-client';
-import * as fplClient from './fpl-client';
+import { db } from './db/client';
+import { getOrFetchBootstrap, getOrFetchGwLive } from './fpl-cache/db-cache';
+import { deriveSeason } from './fpl-cache/season';
+import type { FPLLive } from './fpl-client';
 import type {
   LeaderboardGwResponse,
   LeaderboardPlayer,
@@ -17,29 +18,6 @@ const POSITION_MAP: Record<number, PlayerPosition> = {
   4: 'FWD',
 };
 
-async function getBootstrapWithCache(): Promise<FPLBootstrapStatic> {
-  const cached = cacheLayer.get<FPLBootstrapStatic>('bootstrap-static');
-  if (cached) return cached;
-  const bootstrap = await fplClient.getBootstrapStatic();
-  cacheLayer.set('bootstrap-static', bootstrap, cacheLayer.ttl.BOOTSTRAP);
-  return bootstrap;
-}
-
-async function getLiveWithCache(gw: number, finished: boolean): Promise<FPLLive> {
-  const key = `live:${gw}`;
-  const cached = cacheLayer.get<FPLLive>(key);
-  if (cached) return cached;
-  let data: FPLLive;
-  try {
-    data = await fplClient.getLive(gw);
-  } catch {
-    return { elements: [] };
-  }
-  const ttl = finished ? cacheLayer.ttl.LEADERBOARD_GW_FINISHED : cacheLayer.ttl.LEADERBOARD_GW_LIVE;
-  cacheLayer.set(key, data, ttl);
-  return data;
-}
-
 function sumDefcon(explain: FPLLive['elements'][0]['explain']): number {
   let total = 0;
   for (const fixture of explain) {
@@ -51,12 +29,18 @@ function sumDefcon(explain: FPLLive['elements'][0]['explain']): number {
 }
 
 export async function getLeaderboardGw(gw: number): Promise<LeaderboardGwResponse> {
-  const bootstrap = await getBootstrapWithCache();
+  const bootstrap = await getOrFetchBootstrap(db);
+  const season = deriveSeason(bootstrap.events);
 
   const event = bootstrap.events.find((e) => e.id === gw);
   if (!event) throw new Error(`Gameweek ${gw} not found`);
 
-  const liveData = await getLiveWithCache(gw, event.finished);
+  let liveData: FPLLive;
+  try {
+    liveData = await getOrFetchGwLive(db, season, gw, bootstrap.events);
+  } catch {
+    liveData = { elements: [] };
+  }
 
   const elementMap = new Map(bootstrap.elements.map((e) => [e.id, e]));
   const teamMap = new Map(bootstrap.teams.map((t) => [t.id, t]));
@@ -65,15 +49,17 @@ export async function getLeaderboardGw(gw: number): Promise<LeaderboardGwRespons
     const element = elementMap.get(live.id);
     if (!element) return [];
     const team = teamMap.get(element.team);
-    return [{
-      id: live.id,
-      webName: element.web_name,
-      position: (POSITION_MAP[element.element_type] ?? 'GK') as PlayerPosition,
-      teamCode: element.team_code,
-      teamShortName: team?.short_name ?? 'UNK',
-      bps: live.stats.bonus,
-      defcon: sumDefcon(live.explain),
-    }];
+    return [
+      {
+        id: live.id,
+        webName: element.web_name,
+        position: (POSITION_MAP[element.element_type] ?? 'GK') as PlayerPosition,
+        teamCode: element.team_code,
+        teamShortName: team?.short_name ?? 'UNK',
+        bps: live.stats.bonus,
+        defcon: sumDefcon(live.explain),
+      },
+    ];
   });
 
   const bps: LeaderboardPlayer[] = allPlayers
@@ -92,11 +78,18 @@ export async function getLeaderboardGw(gw: number): Promise<LeaderboardGwRespons
 }
 
 export async function getLeaderboardSeason(): Promise<LeaderboardSeasonResponse> {
-  const bootstrap = await getBootstrapWithCache();
+  const bootstrap = await getOrFetchBootstrap(db);
+  const season = deriveSeason(bootstrap.events);
   const finishedEvents = bootstrap.events.filter((e) => e.finished);
 
   const liveDataArr = await Promise.all(
-    finishedEvents.map((event) => getLiveWithCache(event.id, true))
+    finishedEvents.map(async (event) => {
+      try {
+        return await getOrFetchGwLive(db, season, event.id, bootstrap.events);
+      } catch {
+        return { elements: [] } as FPLLive;
+      }
+    }),
   );
 
   const elementMap = new Map(bootstrap.elements.map((e) => [e.id, e]));
@@ -119,7 +112,7 @@ export async function getLeaderboardSeason(): Promise<LeaderboardSeasonResponse>
   function buildList(
     valueMap: Map<number, number>,
     excludeZero: boolean,
-    gamesPlayedMap?: Map<number, number>
+    gamesPlayedMap?: Map<number, number>,
   ): LeaderboardPlayer[] {
     const players: LeaderboardPlayer[] = [];
     for (const [id, value] of valueMap) {

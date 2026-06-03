@@ -1,18 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import * as cache from './cache';
-import * as fplClient from './fpl-client';
+import * as dbCache from './fpl-cache/db-cache';
 import * as leaderboardService from './leaderboard-service';
 
-vi.mock('./fpl-client');
-vi.mock('./cache');
+vi.mock('./db/client', () => ({ db: {} }));
+vi.mock('./fpl-cache/db-cache');
 
 const mockBootstrap = {
   total_players: 10000000,
   events: [
-    { id: 1, name: 'Gameweek 1', finished: true, average_entry_score: 50, highest_score: 120, deadline_time: '2025-08-09T11:00:00Z', is_current: false, is_next: false },
-    { id: 2, name: 'Gameweek 2', finished: true, average_entry_score: 45, highest_score: 110, deadline_time: '2025-08-16T11:00:00Z', is_current: false, is_next: false },
-    { id: 3, name: 'Gameweek 3', finished: false, average_entry_score: 0, highest_score: 0, deadline_time: '2025-08-23T11:00:00Z', is_current: true, is_next: false },
+    { id: 1, name: 'Gameweek 1', finished: true, average_entry_score: 50, highest_score: 120, deadline_time: '2025-08-09T11:00:00Z', is_current: false, is_next: false, data_checked: true },
+    { id: 2, name: 'Gameweek 2', finished: true, average_entry_score: 45, highest_score: 110, deadline_time: '2025-08-16T11:00:00Z', is_current: false, is_next: false, data_checked: true },
+    { id: 3, name: 'Gameweek 3', finished: false, average_entry_score: 0, highest_score: 0, deadline_time: '2025-08-23T11:00:00Z', is_current: true, is_next: false, data_checked: false },
   ],
   teams: [
     { id: 1, name: 'Arsenal', short_name: 'ARS', code: 3 },
@@ -39,18 +38,17 @@ function mkLive(elements: Array<{ id: number; bonus: number; defcon: number }>) 
 
 describe('getLeaderboardGw', () => {
   beforeEach(() => {
-    vi.mocked(cache.get).mockReturnValue(null);
-    vi.mocked(cache.set).mockImplementation(() => {});
-    vi.mocked(fplClient.getBootstrapStatic).mockResolvedValue(mockBootstrap as any);
+    vi.clearAllMocks();
+    vi.mocked(dbCache.getOrFetchBootstrap).mockResolvedValue(mockBootstrap as never);
   });
 
   it('returns top players sorted by bonus desc', async () => {
-    vi.mocked(fplClient.getLive).mockResolvedValue(
+    vi.mocked(dbCache.getOrFetchGwLive).mockResolvedValueOnce(
       mkLive([
         { id: 10, bonus: 30, defcon: 5 },
         { id: 20, bonus: 50, defcon: 0 },
         { id: 30, bonus: 20, defcon: 8 },
-      ]) as any
+      ]) as never
     );
 
     const result = await leaderboardService.getLeaderboardGw(1);
@@ -63,12 +61,12 @@ describe('getLeaderboardGw', () => {
   });
 
   it('returns top players sorted by defensive_contribution desc', async () => {
-    vi.mocked(fplClient.getLive).mockResolvedValue(
+    vi.mocked(dbCache.getOrFetchGwLive).mockResolvedValueOnce(
       mkLive([
         { id: 10, bonus: 30, defcon: 5 },
         { id: 20, bonus: 50, defcon: 0 },
         { id: 30, bonus: 20, defcon: 8 },
-      ]) as any
+      ]) as never
     );
 
     const result = await leaderboardService.getLeaderboardGw(1);
@@ -80,11 +78,11 @@ describe('getLeaderboardGw', () => {
   });
 
   it('excludes players with defcon = 0 from the DEFCON list', async () => {
-    vi.mocked(fplClient.getLive).mockResolvedValue(
+    vi.mocked(dbCache.getOrFetchGwLive).mockResolvedValueOnce(
       mkLive([
         { id: 10, bonus: 30, defcon: 5 },
         { id: 20, bonus: 50, defcon: 0 },
-      ]) as any
+      ]) as never
     );
 
     const result = await leaderboardService.getLeaderboardGw(1);
@@ -121,8 +119,8 @@ describe('getLeaderboardGw', () => {
         price_change_percent: '0.0',
       })),
     };
-    vi.mocked(fplClient.getBootstrapStatic).mockResolvedValue(bootstrapWithMany as any);
-    vi.mocked(fplClient.getLive).mockResolvedValue(mkLive(many) as any);
+    vi.mocked(dbCache.getOrFetchBootstrap).mockResolvedValueOnce(bootstrapWithMany as never);
+    vi.mocked(dbCache.getOrFetchGwLive).mockResolvedValueOnce(mkLive(many) as never);
 
     const result = await leaderboardService.getLeaderboardGw(1);
 
@@ -130,18 +128,8 @@ describe('getLeaderboardGw', () => {
     expect(result.defcon).toHaveLength(50);
   });
 
-  it('uses finished GW cache TTL for a finished GW', async () => {
-    vi.mocked(fplClient.getLive).mockResolvedValue(mkLive([{ id: 10, bonus: 10, defcon: 5 }]) as any);
-
-    await leaderboardService.getLeaderboardGw(1);
-
-    const setCalls = vi.mocked(cache.set).mock.calls;
-    const liveCall = setCalls.find(([key]) => key === 'live:1');
-    expect(liveCall?.[2]).toBe(cache.ttl.LEADERBOARD_GW_FINISHED);
-  });
-
   it('returns empty lists when FPL API throws (404 / no data)', async () => {
-    vi.mocked(fplClient.getLive).mockRejectedValue(new Error('FPL API error: 404 Not Found'));
+    vi.mocked(dbCache.getOrFetchGwLive).mockRejectedValueOnce(new Error('FPL API error: 404 Not Found'));
 
     const result = await leaderboardService.getLeaderboardGw(1);
 
@@ -150,7 +138,7 @@ describe('getLeaderboardGw', () => {
   });
 
   it('sums defcon across multiple fixtures for a single player', async () => {
-    vi.mocked(fplClient.getLive).mockResolvedValue({
+    vi.mocked(dbCache.getOrFetchGwLive).mockResolvedValueOnce({
       elements: [{
         id: 10,
         stats: { total_points: 5, minutes: 90, goals_scored: 0, assists: 0, clean_sheets: 1, goals_conceded: 0, own_goals: 0, penalties_saved: 0, penalties_missed: 0, yellow_cards: 0, red_cards: 0, saves: 0, bonus: 0, bps: 20 },
@@ -159,7 +147,7 @@ describe('getLeaderboardGw', () => {
           { fixture: 2, stats: [{ identifier: 'defensive_contribution', value: 4, points: 1 }, { identifier: 'minutes', value: 90, points: 2 }] },
         ],
       }],
-    } as any);
+    } as never);
 
     const result = await leaderboardService.getLeaderboardGw(1);
 
@@ -170,15 +158,13 @@ describe('getLeaderboardGw', () => {
 describe('getLeaderboardSeason', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(cache.get).mockReturnValue(null);
-    vi.mocked(cache.set).mockImplementation(() => {});
-    vi.mocked(fplClient.getBootstrapStatic).mockResolvedValue(mockBootstrap as any);
+    vi.mocked(dbCache.getOrFetchBootstrap).mockResolvedValue(mockBootstrap as never);
   });
 
   it('aggregates bps and defcon across all finished GWs only', async () => {
-    vi.mocked(fplClient.getLive)
-      .mockResolvedValueOnce(mkLive([{ id: 10, bonus: 10, defcon: 5 }, { id: 20, bonus: 30, defcon: 0 }]) as any)
-      .mockResolvedValueOnce(mkLive([{ id: 10, bonus: 20, defcon: 8 }, { id: 20, bonus: 15, defcon: 0 }]) as any);
+    vi.mocked(dbCache.getOrFetchGwLive)
+      .mockResolvedValueOnce(mkLive([{ id: 10, bonus: 10, defcon: 5 }, { id: 20, bonus: 30, defcon: 0 }]) as never)
+      .mockResolvedValueOnce(mkLive([{ id: 10, bonus: 20, defcon: 8 }, { id: 20, bonus: 15, defcon: 0 }]) as never);
 
     const result = await leaderboardService.getLeaderboardSeason();
 
@@ -191,7 +177,5 @@ describe('getLeaderboardSeason', () => {
     expect(result.defcon[0].value).toBe(13);
     expect(result.defcon[0].avg).toBe(6.5);
     expect(result.defcon).toHaveLength(1);
-
-    expect(fplClient.getLive).toHaveBeenCalledTimes(2);
   });
 });

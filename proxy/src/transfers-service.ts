@@ -1,31 +1,18 @@
-import * as cacheLayer from './cache';
-import type { FPLBootstrapStatic } from './fpl-client';
-import * as fplClient from './fpl-client';
+import { db } from './db/client';
+import { getOrFetchBootstrap, getOrFetchTransfers, getSeasonMeta } from './fpl-cache/db-cache';
+import { deriveSeason } from './fpl-cache/season';
 import type { TransfersResponse } from './types';
 
-const TTL_TRANSFERS = 3600;
-
-async function getBootstrapWithCache(): Promise<FPLBootstrapStatic> {
-  const cached = cacheLayer.get<FPLBootstrapStatic>('bootstrap-static');
-  if (cached) return cached;
-  const bootstrap = await fplClient.getBootstrapStatic();
-  cacheLayer.set('bootstrap-static', bootstrap, cacheLayer.ttl.BOOTSTRAP);
-  return bootstrap;
-}
-
 export async function getTransfers(teamId: number): Promise<TransfersResponse> {
-  const cacheKey = `transfers:${teamId}`;
-  const cached = cacheLayer.get<TransfersResponse>(cacheKey);
-  if (cached) return cached;
+  const bootstrap = await getOrFetchBootstrap(db);
+  const season = deriveSeason(bootstrap.events);
+  const { isComplete } = await getSeasonMeta(db, season);
 
-  const [transfers, bootstrap] = await Promise.all([
-    fplClient.getTransfers(teamId),
-    getBootstrapWithCache(),
-  ]);
+  const transfers = await getOrFetchTransfers(db, season, teamId, bootstrap.events, isComplete);
 
   const playerMap = new Map<number, string>(bootstrap.elements.map((e) => [e.id, e.web_name]));
 
-  const result: TransfersResponse = {
+  return {
     teamId,
     transfers: transfers.map((t) => ({
       event: t.event,
@@ -38,7 +25,4 @@ export async function getTransfers(teamId: number): Promise<TransfersResponse> {
       time: t.time,
     })),
   };
-
-  cacheLayer.set(cacheKey, result, TTL_TRANSFERS);
-  return result;
 }

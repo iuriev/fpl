@@ -1,6 +1,6 @@
-import * as cacheLayer from './cache';
+import { db } from './db/client';
+import { getOrFetchBootstrap } from './fpl-cache/db-cache';
 import type { FPLBootstrapStatic } from './fpl-client';
-import * as fplClient from './fpl-client';
 import type { PlayerPosition } from './types';
 
 export const POSITION_MAP: Record<number, PlayerPosition> = {
@@ -15,12 +15,7 @@ export type PositionFilter = 'all' | PlayerPosition;
 export const TOP_PRICE_LIST = 50;
 
 export async function getBootstrapWithCache(): Promise<FPLBootstrapStatic> {
-  const cached = cacheLayer.get<FPLBootstrapStatic>('bootstrap-static');
-  if (cached) return cached;
-
-  const bootstrap = await fplClient.getBootstrapStatic();
-  cacheLayer.set('bootstrap-static', bootstrap, cacheLayer.ttl.BOOTSTRAP);
-  return bootstrap;
+  return getOrFetchBootstrap(db);
 }
 
 export function matchesPosition(elementType: number, position: PositionFilter): boolean {

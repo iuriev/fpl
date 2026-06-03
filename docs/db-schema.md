@@ -112,6 +112,89 @@ One transfer planner draft per user (upsert on `user_id`).
 | `subs` | jsonb | NO | `SubSwap[]` |
 | `updated_at` | timestamp | NO | Server write time |
 
+### `fpl_meta`
+
+Active FPL season tracker. One row per season, created on first bootstrap fetch.
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| `season` | text | NO | PK, e.g. `"2025-26"` — derived from GW1 deadline year |
+| `is_complete` | boolean | NO | `true` when GW38 `finished=true AND data_checked=true` |
+| `created_at` | timestamp | NO | Default now() |
+
+### `fpl_bootstrap_cache`
+
+Persists `bootstrap-static` responses. Old season rows are archived, never deleted.
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| `id` | serial | NO | PK |
+| `season` | text | NO | FK → `fpl_meta.season` |
+| `data` | jsonb | NO | Full `bootstrap-static` response |
+| `fetched_at` | timestamp | NO | |
+| `archived` | boolean | NO | `true` after season rollover; never read when archived |
+
+### `fpl_gw_live_cache`
+
+Persists `event/{gw}/live/` responses. Frozen once `data_checked=true` — never re-fetched.
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| `season` | text | NO | PK component |
+| `gw` | integer | NO | PK component |
+| `data` | jsonb | NO | Full live response |
+| `frozen` | boolean | NO | `true` once `data_checked=true`; row never updated after |
+| `fetched_at` | timestamp | NO | |
+
+### `fpl_squad_cache`
+
+Persists `entry/{teamId}/event/{gw}/picks/` responses. Frozen once `data_checked=true`.
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| `season` | text | NO | PK component |
+| `team_id` | integer | NO | PK component |
+| `gw` | integer | NO | PK component |
+| `data` | jsonb | NO | Full picks response |
+| `frozen` | boolean | NO | `true` once `finished=true AND data_checked=true` |
+| `fetched_at` | timestamp | NO | |
+
+### `fpl_dream_team_cache`
+
+Persists `dream-team/{gw}/` responses. Frozen once GW is finished.
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| `season` | text | NO | PK component |
+| `gw` | integer | NO | PK component |
+| `data` | jsonb | NO | Full dream-team response |
+| `frozen` | boolean | NO | `true` once `event.finished=true` |
+| `fetched_at` | timestamp | NO | |
+
+### `fpl_history_cache`
+
+Persists `entry/{teamId}/history/` responses. Refreshed only when a new GW has been finished since last fetch.
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| `season` | text | NO | PK component |
+| `team_id` | integer | NO | PK component |
+| `data` | jsonb | NO | Full history response |
+| `last_finished_gw` | integer | NO | Latest finished GW at fetch time; re-fetch trigger |
+| `fetched_at` | timestamp | NO | |
+
+### `fpl_transfers_cache`
+
+Persists `entry/{teamId}/transfers/` responses. Same refresh logic as `fpl_history_cache`.
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| `season` | text | NO | PK component |
+| `team_id` | integer | NO | PK component |
+| `data` | jsonb | NO | Full transfers response |
+| `last_finished_gw` | integer | NO | Latest finished GW at fetch time |
+| `fetched_at` | timestamp | NO | |
+
 ## ER Diagram
 
 ```mermaid
@@ -160,7 +243,6 @@ erDiagram
         timestamp created_at
         timestamp updated_at
     }
-
     watchlist_entry {
         text id PK
         text user_id FK
@@ -184,10 +266,64 @@ erDiagram
         jsonb subs
         timestamp updated_at
     }
+    fpl_meta {
+        text season PK
+        boolean is_complete
+        timestamp created_at
+    }
+    fpl_bootstrap_cache {
+        serial id PK
+        text season FK
+        jsonb data
+        timestamp fetched_at
+        boolean archived
+    }
+    fpl_gw_live_cache {
+        text season PK
+        integer gw PK
+        jsonb data
+        boolean frozen
+        timestamp fetched_at
+    }
+    fpl_squad_cache {
+        text season PK
+        integer team_id PK
+        integer gw PK
+        jsonb data
+        boolean frozen
+        timestamp fetched_at
+    }
+    fpl_dream_team_cache {
+        text season PK
+        integer gw PK
+        jsonb data
+        boolean frozen
+        timestamp fetched_at
+    }
+    fpl_history_cache {
+        text season PK
+        integer team_id PK
+        jsonb data
+        integer last_finished_gw
+        timestamp fetched_at
+    }
+    fpl_transfers_cache {
+        text season PK
+        integer team_id PK
+        jsonb data
+        integer last_finished_gw
+        timestamp fetched_at
+    }
 
     user ||--o{ session : "has"
     user ||--o{ account : "has"
     user ||--o{ watchlist_entry : "follows"
     user ||--o{ player_watchlist_entry : "shortlists"
     user ||--o| transfer_draft : "has"
+    fpl_meta ||--o{ fpl_bootstrap_cache : "has"
+    fpl_meta ||--o{ fpl_gw_live_cache : "caches"
+    fpl_meta ||--o{ fpl_squad_cache : "caches"
+    fpl_meta ||--o{ fpl_dream_team_cache : "caches"
+    fpl_meta ||--o{ fpl_history_cache : "caches"
+    fpl_meta ||--o{ fpl_transfers_cache : "caches"
 ```

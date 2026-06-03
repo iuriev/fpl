@@ -2,11 +2,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as cache from './cache';
 import * as fixturesService from './fixtures-service';
-import type { FPLBootstrapStatic } from './fpl-client';
-import * as fplClient from './fpl-client';
+import * as dbCache from './fpl-cache/db-cache';
 import * as playerPoolService from './player-pool-service';
 
-vi.mock('./fpl-client');
+vi.mock('./db/client', () => ({ db: {} }));
+vi.mock('./fpl-cache/db-cache');
 vi.mock('./cache');
 vi.mock('./fixtures-service');
 
@@ -35,6 +35,7 @@ const mockBootstrap = {
     },
   ],
   element_types: [],
+  chips: [],
 };
 
 describe('player-pool-service', () => {
@@ -44,9 +45,7 @@ describe('player-pool-service', () => {
     it('composes pool players from bootstrap and fixture data', async () => {
       vi.mocked(cache.get).mockReturnValue(null);
       vi.mocked(cache.set).mockReturnValue(undefined);
-      vi.mocked(fplClient.getBootstrapStatic).mockResolvedValue(
-        mockBootstrap as unknown as FPLBootstrapStatic
-      );
+      vi.mocked(dbCache.getOrFetchBootstrap).mockResolvedValueOnce(mockBootstrap as never);
       vi.mocked(fixturesService.getUpcomingFixtures).mockResolvedValue({
         1: [{ gw: 3, opponent: 'MCI', home: true, difficulty: 4 }],
       });
@@ -81,7 +80,7 @@ describe('player-pool-service', () => {
 
       const result = await playerPoolService.getPlayerPool();
 
-      expect(fplClient.getBootstrapStatic).not.toHaveBeenCalled();
+      expect(dbCache.getOrFetchBootstrap).not.toHaveBeenCalled();
       expect(result).toEqual(cached);
     });
   });

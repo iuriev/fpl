@@ -50,6 +50,26 @@ docs/       # architecture overview + decision records (ADRs)
   choice. When a decision changes, the old ADR is marked `Superseded by ADR-XXXX` (never deleted)
   so the history of *why it changed* is preserved.
 
+## Caching
+
+FPL API responses are persisted in Postgres via `proxy/src/fpl-cache/db-cache.ts`. See
+ADR 0018 for the full rationale and design.
+
+**Key rules:**
+- Rows with `frozen = true` are returned from DB without any FPL API call (used for
+  finished gameweeks where data is permanently final).
+- Bootstrap TTL: 12 hours during active/pre-season; 168 hours once the season is complete.
+- Current-GW live data TTL: 3 hours.
+- History and transfers: re-fetched only when a new gameweek finishes (`last_finished_gw`
+  staleness check), not on a wall-clock TTL.
+- Season rollovers: old cache rows are archived (never deleted); a new `fpl_meta` row marks
+  the active season.
+- Startup prefetch: on boot, a background job (rate-limited to 1 req/s, max 10 requests)
+  fills in any missing frozen GW rows.
+
+The in-memory `cache.ts` is retained only for computed, non-FPL results (player pool,
+fixtures).
+
 ## Production
 
 Live at **https://fpl-squad-viewer.fly.dev/** — single Hono service on Fly.io (London, `shared-cpu-1x`, 256 MB RAM, 1 machine, always-on).

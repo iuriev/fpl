@@ -1,6 +1,6 @@
-import * as cacheLayer from './cache';
-import type { FPLBootstrapStatic, FPLDreamTeam } from './fpl-client';
-import * as fplClient from './fpl-client';
+import { db } from './db/client';
+import { getOrFetchBootstrap, getOrFetchDreamTeam } from './fpl-cache/db-cache';
+import { deriveSeason } from './fpl-cache/season';
 import type { PlayerPosition, TeamOfTheWeekPlayer, TeamOfTheWeekResponse } from './types';
 
 const POSITION_MAP: Record<number, PlayerPosition> = {
@@ -12,33 +12,15 @@ const POSITION_MAP: Record<number, PlayerPosition> = {
 
 const POSITION_ORDER: PlayerPosition[] = ['GK', 'DEF', 'MID', 'FWD'];
 
-async function getBootstrapWithCache(): Promise<FPLBootstrapStatic> {
-  const cached = cacheLayer.get<FPLBootstrapStatic>('bootstrap-static');
-  if (cached) return cached;
-
-  const bootstrap = await fplClient.getBootstrapStatic();
-  cacheLayer.set('bootstrap-static', bootstrap, cacheLayer.ttl.BOOTSTRAP);
-  return bootstrap;
-}
-
-async function getTeamOfTheWeekWithCache(gameweek: number): Promise<FPLDreamTeam> {
-  const cacheKey = `team-of-the-week:${gameweek}`;
-  const cached = cacheLayer.get<FPLDreamTeam>(cacheKey);
-  if (cached) return cached;
-
-  const data = await fplClient.getDreamTeam(gameweek);
-  cacheLayer.set(cacheKey, data, cacheLayer.ttl.SQUAD_FINISHED);
-  return data;
-}
-
 export async function getTeamOfTheWeek(gameweek: number): Promise<TeamOfTheWeekResponse> {
-  const bootstrap = await getBootstrapWithCache();
+  const bootstrap = await getOrFetchBootstrap(db);
+  const season = deriveSeason(bootstrap.events);
 
   const gameweekEvent = bootstrap.events.find((e) => e.id === gameweek);
   if (!gameweekEvent) throw new Error(`Gameweek ${gameweek} not found`);
   if (!gameweekEvent.finished) throw new Error(`Gameweek ${gameweek} not yet finished`);
 
-  const teamOfTheWeekData = await getTeamOfTheWeekWithCache(gameweek);
+  const teamOfTheWeekData = await getOrFetchDreamTeam(db, season, gameweek, bootstrap.events);
 
   const teamMap = new Map(bootstrap.teams.map((t) => [t.id, t]));
   const playerMap = new Map(bootstrap.elements.map((e) => [e.id, e]));

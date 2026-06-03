@@ -1,148 +1,33 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import * as cache from './cache';
-import * as fplClient from './fpl-client';
+import * as dbCache from './fpl-cache/db-cache';
 import * as teamOfTheWeekService from './team-of-the-week-service';
 
-vi.mock('./fpl-client');
-vi.mock('./cache');
+vi.mock('./db/client', () => ({ db: {} }));
+vi.mock('./fpl-cache/db-cache');
 
 const mockBootstrap = {
+  total_players: 10000000,
   events: [
-    {
-      id: 1,
-      name: 'Gameweek 1',
-      finished: true,
-      average_entry_score: 50,
-      highest_score: 120,
-      deadline_time: '2025-08-09T11:00:00Z',
-      is_current: false,
-    },
-    {
-      id: 2,
-      name: 'Gameweek 2',
-      finished: false,
-      average_entry_score: 0,
-      highest_score: 0,
-      deadline_time: '2025-08-16T11:00:00Z',
-      is_current: true,
-    },
+    { id: 1, name: 'Gameweek 1', finished: true, average_entry_score: 50, highest_score: 120, deadline_time: '2025-08-09T11:00:00Z', is_current: false, is_next: false, data_checked: true },
+    { id: 2, name: 'Gameweek 2', finished: false, average_entry_score: 0, highest_score: 0, deadline_time: '2025-08-16T11:00:00Z', is_current: true, is_next: false, data_checked: false },
   ],
   teams: [
     { id: 1, name: 'Arsenal', short_name: 'ARS', code: 3 },
     { id: 2, name: 'Man City', short_name: 'MCI', code: 43 },
   ],
   elements: [
-    {
-      id: 10,
-      web_name: 'Raya',
-      team: 1,
-      team_code: 3,
-      element_type: 1,
-      status: 'a',
-      chance_of_playing_this_round: null,
-      news: '',
-    },
-    {
-      id: 20,
-      web_name: 'Saliba',
-      team: 1,
-      team_code: 3,
-      element_type: 2,
-      status: 'a',
-      chance_of_playing_this_round: null,
-      news: '',
-    },
-    {
-      id: 30,
-      web_name: 'Gabriel',
-      team: 1,
-      team_code: 3,
-      element_type: 2,
-      status: 'a',
-      chance_of_playing_this_round: null,
-      news: '',
-    },
-    {
-      id: 40,
-      web_name: 'White',
-      team: 1,
-      team_code: 3,
-      element_type: 2,
-      status: 'a',
-      chance_of_playing_this_round: null,
-      news: '',
-    },
-    {
-      id: 50,
-      web_name: 'Saka',
-      team: 1,
-      team_code: 3,
-      element_type: 3,
-      status: 'a',
-      chance_of_playing_this_round: null,
-      news: '',
-    },
-    {
-      id: 60,
-      web_name: 'Ødegaard',
-      team: 1,
-      team_code: 3,
-      element_type: 3,
-      status: 'a',
-      chance_of_playing_this_round: null,
-      news: '',
-    },
-    {
-      id: 70,
-      web_name: 'Havertz',
-      team: 1,
-      team_code: 3,
-      element_type: 3,
-      status: 'a',
-      chance_of_playing_this_round: null,
-      news: '',
-    },
-    {
-      id: 80,
-      web_name: 'Rice',
-      team: 1,
-      team_code: 3,
-      element_type: 3,
-      status: 'a',
-      chance_of_playing_this_round: null,
-      news: '',
-    },
-    {
-      id: 90,
-      web_name: 'Haaland',
-      team: 2,
-      team_code: 43,
-      element_type: 4,
-      status: 'a',
-      chance_of_playing_this_round: null,
-      news: '',
-    },
-    {
-      id: 100,
-      web_name: 'Jesus',
-      team: 1,
-      team_code: 3,
-      element_type: 4,
-      status: 'a',
-      chance_of_playing_this_round: null,
-      news: '',
-    },
-    {
-      id: 110,
-      web_name: 'Trossard',
-      team: 1,
-      team_code: 3,
-      element_type: 4,
-      status: 'a',
-      chance_of_playing_this_round: null,
-      news: '',
-    },
+    { id: 10, web_name: 'Raya', team: 1, team_code: 3, element_type: 1, status: 'a', chance_of_playing_this_round: null, news: '' },
+    { id: 20, web_name: 'Saliba', team: 1, team_code: 3, element_type: 2, status: 'a', chance_of_playing_this_round: null, news: '' },
+    { id: 30, web_name: 'Gabriel', team: 1, team_code: 3, element_type: 2, status: 'a', chance_of_playing_this_round: null, news: '' },
+    { id: 40, web_name: 'White', team: 1, team_code: 3, element_type: 2, status: 'a', chance_of_playing_this_round: null, news: '' },
+    { id: 50, web_name: 'Saka', team: 1, team_code: 3, element_type: 3, status: 'a', chance_of_playing_this_round: null, news: '' },
+    { id: 60, web_name: 'Ødegaard', team: 1, team_code: 3, element_type: 3, status: 'a', chance_of_playing_this_round: null, news: '' },
+    { id: 70, web_name: 'Havertz', team: 1, team_code: 3, element_type: 3, status: 'a', chance_of_playing_this_round: null, news: '' },
+    { id: 80, web_name: 'Rice', team: 1, team_code: 3, element_type: 3, status: 'a', chance_of_playing_this_round: null, news: '' },
+    { id: 90, web_name: 'Haaland', team: 2, team_code: 43, element_type: 4, status: 'a', chance_of_playing_this_round: null, news: '' },
+    { id: 100, web_name: 'Jesus', team: 1, team_code: 3, element_type: 4, status: 'a', chance_of_playing_this_round: null, news: '' },
+    { id: 110, web_name: 'Trossard', team: 1, team_code: 3, element_type: 4, status: 'a', chance_of_playing_this_round: null, news: '' },
   ],
   element_types: [
     { id: 1, singular_name_short: 'GKP' },
@@ -150,6 +35,7 @@ const mockBootstrap = {
     { id: 3, singular_name_short: 'MID' },
     { id: 4, singular_name_short: 'FWD' },
   ],
+  chips: [],
 };
 
 const mockTeamOfTheWeek = {
@@ -172,13 +58,11 @@ const mockTeamOfTheWeek = {
 describe('Team of the Week Service', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(dbCache.getOrFetchBootstrap).mockResolvedValue(mockBootstrap as never);
+    vi.mocked(dbCache.getOrFetchDreamTeam).mockResolvedValue(mockTeamOfTheWeek as never);
   });
 
   it('returns 11 players merged with bootstrap metadata', async () => {
-    (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
-    (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockBootstrap);
-    (fplClient.getDreamTeam as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockTeamOfTheWeek);
-
     const result = await teamOfTheWeekService.getTeamOfTheWeek(1);
 
     expect(result.gw).toBe(1);
@@ -186,10 +70,6 @@ describe('Team of the Week Service', () => {
   });
 
   it('maps player fields correctly', async () => {
-    (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
-    (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockBootstrap);
-    (fplClient.getDreamTeam as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockTeamOfTheWeek);
-
     const result = await teamOfTheWeekService.getTeamOfTheWeek(1);
 
     const gk = result.players.find((p) => p.id === 10)!;
@@ -208,10 +88,6 @@ describe('Team of the Week Service', () => {
   });
 
   it('returns players sorted GK → DEF → MID → FWD', async () => {
-    (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
-    (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockBootstrap);
-    (fplClient.getDreamTeam as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockTeamOfTheWeek);
-
     const result = await teamOfTheWeekService.getTeamOfTheWeek(1);
 
     const positions = result.players.map((p) => p.position);
@@ -226,43 +102,10 @@ describe('Team of the Week Service', () => {
   });
 
   it('throws when gameweek not found', async () => {
-    (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
-    (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ...mockBootstrap,
-      events: [],
-    });
-
-    await expect(teamOfTheWeekService.getTeamOfTheWeek(1)).rejects.toThrow('Gameweek 1 not found');
+    await expect(teamOfTheWeekService.getTeamOfTheWeek(99)).rejects.toThrow('Gameweek 99 not found');
   });
 
   it('throws when gameweek is not yet finished', async () => {
-    (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
-    (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockBootstrap);
-
     await expect(teamOfTheWeekService.getTeamOfTheWeek(2)).rejects.toThrow('not yet finished');
-  });
-
-  it('uses cached bootstrap data', async () => {
-    (cache.get as ReturnType<typeof vi.fn>).mockReturnValueOnce(mockBootstrap);
-    (cache.get as ReturnType<typeof vi.fn>).mockReturnValueOnce(null);
-    (fplClient.getDreamTeam as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockTeamOfTheWeek);
-
-    await teamOfTheWeekService.getTeamOfTheWeek(1);
-
-    expect(fplClient.getBootstrapStatic).not.toHaveBeenCalled();
-  });
-
-  it('caches dream team data with SQUAD_FINISHED TTL', async () => {
-    (cache.get as ReturnType<typeof vi.fn>).mockReturnValue(null);
-    (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockBootstrap);
-    (fplClient.getDreamTeam as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockTeamOfTheWeek);
-
-    await teamOfTheWeekService.getTeamOfTheWeek(1);
-
-    expect(cache.set).toHaveBeenCalledWith(
-      'team-of-the-week:1',
-      mockTeamOfTheWeek,
-      cache.ttl.SQUAD_FINISHED
-    );
   });
 });

@@ -1,6 +1,7 @@
-import * as cacheLayer from './cache';
-import type { FPLBootstrapStatic, FPLLive } from './fpl-client';
-import * as fplClient from './fpl-client';
+import { db } from './db/client';
+import { getOrFetchBootstrap, getOrFetchGwLive } from './fpl-cache/db-cache';
+import { deriveSeason } from './fpl-cache/season';
+import type { FPLLive } from './fpl-client';
 import type {
   PlayerPosition,
   StatEntry,
@@ -41,28 +42,14 @@ const POSITION_MAP: Record<number, PlayerPosition> = {
   4: 'FWD',
 };
 
-async function getBootstrapWithCache(): Promise<FPLBootstrapStatic> {
-  const cached = cacheLayer.get<FPLBootstrapStatic>('bootstrap-static');
-  if (cached) return cached;
-
-  const bootstrap = await fplClient.getBootstrapStatic();
-  cacheLayer.set('bootstrap-static', bootstrap, cacheLayer.ttl.BOOTSTRAP);
-  return bootstrap;
-}
-
 export async function getTopPlayersGameweek(gw: number): Promise<TopPlayersGameweekResponse> {
-  const bootstrap = await getBootstrapWithCache();
+  const bootstrap = await getOrFetchBootstrap(db);
+  const season = deriveSeason(bootstrap.events);
 
   const event = bootstrap.events.find((e) => e.id === gw);
   if (!event) throw new Error(`Gameweek ${gw} not found`);
 
-  const liveCacheKey = `live:${gw}`;
-  let liveData = cacheLayer.get<fplClient.FPLLive>(liveCacheKey);
-  if (!liveData) {
-    liveData = await fplClient.getLive(gw);
-    const liveTtl = event.finished ? cacheLayer.ttl.SQUAD_FINISHED : cacheLayer.ttl.SQUAD_CURRENT;
-    cacheLayer.set(liveCacheKey, liveData, liveTtl);
-  }
+  const liveData = await getOrFetchGwLive(db, season, gw, bootstrap.events);
 
   const teamMap = new Map(bootstrap.teams.map((t) => [t.id, t]));
   const elementMap = new Map(bootstrap.elements.map((e) => [e.id, e]));
@@ -93,20 +80,15 @@ export async function getTopPlayersGameweek(gw: number): Promise<TopPlayersGamew
 
 export async function getPlayersLiveGw(
   gw: number,
-  ids: number[]
+  ids: number[],
 ): Promise<TopPlayersGameweekResponse> {
-  const bootstrap = await getBootstrapWithCache();
+  const bootstrap = await getOrFetchBootstrap(db);
+  const season = deriveSeason(bootstrap.events);
 
   const event = bootstrap.events.find((e) => e.id === gw);
   if (!event) throw new Error(`Gameweek ${gw} not found`);
 
-  const liveCacheKey = `live:${gw}`;
-  let liveData = cacheLayer.get<fplClient.FPLLive>(liveCacheKey);
-  if (!liveData) {
-    liveData = await fplClient.getLive(gw);
-    const liveTtl = event.finished ? cacheLayer.ttl.SQUAD_FINISHED : cacheLayer.ttl.SQUAD_CURRENT;
-    cacheLayer.set(liveCacheKey, liveData, liveTtl);
-  }
+  const liveData = await getOrFetchGwLive(db, season, gw, bootstrap.events);
 
   const idSet = new Set(ids);
   const teamMap = new Map(bootstrap.teams.map((t) => [t.id, t]));
@@ -136,7 +118,7 @@ export async function getPlayersLiveGw(
 }
 
 export async function getTopPlayersSeason(): Promise<TopPlayersSeasonResponse> {
-  const bootstrap = await getBootstrapWithCache();
+  const bootstrap = await getOrFetchBootstrap(db);
 
   const teamMap = new Map(bootstrap.teams.map((t) => [t.id, t]));
 

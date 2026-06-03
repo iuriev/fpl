@@ -14,6 +14,7 @@ export interface FPLBootstrapStatic {
     is_current: boolean;
     is_next: boolean;
     finished: boolean;
+    data_checked: boolean;
     average_entry_score: number;
     highest_score: number;
   }>;

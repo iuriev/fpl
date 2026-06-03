@@ -1,25 +1,14 @@
-import * as cacheLayer from './cache';
-import type { FPLBootstrapStatic } from './fpl-client';
-import * as fplClient from './fpl-client';
+import { db } from './db/client';
+import { getOrFetchBootstrap, getOrFetchHistory, getSeasonMeta } from './fpl-cache/db-cache';
+import { deriveSeason } from './fpl-cache/season';
 import type { HistoryResponse } from './types';
 
-async function getBootstrapWithCache(): Promise<FPLBootstrapStatic> {
-  const cached = cacheLayer.get<FPLBootstrapStatic>('bootstrap-static');
-  if (cached) return cached;
-  const bootstrap = await fplClient.getBootstrapStatic();
-  cacheLayer.set('bootstrap-static', bootstrap, cacheLayer.ttl.BOOTSTRAP);
-  return bootstrap;
-}
-
 export async function getHistory(teamId: number): Promise<HistoryResponse> {
-  const cacheKey = `history:${teamId}`;
-  const cached = cacheLayer.get<HistoryResponse>(cacheKey);
-  if (cached) return cached;
+  const bootstrap = await getOrFetchBootstrap(db);
+  const season = deriveSeason(bootstrap.events);
+  const { isComplete } = await getSeasonMeta(db, season);
 
-  const [history, bootstrap] = await Promise.all([
-    fplClient.getHistory(teamId),
-    getBootstrapWithCache(),
-  ]);
+  const history = await getOrFetchHistory(db, season, teamId, bootstrap.events, isComplete);
 
   const gameweeks = [...history.current].reverse().map((row) => ({
     gw: row.event,
@@ -33,15 +22,5 @@ export async function getHistory(teamId: number): Promise<HistoryResponse> {
     teamValue: row.value / 10,
   }));
 
-  const result: HistoryResponse = { teamId, gameweeks };
-
-  const currentEvent = bootstrap.events.find((e) => e.is_current);
-  const isFinished = currentEvent?.finished ?? false;
-  cacheLayer.set(
-    cacheKey,
-    result,
-    isFinished ? cacheLayer.ttl.HISTORY_FINISHED : cacheLayer.ttl.HISTORY_CURRENT
-  );
-
-  return result;
+  return { teamId, gameweeks };
 }

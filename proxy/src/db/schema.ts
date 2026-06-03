@@ -1,4 +1,14 @@
-import { boolean, integer, jsonb, pgTable, text, timestamp, uniqueIndex } from 'drizzle-orm/pg-core';
+import {
+  boolean,
+  integer,
+  jsonb,
+  pgTable,
+  primaryKey,
+  serial,
+  text,
+  timestamp,
+  uniqueIndex,
+} from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
@@ -91,3 +101,82 @@ export const transferDraft = pgTable('transfer_draft', {
   subs: jsonb('subs').notNull(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
+
+// ─── FPL persistent cache tables ───────────────────────────────────────────
+
+export const fplMeta = pgTable('fpl_meta', {
+  season: text('season').primaryKey(),
+  isComplete: boolean('is_complete').notNull().default(false),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
+export const fplBootstrapCache = pgTable('fpl_bootstrap_cache', {
+  id: serial('id').primaryKey(),
+  season: text('season')
+    .notNull()
+    .references(() => fplMeta.season),
+  data: jsonb('data').notNull(),
+  fetchedAt: timestamp('fetched_at').notNull(),
+  archived: boolean('archived').notNull().default(false),
+});
+
+export const fplGwLiveCache = pgTable(
+  'fpl_gw_live_cache',
+  {
+    season: text('season').notNull(),
+    gw: integer('gw').notNull(),
+    data: jsonb('data').notNull(),
+    frozen: boolean('frozen').notNull().default(false),
+    fetchedAt: timestamp('fetched_at').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.season, t.gw] })],
+);
+
+export const fplSquadCache = pgTable(
+  'fpl_squad_cache',
+  {
+    season: text('season').notNull(),
+    teamId: integer('team_id').notNull(),
+    gw: integer('gw').notNull(),
+    data: jsonb('data').notNull(),
+    frozen: boolean('frozen').notNull().default(false),
+    fetchedAt: timestamp('fetched_at').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.season, t.teamId, t.gw] })],
+);
+
+export const fplDreamTeamCache = pgTable(
+  'fpl_dream_team_cache',
+  {
+    season: text('season').notNull(),
+    gw: integer('gw').notNull(),
+    data: jsonb('data').notNull(),
+    frozen: boolean('frozen').notNull().default(false),
+    fetchedAt: timestamp('fetched_at').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.season, t.gw] })],
+);
+
+export const fplHistoryCache = pgTable(
+  'fpl_history_cache',
+  {
+    season: text('season').notNull(),
+    teamId: integer('team_id').notNull(),
+    data: jsonb('data').notNull(),
+    lastFinishedGw: integer('last_finished_gw').notNull(),
+    fetchedAt: timestamp('fetched_at').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.season, t.teamId] })],
+);
+
+export const fplTransfersCache = pgTable(
+  'fpl_transfers_cache',
+  {
+    season: text('season').notNull(),
+    teamId: integer('team_id').notNull(),
+    data: jsonb('data').notNull(),
+    lastFinishedGw: integer('last_finished_gw').notNull(),
+    fetchedAt: timestamp('fetched_at').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.season, t.teamId] })],
+);

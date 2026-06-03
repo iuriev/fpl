@@ -2,9 +2,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as cache from './cache';
 import * as fixturesService from './fixtures-service';
+import * as dbCache from './fpl-cache/db-cache';
 import * as fplClient from './fpl-client';
 import * as playerProfileService from './player-profile-service';
 
+vi.mock('./db/client', () => ({ db: {} }));
+vi.mock('./fpl-cache/db-cache');
 vi.mock('./fpl-client');
 vi.mock('./cache');
 vi.mock('./fixtures-service');
@@ -35,10 +38,7 @@ describe('getPlayerProfile', () => {
     vi.clearAllMocks();
     vi.mocked(cache.get).mockReturnValue(null);
     vi.mocked(cache.set).mockReturnValue(undefined);
-    vi.mocked(cache.get).mockImplementation((key: string) => {
-      if (key === 'bootstrap-static') return bootstrap;
-      return null;
-    });
+    vi.mocked(dbCache.getOrFetchBootstrap).mockResolvedValue(bootstrap);
     vi.mocked(fixturesService.getUpcomingFixtures).mockResolvedValue({
       1: [{ gw: 39, opponent: 'MCI', home: true, difficulty: 4 }],
     });

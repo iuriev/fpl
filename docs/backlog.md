@@ -415,6 +415,7 @@ Can be integrated into the player info popup or as a standalone screen.
 | INF-03 | Redis cache + фонова prefetch-стратегія для масштабу 5000+ юзерів | L | Замінює in-memory кеш на Redis; фонові jobs тягнуть популярні squad IDs заздалегідь. Потрібно тільки після валідації попиту. |
 | PRED-04 | Full AI prediction engine | XL | The big bet. Do this after PRED-02/03 validate demand and after MON-01 is live. |
 | AI-01 | Personal FPL AI analyst chat (free 2-3 Qs, then paid) | XL | Build after AUTH-01 and PRED-04 are live. |
+| AUTH-05 | Session hygiene — purge expired rows + cap sessions per user | S | better-auth keeps one DB row per login/device; no cron today → stale `session` rows accumulate. |
 | AUTH-02 | FPL OAuth / transfer execution | XL | Complex. Needs FPL API capability research first (may not be possible). |
 | START-01 | GW1 draft assistant | L | Seasonal feature (once a year). High viral potential before season start. |
 | DES-01 | Desktop responsive layout | L | Low priority while the app is pre-launch / mobile-first. |
@@ -462,6 +463,73 @@ Team-aware AI chat assistant embedded in the app:
 - **Free tier:** 2–3 questions per GW; **Paid tier:** unlimited with larger context window
 - UI: floating chat bubble → modal with chat history, input field
 - Reference: fplukraine.com "FPL Помічник" + fpl.team AI assistant
+
+#### AUTH-05: Session hygiene (expired purge + per-user cap)
+
+**Problem:** Each sign-in (email, Google OAuth, email-verify auto-login, new browser/device)
+inserts a row in `session` with `expires_at` ≈ now + 30 days (`proxy/src/auth/auth.ts`).
+Sign-out deletes only the current session. Expired rows are removed from Postgres only when
+that session's cookie is sent again on `getSession` — abandoned sessions (cleared cookies,
+closed tab) can linger indefinitely. No scheduled cleanup exists today.
+
+**Goals:**
+1. Periodically delete expired sessions from Postgres.
+2. Optionally cap active sessions per user (e.g. keep current + revoke older ones on new login).
+
+**Recommended implementation (proxy, matches single Fly machine today):**
+
+- Add `proxy/src/jobs/session-cleanup.ts` using Drizzle:
+  ```sql
+  DELETE FROM session WHERE expires_at < NOW();
+  ```
+- Schedule with `node-cron` (same stack as INF-03 suggestion): e.g. `0 3 * * *` UTC daily.
+- Start the job from `proxy/src/index.ts` only when `SESSION_CLEANUP_ENABLED=true` (default
+  `true` in production, `false` in local dev to avoid surprising deletes during auth testing).
+- Log deleted row count at `info` level; metric hook later if needed.
+
+**Alternative A — Supabase `pg_cron` (no proxy code):**
+
+- Enable `pg_cron` extension in Supabase (project must support it).
+- Schedule in SQL Editor:
+  ```sql
+  SELECT cron.schedule(
+    'purge-expired-sessions',
+    '0 3 * * *',
+    $$DELETE FROM public.session WHERE expires_at < NOW()$$
+  );
+  ```
+- Pros: runs even if proxy is down; no extra dependency.
+- Cons: ops live outside repo unless documented in `docs/db-schema.md` + migration note;
+  verify RLS/service role (table is service-managed today).
+
+**Alternative B — one-off / manual (dev only):**
+
+- Supabase Table Editor or `psql`: `DELETE FROM session WHERE expires_at < NOW();`
+
+**Per-user session cap (phase 2, optional):**
+
+- On successful sign-in (email + social), call better-auth
+  `auth.api.revokeOtherSessions` for that user so only the new session remains, **or**
+  keep last N (e.g. 5) via `listSessions` + `revokeSession` in an `after` hook in
+  `proxy/src/auth/auth.ts` (confirm hook API in better-auth docs for v1.6.x).
+- Product choice: `revokeOtherSessions` = one device at a time (strict); cap N = phone +
+  laptop + tablet (lenient). Default proposal: **cap at 5 active sessions** (revoke oldest
+  by `created_at` when count > 5 after login).
+- Do **not** revoke on every `getSession` refresh — only on explicit sign-in endpoints.
+
+**Acceptance criteria:**
+- After job runs, no rows with `expires_at < NOW()` remain (except in-flight transactions).
+- New login with cap enabled: user has ≤ N rows in `session` for their `user_id`.
+- Document chosen approach in `docs/db-schema.md` (maintenance section) and
+  `proxy/.env.example` (`SESSION_CLEANUP_ENABLED`, optional `SESSION_MAX_PER_USER`).
+
+**Deploy notes:**
+- Fly.io: in-process cron on the always-on machine is sufficient until horizontal scaling.
+- INFRA-01 (Cloudflare Workers): in-process `node-cron` will **not** work — use Supabase
+  `pg_cron`, Workers Cron Trigger + internal admin route, or a tiny scheduled Fly job.
+- Promote via `/opsx:propose` when ready to implement.
+
+**Effort:** S (purge only) · S+ (purge + cap + tests).
 
 #### AUTH-02: FPL OAuth / transfer execution integration
 Research whether the official FPL API supports OAuth or credential-based authentication

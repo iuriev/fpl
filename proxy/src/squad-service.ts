@@ -1,17 +1,12 @@
-/**
- * Squad service — composes squad data from FPL endpoints.
- * Handles all the complex mapping logic: players, positions, captain flags, availability, etc.
- */
-
-import * as cacheLayer from './cache';
+import { db } from './db/client';
+import { getOrFetchBootstrap, getOrFetchGwLive, getOrFetchHistory, getOrFetchSquad, getSeasonMeta } from './fpl-cache/db-cache';
+import { deriveSeason } from './fpl-cache/season';
 import type {
   FPLBootstrapStatic,
   FPLHistory,
   FPLHistoryChip,
   FPLLive,
-  FPLPicks,
 } from './fpl-client';
-import * as fplClient from './fpl-client';
 import type {
   ActiveChip,
   ChipInfo,
@@ -60,50 +55,6 @@ function toActiveChip(raw: string | null): ActiveChip {
   return null;
 }
 
-async function getBootstrapWithCache(): Promise<FPLBootstrapStatic> {
-  const cached = cacheLayer.get<FPLBootstrapStatic>('bootstrap-static');
-  if (cached) return cached;
-
-  const bootstrap = await fplClient.getBootstrapStatic();
-  cacheLayer.set('bootstrap-static', bootstrap, cacheLayer.ttl.BOOTSTRAP);
-  return bootstrap;
-}
-
-async function getPicksWithCache(
-  teamId: number,
-  gameweek: number,
-  gameweekFinished: boolean
-): Promise<FPLPicks> {
-  const cacheKey = `picks:${teamId}:${gameweek}`;
-  const cached = cacheLayer.get<FPLPicks>(cacheKey);
-  if (cached) return cached;
-
-  const picks = await fplClient.getPicks(teamId, gameweek);
-  const ttl = gameweekFinished ? cacheLayer.ttl.SQUAD_FINISHED : cacheLayer.ttl.SQUAD_CURRENT;
-  cacheLayer.set(cacheKey, picks, ttl);
-  return picks;
-}
-
-async function getLiveWithCache(gameweek: number): Promise<FPLLive> {
-  const cacheKey = `live:${gameweek}`;
-  const cached = cacheLayer.get<FPLLive>(cacheKey);
-  if (cached) return cached;
-
-  const live = await fplClient.getLive(gameweek);
-  cacheLayer.set(cacheKey, live, cacheLayer.ttl.SQUAD_CURRENT);
-  return live;
-}
-
-async function getHistoryWithCache(teamId: number): Promise<FPLHistory> {
-  const cacheKey = `squad-history:${teamId}`;
-  const cached = cacheLayer.get<FPLHistory>(cacheKey);
-  if (cached) return cached;
-
-  const history = await fplClient.getHistory(teamId);
-  cacheLayer.set(cacheKey, history, cacheLayer.ttl.SQUAD_CURRENT);
-  return history;
-}
-
 export function computeFreeTransfers(history: FPLHistory['current']): number {
   let ft = 1;
   for (const gw of history) {
@@ -116,7 +67,7 @@ export function computeChipStatuses(
   activeChip: ActiveChip,
   playedChips: FPLHistoryChip[],
   bootstrapChips: FPLBootstrapStatic['chips'],
-  currentGw: number
+  currentGw: number,
 ): ChipStatuses {
   const chips = playedChips ?? [];
   const windows = bootstrapChips ?? [];
@@ -124,11 +75,11 @@ export function computeChipStatuses(
 
   const wcWindows = windows.filter((c) => c.name === 'wildcard');
   const currentWindow = wcWindows.find(
-    (w) => currentGw >= w.start_event && currentGw <= w.stop_event
+    (w) => currentGw >= w.start_event && currentGw <= w.stop_event,
   );
   const wcPlayInWindow = currentWindow
     ? played('wildcard').find(
-        (c) => c.event >= currentWindow.start_event && c.event <= currentWindow.stop_event
+        (c) => c.event >= currentWindow.start_event && c.event <= currentWindow.stop_event,
       )
     : undefined;
 
@@ -153,13 +104,16 @@ export function computeChipStatuses(
 }
 
 export async function getSquad(teamId: number, gameweek: number): Promise<SquadResponse> {
-  const bootstrap = await getBootstrapWithCache();
+  const bootstrap = await getOrFetchBootstrap(db);
+  const season = deriveSeason(bootstrap.events);
+  const { isComplete } = await getSeasonMeta(db, season);
+
   const gameweekEvent = bootstrap.events.find((e) => e.id === gameweek);
   if (!gameweekEvent) throw new Error(`Gameweek ${gameweek} not found`);
 
   let picks;
   try {
-    picks = await getPicksWithCache(teamId, gameweek, gameweekEvent.finished);
+    picks = await getOrFetchSquad(db, season, teamId, gameweek, bootstrap.events);
   } catch (error) {
     if (error instanceof Error && error.message.includes('404')) {
       const err = new Error(`No picks available for gameweek ${gameweek}`);
@@ -170,17 +124,15 @@ export async function getSquad(teamId: number, gameweek: number): Promise<SquadR
   }
 
   const [live, history] = await Promise.all([
-    getLiveWithCache(gameweek),
-    getHistoryWithCache(teamId),
+    getOrFetchGwLive(db, season, gameweek, bootstrap.events),
+    getOrFetchHistory(db, season, teamId, bootstrap.events, isComplete),
   ]);
 
-  // Build lookup maps for quick access
   const teamMap = new Map(bootstrap.teams.map((t) => [t.id, t.short_name]));
   const playerMap = new Map(bootstrap.elements.map((e) => [e.id, e]));
   const liveMap = new Map(live.elements.map((e) => [e.id, e]));
   const pickPositionMap = new Map(picks.picks.map((p) => [p.element, p.position]));
 
-  // Build players array
   const players = picks.picks.map((pick) => {
     const playerData = playerMap.get(pick.element);
     if (!playerData) throw new Error(`Player ${pick.element} not found`);
@@ -228,33 +180,22 @@ export async function getSquad(teamId: number, gameweek: number): Promise<SquadR
     } as SquadPlayer;
   });
 
-  // Split into starters (positions 1-11) and bench (positions 12-15)
   const starters = players
     .filter((p) => {
       const pos = pickPositionMap.get(p.id);
       return pos !== undefined && pos <= 11;
     })
-    .sort((a, b) => {
-      const posA = pickPositionMap.get(a.id) ?? 0;
-      const posB = pickPositionMap.get(b.id) ?? 0;
-      return posA - posB;
-    });
+    .sort((a, b) => (pickPositionMap.get(a.id) ?? 0) - (pickPositionMap.get(b.id) ?? 0));
 
   const bench = players
     .filter((p) => {
       const pos = pickPositionMap.get(p.id);
       return pos !== undefined && pos > 11;
     })
-    .sort((a, b) => {
-      const posA = pickPositionMap.get(a.id) ?? 0;
-      const posB = pickPositionMap.get(b.id) ?? 0;
-      return posA - posB;
-    });
+    .sort((a, b) => (pickPositionMap.get(a.id) ?? 0) - (pickPositionMap.get(b.id) ?? 0));
 
-  // Build summary
   const entryHistory = picks.entry_history;
   const totalPoints = Math.max(0, entryHistory.points - entryHistory.event_transfers_cost);
-
   const activeChip = toActiveChip(picks.active_chip);
 
   return {
@@ -270,7 +211,7 @@ export async function getSquad(teamId: number, gameweek: number): Promise<SquadR
       bank: entryHistory.bank,
       freeTransfers: Math.max(
         0,
-        computeFreeTransfers(history.current) - entryHistory.event_transfers
+        computeFreeTransfers(history.current) - entryHistory.event_transfers,
       ),
     },
     starters,

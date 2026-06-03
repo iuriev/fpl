@@ -12,6 +12,9 @@ import { db } from './db/client';
 import { playerWatchlistEntry } from './db/schema';
 import * as entryService from './entry-service';
 import * as fixturesService from './fixtures-service';
+import { getOrFetchBootstrap } from './fpl-cache/db-cache';
+import { prefetchMissingGwData } from './fpl-cache/prefetch';
+import { deriveSeason } from './fpl-cache/season';
 import * as gameweeksService from './gameweeks-service';
 import * as historyService from './history-service';
 import * as leaderboardService from './leaderboard-service';
@@ -408,4 +411,12 @@ const port = Number(process.env.PORT ?? 3001);
 
 serve({ fetch: app.fetch, port }, () => {
   console.log(`Proxy server running on port ${port}`);
+  getOrFetchBootstrap(db)
+    .then((bootstrap) => {
+      const season = deriveSeason(bootstrap.events);
+      prefetchMissingGwData(db, season, bootstrap.events).catch((err) =>
+        console.error('[prefetch] error:', err),
+      );
+    })
+    .catch((err) => console.error('[prefetch] bootstrap error:', err));
 });
