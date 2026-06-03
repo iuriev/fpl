@@ -178,6 +178,7 @@ export interface FPLLive {
       red_cards: number;
       saves: number;
       bonus: number;
+      bps: number;
     };
     explain: Array<{
       fixture: number;

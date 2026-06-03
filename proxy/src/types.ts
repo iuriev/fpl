@@ -254,3 +254,23 @@ export interface LeagueStandingsResponse {
   hasNext: boolean;
   standings: StandingEntry[];
 }
+
+export interface LeaderboardPlayer {
+  id: number;
+  webName: string;
+  position: PlayerPosition;
+  teamCode: number;
+  teamShortName: string;
+  value: number;
+}
+
+export interface LeaderboardGwResponse {
+  gw: number;
+  defcon: LeaderboardPlayer[];
+  bps: LeaderboardPlayer[];
+}
+
+export interface LeaderboardSeasonResponse {
+  defcon: LeaderboardPlayer[];
+  bps: LeaderboardPlayer[];
+}
