@@ -144,9 +144,9 @@ describe('TeamInfoPanel — user block', () => {
     expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument();
   });
 
-  it('shows Change team button in full mode', () => {
+  it('shows Change your team ID button in full mode', () => {
     renderPanelWithUser();
-    expect(screen.getByRole('button', { name: /change team/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /change your team id/i })).toBeInTheDocument();
   });
 
   it('does not show user block in demo mode', () => {

@@ -1,6 +1,7 @@
 import * as cacheLayer from './cache';
 import type { FPLBootstrapStatic } from './fpl-client';
 import * as fplClient from './fpl-client';
+import { resolveNextGw } from './resolve-next-gw';
 import type { FixtureInfo } from './types';
 import { MAX_GAMEWEEK } from './types';
 
@@ -10,15 +11,6 @@ async function getBootstrapWithCache(): Promise<FPLBootstrapStatic> {
   const bootstrap = await fplClient.getBootstrapStatic();
   cacheLayer.set('bootstrap-static', bootstrap, cacheLayer.ttl.BOOTSTRAP);
   return bootstrap;
-}
-
-function resolveNextGw(bootstrap: FPLBootstrapStatic): number {
-  const next = bootstrap.events.find((e) => e.is_next);
-  if (next) return next.id;
-  const current = bootstrap.events.find((e) => e.is_current);
-  if (current) return Math.min(current.id + 1, MAX_GAMEWEEK);
-  const finished = bootstrap.events.filter((e) => e.finished);
-  return finished.length > 0 ? Math.min(finished[finished.length - 1].id + 1, MAX_GAMEWEEK) : 1;
 }
 
 export async function getUpcomingFixtures(): Promise<Record<number, FixtureInfo[]>> {

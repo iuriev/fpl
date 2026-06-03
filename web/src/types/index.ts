@@ -10,6 +10,7 @@ export interface Gameweek {
 
 export interface GameweeksResponse {
   current: number;
+  next: number;
   gameweeks: Gameweek[];
 }
 

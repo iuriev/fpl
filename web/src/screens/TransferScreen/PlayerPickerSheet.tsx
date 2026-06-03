@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 
 import { BottomSheet } from '@/components/ui/BottomSheet/BottomSheet';
 import { copy, interpolate } from '@/lib/copy';
-import type { PlayerPosition, PoolPlayer } from '@/types';
+import { MAX_GAMEWEEK, type PlayerPosition, type PoolPlayer } from '@/types';
 
 import { PlayerPickerRow } from './PlayerPickerRow';
 import styles from './PlayerPickerSheet.module.css';
@@ -125,7 +125,7 @@ export const PlayerPickerSheet: React.FC<PlayerPickerSheetProps> = ({
             </span>
             <span role="columnheader" className={styles.label}>
               {targetGw
-                ? `GW${targetGw}${targetGw < 38 ? `-${Math.min(targetGw + 2, 38)}` : ''}`
+                ? `GW${targetGw}${targetGw < MAX_GAMEWEEK ? `-${Math.min(targetGw + 2, MAX_GAMEWEEK)}` : ''}`
                 : copy.transfersColFix}
             </span>
             <span

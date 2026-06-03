@@ -6,6 +6,7 @@
 import * as cacheLayer from './cache';
 import type { FPLBootstrapStatic } from './fpl-client';
 import * as fplClient from './fpl-client';
+import { resolveNextGw } from './resolve-next-gw';
 import type { GameweeksResponse } from './types';
 
 async function getBootstrapWithCache(): Promise<FPLBootstrapStatic> {
@@ -35,5 +36,7 @@ export async function getGameweeks(): Promise<GameweeksResponse> {
     highestScore: e.highest_score > 0 ? e.highest_score : undefined,
   }));
 
-  return { current, gameweeks };
+  const next = resolveNextGw(bootstrap);
+
+  return { current, next, gameweeks };
 }

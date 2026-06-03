@@ -33,6 +33,7 @@ function mkStats(overrides: Partial<PlayerStats> = {}): PlayerStats {
 
 export const fixtureGameweeks: GameweeksResponse = {
   current: 37,
+  next: 38,
   gameweeks: Array.from({ length: 37 }, (_, i) => ({
     id: i + 1,
     name: `Gameweek ${i + 1}`,

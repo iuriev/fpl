@@ -48,6 +48,7 @@ describe('Gameweeks Service', () => {
       const result = await gameweeksService.getGameweeks();
 
       expect(result.current).toBe(2);
+      expect(result.next).toBe(3);
       expect(result.gameweeks).toHaveLength(2);
       expect(result.gameweeks[0]).toEqual({
         id: 1,
@@ -130,6 +131,47 @@ describe('Gameweeks Service', () => {
       const result = await gameweeksService.getGameweeks();
 
       expect(result.current).toBe(1);
+      expect(result.next).toBe(1);
+    });
+
+    it('caps next at 38 when current is the last gameweek', async () => {
+      const mockBootstrap = {
+        events: [
+          {
+            id: 37,
+            name: 'Gameweek 37',
+            finished: true,
+            is_current: false,
+            is_next: false,
+            average_entry_score: 50,
+            highest_score: 100,
+            deadline_time: '2025-01-01T12:00:00Z',
+          },
+          {
+            id: 38,
+            name: 'Gameweek 38',
+            finished: false,
+            is_current: true,
+            is_next: false,
+            average_entry_score: 0,
+            highest_score: 0,
+            deadline_time: '2025-01-08T12:00:00Z',
+          },
+        ],
+        teams: [],
+        elements: [],
+        element_types: [],
+      };
+
+      (cache.get as ReturnType<typeof vi.fn>).mockReturnValueOnce(null);
+      (fplClient.getBootstrapStatic as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+        mockBootstrap
+      );
+
+      const result = await gameweeksService.getGameweeks();
+
+      expect(result.current).toBe(38);
+      expect(result.next).toBe(38);
     });
 
     it('respects cached bootstrap data', async () => {

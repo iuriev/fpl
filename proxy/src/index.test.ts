@@ -94,6 +94,7 @@ describe('Proxy Endpoints', () => {
     it('returns gameweeks', async () => {
       const mockResponse = {
         current: 10,
+        next: 11,
         gameweeks: [{ id: 1, name: 'Gameweek 1', finished: true }],
       };
       (gameweeksService.getGameweeks as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
