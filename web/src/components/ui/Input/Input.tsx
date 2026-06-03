@@ -11,7 +11,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, className, ...props }, ref) => {
     return (
       <div className={styles.wrapper}>
-        {label && <label className={styles.label}>{label}</label>}
+        {label && <label className={styles.label} htmlFor={props.id}>{label}</label>}
         <input
           ref={ref}
           className={`${styles.input} ${error ? styles.hasError : ''} ${className || ''}`}

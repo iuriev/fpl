@@ -24,7 +24,7 @@ describe('ForgotPasswordScreen', () => {
   it('renders headline and email field', () => {
     renderScreen();
     expect(screen.getByRole('heading', { name: /forgot password/i })).toBeInTheDocument();
-    expect(document.querySelector('input[type="email"]')).toBeInTheDocument();
+    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
   });
 
   it('renders submit button and back link', () => {
@@ -41,8 +41,7 @@ describe('ForgotPasswordScreen', () => {
     });
 
     renderScreen();
-    const emailInput = document.querySelector('input[type="email"]') as HTMLInputElement;
-    fireEvent.change(emailInput, { target: { value: 'user@test.com' } });
+    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'user@test.com' } });
     fireEvent.click(screen.getByRole('button', { name: /send reset link/i }));
 
     await waitFor(() =>
@@ -58,8 +57,7 @@ describe('ForgotPasswordScreen', () => {
     });
 
     renderScreen();
-    const emailInput = document.querySelector('input[type="email"]') as HTMLInputElement;
-    fireEvent.change(emailInput, { target: { value: 'user@test.com' } });
+    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'user@test.com' } });
     fireEvent.click(screen.getByRole('button', { name: /send reset link/i }));
 
     await waitFor(() =>
@@ -76,8 +74,7 @@ describe('ForgotPasswordScreen', () => {
     });
 
     renderScreen();
-    const emailInput = document.querySelector('input[type="email"]') as HTMLInputElement;
-    fireEvent.change(emailInput, { target: { value: 'user@test.com' } });
+    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'user@test.com' } });
     fireEvent.click(screen.getByRole('button', { name: /send reset link/i }));
 
     await waitFor(() =>
