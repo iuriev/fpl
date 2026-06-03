@@ -57,8 +57,24 @@ describe('GET /api/me', () => {
     expect(res.status).toBe(401);
   });
 
-  it('returns user profile when authenticated', async () => {
-    mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
+  it('returns user profile from database, not stale session cache', async () => {
+    mockGetSession.mockResolvedValue({
+      user: { ...mockUser, fplTeamId: null },
+      session: {} as never,
+    });
+    const mockLimit = vi.fn().mockResolvedValue([
+      {
+        id: 'user-1',
+        email: 'test@example.com',
+        name: 'Test User',
+        fplTeamId: 42,
+        emailVerified: false,
+      },
+    ]);
+    const mockWhere = vi.fn().mockReturnValue({ limit: mockLimit });
+    const mockFrom = vi.fn().mockReturnValue({ where: mockWhere });
+    vi.mocked(db.select).mockReturnValue({ from: mockFrom } as never);
+
     const res = await app.request('/api/me');
     expect(res.status).toBe(200);
     const body = await res.json();
@@ -71,11 +87,24 @@ describe('GET /api/me', () => {
     });
   });
 
-  it('returns null fplTeamId when not set', async () => {
+  it('returns null fplTeamId when not set in database', async () => {
     mockGetSession.mockResolvedValue({
-      user: { ...mockUser, fplTeamId: null },
+      user: { ...mockUser, fplTeamId: 99 },
       session: {} as never,
     });
+    const mockLimit = vi.fn().mockResolvedValue([
+      {
+        id: 'user-1',
+        email: 'test@example.com',
+        name: 'Test User',
+        fplTeamId: null,
+        emailVerified: false,
+      },
+    ]);
+    const mockWhere = vi.fn().mockReturnValue({ limit: mockLimit });
+    const mockFrom = vi.fn().mockReturnValue({ where: mockWhere });
+    vi.mocked(db.select).mockReturnValue({ from: mockFrom } as never);
+
     const res = await app.request('/api/me');
     const body = (await res.json()) as { fplTeamId: null };
     expect(body.fplTeamId).toBeNull();

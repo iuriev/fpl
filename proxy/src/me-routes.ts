@@ -13,15 +13,43 @@ const isDev = process.env.NODE_ENV !== 'production';
 
 const me = new Hono<AuthVars>();
 
-me.get('/', requireUser, (c) => {
-  const u = c.var.user;
-  if (isDev) console.log('[me] GET /api/me — id:', u.id, 'email:', u.email, 'emailVerified:', u.emailVerified, 'fplTeamId:', u.fplTeamId);
+me.get('/', requireUser, async (c) => {
+  const sessionUser = c.var.user;
+  const [dbUser] = await db
+    .select({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      fplTeamId: user.fplTeamId,
+      emailVerified: user.emailVerified,
+    })
+    .from(user)
+    .where(eq(user.id, sessionUser.id))
+    .limit(1);
+
+  if (!dbUser) {
+    return c.json({ error: 'User not found' }, 404);
+  }
+
+  if (isDev) {
+    console.log(
+      '[me] GET /api/me — id:',
+      dbUser.id,
+      'email:',
+      dbUser.email,
+      'emailVerified:',
+      dbUser.emailVerified,
+      'fplTeamId:',
+      dbUser.fplTeamId,
+    );
+  }
+
   return c.json({
-    id: u.id,
-    email: u.email,
-    name: u.name,
-    fplTeamId: u.fplTeamId ?? null,
-    emailVerified: u.emailVerified,
+    id: dbUser.id,
+    email: dbUser.email,
+    name: dbUser.name,
+    fplTeamId: dbUser.fplTeamId ?? null,
+    emailVerified: dbUser.emailVerified,
   });
 });
 
