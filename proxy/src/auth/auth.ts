@@ -23,7 +23,7 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
-    sendResetPasswordEmail: async ({ user, url }: { user: { email: string }; url: string }) => {
+    sendResetPassword: async ({ user, url }: { user: { email: string }; url: string }) => {
       const resend = new Resend(process.env.RESEND_API_KEY);
       const { error } = await resend.emails.send({
         from: process.env.FROM_EMAIL ?? 'noreply@fpl-squad-viewer.fly.dev',

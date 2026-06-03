@@ -31,10 +31,8 @@ async function makeRequest<T>(
     const response = await fetch(`${API_BASE}${endpoint}`, {
       method,
       credentials: 'same-origin',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: body ? JSON.stringify(body) : undefined,
+      headers: { 'Content-Type': 'application/json' },
+      body: body !== undefined ? JSON.stringify(body) : undefined,
     });
 
     if (!response.ok) {
@@ -59,7 +57,7 @@ export const authClient = {
     makeRequest<AuthUser>('POST', '/auth/sign-up/email', { email, password, name }),
 
   signOut: (): Promise<void> =>
-    makeRequest<void>('POST', '/auth/sign-out'),
+    makeRequest<void>('POST', '/auth/sign-out', {}),
 
   getMe: (): Promise<AuthUser> =>
     makeRequest<AuthUser>('GET', '/me'),
@@ -68,7 +66,7 @@ export const authClient = {
     makeRequest<{ fplTeamId: number }>('PUT', '/me/team', { teamId }),
 
   requestPasswordReset: (email: string): Promise<void> =>
-    makeRequest<void>('POST', '/auth/forget-password', {
+    makeRequest<void>('POST', '/auth/request-password-reset', {
       email,
       redirectTo: `${window.location.origin}/reset-password`,
     }),
