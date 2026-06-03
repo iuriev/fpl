@@ -60,6 +60,8 @@ export const copy = {
   resetPasswordMismatchError: "Passwords don't match.",
   resetPasswordInvalidToken: 'This reset link is invalid or has expired.',
   resetPasswordRequestNew: 'Request a new one',
+  resetPasswordError: 'Something went wrong. Please try again.',
+  resetPasswordBackToSignIn: 'Back to sign in',
 
   // Demo gate dialog
   demoGateTitle: 'Sign in to unlock',
