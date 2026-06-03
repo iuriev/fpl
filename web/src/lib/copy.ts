@@ -208,6 +208,13 @@ export const copy = {
   topPlayersLoadError: "Couldn't load top players",
   topPlayersRetry: 'Try again',
   topPlayersNavLink: 'Top Players',
+
+  // Leaderboard screen
+  leaderboardTitle: 'Leaderboard',
+  leaderboardNavLink: 'Leaderboard',
+  leaderboardBack: 'Squad',
+  leaderboardLoadError: 'Failed to load leaderboard',
+  leaderboardRetry: 'Retry',
   priceChangesNavLink: 'Price changes',
   priceChangesTitle: 'Price changes',
   priceChangesActualTab: 'Actual',

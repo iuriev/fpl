@@ -6,6 +6,7 @@ import { useGameweeks, useLeaderboardGw, useLeaderboardSeason } from '@/api/quer
 import { BottomSheet } from '@/components/ui/BottomSheet/BottomSheet';
 import { Button } from '@/components/ui/Button/Button';
 import { ScreenHeader } from '@/components/ui/ScreenHeader/ScreenHeader';
+import { copy } from '@/lib/copy';
 import { useFollowPlayer } from '@/lib/use-follow-player';
 import type { LeaderboardPlayer } from '@/types';
 import { MAX_GAMEWEEK } from '@/types';
@@ -120,9 +121,9 @@ export const LeaderboardScreen: React.FC = () => {
 
   return (
     <div className={styles.screen}>
-      <ScreenHeader backTo="/" backLabel="Squad" title="Leaderboard" />
+      <ScreenHeader backTo="/" backLabel={copy.leaderboardBack} title={copy.leaderboardTitle} />
 
-      <div className={styles.tabs} role="tablist" aria-label="Leaderboard">
+      <div className={styles.tabs} role="tablist" aria-label={copy.leaderboardTitle}>
         <button
           role="tab"
           aria-selected={activeTab === 'gw'}
@@ -161,8 +162,8 @@ export const LeaderboardScreen: React.FC = () => {
 
         {isError && (
           <div className={styles.stateCenter}>
-            <p className={styles.stateText}>Failed to load leaderboard</p>
-            <Button variant="secondary" onClick={() => refetch()}>Retry</Button>
+            <p className={styles.stateText}>{copy.leaderboardLoadError}</p>
+            <Button variant="secondary" onClick={() => refetch()}>{copy.leaderboardRetry}</Button>
           </div>
         )}
 

@@ -5,6 +5,7 @@ export type { GameweekHistoryScreenProps } from './GameweekHistoryScreen/Gamewee
 export { GameweekHistoryScreen } from './GameweekHistoryScreen/GameweekHistoryScreen';
 export type { GameweekReviewScreenProps } from './GameweekReviewScreen/GameweekReviewScreen';
 export { GameweekReviewScreen } from './GameweekReviewScreen/GameweekReviewScreen';
+export { LeaderboardScreen } from './LeaderboardScreen/LeaderboardScreen';
 export type { LeaguesStatsScreenProps } from './LeaguesStatsScreen/LeaguesStatsScreen';
 export { LeaguesStatsScreen } from './LeaguesStatsScreen/LeaguesStatsScreen';
 export { LeagueStandingsScreen } from './LeagueStandingsScreen/LeagueStandingsScreen';

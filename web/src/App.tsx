@@ -23,6 +23,7 @@ import {
   ForgotPasswordScreen,
   GameweekHistoryScreen,
   GameweekReviewScreen,
+  LeaderboardScreen,
   LeaguesStatsScreen,
   LeagueStandingsScreen,
   PlayerWatchlistScreen,
@@ -118,6 +119,14 @@ function AppContent() {
         element={
           <AuthAndTeamProtectedRoute>
             <TopPlayersScreen />
+          </AuthAndTeamProtectedRoute>
+        }
+      />
+      <Route
+        path="/leaderboard"
+        element={
+          <AuthAndTeamProtectedRoute>
+            <LeaderboardScreen />
           </AuthAndTeamProtectedRoute>
         }
       />
