@@ -66,4 +66,13 @@ export const authClient = {
 
   saveTeam: (teamId: number): Promise<{ fplTeamId: number }> =>
     makeRequest<{ fplTeamId: number }>('PUT', '/me/team', { teamId }),
+
+  requestPasswordReset: (email: string): Promise<void> =>
+    makeRequest<void>('POST', '/auth/forget-password', {
+      email,
+      redirectTo: `${window.location.origin}/reset-password`,
+    }),
+
+  resetPassword: (token: string, newPassword: string): Promise<void> =>
+    makeRequest<void>('POST', '/auth/reset-password', { token, newPassword }),
 };
