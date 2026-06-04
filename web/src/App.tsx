@@ -22,11 +22,10 @@ import {
   EntryScreen,
   FixturesCalendarScreen,
   ForgotPasswordScreen,
-  GameweekHistoryScreen,
   GameweekReviewScreen,
   LeaderboardScreen,
-  LeaguesStatsScreen,
   LeagueStandingsScreen,
+  MyStatsScreen,
   PlayerWatchlistScreen,
   PredictedPointsScreen,
   PriceChangesScreen,
@@ -84,18 +83,10 @@ function AppContent() {
       <Route path="/reset-password" element={<ResetPasswordScreen />} />
       <Route path="/entry" element={<EntryScreen />} />
       <Route
-        path="/history"
-        element={
-          <AuthAndTeamProtectedRoute>
-            <GameweekHistoryScreen teamId={myTeamId!} />
-          </AuthAndTeamProtectedRoute>
-        }
-      />
-      <Route
         path="/stats"
         element={
           <AuthAndTeamProtectedRoute>
-            <LeaguesStatsScreen teamId={myTeamId!} />
+            <MyStatsScreen teamId={myTeamId!} />
           </AuthAndTeamProtectedRoute>
         }
       />

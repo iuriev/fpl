@@ -639,7 +639,7 @@ For reference — features that are live in the codebase:
 - **Team Info Panel** — drawer with team/manager stats
 - **Monobank donation banner (MON-03)** — pinned footer in team sidebar → Monobank jar; OpenSpec `archive/2026-06-03-mon-03-monobank-donation-banner`
 - **Team of the Week Screen** — best XI for a GW
-- **Gameweek History Screen** — per-GW points history chart/table
+- **My Stats screen** — league rankings and per-GW history (tabbed on `/stats`)
 - **Leagues Stats Screen** — mini-league standings
 - **Top Players Screen** — top performers for a GW
 - **Transfer Planner** — pick players to transfer in/out, budget tracking, squad validation; saved draft syncs to account via `/api/me/transfer-draft` (PLAN-00)

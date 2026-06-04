@@ -72,7 +72,7 @@ describe('SquadScreen header navigation', () => {
   });
 
   it('shows custom back label from location state', () => {
-    renderScreen(false, { returnTo: '/history', backLabel: 'History' });
+    renderScreen(false, { returnTo: '/stats?tab=history', backLabel: 'History' });
     expect(screen.getByRole('button', { name: /^history$/i })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /open team info/i })).toBeNull();
   });

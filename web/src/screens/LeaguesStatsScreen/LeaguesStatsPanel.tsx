@@ -3,15 +3,15 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useLeagues } from '@/api/queries';
 import { Button } from '@/components/ui/Button/Button';
-import { ScreenHeader } from '@/components/ui/ScreenHeader/ScreenHeader';
 import { copy } from '@/lib/copy';
 import type { LeagueEntry } from '@/types';
 
 import { formatRank, getLeagueRankDirection, type RankDirection } from './leagues-helpers';
 import styles from './LeaguesStatsScreen.module.css';
 
-export interface LeaguesStatsScreenProps {
+export interface LeaguesStatsPanelProps {
   teamId: number;
+  active: boolean;
 }
 
 const DIR_SYMBOL: Record<RankDirection, string> = {
@@ -84,11 +84,11 @@ function LeaguesSkeleton() {
   );
 }
 
-export const LeaguesStatsScreen: React.FC<LeaguesStatsScreenProps> = ({ teamId }) => {
+export const LeaguesStatsPanel: React.FC<LeaguesStatsPanelProps> = ({ teamId, active }) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const { data, isLoading, isError, refetch } = useLeagues(teamId);
+  const { data, isLoading, isError, refetch } = useLeagues(active ? teamId : null);
 
   const gwParam = searchParams.get('gw');
 
@@ -99,46 +99,44 @@ export const LeaguesStatsScreen: React.FC<LeaguesStatsScreenProps> = ({ teamId }
     [navigate, gwParam],
   );
 
+  if (!active) return null;
+
   return (
-    <div className={styles.screen}>
-      <ScreenHeader title={copy.statsTitle} teamId={teamId} />
+    <div className={styles.body}>
+      {isLoading && <LeaguesSkeleton />}
 
-      <div className={styles.body}>
-        {isLoading && <LeaguesSkeleton />}
+      {isError && (
+        <div className={styles.stateCenter}>
+          <p className={styles.stateText}>{copy.statsLoadError}</p>
+          <Button variant="secondary" onClick={() => refetch()}>
+            {copy.statsRetry}
+          </Button>
+        </div>
+      )}
 
-        {isError && (
-          <div className={styles.stateCenter}>
-            <p className={styles.stateText}>{copy.statsLoadError}</p>
-            <Button variant="secondary" onClick={() => refetch()}>
-              {copy.statsRetry}
-            </Button>
-          </div>
-        )}
+      {data && data.classic.length === 0 && data.h2h.length === 0 && (
+        <div className={styles.stateCenter}>
+          <p className={styles.stateText}>{copy.statsNoLeagues}</p>
+        </div>
+      )}
 
-        {data && data.classic.length === 0 && data.h2h.length === 0 && (
-          <div className={styles.stateCenter}>
-            <p className={styles.stateText}>{copy.statsNoLeagues}</p>
-          </div>
-        )}
+      {data && data.classic.length > 0 && (
+        <LeagueSection
+          title={copy.statsGeneralLeagues}
+          leagues={data.classic}
+          onLeagueClick={handleLeagueClick}
+        />
+      )}
 
-        {data && data.classic.length > 0 && (
-          <LeagueSection
-            title={copy.statsGeneralLeagues}
-            leagues={data.classic}
-            onLeagueClick={handleLeagueClick}
-          />
-        )}
-
-        {data && data.h2h.length > 0 && (
-          <LeagueSection
-            title={copy.statsH2HLeagues}
-            leagues={data.h2h}
-            onLeagueClick={handleLeagueClick}
-          />
-        )}
-      </div>
+      {data && data.h2h.length > 0 && (
+        <LeagueSection
+          title={copy.statsH2HLeagues}
+          leagues={data.h2h}
+          onLeagueClick={handleLeagueClick}
+        />
+      )}
     </div>
   );
 };
 
-LeaguesStatsScreen.displayName = 'LeaguesStatsScreen';
+LeaguesStatsPanel.displayName = 'LeaguesStatsPanel';

@@ -3,16 +3,18 @@ import { useNavigate } from 'react-router-dom';
 
 import { useHistory } from '@/api/queries';
 import { Button } from '@/components/ui/Button/Button';
-import { ScreenHeader } from '@/components/ui/ScreenHeader/ScreenHeader';
 import { copy } from '@/lib/copy';
 import type { HistoryGameweek } from '@/types';
 
 import styles from './GameweekHistoryScreen.module.css';
 import { formatNumber, formatValue, getRankDirection, type RankDirection } from './history-helpers';
 
-export interface GameweekHistoryScreenProps {
+export interface GameweekHistoryPanelProps {
   teamId: number;
+  active: boolean;
 }
+
+const HISTORY_RETURN_TO = '/stats?tab=history';
 
 const DIR_SYMBOL: Record<RankDirection, string> = {
   up: '↑',
@@ -31,42 +33,38 @@ function RankDir({ current, previous }: { current: number; previous: number | un
   return <span className={DIR_CLASS[dir]}>{DIR_SYMBOL[dir]}</span>;
 }
 
-export const GameweekHistoryScreen: React.FC<GameweekHistoryScreenProps> = ({ teamId }) => {
-  const { data, isLoading, isError, refetch } = useHistory(teamId);
+export const GameweekHistoryPanel: React.FC<GameweekHistoryPanelProps> = ({ teamId, active }) => {
+  const { data, isLoading, isError, refetch } = useHistory(active ? teamId : null);
+
+  if (!active) return null;
 
   return (
-    <div className={styles.screen}>
-      <ScreenHeader title={copy.historyTitle} teamId={teamId} />
+    <div className={styles.body}>
+      <span className={styles.sectionLabel}>{copy.historyThisSeason}</span>
 
-      <div className={styles.body}>
-        <span className={styles.sectionLabel}>{copy.historyThisSeason}</span>
+      {isLoading && <HistorySkeleton />}
 
-        {isLoading && <HistorySkeleton />}
+      {isError && (
+        <div className={styles.stateCenter}>
+          <p className={styles.stateText}>{copy.historyLoadError}</p>
+          <Button variant="secondary" onClick={() => refetch()}>
+            {copy.historyRetry}
+          </Button>
+        </div>
+      )}
 
-        {isError && (
-          <div className={styles.stateCenter}>
-            <p className={styles.stateText}>{copy.historyLoadError}</p>
-            <Button variant="secondary" onClick={() => refetch()}>
-              {copy.historyRetry}
-            </Button>
-          </div>
-        )}
+      {data && data.gameweeks.length === 0 && (
+        <div className={styles.stateCenter}>
+          <p className={styles.stateText}>{copy.historyEmpty}</p>
+        </div>
+      )}
 
-        {data && data.gameweeks.length === 0 && (
-          <div className={styles.stateCenter}>
-            <p className={styles.stateText}>{copy.historyEmpty}</p>
-          </div>
-        )}
-
-        {data && data.gameweeks.length > 0 && (
-          <HistoryTable gameweeks={data.gameweeks} />
-        )}
-      </div>
+      {data && data.gameweeks.length > 0 && <HistoryTable gameweeks={data.gameweeks} />}
     </div>
   );
 };
 
-GameweekHistoryScreen.displayName = 'GameweekHistoryScreen';
+GameweekHistoryPanel.displayName = 'GameweekHistoryPanel';
 
 function HistoryTable({ gameweeks }: { gameweeks: HistoryGameweek[] }) {
   const navigate = useNavigate();
@@ -97,7 +95,7 @@ function HistoryTable({ gameweeks }: { gameweeks: HistoryGameweek[] }) {
                 className={styles.clickableRow}
                 onClick={() =>
                   navigate(`/?gw=${row.gw}`, {
-                    state: { returnTo: '/history', backLabel: copy.squadBackToHistory },
+                    state: { returnTo: HISTORY_RETURN_TO, backLabel: copy.squadBackToHistory },
                   })
                 }
               >

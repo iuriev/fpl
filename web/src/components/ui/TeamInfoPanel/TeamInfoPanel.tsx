@@ -37,7 +37,6 @@ const NAV_LINKS: { to: string; label: () => string; featured?: boolean; end?: bo
   { to: '/predicted-points', label: () => copy.predictedPointsNavLink },
   { to: '/price-changes', label: () => copy.priceChangesNavLink },
   { to: '/fixtures', label: () => copy.fixturesCalendarNavLink },
-  { to: '/history', label: () => copy.teamInfoGwHistory },
 ];
 
 export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({

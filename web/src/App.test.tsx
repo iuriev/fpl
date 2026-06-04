@@ -15,9 +15,8 @@ vi.mock('@/screens', () => ({
   SignUpScreen: () => <div data-testid="sign-up-screen" />,
   ForgotPasswordScreen: () => <div data-testid="forgot-password-screen" />,
   ResetPasswordScreen: () => <div data-testid="reset-password-screen" />,
-  GameweekHistoryScreen: () => <div data-testid="history-screen" />,
   GameweekReviewScreen: () => <div data-testid="review-screen" />,
-  LeaguesStatsScreen: () => <div data-testid="stats-screen" />,
+  MyStatsScreen: () => <div data-testid="stats-screen" />,
   LeagueStandingsScreen: () => <div data-testid="standings-screen" />,
   TeamOfTheWeekScreen: () => <div data-testid="totw-screen" />,
   TopPlayersScreen: () => <div data-testid="top-players-screen" />,
@@ -55,10 +54,9 @@ import { useMyTeam } from '@/lib/my-team/MyTeamContext';
 import {
   EntryScreen,
   ForgotPasswordScreen,
-  GameweekHistoryScreen,
   GameweekReviewScreen,
-  LeaguesStatsScreen,
   LeagueStandingsScreen,
+  MyStatsScreen,
   PlayerWatchlistScreen,
   ResetPasswordScreen,
   SignInScreen,
@@ -112,18 +110,10 @@ function AppContent() {
       <Route path="/reset-password" element={<ResetPasswordScreen />} />
       <Route path="/entry" element={<EntryScreen />} />
       <Route
-        path="/history"
-        element={
-          <AuthAndTeamProtectedRoute>
-            <GameweekHistoryScreen teamId={myTeamId!} />
-          </AuthAndTeamProtectedRoute>
-        }
-      />
-      <Route
         path="/stats"
         element={
           <AuthAndTeamProtectedRoute>
-            <LeaguesStatsScreen teamId={myTeamId!} />
+            <MyStatsScreen teamId={myTeamId!} />
           </AuthAndTeamProtectedRoute>
         }
       />
@@ -292,22 +282,22 @@ describe('App routing — guest view /?teamId=', () => {
 });
 
 describe('App routing — AuthAndTeamProtectedRoute', () => {
-  it('redirects to /sign-in for unauthenticated user on /history', () => {
-    renderAt('/history', makeAuthCtx(), makeMyTeamCtx());
+  it('redirects to /sign-in for unauthenticated user on /stats', () => {
+    renderAt('/stats', makeAuthCtx(), makeMyTeamCtx());
     expect(screen.getByTestId('sign-in-screen')).toBeInTheDocument();
   });
 
-  it('redirects to /entry when user has no team id on /history', () => {
-    renderAt('/history', makeAuthCtx({ user: { ...baseUser } }), makeMyTeamCtx({ myTeamId: null }));
+  it('redirects to /entry when user has no team id on /stats', () => {
+    renderAt('/stats', makeAuthCtx({ user: { ...baseUser } }), makeMyTeamCtx({ myTeamId: null }));
     expect(screen.getByTestId('entry-screen')).toBeInTheDocument();
   });
 
   it('renders protected screen when user and team id are present', () => {
     renderAt(
-      '/history',
+      '/stats',
       makeAuthCtx({ user: { ...baseUser, fplTeamId: 99 } }),
       makeMyTeamCtx({ myTeamId: 99 })
     );
-    expect(screen.getByTestId('history-screen')).toBeInTheDocument();
+    expect(screen.getByTestId('stats-screen')).toBeInTheDocument();
   });
 });

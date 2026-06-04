@@ -176,6 +176,8 @@ export const copy = {
 
   // Leagues stats screen
   statsTitle: 'My Stats',
+  statsTabLeagues: 'Leagues',
+  statsTabHistory: 'My GW history',
   statsBack: 'Squad',
   statsGeneralLeagues: 'General Leagues',
   statsH2HLeagues: 'Head-to-Head Leagues',
