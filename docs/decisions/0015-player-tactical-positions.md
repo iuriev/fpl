@@ -2,7 +2,9 @@
 
 ## Status
 
-Accepted (v2 — see `docs/predicted-lineups-positions.md`)
+Accepted (v2 — see `docs/predicted-lineups-positions.md`). **Ingest superseded by
+[ADR 0016](0016-transfermarkt-tactical-positions.md)** (Transfermarkt offline scrape replaces
+heuristic seed).
 
 ## Context
 

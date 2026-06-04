@@ -222,32 +222,56 @@ function buildTeamLineup(
   };
 }
 
+const SUMMARY_LOAD_LOG_EVERY = 50;
+
 async function loadSummariesForTeams(
   bootstrap: FPLBootstrapStatic,
   teamIds: number[],
   season: string
 ): Promise<Map<number, FPLElementSummary>> {
-  const ids = new Set<number>();
-  for (const teamId of teamIds) {
-    for (const el of activeSquadElements(bootstrap, teamId)) {
-      ids.add(el.id);
-    }
-  }
+  const ids = [...new Set(
+    teamIds.flatMap((teamId) =>
+      activeSquadElements(bootstrap, teamId).map((el) => el.id)
+    )
+  )];
+  logPredictedLineups(`loading ${ids.length} element summaries from cache (DB per player)`);
+  const started = Date.now();
   const map = new Map<number, FPLElementSummary>();
-  for (const id of ids) {
+  let loaded = 0;
+  for (let i = 0; i < ids.length; i++) {
+    const id = ids[i]!;
     const summary = await getCachedElementSummary(db, season, id);
-    if (summary) map.set(id, summary);
+    if (summary) {
+      map.set(id, summary);
+      loaded++;
+    }
+    const done = i + 1;
+    if (done === ids.length || done % SUMMARY_LOAD_LOG_EVERY === 0) {
+      logPredictedLineups(
+        `summaries ${done}/${ids.length} checked, ${loaded} hit (${Date.now() - started}ms)`
+      );
+    }
   }
   return map;
 }
 
+function logPredictedLineups(message: string): void {
+  console.log(`[predicted-lineups] ${message}`);
+}
+
 export async function getPredictedLineups(
   gwParam?: number,
-  opts?: { skipReadyGuard?: boolean }
+  opts?: { skipReadyGuard?: boolean; refreshCache?: boolean }
 ): Promise<PredictedLineupsResponse> {
   const cacheKey = `predicted-lineups:${gwParam ?? 'next'}`;
+  if (opts?.refreshCache) {
+    cacheLayer.remove(cacheKey);
+  }
   const cached = cacheLayer.get<PredictedLineupsResponse>(cacheKey);
-  if (cached) return cached;
+  if (cached) {
+    logPredictedLineups(`cache hit gw=${cached.gameweek} key=${cacheKey}`);
+    return cached;
+  }
 
   if (!opts?.skipReadyGuard && !getLineupsWarmupStatus().ready) {
     throw new LineupsWarmingError();
@@ -257,25 +281,44 @@ export async function getPredictedLineups(
   const bootstrap = await getOrFetchBootstrap(db);
   const season = deriveSeason(bootstrap.events);
   const targetGw = gwParam ?? resolveNextGw(bootstrap);
-  console.log(
-    `[predicted-lineups] building cache gw=${targetGw} season=${season}${opts?.skipReadyGuard ? ' (warmup)' : ''}`
-  );
+  const warmupTag = opts?.skipReadyGuard
+    ? opts.refreshCache
+      ? ' (warmup full)'
+      : ' (warmup hot)'
+    : '';
+  logPredictedLineups(`building cache gw=${targetGw} season=${season}${warmupTag}`);
 
+  const fixturesStarted = Date.now();
+  logPredictedLineups('fetching all fixtures and upcoming fixture map');
   const [allFixtures, upcoming] = await Promise.all([
     getOrFetchAllFixtures(db),
     fixturesService.getUpcomingFixtures(),
   ]);
-
-  const teamIds = bootstrap.teams.map((t) => t.id);
-  const [summaries, previousSeasonFormations] = await Promise.all([
-    loadSummariesForTeams(bootstrap, teamIds, season),
-    loadPreviousSeasonFormationsByTeam(db, season),
-  ]);
-
-  console.log(
-    `[predicted-lineups] loaded ${summaries.size} element summaries for ${teamIds.length} teams`
+  logPredictedLineups(
+    `fixtures ready: ${allFixtures.length} rows, ${Object.keys(upcoming).length} teams with upcoming (${Date.now() - fixturesStarted}ms)`
   );
 
+  const teamIds = bootstrap.teams.map((t) => t.id);
+  const depsStarted = Date.now();
+  logPredictedLineups(
+    `loading summaries + previous-season formations for ${teamIds.length} teams`
+  );
+  const [summaries, previousSeasonFormations] = await Promise.all([
+    loadSummariesForTeams(bootstrap, teamIds, season),
+    loadPreviousSeasonFormationsByTeam(db, season).then((formations) => {
+      logPredictedLineups(
+        `previous-season formations: ${formations.size} teams (${Date.now() - depsStarted}ms)`
+      );
+      return formations;
+    }),
+  ]);
+
+  logPredictedLineups(
+    `dependencies ready: ${summaries.size} summaries, ${previousSeasonFormations.size} prior formations (${Date.now() - depsStarted}ms)`
+  );
+
+  const lineupsStarted = Date.now();
+  logPredictedLineups(`building ${teamIds.length} team lineups`);
   const teams = teamIds.map((teamId) =>
     buildTeamLineup(
       teamId,
@@ -287,11 +330,10 @@ export async function getPredictedLineups(
       previousSeasonFormations.get(teamId) ?? null
     )
   );
+  logPredictedLineups(`team lineups built in ${Date.now() - lineupsStarted}ms`);
 
   const result: PredictedLineupsResponse = { gameweek: targetGw, teams };
   cacheLayer.set(cacheKey, result, cacheLayer.ttl.PREDICTED_LINEUPS);
-  console.log(
-    `[predicted-lineups] cache stored gw=${targetGw} in ${Date.now() - buildStarted}ms`
-  );
+  logPredictedLineups(`cache stored gw=${targetGw} in ${Date.now() - buildStarted}ms`);
   return result;
 }

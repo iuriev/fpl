@@ -19,6 +19,14 @@ describe('Cache', () => {
       expect(result).toBeNull();
     });
 
+    it('remove deletes a key without clearing others', () => {
+      cache.set('a', 1, 100);
+      cache.set('b', 2, 100);
+      cache.remove('a');
+      expect(cache.get('a')).toBeNull();
+      expect(cache.get('b')).toBe(2);
+    });
+
     it('handles complex objects', () => {
       const obj = { id: 1, name: 'Test', items: [1, 2, 3] };
       cache.set('obj-key', obj, 100);

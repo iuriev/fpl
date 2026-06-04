@@ -21,7 +21,8 @@ predicted elevens. Implementation will evolve; this document is the source of tr
 | `st` | FWD | C |
 
 FPL only exposes `element_type` (GK/DEF/MID/FWD). Roles come from `player-tactical-roles.json`
-(seed heuristics + manual overrides).
+built by **offline Transfermarkt squad ingest** (`npm run lineups:ingest-tm -w proxy`) plus
+manual overrides.
 
 ## Formation row quotas (hard rules when counts match)
 
@@ -94,28 +95,27 @@ Among eligible players, quotas are satisfied using fill priority above.
    - Fill remaining slots up to row count by score.
 4. `assignPlayersToSlots`: map picked players to lane/role slots using the same fill priority.
 
-## Seed heuristics (`seed-player-tactical-roles.mjs`)
+## Transfermarkt ingest
 
-- **DEF:** top defcon/influence → `cb`; widest two → `lb` + `rb` (by id order L/R).
-- **MID:** high defcon → `dm`; else `cm`; highest threat among centrals → `am`; widest two
-  → `lm` + `rm`.
-- **FWD:** widest → `lw` / `rw`; else `st`.
-- **Secondary (default):** `lb`/`rb` → `cb`; `cb` → `lb`+`rb` for top two CBs only;
-  `dm`↔`cm`; `cm`→`am` for high threat.
+See `proxy/scripts/transfermarkt/README.md`. Summary:
+
+- Scrape each PL club squad page (~4s delay between clubs).
+- Map TM position label → `TacticalRole` + `lane`.
+- Write `player-tactical-roles.json` and `player-lanes.json`.
+- Reports: `proxy/data/transfermarkt/match-report.json`, `unmapped.json`.
+
+```bash
+npm run lineups:ingest-tm -w proxy
+```
 
 ## Manual overrides
 
 `proxy/scripts/player-tactical-role-overrides.json` — keyed by team short code and
-`web_name`. Wins over seed.
+`web_name`. Wins over Transfermarkt ingest.
 
-After edits:
+## Deprecated
 
-```bash
-npm run lineups:seed-positions -w proxy
-```
-
-Or set `LINEUPS_SEED_ON_START=true` in `proxy/.env` to run the same scripts automatically
-before lineups warmup on each proxy start (one extra FPL `bootstrap-static` fetch per restart).
+`seed-player-tactical-roles.mjs` (FPL-stat heuristics) — do not use; kept for reference only.
 
 ## Future work
 

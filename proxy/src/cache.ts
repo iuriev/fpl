@@ -21,6 +21,10 @@ export function set<T>(key: string, data: T, ttlSeconds: number): void {
   cache.set(key, { data, expiresAt });
 }
 
+export function remove(key: string): void {
+  cache.delete(key);
+}
+
 export function clearCache(): void {
   cache.clear();
 }

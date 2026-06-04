@@ -24,7 +24,7 @@ describe('lineups-seed-on-start', () => {
     expect(isLineupsSeedOnStartEnabled()).toBe(true);
   });
 
-  it('runs both seed scripts when enabled', async () => {
+  it('runs Transfermarkt ingest when enabled', async () => {
     process.env.LINEUPS_SEED_ON_START = 'true';
     spawnMock.mockImplementation(() => ({
       on(event: string, cb: (code?: number) => void) {
@@ -34,10 +34,9 @@ describe('lineups-seed-on-start', () => {
 
     await maybeRunLineupsSeedOnStart();
 
-    expect(spawnMock).toHaveBeenCalledTimes(2);
-    const scripts = spawnMock.mock.calls.map((c) => String(c[1][0]));
-    expect(scripts.some((p) => p.endsWith('seed-player-tactical-roles.mjs'))).toBe(true);
-    expect(scripts.some((p) => p.endsWith('seed-player-lanes.mjs'))).toBe(true);
+    expect(spawnMock).toHaveBeenCalledTimes(1);
+    const args = spawnMock.mock.calls[0];
+    expect(String(args[1]?.[1] ?? '')).toContain('ingest-transfermarkt-positions.ts');
   });
 
   it('skips spawn when disabled', async () => {

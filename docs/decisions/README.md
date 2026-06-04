@@ -31,7 +31,8 @@ it behaves. Avoid duplicating: link between them instead.
 | [0012](0012-drop-screenshot-qa-gate.md) | Drop screenshot QA gate | Accepted |
 | [0013](0013-db-persistence-consideration.md) | Persistent storage to reduce FPL API request volume | Superseded by 0015 |
 | [0014](0014-native-css-primitives.md) | Prefer native CSS: Popover API, :has(), @starting-style | Accepted |
-| [0015](0015-player-tactical-positions.md) | Tactical roles (CB/FB/DM/…) for predicted lineups | Accepted |
+| [0015](0015-player-tactical-positions.md) | Tactical roles (CB/FB/DM/…) for predicted lineups | Accepted (ingest superseded by 0016) |
+| [0016](0016-transfermarkt-tactical-positions.md) | Transfermarkt offline ingest for tactical registry | Accepted |
 | [0015](0015-database-postgres.md) | Adopt Postgres (Supabase) as the user-data store | Accepted |
 | [0016](0016-auth-better-auth.md) | Use better-auth for authentication | Accepted |
 | [0017](0017-session-transport-cookie.md) | Session transport — HttpOnly cookie | Accepted |

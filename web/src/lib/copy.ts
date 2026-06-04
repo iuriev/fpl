@@ -9,6 +9,11 @@ export const copy = {
   appTitle: 'FPL Squad Viewer',
   appSubtitle: 'See your FPL squad and points - just enter your team ID',
 
+  startupMaintenanceTitle: 'We’re updating',
+  startupMaintenanceBody:
+    'Loading the latest squad and lineup data. You’ll be able to use the app again in a few minutes.',
+  startupMaintenanceProgressLabel: 'Startup progress',
+
   // Entry screen
   entryHeadlineLine1: 'Your squad.',
   entryHeadlineAccent: 'Every gameweek.',

@@ -19,7 +19,8 @@
     "pred:score": "tsx --env-file=.env src/pred-cli.ts score",
     "pred:verify": "tsx --env-file=.env src/pred-verify.ts",
     "lineups:warmup": "tsx --env-file=.env src/lineups-warmup-cli.ts",
-    "lineups:seed-positions": "node scripts/seed-player-tactical-roles.mjs && node scripts/seed-player-lanes.mjs"
+    "lineups:ingest-tm": "tsx scripts/ingest-transfermarkt-positions.ts",
+    "lineups:seed-positions": "npm run lineups:ingest-tm"
   },
   "dependencies": {
     "@hono/node-server": "^2.0.3",

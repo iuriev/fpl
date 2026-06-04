@@ -7,6 +7,7 @@ import {
   CalendarResponse,
   EntryResponse,
   GameweeksResponse,
+  HealthResponse,
   HistoryResponse,
   LeaderboardGwResponse,
   LeaderboardSeasonResponse,
@@ -78,6 +79,8 @@ function priceQuery(
 }
 
 export const api = {
+  getHealth: () => request<HealthResponse>('/health'),
+
   getMe: () =>
     request<{
       id: string;

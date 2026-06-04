@@ -57,8 +57,12 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function isWarmupEnabled(): boolean {
+export function isLineupsWarmupEnabled(): boolean {
   return process.env.LINEUPS_WARMUP_ENABLED !== 'false';
+}
+
+function isWarmupEnabled(): boolean {
+  return isLineupsWarmupEnabled();
 }
 
 function startDelayMs(): number {
@@ -172,7 +176,8 @@ async function warmElementIds(
 
 export async function runLineupsWarmup(db: Db): Promise<void> {
   if (!isWarmupEnabled()) {
-    status.phase = 'idle';
+    status.phase = 'done';
+    status.ready = true;
     return;
   }
   if (running) {
@@ -232,7 +237,9 @@ export async function runLineupsWarmup(db: Db): Promise<void> {
       `phase=lineups_hot ready=${status.ready} (${formatLineupsWarmupStatus()}) — first predicted-lineups cache build`
     );
     const hotCacheStart = Date.now();
-    await predictedLineupService.getPredictedLineups(undefined, { skipReadyGuard: true });
+    await predictedLineupService.getPredictedLineups(undefined, {
+      skipReadyGuard: true,
+    });
     if (isShuttingDown()) return;
     logWarmup(
       `predicted-lineups initial cache ready in ${Date.now() - hotCacheStart}ms — API may return 200 now`
@@ -250,7 +257,10 @@ export async function runLineupsWarmup(db: Db): Promise<void> {
     status.phase = 'lineups_full';
     logWarmup('phase=lineups_full — refreshing predicted-lineups with full squad coverage');
     const fullCacheStart = Date.now();
-    await predictedLineupService.getPredictedLineups(undefined, { skipReadyGuard: true });
+    await predictedLineupService.getPredictedLineups(undefined, {
+      skipReadyGuard: true,
+      refreshCache: true,
+    });
     logWarmup(`predicted-lineups full cache refreshed in ${Date.now() - fullCacheStart}ms`);
 
     status.phase = 'done';
@@ -267,6 +277,8 @@ export async function runLineupsWarmup(db: Db): Promise<void> {
 
 export function startLineupsWarmup(db: Db): void {
   if (!isWarmupEnabled()) {
+    status.phase = 'done';
+    status.ready = true;
     logWarmup('disabled (LINEUPS_WARMUP_ENABLED=false)');
     return;
   }

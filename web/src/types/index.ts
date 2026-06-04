@@ -484,3 +484,34 @@ export interface PredictionsResponse {
   ready: boolean;
   players: PlayerGameweekPrediction[];
 }
+
+export type LineupsWarmupPhase =
+  | 'idle'
+  | 'waiting'
+  | 'fixtures'
+  | 'hot'
+  | 'lineups_hot'
+  | 'cold'
+  | 'lineups_full'
+  | 'done'
+  | 'error';
+
+export interface LineupsWarmupStatus {
+  phase: LineupsWarmupPhase;
+  ready: boolean;
+  hotDone: number;
+  hotTotal: number;
+  coldDone: number;
+  coldTotal: number;
+  lastError: string | null;
+  startedAt: string | null;
+}
+
+export type StartupSeedPhase = 'pending' | 'running' | 'done' | 'skipped';
+
+export interface HealthResponse {
+  status: 'ok';
+  ready: boolean;
+  seed: { phase: StartupSeedPhase };
+  lineupsWarmup: LineupsWarmupStatus;
+}

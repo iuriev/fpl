@@ -13,6 +13,8 @@ import {
   PlayerWatchlistRepositoryContext,
 } from '@/lib/player-watchlist-repository';
 import { PremiumUpsellProvider } from '@/lib/premium-upsell/PremiumUpsellProvider';
+import { StartupGate } from '@/lib/startup-readiness/StartupGate';
+import { StartupReadinessProvider } from '@/lib/startup-readiness/StartupReadinessProvider';
 import { ToastProvider } from '@/lib/toast';
 import {
   ApiWatchlistRepository,
@@ -176,23 +178,27 @@ function AppContent() {
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <WatchlistRepositoryContext.Provider value={watchlistRepo}>
-        <PlayerWatchlistRepositoryContext.Provider value={playerWatchlistRepo}>
-          <ToastProvider>
-            <PlayerWatchlistPremiumProvider>
-              <BrowserRouter>
-                <AuthProvider>
-                  <MyTeamProvider>
-                    <PremiumUpsellProvider>
-                      <AppContent />
-                    </PremiumUpsellProvider>
-                  </MyTeamProvider>
-                </AuthProvider>
-              </BrowserRouter>
-            </PlayerWatchlistPremiumProvider>
-          </ToastProvider>
-        </PlayerWatchlistRepositoryContext.Provider>
-      </WatchlistRepositoryContext.Provider>
+      <StartupReadinessProvider>
+        <StartupGate>
+          <WatchlistRepositoryContext.Provider value={watchlistRepo}>
+            <PlayerWatchlistRepositoryContext.Provider value={playerWatchlistRepo}>
+              <ToastProvider>
+                <PlayerWatchlistPremiumProvider>
+                  <BrowserRouter>
+                    <AuthProvider>
+                      <MyTeamProvider>
+                        <PremiumUpsellProvider>
+                          <AppContent />
+                        </PremiumUpsellProvider>
+                      </MyTeamProvider>
+                    </AuthProvider>
+                  </BrowserRouter>
+                </PlayerWatchlistPremiumProvider>
+              </ToastProvider>
+            </PlayerWatchlistRepositoryContext.Provider>
+          </WatchlistRepositoryContext.Provider>
+        </StartupGate>
+      </StartupReadinessProvider>
     </QueryClientProvider>
   );
 }

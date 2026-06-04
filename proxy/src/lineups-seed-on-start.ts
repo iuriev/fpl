@@ -8,10 +8,12 @@ export function isLineupsSeedOnStartEnabled(): boolean {
   return process.env.LINEUPS_SEED_ON_START === 'true';
 }
 
-function runNodeScript(scriptName: string): Promise<void> {
-  const scriptPath = join(scriptsDir, scriptName);
+function runTransfermarktIngest(): Promise<void> {
+  const scriptPath = join(scriptsDir, 'ingest-transfermarkt-positions.ts');
+  const proxyRoot = join(scriptsDir, '..');
   return new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, [scriptPath], {
+    const child = spawn('npx', ['tsx', scriptPath], {
+      cwd: proxyRoot,
       stdio: 'inherit',
       env: process.env,
     });
@@ -21,7 +23,7 @@ function runNodeScript(scriptName: string): Promise<void> {
       else
         reject(
           new Error(
-            `[lineups:seed] ${scriptName} exited with code ${code ?? 'null'} signal ${signal ?? 'null'}`
+            `[lineups:seed] ingest-transfermarkt-positions exited with code ${code ?? 'null'} signal ${signal ?? 'null'}`
           )
         );
     });
@@ -32,10 +34,9 @@ export async function maybeRunLineupsSeedOnStart(): Promise<void> {
   if (!isLineupsSeedOnStartEnabled()) return;
 
   console.log(
-    '[lineups:seed] LINEUPS_SEED_ON_START=true — fetching FPL bootstrap and rewriting position JSON'
+    '[lineups:seed] LINEUPS_SEED_ON_START=true — Transfermarkt ingest (slow; ~4s per club)'
   );
   const started = Date.now();
-  await runNodeScript('seed-player-tactical-roles.mjs');
-  await runNodeScript('seed-player-lanes.mjs');
+  await runTransfermarktIngest();
   console.log(`[lineups:seed] position registry refreshed in ${Date.now() - started}ms`);
 }

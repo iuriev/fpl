@@ -24,7 +24,7 @@ import * as leaderboardService from './leaderboard-service';
 import * as leagueStandingsService from './league-standings-service';
 import * as leaguesService from './leagues-service';
 import { maybeRunLineupsSeedOnStart } from './lineups-seed-on-start';
-import { getLineupsWarmupStatus, startLineupsWarmup } from './lineups-warmup';
+import { startLineupsWarmup } from './lineups-warmup';
 import { me } from './me-routes';
 import * as playerPoolService from './player-pool-service';
 import { predictedLineupsRoutes } from './predicted-lineups-routes';
@@ -32,6 +32,11 @@ import { predictionRoutes } from './prediction-routes';
 import { priceRoutes } from './price-routes';
 import { requestShutdown } from './shutdown';
 import * as squadService from './squad-service';
+import {
+  getStartupReadiness,
+  setStartupSeedDone,
+  setStartupSeedRunning,
+} from './startup-readiness';
 import * as teamOfTheWeekService from './team-of-the-week-service';
 import * as teamService from './team-service';
 import * as topPlayersService from './top-players-service';
@@ -62,7 +67,7 @@ if (isDev) {
 }
 
 function healthPayload() {
-  return { status: 'ok', lineupsWarmup: getLineupsWarmupStatus() };
+  return { status: 'ok', ...getStartupReadiness() };
 }
 
 app.get('/health', (c) => c.json(healthPayload()));
@@ -466,7 +471,9 @@ httpServer = serve({ fetch: app.fetch, port }, () => {
   console.log(`Proxy server running on port ${port}`);
   void (async () => {
     try {
+      setStartupSeedRunning();
       await maybeRunLineupsSeedOnStart();
+      setStartupSeedDone();
       const bootstrap = await getOrFetchBootstrap(db);
       const season = deriveSeason(bootstrap.events);
       prefetchMissingGwData(db, season, bootstrap.events).catch((err) =>
@@ -474,6 +481,7 @@ httpServer = serve({ fetch: app.fetch, port }, () => {
       );
       startLineupsWarmup(db);
     } catch (err) {
+      setStartupSeedDone();
       console.error('[proxy] startup background tasks error:', err);
     }
   })();

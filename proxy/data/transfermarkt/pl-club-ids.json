@@ -1,0 +1,22 @@
+{
+  "1": { "shortName": "ARS", "slug": "fc-arsenal", "clubId": "11" },
+  "2": { "shortName": "AVL", "slug": "aston-villa", "clubId": "405" },
+  "3": { "shortName": "BUR", "slug": "burnley-fc", "clubId": "1132" },
+  "4": { "shortName": "BOU", "slug": "afc-bournemouth", "clubId": "989" },
+  "5": { "shortName": "BRE", "slug": "brentford-fc", "clubId": "1148" },
+  "6": { "shortName": "BHA", "slug": "brighton-amp-hove-albion", "clubId": "1230" },
+  "7": { "shortName": "CHE", "slug": "chelsea-fc", "clubId": "631" },
+  "8": { "shortName": "CRY", "slug": "crystal-palace", "clubId": "873" },
+  "9": { "shortName": "EVE", "slug": "everton-fc", "clubId": "29" },
+  "10": { "shortName": "FUL", "slug": "fulham-fc", "clubId": "931" },
+  "11": { "shortName": "LEE", "slug": "leeds-united", "clubId": "399" },
+  "12": { "shortName": "LIV", "slug": "fc-liverpool", "clubId": "31" },
+  "13": { "shortName": "MCI", "slug": "manchester-city", "clubId": "281" },
+  "14": { "shortName": "MUN", "slug": "manchester-united", "clubId": "985" },
+  "15": { "shortName": "NEW", "slug": "newcastle-united", "clubId": "762" },
+  "16": { "shortName": "NFO", "slug": "nottingham-forest", "clubId": "703" },
+  "17": { "shortName": "SUN", "slug": "sunderland-afc", "clubId": "289" },
+  "18": { "shortName": "TOT", "slug": "tottenham-hotspur", "clubId": "148" },
+  "19": { "shortName": "WHU", "slug": "west-ham-united", "clubId": "379" },
+  "20": { "shortName": "WOL", "slug": "wolverhampton-wanderers", "clubId": "543" }
+}
