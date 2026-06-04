@@ -23,6 +23,7 @@ export interface TeamInfoPanelProps {
   teamId: number;
   showFollow?: boolean;
   navLinksMode?: NavLinksMode;
+  onClose?: () => void;
 }
 
 const NAV_LINKS: { to: string; label: () => string; featured?: boolean; end?: boolean }[] = [
@@ -35,7 +36,6 @@ const NAV_LINKS: { to: string; label: () => string; featured?: boolean; end?: bo
   { to: '/leaderboard', label: () => copy.leaderboardNavLink },
   { to: '/price-changes', label: () => copy.priceChangesNavLink },
   { to: '/fixtures', label: () => copy.fixturesCalendarNavLink },
-  { to: '/team-of-the-week', label: () => copy.teamOfTheWeekNavLink },
   { to: '/history', label: () => copy.teamInfoGwHistory },
 ];
 
@@ -44,6 +44,7 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({
   teamId,
   showFollow = false,
   navLinksMode = 'full',
+  onClose,
 }) => {
   const navigate = useNavigate();
   const { user, refetch } = useCurrentUser();
@@ -154,6 +155,7 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({
               key={to}
               to={to}
               end={end}
+              onClick={onClose}
               className={({ isActive }) =>
                 [
                   styles.navLink,
@@ -177,7 +179,7 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({
               key={to}
               type="button"
               className={`${styles.navLink} ${styles.navLinkDemo}${featured ? ` ${styles.navLinkFeatured}` : ''}`}
-              onClick={openDemoGate}
+              onClick={() => { openDemoGate(); onClose?.(); }}
             >
               {label()}
             </button>

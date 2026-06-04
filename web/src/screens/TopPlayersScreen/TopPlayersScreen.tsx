@@ -2,8 +2,10 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { useSearchParams } from 'react-router-dom';
 
+import { ApiError } from '@/api/client';
 import {
   useGameweeks,
+  useTeamOfTheWeek,
   useTeamPlayers,
   useTeams,
   useTopPlayersGw,
@@ -11,19 +13,28 @@ import {
 } from '@/api/queries';
 import { BottomSheet } from '@/components/ui/BottomSheet/BottomSheet';
 import { Button } from '@/components/ui/Button/Button';
+import { Pitch } from '@/components/ui/Pitch/Pitch';
+import { PlayerCard } from '@/components/ui/PlayerCard/PlayerCard';
 import { PlayerRankRow } from '@/components/ui/PlayerRankRow/PlayerRankRow';
 import { ScreenHeader } from '@/components/ui/ScreenHeader/ScreenHeader';
 import { copy } from '@/lib/copy';
 import { useFollowPlayer } from '@/lib/use-follow-player';
-import type { TopPlayersPlayer } from '@/types';
+import type {
+  PlayerPosition,
+  PlayerStatus,
+  SquadPlayer,
+  TeamOfTheWeekPlayer,
+  TopPlayersPlayer,
+} from '@/types';
 import { MAX_GAMEWEEK } from '@/types';
 
 import styles from './TopPlayersScreen.module.css';
 
-type Tab = 'gw' | 'season' | 'team';
+type Tab = 'gw' | 'season' | 'team' | 'totw';
 
 const PAGE_SIZE = 20;
 const EMPTY: TopPlayersPlayer[] = [];
+const POSITION_ORDER: PlayerPosition[] = ['GK', 'DEF', 'MID', 'FWD'];
 
 function withTransition(update: () => void): void {
   if (!document.startViewTransition) {
@@ -66,6 +77,54 @@ function useProgressiveList(items: TopPlayersPlayer[]) {
   };
 }
 
+function toSquadPlayer(p: TeamOfTheWeekPlayer): SquadPlayer {
+  return {
+    id: p.id,
+    name: p.webName,
+    position: p.position,
+    club: p.teamShortName,
+    teamCode: p.teamCode,
+    teamId: p.teamCode,
+    nowCost: 0,
+    points: p.points,
+    isCaptain: false,
+    isViceCaptain: false,
+    status: 'a' as PlayerStatus,
+    chanceOfPlaying: null,
+    news: undefined,
+    stats: {
+      total_points: p.points,
+      minutes: 0,
+      goals_scored: 0,
+      assists: 0,
+      clean_sheets: 0,
+      goals_conceded: 0,
+      own_goals: 0,
+      penalties_saved: 0,
+      penalties_missed: 0,
+      yellow_cards: 0,
+      red_cards: 0,
+      saves: 0,
+      bonus: 0,
+    },
+  };
+}
+
+function groupByPosition(
+  players: TeamOfTheWeekPlayer[]
+): Record<PlayerPosition, TeamOfTheWeekPlayer[]> {
+  const groups: Record<PlayerPosition, TeamOfTheWeekPlayer[]> = {
+    GK: [],
+    DEF: [],
+    MID: [],
+    FWD: [],
+  };
+  for (const p of players) {
+    groups[p.position].push(p);
+  }
+  return groups;
+}
+
 export const TopPlayersScreen: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -78,7 +137,14 @@ export const TopPlayersScreen: React.FC = () => {
   const latestFinishedGw = finishedGws.length > 0 ? finishedGws[finishedGws.length - 1].id : null;
 
   const tabParam = searchParams.get('tab');
-  const activeTab: Tab = tabParam === 'season' ? 'season' : tabParam === 'team' ? 'team' : 'gw';
+  const activeTab: Tab =
+    tabParam === 'season'
+      ? 'season'
+      : tabParam === 'team'
+        ? 'team'
+        : tabParam === 'totw'
+          ? 'totw'
+          : 'gw';
 
   const gwParam = searchParams.get('gw');
   const selectedGw = useMemo(() => {
@@ -109,6 +175,8 @@ export const TopPlayersScreen: React.FC = () => {
 
   const selectedTeamName = teams.find((t) => t.code === selectedTeamCode)?.name ?? '';
   const [teamPickerOpen, setTeamPickerOpen] = useState(false);
+
+  const showGwNav = activeTab === 'gw' || activeTab === 'totw';
 
   const canGoPrev =
     selectedGw !== null && selectedGw > 1 && finishedGws.some((gw) => gw.id === selectedGw - 1);
@@ -149,6 +217,9 @@ export const TopPlayersScreen: React.FC = () => {
   const gwQuery = useTopPlayersGw(activeTab === 'gw' && selectedGwFinished ? selectedGw : null);
   const seasonQuery = useTopPlayersSeason();
   const teamPlayersQuery = useTeamPlayers(activeTab === 'team' ? selectedTeamCode : null);
+  const totwQuery = useTeamOfTheWeek(
+    activeTab === 'totw' && selectedGwFinished ? selectedGw : null
+  );
 
   const gwPlayers = gwQuery.data?.players ?? EMPTY;
   const seasonPlayers = seasonQuery.data?.players ?? EMPTY;
@@ -182,38 +253,61 @@ export const TopPlayersScreen: React.FC = () => {
         ? seasonQuery.refetch
         : teamPlayersQuery.refetch;
 
+  // TOTW state
+  const isTotwGwTransition =
+    totwQuery.isFetching && totwQuery.isPlaceholderData && !!totwQuery.data;
+  const showTotwInitialSkeleton = totwQuery.isPending && !totwQuery.data;
+  const isTotwNotAvailable = !selectedGwFinished && selectedGw !== null;
+  const isTotwIs400 =
+    totwQuery.isError && totwQuery.error instanceof ApiError && totwQuery.error.status === 400;
+  const isTotwRealError = totwQuery.isError && !isTotwIs400;
+  const showPitch = activeTab === 'totw' && selectedGwFinished && !isTotwRealError && !isTotwNotAvailable && !isTotwIs400;
+
+  const totwPositionGroups = useMemo(() => {
+    if (!totwQuery.data) return null;
+    return groupByPosition(totwQuery.data.players);
+  }, [totwQuery.data]);
+
   return (
-    <div className={styles.screen}>
+    <div className={`${styles.screen} ${activeTab === 'totw' ? styles.screenTotw : ''}`}>
       <ScreenHeader title={copy.topPlayersTitle} />
 
       <div className={styles.tabs} role="tablist" aria-label={copy.topPlayersTitle}>
-          <button
-            role="tab"
-            aria-selected={activeTab === 'gw'}
-            className={`${styles.tab} ${activeTab === 'gw' ? styles.tabActive : ''}`}
-            onClick={() => setTab('gw')}
-          >
-            {copy.topPlayersTabGw}
-          </button>
-          <button
-            role="tab"
-            aria-selected={activeTab === 'season'}
-            className={`${styles.tab} ${activeTab === 'season' ? styles.tabActive : ''}`}
-            onClick={() => setTab('season')}
-          >
-            {copy.topPlayersTabSeason}
-          </button>
-          <button
-            role="tab"
-            aria-selected={activeTab === 'team'}
-            className={`${styles.tab} ${activeTab === 'team' ? styles.tabActive : ''}`}
-            onClick={() => setTab('team')}
-          >
-            {copy.topPlayersTabTeam}
-          </button>
-        </div>
+        <button
+          role="tab"
+          aria-selected={activeTab === 'gw'}
+          className={`${styles.tab} ${activeTab === 'gw' ? styles.tabActive : ''}`}
+          onClick={() => setTab('gw')}
+        >
+          {copy.topPlayersTabGw}
+        </button>
+        <button
+          role="tab"
+          aria-selected={activeTab === 'season'}
+          className={`${styles.tab} ${activeTab === 'season' ? styles.tabActive : ''}`}
+          onClick={() => setTab('season')}
+        >
+          {copy.topPlayersTabSeason}
+        </button>
+        <button
+          role="tab"
+          aria-selected={activeTab === 'team'}
+          className={`${styles.tab} ${activeTab === 'team' ? styles.tabActive : ''}`}
+          onClick={() => setTab('team')}
+        >
+          {copy.topPlayersTabTeam}
+        </button>
+        <button
+          role="tab"
+          aria-selected={activeTab === 'totw'}
+          className={`${styles.tab} ${activeTab === 'totw' ? styles.tabActive : ''}`}
+          onClick={() => setTab('totw')}
+        >
+          {copy.topPlayersTabTotw}
+        </button>
+      </div>
 
-      {activeTab === 'gw' && (
+      {showGwNav && (
         <div className={styles.gwNav}>
           <button
             className={styles.navBtn}
@@ -319,29 +413,73 @@ export const TopPlayersScreen: React.FC = () => {
         </>
       )}
 
-      <div className={styles.body}>
-        {isLoading && <PlayerListSkeleton />}
+      {activeTab !== 'totw' && (
+        <div className={styles.body}>
+          {isLoading && <PlayerListSkeleton />}
 
-        {isError && (
-          <div className={styles.stateCenter}>
-            <p className={styles.stateText}>
-              {activeTab === 'team' ? copy.topPlayersTeamLoadError : copy.topPlayersLoadError}
-            </p>
-            <Button variant="secondary" onClick={() => refetch()}>
-              {copy.topPlayersRetry}
-            </Button>
-          </div>
-        )}
+          {isError && (
+            <div className={styles.stateCenter}>
+              <p className={styles.stateText}>
+                {activeTab === 'team' ? copy.topPlayersTeamLoadError : copy.topPlayersLoadError}
+              </p>
+              <Button variant="secondary" onClick={() => refetch()}>
+                {copy.topPlayersRetry}
+              </Button>
+            </div>
+          )}
 
-        {!isLoading && !isError && activePlayers.length > 0 && (
-          <div className={styles.list}>
-            {visible.map((player, i) => (
-              <FollowableRankRow key={player.id} rank={i + 1} player={player} />
-            ))}
-            {hasMore && <div ref={sentinelRef} className={styles.sentinel} aria-hidden="true" />}
-          </div>
-        )}
-      </div>
+          {!isLoading && !isError && activePlayers.length > 0 && (
+            <div className={styles.list}>
+              {visible.map((player, i) => (
+                <FollowableRankRow key={player.id} rank={i + 1} player={player} />
+              ))}
+              {hasMore && <div ref={sentinelRef} className={styles.sentinel} aria-hidden="true" />}
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'totw' && isTotwRealError && (
+        <div className={styles.stateCenter}>
+          <p className={styles.stateText}>{copy.teamOfTheWeekLoadError}</p>
+          <Button variant="secondary" onClick={() => totwQuery.refetch()}>
+            {copy.teamOfTheWeekRetry}
+          </Button>
+        </div>
+      )}
+
+      {activeTab === 'totw' && (isTotwNotAvailable || isTotwIs400) && (
+        <div className={styles.stateCenter}>
+          <p className={styles.stateText}>{copy.teamOfTheWeekNotAvailable}</p>
+        </div>
+      )}
+
+      {showPitch && (
+        <div
+          className={`${styles.pitchWrap} ${isTotwGwTransition ? styles.pitchWrap_fetching : ''}`}
+          aria-busy={showTotwInitialSkeleton || isTotwGwTransition}
+          aria-label={showTotwInitialSkeleton ? copy.loadingPlaceholder : undefined}
+        >
+          <Pitch className={styles.pitchFill} preserveAspectRatio="none">
+            {showTotwInitialSkeleton ? (
+              <PitchSkeletonContent />
+            ) : (
+              totwQuery.data &&
+              totwPositionGroups && (
+                <div className={styles.pitchRows}>
+                  {POSITION_ORDER.map((pos) => (
+                    <div key={pos} className={styles.playerRow}>
+                      {totwPositionGroups[pos].map((player) => (
+                        <PlayerCard key={player.id} player={toSquadPlayer(player)} size="large" />
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              )
+            )}
+          </Pitch>
+        </div>
+      )}
     </div>
   );
 };
@@ -381,5 +519,25 @@ function PlayerListSkeleton() {
         </div>
       ))}
     </div>
+  );
+}
+
+function PitchSkeletonContent() {
+  return (
+    <>
+      <div className={styles.pitchSkeletonVeil} />
+      <div className={styles.pitchRows}>
+        {[1, 3, 4, 3].map((count, rowIdx) => (
+          <div key={rowIdx} className={styles.playerRow}>
+            {Array.from({ length: count }).map((_, i) => (
+              <div key={i} className={styles.pitchSkeletonPlayer}>
+                <div className={styles.pitchSkeletonJersey} />
+                <div className={styles.pitchSkeletonNameBar} />
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </>
   );
 }

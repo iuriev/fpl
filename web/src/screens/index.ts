@@ -17,7 +17,6 @@ export { SignInScreen } from './SignInScreen/SignInScreen';
 export { SignUpScreen } from './SignUpScreen/SignUpScreen';
 export type { SquadScreenProps } from './SquadScreen/SquadScreen';
 export { SquadScreen } from './SquadScreen/SquadScreen';
-export { TeamOfTheWeekScreen } from './TeamOfTheWeekScreen/TeamOfTheWeekScreen';
 export { TopPlayersScreen } from './TopPlayersScreen/TopPlayersScreen';
 export type { TransferScreenProps } from './TransferScreen/TransferScreen';
 export { TransferScreen } from './TransferScreen/TransferScreen';

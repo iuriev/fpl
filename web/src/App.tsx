@@ -33,7 +33,6 @@ import {
   SignInScreen,
   SignUpScreen,
   SquadScreen,
-  TeamOfTheWeekScreen,
   TopPlayersScreen,
   TransferScreen,
   WatchlistScreen,
@@ -104,14 +103,6 @@ function AppContent() {
         element={
           <AuthAndTeamProtectedRoute>
             <GameweekReviewScreen teamId={myTeamId!} />
-          </AuthAndTeamProtectedRoute>
-        }
-      />
-      <Route
-        path="/team-of-the-week"
-        element={
-          <AuthAndTeamProtectedRoute>
-            <TeamOfTheWeekScreen />
           </AuthAndTeamProtectedRoute>
         }
       />

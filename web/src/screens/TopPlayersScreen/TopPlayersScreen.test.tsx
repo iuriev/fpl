@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as queries from '@/api/queries';
 import {
+  fixtureDreamTeam,
   fixtureGameweeks,
   fixtureTeamPlayers,
   fixtureTeams,
@@ -18,6 +19,7 @@ vi.mock('@/api/queries', () => ({
   useTopPlayersSeason: vi.fn(),
   useTeams: vi.fn(),
   useTeamPlayers: vi.fn(),
+  useTeamOfTheWeek: vi.fn(),
 }));
 
 const mockQueries = vi.mocked(queries);
@@ -47,6 +49,15 @@ function setupDefaultMocks() {
     isError: false,
     refetch: vi.fn(),
   } as unknown as ReturnType<typeof queries.useTeamPlayers>);
+  mockQueries.useTeamOfTheWeek.mockReturnValue({
+    data: fixtureDreamTeam,
+    isPending: false,
+    isFetching: false,
+    isPlaceholderData: false,
+    isError: false,
+    error: null,
+    refetch: vi.fn(),
+  } as unknown as ReturnType<typeof queries.useTeamOfTheWeek>);
 }
 
 import { TopPlayersScreen } from './TopPlayersScreen';

@@ -7,6 +7,10 @@
   color: var(--fpl-text);
 }
 
+.screenTotw {
+  height: 100dvh;
+}
+
 /* Tabs row */
 .tabs {
   display: flex;
@@ -289,15 +293,121 @@
   flex-shrink: 0;
 }
 
+/* TOTW pitch */
+.pitchWrap {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 5px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  transition: opacity 180ms ease;
+}
+
+.pitchWrap_fetching {
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.pitchFill {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 100%;
+  aspect-ratio: 100 / 156;
+  flex-shrink: 0;
+}
+
+.pitchRows {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  padding: 4% 1%;
+}
+
+.playerRow {
+  display: flex;
+  justify-content: center;
+  gap: var(--fpl-space-sm);
+  flex-wrap: nowrap;
+}
+
+.pitchSkeletonVeil {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--fpl-radius-md);
+  background: rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+.pitchSkeletonPlayer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  flex: 1 1 0;
+  max-width: 5rem;
+  min-width: 0;
+}
+
+.pitchSkeletonJersey {
+  width: var(--fpl-size-jersey-l);
+  height: var(--fpl-size-jersey-l);
+  border-radius: var(--fpl-radius-md);
+  background: rgba(255, 255, 255, 0.08);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.14) 50%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  background-size: 200% 100%;
+  animation: fplShimmer 1.6s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.pitchSkeletonNameBar {
+  width: 4.625rem;
+  height: 2rem;
+  border-radius: 0.3125rem;
+  margin-top: 0.125rem;
+  background: rgba(255, 255, 255, 0.1);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.18) 50%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
+  background-size: 200% 100%;
+  animation: fplShimmer 1.6s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
 @media (min-width: 37.5rem) {
   .screen {
     max-width: 30rem;
     margin: 0 auto;
   }
+
+  .pitchWrap {
+    padding: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .skeletonCell {
+  .skeletonCell,
+  .pitchSkeletonJersey,
+  .pitchSkeletonNameBar {
     animation: none;
+  }
+
+  .pitchWrap {
+    transition: none;
+  }
+
+  .pitchWrap_fetching {
+    opacity: 1;
   }
 }

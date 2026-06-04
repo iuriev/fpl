@@ -53,6 +53,7 @@ export const TeamNavDrawer: React.FC<TeamNavDrawerProps> = ({
           teamId={teamId}
           showFollow={showFollow}
           navLinksMode={navLinksMode}
+          onClose={onClose}
         />
       ) : (
         !entryIsError && <TeamInfoPanelSkeleton />

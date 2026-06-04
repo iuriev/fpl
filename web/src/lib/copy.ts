@@ -252,6 +252,7 @@ export const copy = {
   priceChangesFilterFWD: 'FWD',
   priceChangesUnlockSquad: 'Unlock my squad view',
   topPlayersTabTeam: 'By Team',
+  topPlayersTabTotw: 'TOTW',
   topPlayersTeamSelectLabel: 'Select team',
   topPlayersTeamLoadError: "Couldn't load team players",
 
