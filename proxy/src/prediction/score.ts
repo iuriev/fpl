@@ -2,6 +2,7 @@ import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
 import * as schema from '../db/schema';
 import { loadEplMatchesFromDisk, loadMergedGwFromDisk } from './ingest';
+import { attachFplCodes, loadElementToFplCode } from './player-code-map';
 import { scoreGameweekFacts } from './player-layer';
 import { fitTeamPoisson } from './team-poisson';
 import type { EplMatchRow, PlayerGwFactRow } from './types';
@@ -57,13 +58,15 @@ export async function runScoreGameweek(
   const idToSlug = new Map(aliasRows.map((a) => [a.fplTeamId, a.slug]));
 
   const trainMaxGw = targetEvent - 1;
-  const predictions = scoreGameweekFacts(
+  const rawPredictions = scoreGameweekFacts(
     facts,
     fit,
     idToSlug,
     targetEvent,
     trainMaxGw,
   );
+  const elementToCode = await loadElementToFplCode(season, dataDir);
+  const predictions = attachFplCodes(rawPredictions, elementToCode);
 
   const [run] = await db
     .insert(schema.predModelRun)
@@ -72,7 +75,10 @@ export async function runScoreGameweek(
       season,
       targetEvent,
       params: { trainMaxGw, trainSeasons: TRAIN_SEASONS },
-      metrics: { players: predictions.length },
+      metrics: {
+        players: predictions.length,
+        skippedNoCode: rawPredictions.length - predictions.length,
+      },
     })
     .returning({ id: schema.predModelRun.id });
 
@@ -96,7 +102,8 @@ export async function runScoreGameweek(
       predictions.map((p) => ({
         modelRunId: runId,
         event: p.event,
-        playerId: p.playerId,
+        fplCode: p.fplCode,
+        seasonElementId: p.seasonElementId,
         xPts: p.xPts,
         xGoals: p.xGoals,
         xAssists: p.xAssists,

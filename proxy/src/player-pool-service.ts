@@ -27,6 +27,7 @@ export async function getPlayerPool(): Promise<PlayerPoolResponse> {
 
   const players: PoolPlayer[] = bootstrap.elements.map((el) => ({
     id: el.id,
+    code: el.code,
     webName: el.web_name,
     firstName: el.first_name,
     lastName: el.second_name,

@@ -48,7 +48,8 @@ export interface TeamPoissonFit {
 export type PredictionConfidence = 'low' | 'medium' | 'high';
 
 export interface PlayerGameweekPrediction {
-  playerId: number;
+  fplCode: number;
+  seasonElementId: number;
   event: number;
   xPts: number;
   xGoals: number;

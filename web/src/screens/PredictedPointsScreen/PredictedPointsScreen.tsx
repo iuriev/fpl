@@ -1,16 +1,20 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-import { useGameweeks, usePlayerPool } from '@/api/queries';
+import { useGameweeks, usePlayerPool, usePredictions } from '@/api/queries';
 import { PlayerProfileSheet } from '@/components/ui/PlayerProfileSheet/PlayerProfileSheet';
 import { PredictedPointsRow } from '@/components/ui/PredictedPointsRow/PredictedPointsRow';
 import { PremiumLockedOverlay } from '@/components/ui/PremiumLockedOverlay/PremiumLockedOverlay';
 import { PremiumSheet } from '@/components/ui/PremiumSheet/PremiumSheet';
 import { ScreenHeader } from '@/components/ui/ScreenHeader/ScreenHeader';
 import { copy, interpolate } from '@/lib/copy';
+import {
+  buildPredictedPointsRows,
+  type PredictedPointsRowData,
+} from '@/lib/predicted-points';
 import { useRequestPremiumUpsell } from '@/lib/premium-upsell/PremiumUpsellContext';
 import { useFollowPlayer } from '@/lib/use-follow-player';
 import { usePremiumStatus } from '@/lib/use-premium-status';
-import type { PlayerPosition, PoolPlayer } from '@/types';
+import type { PlayerPosition } from '@/types';
 
 import styles from './PredictedPointsScreen.module.css';
 
@@ -21,37 +25,47 @@ const FREE_TOTAL = 10;
 const FREE_VISIBLE = 3;
 const PREMIUM_PAGE_SIZE = 20;
 
-function sortByXpts(players: PoolPlayer[]): PoolPlayer[] {
-  return [...players].sort((a, b) => parseFloat(b.expectedPoints) - parseFloat(a.expectedPoints));
+function listItemsKey(items: PredictedPointsRowData[]): string {
+  return items.map((r) => `${r.player.id}:${r.xPts}`).join(',');
 }
 
-function useProgressiveList(items: PoolPlayer[]) {
+function PremiumPredictedList({
+  rows,
+  onSelect,
+}: {
+  rows: PredictedPointsRowData[];
+  onSelect: (playerId: number) => void;
+}) {
   const [visibleCount, setVisibleCount] = useState(PREMIUM_PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
-  const [prevItems, setPrevItems] = useState(items);
-  if (items !== prevItems) {
-    setPrevItems(items);
-    setVisibleCount(PREMIUM_PAGE_SIZE);
-  }
-
   useEffect(() => {
     const sentinel = sentinelRef.current;
-    if (!sentinel || visibleCount >= items.length) return;
+    if (!sentinel || visibleCount >= rows.length) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          setVisibleCount((c) => Math.min(c + PREMIUM_PAGE_SIZE, items.length));
+          setVisibleCount((c) => Math.min(c + PREMIUM_PAGE_SIZE, rows.length));
         }
       },
       { threshold: 0 }
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [items, visibleCount, items.length]);
+  }, [rows, visibleCount, rows.length]);
 
-  return { visible: items.slice(0, visibleCount), sentinelRef, hasMore: visibleCount < items.length };
+  const visible = rows.slice(0, visibleCount);
+  const hasMore = visibleCount < rows.length;
+
+  return (
+    <>
+      {visible.map((row, i) => (
+        <PredictedPointsRow key={row.player.id} rank={i + 1} row={row} onSelect={onSelect} />
+      ))}
+      {hasMore && <div ref={sentinelRef} className={styles.sentinel} aria-hidden="true" />}
+    </>
+  );
 }
 
 export const PredictedPointsScreen: React.FC = () => {
@@ -61,9 +75,12 @@ export const PredictedPointsScreen: React.FC = () => {
   const [premiumOpen, setPremiumOpen] = useState(false);
   const [profilePlayerId, setProfilePlayerId] = useState<number | null>(null);
 
-  const { data: poolData, isLoading } = usePlayerPool();
+  const { data: poolData, isLoading: poolLoading } = usePlayerPool();
   const { data: gameweeksData } = useGameweeks();
   const { following, toggle: toggleFollow } = useFollowPlayer(profilePlayerId ?? 0);
+
+  const nextGw = gameweeksData?.next ?? gameweeksData?.current ?? null;
+  const { data: predictionsData, isLoading: predictionsLoading } = usePredictions(nextGw);
 
   useEffect(() => {
     if (!isPremium) {
@@ -71,20 +88,24 @@ export const PredictedPointsScreen: React.FC = () => {
     }
   }, [isPremium, requestUpsell]);
 
-  const nextGw = gameweeksData?.next ?? gameweeksData?.current ?? null;
   const gwLabel = nextGw !== null ? interpolate(copy.predictedPointsGwLabel, { n: nextGw }) : '';
 
   const sortedForTab = useMemo(() => {
     const players = poolData?.players ?? [];
-    return sortByXpts(players.filter((p) => p.position === activeTab));
-  }, [poolData, activeTab]);
+    const filtered = players.filter((p) => p.position === activeTab);
+    return buildPredictedPointsRows(filtered, predictionsData);
+  }, [poolData, activeTab, predictionsData]);
 
-  const { visible: premiumVisible, sentinelRef, hasMore } = useProgressiveList(sortedForTab);
+  const listKey = listItemsKey(sortedForTab);
 
   const freeRows = sortedForTab.slice(0, FREE_TOTAL);
   const freeVisible = freeRows.slice(0, FREE_VISIBLE);
   const freeLocked = freeRows.slice(FREE_VISIBLE);
 
+  const isLoading = poolLoading;
+  const modelReady = predictionsData?.ready === true;
+  const showFplFallback =
+    !predictionsLoading && nextGw != null && predictionsData != null && !modelReady;
 
   return (
     <div className={styles.screen}>
@@ -109,6 +130,10 @@ export const PredictedPointsScreen: React.FC = () => {
         ))}
       </div>
 
+      {showFplFallback && (
+        <p className={styles.fallbackNotice}>{copy.predictedPointsFplFallback}</p>
+      )}
+
       <div className={styles.listWrap}>
         {isLoading && <PredictedPointsSkeleton />}
 
@@ -117,36 +142,30 @@ export const PredictedPointsScreen: React.FC = () => {
         )}
 
         {!isLoading && sortedForTab.length > 0 && isPremium && (
-          <>
-            {premiumVisible.map((player, i) => (
-              <PredictedPointsRow
-                key={player.id}
-                rank={i + 1}
-                player={player}
-                onSelect={setProfilePlayerId}
-              />
-            ))}
-            {hasMore && <div ref={sentinelRef} className={styles.sentinel} aria-hidden="true" />}
-          </>
+          <PremiumPredictedList
+            key={listKey}
+            rows={sortedForTab}
+            onSelect={setProfilePlayerId}
+          />
         )}
 
         {!isLoading && sortedForTab.length > 0 && !isPremium && (
           <>
-            {freeVisible.map((player, i) => (
+            {freeVisible.map((row, i) => (
               <PredictedPointsRow
-                key={player.id}
+                key={row.player.id}
                 rank={i + 1}
-                player={player}
+                row={row}
                 onSelect={setProfilePlayerId}
               />
             ))}
             {freeLocked.length > 0 && (
               <div className={styles.lockedSection}>
-                {freeLocked.map((player, i) => (
+                {freeLocked.map((row, i) => (
                   <PredictedPointsRow
-                    key={player.id}
+                    key={row.player.id}
                     rank={FREE_VISIBLE + i + 1}
-                    player={player}
+                    row={row}
                     onSelect={() => {}}
                   />
                 ))}
@@ -157,6 +176,10 @@ export const PredictedPointsScreen: React.FC = () => {
               </div>
             )}
           </>
+        )}
+
+        {!isLoading && sortedForTab.length > 0 && modelReady && (
+          <p className={styles.disclaimer}>{copy.predictedPointsDisclaimer}</p>
         )}
       </div>
 

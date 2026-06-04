@@ -197,6 +197,7 @@ export interface FixtureInfo {
 
 export interface PoolPlayer {
   id: number;
+  code: number;
   webName: string;
   firstName: string;
   lastName: string;
@@ -438,6 +439,7 @@ export interface PredictedLineupPlayer {
   xMins: number;
   xPts: number;
   benchRisk: boolean;
+  injuryWarning: boolean;
   chanceOfPlaying: number | null;
   status: PlayerStatus;
 }
@@ -463,6 +465,7 @@ export interface PredictedLineupsResponse {
 export type PredictionConfidence = 'low' | 'medium' | 'high';
 
 export interface PlayerGameweekPrediction {
+  fplCode: number;
   playerId: number;
   event: number;
   xPts: number;

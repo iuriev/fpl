@@ -60,6 +60,22 @@
   margin: 0;
 }
 
+.fallbackNotice {
+  flex-shrink: 0;
+  margin: 0;
+  padding: var(--fpl-space-sm) var(--fpl-space-xl3);
+  font: var(--fpl-fw-regular) var(--fpl-fs-micro) / 1.4 var(--fpl-font-display);
+  color: var(--fpl-muted);
+  border-bottom: 1px solid var(--fpl-bg-hair);
+}
+
+.disclaimer {
+  margin: var(--fpl-space-base) var(--fpl-space-xl3) 0;
+  padding: 0;
+  font: var(--fpl-fw-regular) var(--fpl-fs-micro) / 1.4 var(--fpl-font-display);
+  color: var(--fpl-muted);
+}
+
 .sentinel {
   height: 1px;
 }

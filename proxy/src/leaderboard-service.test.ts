@@ -77,6 +77,20 @@ describe('getLeaderboardGw', () => {
     expect(result.defcon[1].value).toBe(5);
   });
 
+  it('excludes players with bps = 0 from the BPS list', async () => {
+    vi.mocked(dbCache.getOrFetchGwLive).mockResolvedValueOnce(
+      mkLive([
+        { id: 10, bonus: 30, defcon: 5 },
+        { id: 20, bonus: 0, defcon: 3 },
+      ]) as never
+    );
+
+    const result = await leaderboardService.getLeaderboardGw(1);
+
+    expect(result.bps).toHaveLength(1);
+    expect(result.bps[0].id).toBe(10);
+  });
+
   it('excludes players with defcon = 0 from the DEFCON list', async () => {
     vi.mocked(dbCache.getOrFetchGwLive).mockResolvedValueOnce(
       mkLive([
@@ -177,5 +191,17 @@ describe('getLeaderboardSeason', () => {
     expect(result.defcon[0].value).toBe(13);
     expect(result.defcon[0].avg).toBe(6.5);
     expect(result.defcon).toHaveLength(1);
+  });
+
+  it('excludes players with bps = 0 from the season BPS list', async () => {
+    vi.mocked(dbCache.getOrFetchGwLive)
+      .mockResolvedValueOnce(mkLive([{ id: 10, bonus: 10, defcon: 5 }, { id: 20, bonus: 0, defcon: 0 }]) as never)
+      .mockResolvedValueOnce(mkLive([{ id: 10, bonus: 20, defcon: 8 }]) as never);
+
+    const result = await leaderboardService.getLeaderboardSeason();
+
+    expect(result.bps).toHaveLength(1);
+    expect(result.bps[0].id).toBe(10);
+    expect(result.bps[0].value).toBe(30);
   });
 });

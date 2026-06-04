@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Pitch } from '@/components/ui/Pitch/Pitch';
 import { PlayerCard } from '@/components/ui/PlayerCard/PlayerCard';
+import { copy } from '@/lib/copy';
 import type { PredictedLineupPlayer } from '@/types';
 
 import { groupByPosition, POSITION_ORDER, toSquadPlayer } from './predicted-lineup-helpers';
@@ -39,6 +40,13 @@ export const PredictedLineupPitch: React.FC<PredictedLineupPitchProps> = ({
                     player={toSquadPlayer(player, teamShortName, teamId)}
                     size="large"
                     hideClub
+                    footBadge={
+                      player.injuryWarning ? (
+                        <span className={styles.injuryWarningBadge}>
+                          {copy.predictedLineupsInjuryWarning}
+                        </span>
+                      ) : undefined
+                    }
                   />
                 </button>
               ))}

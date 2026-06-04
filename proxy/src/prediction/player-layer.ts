@@ -35,7 +35,30 @@ function defaultShare(position: string): { xg: number; xa: number } {
   return { xg: 0.04, xa: 0.05 };
 }
 
+function teamKeyForRow(row: PlayerGwFactRow): string {
+  return row.teamName ?? String(row.teamId ?? '');
+}
+
+function teamMatchTotalsKey(row: PlayerGwFactRow): string {
+  return `${row.season}|${row.round}|${teamKeyForRow(row)}`;
+}
+
+function buildTeamMatchTotals(
+  rows: PlayerGwFactRow[],
+): Map<string, { teamXg: number; teamXa: number }> {
+  const totals = new Map<string, { teamXg: number; teamXa: number }>();
+  for (const row of rows) {
+    const key = teamMatchTotalsKey(row);
+    const cur = totals.get(key) ?? { teamXg: 0, teamXa: 0 };
+    cur.teamXg += row.expectedGoals;
+    cur.teamXa += row.expectedAssists;
+    totals.set(key, cur);
+  }
+  return totals;
+}
+
 function enrichWithShares(rows: PlayerGwFactRow[]): EnrichedFact[] {
+  const teamTotals = buildTeamMatchTotals(rows);
   const byPlayer = new Map<number, PlayerGwFactRow[]>();
   for (const r of rows) {
     const list = byPlayer.get(r.element) ?? [];
@@ -50,14 +73,9 @@ function enrichWithShares(rows: PlayerGwFactRow[]): EnrichedFact[] {
     );
     const hist: { xg: number; xa: number; teamXg: number; teamXa: number }[] = [];
     for (const row of sorted) {
-      const teamKey = row.teamName ?? String(row.teamId ?? '');
-      const teamRows = sorted.filter(
-        (x) =>
-          x.round === row.round &&
-          (x.teamName ?? String(x.teamId ?? '')) === teamKey,
-      );
-      const teamXg = teamRows.reduce((s, x) => s + x.expectedGoals, 0) || 1e-6;
-      const teamXa = teamRows.reduce((s, x) => s + x.expectedAssists, 0) || 1e-6;
+      const matchTotals = teamTotals.get(teamMatchTotalsKey(row));
+      const teamXg = matchTotals?.teamXg || 1e-6;
+      const teamXa = matchTotals?.teamXa || 1e-6;
       let shareXg: number;
       let shareXa: number;
       if (hist.length > 0) {
@@ -66,8 +84,8 @@ function enrichWithShares(rows: PlayerGwFactRow[]): EnrichedFact[] {
         const tXg = recent.reduce((s, h) => s + h.teamXg, 0) || 1e-6;
         const pXa = recent.reduce((s, h) => s + h.xa, 0);
         const tXa = recent.reduce((s, h) => s + h.teamXa, 0) || 1e-6;
-        shareXg = pXg / tXg;
-        shareXa = pXa / tXa;
+        shareXg = Math.min(1, pXg / tXg);
+        shareXa = Math.min(1, pXa / tXa);
       } else {
         const d = defaultShare(row.position);
         shareXg = d.xg;
@@ -154,8 +172,9 @@ function predictFixture(
     recent.reduce((s, h) => s + h.minutes, 0) / Math.max(recent.length, 1);
   const startRate =
     recent.filter((h) => h.starts > 0).length / Math.max(recent.length, 1);
+  const playedRecent = recent.filter((h) => h.minutes > 0).length;
   const confidence: PredictionConfidence = inferConfidence(
-    history.length,
+    playedRecent,
     avgMins,
     startRate,
   );
@@ -164,7 +183,7 @@ function predictFixture(
   const xPts = blendXPts(mPts, ep, confidence);
 
   return {
-    playerId: row.element,
+    seasonElementId: row.element,
     round: row.round,
     fixture: row.fixture,
     xPts,
@@ -222,15 +241,15 @@ export function scoreGameweekFacts(
 
   const byPlayer = new Map<number, typeof fixturePreds>();
   for (const p of fixturePreds) {
-    const list = byPlayer.get(p.playerId) ?? [];
+    const list = byPlayer.get(p.seasonElementId) ?? [];
     list.push(p);
-    byPlayer.set(p.playerId, list);
+    byPlayer.set(p.seasonElementId, list);
   }
 
-  const results: PlayerGameweekPrediction[] = [];
-  for (const [playerId, fixtures] of byPlayer) {
+  const results: Omit<PlayerGameweekPrediction, 'fplCode'>[] = [];
+  for (const [seasonElementId, fixtures] of byPlayer) {
     results.push({
-      playerId,
+      seasonElementId,
       event: targetEvent,
       xGoals: fixtures.reduce((s, f) => s + f.xGoals, 0),
       xAssists: fixtures.reduce((s, f) => s + f.xAssists, 0),

@@ -26,6 +26,9 @@ for s in "${SEASONS[@]}"; do
   out="$dir/merged_gw.csv"
   echo "vaastav: $s merged_gw.csv"
   curl -fsSL "$VAASTAV_BASE/$s/gws/merged_gw.csv" -o "$out"
+  players="$VAASTAV/$s/players_raw.csv"
+  echo "vaastav: $s players_raw.csv"
+  curl -fsSL "$VAASTAV_BASE/$s/players_raw.csv" -o "$players"
 done
 
 for code in "${FDATA_SEASONS[@]}"; do

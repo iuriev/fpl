@@ -4,7 +4,7 @@
   "description": "FPL Proxy — Hono server fronting the public FPL API",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch --env-file=.env src/index.ts",
+    "dev": "tsx watch --env-file=.env --exclude 'src/data/**' src/index.ts",
     "start": "tsx src/index.ts",
     "build": "tsc",
     "lint": "eslint src",
@@ -18,7 +18,8 @@
     "pred:ingest": "tsx --env-file=.env src/pred-cli.ts ingest",
     "pred:score": "tsx --env-file=.env src/pred-cli.ts score",
     "pred:verify": "tsx --env-file=.env src/pred-verify.ts",
-    "lineups:warmup": "tsx --env-file=.env src/lineups-warmup-cli.ts"
+    "lineups:warmup": "tsx --env-file=.env src/lineups-warmup-cli.ts",
+    "lineups:seed-positions": "node scripts/seed-player-tactical-roles.mjs && node scripts/seed-player-lanes.mjs"
   },
   "dependencies": {
     "@hono/node-server": "^2.0.3",

@@ -307,7 +307,8 @@ See `research/pred-09/DATABASE_PLAN.md` and OpenSpec `2026-06-04-pred-09-predict
 |--------|------|----------|-------|
 | `model_run_id` | uuid | NO | PK, FK |
 | `event` | integer | NO | PK — GW |
-| `player_id` | integer | NO | PK |
+| `fpl_code` | integer | NO | PK — stable FPL player code (join to bootstrap) |
+| `season_element_id` | integer | NO | Element id in scored season (audit) |
 | `x_pts` | double precision | NO | Headline hybrid |
 | `x_goals`, `x_assists` | double precision | NO | |
 | `cs_prob` | double precision | YES | null MID/FWD |

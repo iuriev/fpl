@@ -16,6 +16,7 @@ import {
   PlayerProfileResponse,
   PositionFilter,
   PredictedLineupsResponse,
+  PredictionsResponse,
   PriceChangeDirection,
   PriceChangePeriod,
   PriceChangesResponse,
@@ -164,4 +165,7 @@ export const api = {
       gw != null ? `/predicted-lineups?gw=${gw}` : '/predicted-lineups',
       { credentials: 'include' }
     ),
+
+  getPredictions: (event: number) =>
+    request<PredictionsResponse>(`/predictions?event=${event}`),
 };

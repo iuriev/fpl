@@ -37,10 +37,15 @@ export const PredictedLineupTable: React.FC<PredictedLineupTableProps> = ({
             <td>
               <button
                 type="button"
-                className={`${styles.tableRowBtn} ${player.benchRisk ? styles.tableRowBenchRisk : ''}`}
+                className={`${styles.tableRowBtn} ${player.benchRisk || player.injuryWarning ? styles.tableRowBenchRisk : ''}`}
                 onClick={() => onSelect(player.id)}
               >
                 <span className={styles.tableName}>{player.webName}</span>
+                {player.injuryWarning && (
+                  <span className={styles.injuryWarningBadge}>
+                    {copy.predictedLineupsInjuryWarning}
+                  </span>
+                )}
                 {player.benchRisk && (
                   <span className={styles.benchRiskBadge}>{copy.predictedLineupsBenchRisk}</span>
                 )}

@@ -5,10 +5,16 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 
 import * as queries from '@/api/queries';
+import { copy } from '@/lib/copy';
 
 vi.mock('@/api/queries', () => ({
   usePlayerPool: vi.fn(),
   useGameweeks: vi.fn(() => ({ data: { current: 30, next: 31, gameweeks: [] } })),
+  usePredictions: vi.fn(() => ({
+    data: { event: 31, modelRunId: null, ready: false, players: [] },
+    isLoading: false,
+    isError: false,
+  })),
   usePlayerProfile: vi.fn(() => ({ data: undefined, isLoading: false, isError: false })),
 }));
 
@@ -30,11 +36,12 @@ import { usePremiumStatus } from '@/lib/use-premium-status';
 const mockUsePremiumStatus = vi.mocked(usePremiumStatus);
 
 function makePlayer(overrides: Partial<{
-  id: number; webName: string; position: string; expectedPoints: string;
+  id: number; code?: number; webName: string; position: string; expectedPoints: string;
   teamCode: number; teamShortName: string; nowCost: number;
 }> = {}) {
   return {
     id: overrides.id ?? 1,
+    code: overrides.code ?? (overrides.id ?? 1) * 1000,
     webName: overrides.webName ?? 'Player',
     firstName: 'First',
     lastName: 'Last',
@@ -154,6 +161,38 @@ describe('PredictedPointsScreen', () => {
       renderScreen(false);
       await user.click(screen.getByRole('button', { name: /Salah/i }));
       expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+  });
+
+  describe('model predictions', () => {
+    it('shows breakdown and disclaimer when model is ready', () => {
+      mockQueries.usePredictions.mockReturnValue({
+        data: {
+          event: 31,
+          modelRunId: 'run-1',
+          ready: true,
+          players: [
+            {
+              fplCode: 1000,
+              playerId: 1,
+              event: 31,
+              xPts: 8.5,
+              xGoals: 0.4,
+              xAssists: 0.2,
+              csProb: null,
+              defconPts: 0.3,
+              confidence: 'high' as const,
+              epNextAnchor: 8.5,
+              modelXPts: 8.2,
+            },
+          ],
+        },
+        isLoading: false,
+        isError: false,
+      } as unknown as ReturnType<typeof queries.usePredictions>);
+      renderScreen(false);
+      expect(screen.getByText(/xG/i)).toBeInTheDocument();
+      expect(screen.getByText(copy.predictedPointsDisclaimer)).toBeInTheDocument();
     });
   });
 

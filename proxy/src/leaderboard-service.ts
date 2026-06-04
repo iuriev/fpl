@@ -63,7 +63,7 @@ export async function getLeaderboardGw(gw: number): Promise<LeaderboardGwRespons
   });
 
   const bps: LeaderboardPlayer[] = allPlayers
-    .slice()
+    .filter((p) => p.bps > 0)
     .sort((a, b) => b.bps - a.bps)
     .slice(0, TOP_N)
     .map(({ bps: value, defcon: _d, ...p }) => ({ ...p, value }));
@@ -116,7 +116,7 @@ export async function getLeaderboardSeason(): Promise<LeaderboardSeasonResponse>
   ): LeaderboardPlayer[] {
     const players: LeaderboardPlayer[] = [];
     for (const [id, value] of valueMap) {
-      if (excludeZero && value === 0) continue;
+      if (excludeZero && value <= 0) continue;
       const element = elementMap.get(id);
       if (!element) continue;
       const team = teamMap.get(element.team);
@@ -136,7 +136,7 @@ export async function getLeaderboardSeason(): Promise<LeaderboardSeasonResponse>
   }
 
   return {
-    bps: buildList(bpsAgg, false),
+    bps: buildList(bpsAgg, true),
     defcon: buildList(defconAgg, true, gamesPlayedAgg),
   };
 }

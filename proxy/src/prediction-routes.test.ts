@@ -10,6 +10,7 @@ vi.mock('./prediction-service', () => ({
     ready: true,
     players: [
       {
+        fplCode: 12345,
         playerId: 1,
         event,
         xPts: 5.5,

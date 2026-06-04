@@ -1,0 +1,11 @@
+{
+  "MUN": {
+    "Shaw": { "role": "lb", "lane": "L", "secondary": ["cb"] },
+    "Dalot": { "role": "rb", "lane": "R", "secondary": ["cb"] },
+    "Mazraoui": { "role": "rb", "lane": "R", "secondary": ["cb", "lb"] },
+    "Maguire": { "role": "cb", "lane": "C", "secondary": [] },
+    "Martinez": { "role": "cb", "lane": "C", "secondary": [] },
+    "Yoro": { "role": "cb", "lane": "C", "secondary": ["rb"] },
+    "De Ligt": { "role": "cb", "lane": "C", "secondary": [] }
+  }
+}

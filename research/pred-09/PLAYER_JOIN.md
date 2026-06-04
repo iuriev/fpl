@@ -19,12 +19,14 @@
 
 ## Player: vaastav `element` → current FPL `id`
 
-FPL reuses `element` ids across seasons when the player persists. Strategy:
+**Production join key: FPL `code`** (from `players_raw.csv` per season). Element `id` is **not**
+stable across seasons when the same numeric id can refer to different players.
 
-### Tier A — stable id (preferred)
+### Tier A — stable code (required in API/UI)
 
-- Join `merged_gw.element` directly to `bootstrap.elements.id` for current season.
-- For historical seasons, join to that season's `players_raw.csv` `id` field (same as element).
+- Load `data/{season}/players_raw.csv` → map `element` → `code`.
+- Store `fpl_code` on `pred_player_gw`; API resolves `code` → current `bootstrap.elements.id`.
+- UI merges predictions with player pool on `poolPlayer.code === prediction.fplCode` only.
 
 ### Tier B — fuzzy name match
 

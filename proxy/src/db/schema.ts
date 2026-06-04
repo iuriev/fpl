@@ -320,7 +320,8 @@ export const predPlayerGw = pgTable(
       .notNull()
       .references(() => predModelRun.id, { onDelete: 'cascade' }),
     event: integer('event').notNull(),
-    playerId: integer('player_id').notNull(),
+    fplCode: integer('fpl_code').notNull(),
+    seasonElementId: integer('season_element_id').notNull(),
     xPts: doublePrecision('x_pts').notNull(),
     xGoals: doublePrecision('x_goals').notNull(),
     xAssists: doublePrecision('x_assists').notNull(),
@@ -330,5 +331,5 @@ export const predPlayerGw = pgTable(
     epNextAnchor: doublePrecision('ep_next_anchor').notNull(),
     modelXPts: doublePrecision('model_x_pts').notNull(),
   },
-  (t) => [primaryKey({ columns: [t.modelRunId, t.event, t.playerId] })],
+  (t) => [primaryKey({ columns: [t.modelRunId, t.event, t.fplCode] })],
 );

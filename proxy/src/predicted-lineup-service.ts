@@ -7,14 +7,17 @@ import { deriveSeason } from './fpl-cache/season';
 import type { FPLBootstrapStatic, FPLElementSummary, FPLFixture } from './fpl-client';
 import { getCachedElementSummary } from './fpl-element-summary-cache';
 import { getOrFetchAllFixtures } from './fpl-fixtures-cache';
+import {
+  hasInjuryWarning,
+  isExcludedFromPredictedLineup,
+} from './lineup-availability';
+import { pickLine, pickLineWithRoleQuotas } from './lineup-selection';
+import type { LineGroup } from './lineup-slot-requirements';
+import { getRoleQuotasForLine } from './lineup-slot-requirements';
 import { activeSquadElements } from './lineups-player-sets';
 import { LineupsWarmingError } from './lineups-warming-error';
 import { getLineupsWarmupStatus } from './lineups-warmup';
-import {
-  assignPlayersToSlots,
-  getSlotLanes,
-  type LaneAssignablePlayer,
-} from './player-lane-registry';
+import { assignPlayersToSlots, type LaneAssignablePlayer } from './player-lane-registry';
 import { loadPreviousSeasonFormationsByTeam } from './previous-season-formation';
 import { resolveNextGw } from './resolve-next-gw';
 import type {
@@ -56,19 +59,29 @@ function computeStartScore(
   return (0.4 * startsScore + 0.3 * minutesScore + 0.3 * chanceScore) * statusMult;
 }
 
-function pickLine(
-  candidates: Array<{
-    el: FPLBootstrapStatic['elements'][number];
-    startScore: number;
-  }>,
-  count: number
+const ELEMENT_LINE: Record<number, LineGroup> = {
+  2: 'DEF',
+  3: 'MID',
+  4: 'FWD',
+};
+
+function pickOutfieldLine(
+  scored: Array<{ el: FPLBootstrapStatic['elements'][number]; startScore: number }>,
+  elementType: number,
+  count: number,
+  kickoffTime: string | null
 ) {
-  return [...candidates]
-    .sort((a, b) => {
-      if (b.startScore !== a.startScore) return b.startScore - a.startScore;
-      return parseFloat(b.el.ep_next) - parseFloat(a.el.ep_next);
-    })
-    .slice(0, count);
+  const eligible = scored.filter(
+    (p) =>
+      p.el.element_type === elementType &&
+      !isExcludedFromPredictedLineup(p.el, kickoffTime)
+  );
+  const line = ELEMENT_LINE[elementType];
+  const quotas = line ? getRoleQuotasForLine(line, count) : null;
+  if (quotas && line) {
+    return pickLineWithRoleQuotas(eligible, count, quotas, line);
+  }
+  return pickLine(eligible, count);
 }
 
 function buildTeamLineup(
@@ -97,38 +110,52 @@ function buildTeamLineup(
     startScore: computeStartScore(el, summaries.get(el.id)),
   }));
 
+  const fixtureRow = allFixtures.find(
+    (f) =>
+      f.event === targetGw &&
+      !f.finished &&
+      (f.team_h === teamId || f.team_a === teamId)
+  );
+  const upcomingRow = (upcoming[teamId] ?? []).find((f) => f.gw === targetGw);
+  const kickoffTime = fixtureRow?.kickoff_time ?? null;
+
   const gkPick = pickLine(
-    scored.filter((p) => p.el.element_type === 1),
+    scored.filter(
+      (p) => p.el.element_type === 1 && !isExcludedFromPredictedLineup(p.el, kickoffTime)
+    ),
     1
   );
-  const defPick = pickLine(
-    scored.filter((p) => p.el.element_type === 2),
-    formation.counts.def
-  );
-  const midPick = pickLine(
-    scored.filter((p) => p.el.element_type === 3),
-    formation.counts.mid
-  );
-  const fwdPick = pickLine(
-    scored.filter((p) => p.el.element_type === 4),
-    formation.counts.fwd
-  );
+  const defPick = pickOutfieldLine(scored, 2, formation.counts.def, kickoffTime);
+  const midPick = pickOutfieldLine(scored, 3, formation.counts.mid, kickoffTime);
+  const fwdPick = pickOutfieldLine(scored, 4, formation.counts.fwd, kickoffTime);
+
+  const playerFlags = (el: FPLBootstrapStatic['elements'][number], startScore: number) => {
+    const chance = el.chance_of_playing_next_round ?? el.chance_of_playing_this_round;
+    return {
+      benchRisk:
+        startScore < 0.6 ||
+        el.status === 'd' ||
+        (chance != null && chance < 75),
+      injuryWarning: hasInjuryWarning(el, kickoffTime),
+      chanceOfPlaying: chance,
+      status: el.status,
+    };
+  };
 
   const assignLine = (
     picks: typeof defPick,
     line: 'DEF' | 'MID' | 'FWD'
   ): PredictedLineupPlayer[] => {
-    const slotLanes = getSlotLanes(line, picks.length);
     const assignable: LaneAssignablePlayer[] = picks.map((p) => ({
       id: p.el.id,
       code: p.el.code,
       startScore: p.startScore,
     }));
-    const assigned = assignPlayersToSlots(assignable, slotLanes);
+    const assigned = assignPlayersToSlots(assignable, line, picks.length);
     return assigned.map((a) => {
       const el = picks.find((p) => p.el.id === a.id)!.el;
-      const chance = el.chance_of_playing_next_round ?? el.chance_of_playing_this_round;
       const startScore = a.startScore;
+      const flags = playerFlags(el, startScore);
       return {
         id: el.id,
         webName: el.web_name,
@@ -138,18 +165,16 @@ function buildTeamLineup(
         pitchOrder: a.pitchOrder,
         xMins: Math.round(Math.min(90, Math.max(0, startScore * 90))),
         xPts: parseFloat(el.ep_next) || 0,
-        benchRisk:
-          startScore < 0.6 ||
-          el.status === 'd' ||
-          (chance != null && chance < 75),
-        chanceOfPlaying: chance,
-        status: el.status,
+        benchRisk: flags.benchRisk,
+        injuryWarning: flags.injuryWarning,
+        chanceOfPlaying: flags.chanceOfPlaying,
+        status: flags.status,
       };
     });
   };
 
   const gkPlayers: PredictedLineupPlayer[] = gkPick.map((p, i) => {
-    const chance = p.el.chance_of_playing_next_round ?? p.el.chance_of_playing_this_round;
+    const flags = playerFlags(p.el, p.startScore);
     return {
       id: p.el.id,
       webName: p.el.web_name,
@@ -159,12 +184,10 @@ function buildTeamLineup(
       pitchOrder: i,
       xMins: Math.round(Math.min(90, Math.max(0, p.startScore * 90))),
       xPts: parseFloat(p.el.ep_next) || 0,
-      benchRisk:
-        p.startScore < 0.6 ||
-        p.el.status === 'd' ||
-        (chance != null && chance < 75),
-      chanceOfPlaying: chance,
-      status: p.el.status,
+      benchRisk: flags.benchRisk,
+      injuryWarning: flags.injuryWarning,
+      chanceOfPlaying: flags.chanceOfPlaying,
+      status: flags.status,
     };
   });
 
@@ -176,13 +199,6 @@ function buildTeamLineup(
   ];
 
   const teamMap = new Map(bootstrap.teams.map((t) => [t.id, t.short_name]));
-  const fixtureRow = allFixtures.find(
-    (f) =>
-      f.event === targetGw &&
-      !f.finished &&
-      (f.team_h === teamId || f.team_a === teamId)
-  );
-  const upcomingRow = (upcoming[teamId] ?? []).find((f) => f.gw === targetGw);
 
   return {
     teamId: team.id,
@@ -237,9 +253,14 @@ export async function getPredictedLineups(
     throw new LineupsWarmingError();
   }
 
+  const buildStarted = Date.now();
   const bootstrap = await getOrFetchBootstrap(db);
   const season = deriveSeason(bootstrap.events);
   const targetGw = gwParam ?? resolveNextGw(bootstrap);
+  console.log(
+    `[predicted-lineups] building cache gw=${targetGw} season=${season}${opts?.skipReadyGuard ? ' (warmup)' : ''}`
+  );
+
   const [allFixtures, upcoming] = await Promise.all([
     getOrFetchAllFixtures(db),
     fixturesService.getUpcomingFixtures(),
@@ -250,6 +271,10 @@ export async function getPredictedLineups(
     loadSummariesForTeams(bootstrap, teamIds, season),
     loadPreviousSeasonFormationsByTeam(db, season),
   ]);
+
+  console.log(
+    `[predicted-lineups] loaded ${summaries.size} element summaries for ${teamIds.length} teams`
+  );
 
   const teams = teamIds.map((teamId) =>
     buildTeamLineup(
@@ -265,5 +290,8 @@ export async function getPredictedLineups(
 
   const result: PredictedLineupsResponse = { gameweek: targetGw, teams };
   cacheLayer.set(cacheKey, result, cacheLayer.ttl.PREDICTED_LINEUPS);
+  console.log(
+    `[predicted-lineups] cache stored gw=${targetGw} in ${Date.now() - buildStarted}ms`
+  );
   return result;
 }

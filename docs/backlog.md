@@ -346,6 +346,9 @@ Reference: fpl.team predicted stats section.
 #### PRED-08: Predicted lineups for all 20 Premier League teams [SHIPPED]
 Premium `/predicted-lineups`: table + pitch for all 20 teams; in-house formation + XI; flank registry (`player-lanes.json`). OpenSpec `archive/2026-06-04-pred-08-predicted-lineups`.
 
+#### PRED-10: Transfermarkt tactical positions (one-time ingest)
+Replace FPL-stat heuristics in `player-tactical-roles.json` with offline Transfermarkt squad positions for all PL players; no production hosting, no runtime TM calls. OpenSpec `openspec/changes/2026-06-04-pred-10-transfermarkt-tactical-positions`.
+
 Before each GW deadline, show the predicted starting XI for every PL team:
 - Table view: Name | xMins | xPts (highlight yellow = rotation risk)
 - Pitch view: circular player photos on formation grid with match info

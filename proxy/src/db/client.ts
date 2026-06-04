@@ -9,6 +9,10 @@ import * as schema from './schema';
 const client = postgres(process.env.DATABASE_URL!, { max: 4 });
 export const db = drizzle(client, { schema });
 
+export async function closeDb(): Promise<void> {
+  await client.end({ timeout: 2 });
+}
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export async function runMigrations() {

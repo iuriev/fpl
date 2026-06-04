@@ -1,3 +1,5 @@
+import type { Server } from 'node:http';
+
 import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
 import { eq } from 'drizzle-orm';
@@ -7,7 +9,7 @@ import { logger } from 'hono/logger';
 
 import { auth } from './auth/auth';
 import { optionalUser } from './auth/middleware';
-import { runMigrations } from './db/client';
+import { closeDb, runMigrations } from './db/client';
 import { db } from './db/client';
 import { playerWatchlistEntry } from './db/schema';
 import * as entryService from './entry-service';
@@ -21,12 +23,14 @@ import * as historyService from './history-service';
 import * as leaderboardService from './leaderboard-service';
 import * as leagueStandingsService from './league-standings-service';
 import * as leaguesService from './leagues-service';
+import { maybeRunLineupsSeedOnStart } from './lineups-seed-on-start';
 import { getLineupsWarmupStatus, startLineupsWarmup } from './lineups-warmup';
 import { me } from './me-routes';
 import * as playerPoolService from './player-pool-service';
 import { predictedLineupsRoutes } from './predicted-lineups-routes';
 import { predictionRoutes } from './prediction-routes';
 import { priceRoutes } from './price-routes';
+import { requestShutdown } from './shutdown';
 import * as squadService from './squad-service';
 import * as teamOfTheWeekService from './team-of-the-week-service';
 import * as teamService from './team-service';
@@ -428,15 +432,49 @@ if (process.env.NODE_ENV === 'production') {
 
 const port = Number(process.env.PORT ?? 3001);
 
-serve({ fetch: app.fetch, port }, () => {
+let httpServer: Server | null = null;
+let shutdownStarted = false;
+
+function shutdown(signal: string): void {
+  if (shutdownStarted) return;
+  shutdownStarted = true;
+  requestShutdown();
+  console.log(`[proxy] ${signal} — shutting down`);
+
+  const forceExit = setTimeout(() => process.exit(1), 4_000);
+  forceExit.unref();
+
+  const closeHttp = new Promise<void>((resolve) => {
+    if (!httpServer) {
+      resolve();
+      return;
+    }
+    httpServer.close(() => resolve());
+  });
+
+  void closeHttp.then(async () => {
+    await closeDb();
+    clearTimeout(forceExit);
+    process.exit(0);
+  });
+}
+
+process.once('SIGTERM', () => shutdown('SIGTERM'));
+process.once('SIGINT', () => shutdown('SIGINT'));
+
+httpServer = serve({ fetch: app.fetch, port }, () => {
   console.log(`Proxy server running on port ${port}`);
-  getOrFetchBootstrap(db)
-    .then((bootstrap) => {
+  void (async () => {
+    try {
+      await maybeRunLineupsSeedOnStart();
+      const bootstrap = await getOrFetchBootstrap(db);
       const season = deriveSeason(bootstrap.events);
       prefetchMissingGwData(db, season, bootstrap.events).catch((err) =>
         console.error('[prefetch] error:', err),
       );
       startLineupsWarmup(db);
-    })
-    .catch((err) => console.error('[prefetch] bootstrap error:', err));
+    } catch (err) {
+      console.error('[proxy] startup background tasks error:', err);
+    }
+  })();
 });

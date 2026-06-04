@@ -57,6 +57,13 @@
       "when": 1780575600000,
       "tag": "0007_fpl_fixtures_cache",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1780579200000,
+      "tag": "0008_pred_player_gw_fpl_code",
+      "breakpoints": true
     }
   ]
 }

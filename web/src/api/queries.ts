@@ -161,6 +161,24 @@ export function usePlayerPool() {
   });
 }
 
+export function usePredictions(event: number | null) {
+  return useQuery({
+    queryKey: ['predictions', event],
+    queryFn: () => {
+      if (event === null) throw new Error('Gameweek required');
+      return api.getPredictions(event);
+    },
+    enabled: event !== null,
+    staleTime: 1000 * 60 * 30,
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && (error.status === 400 || error.status === 404)) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+  });
+}
+
 export function useTransfers(teamId: number | null) {
   return useQuery({
     queryKey: ['transfers', teamId],

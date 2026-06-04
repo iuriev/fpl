@@ -177,6 +177,12 @@
   color: var(--fpl-warn);
 }
 
+.injuryWarningBadge {
+  font: var(--fpl-fw-semibold) var(--fpl-fs-body-xs) var(--fpl-font-display);
+  color: var(--fpl-danger);
+  white-space: nowrap;
+}
+
 .tableNum {
   font: var(--fpl-fw-regular) var(--fpl-fs-body-m) var(--fpl-font-display);
   color: var(--fpl-text-soft);
