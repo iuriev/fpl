@@ -22,7 +22,10 @@ import {
 } from '../../proxy/src/player-lane-registry.ts';
 import { getPlayerTacticalRole } from '../../proxy/src/player-tactical-role.ts';
 
-const TARGET_GWS = [10, 11, 12, 13, 14] as const;
+import { gameweekRangeLabel, parseTargetGameweeks } from './parse-gameweeks.ts';
+import type { StarterMetrics } from './run-eval-types.ts';
+import { writeFactualReport, type CombinedSummary } from './write-report.ts';
+
 const OUT_DIR = join(dirname(fileURLToPath(import.meta.url)), 'output');
 
 type LineGroup = 'DEF' | 'MID' | 'FWD';
@@ -38,12 +41,13 @@ function fixturesBeforeGw(all: FPLFixture[], gw: number): FPLFixture[] {
 
 async function loadAllSummaries(
   bootstrap: FPLBootstrapStatic,
-  season: string
+  season: string,
+  targetGws: number[]
 ): Promise<Map<number, FPLElementSummary>> {
   const ids = [
     ...new Set(
       bootstrap.teams.flatMap((t) =>
-        TARGET_GWS.flatMap((gw) =>
+        targetGws.flatMap((gw) =>
           predictedLineupPoolElements(bootstrap, t.id, gw).map((el) => el.id)
         )
       )
@@ -129,15 +133,6 @@ interface TeamGwSummary {
   xiFalsePositives: number;
   roleHits: number;
   roleCompared: number;
-}
-
-interface StarterMetrics {
-  correct: number;
-  missed: number;
-  falsePositives: number;
-  precision: number;
-  recall: number;
-  xiAccuracyPerPlayer: number;
 }
 
 function computeMetrics(hits: number, misses: number, fp: number): StarterMetrics {
@@ -309,7 +304,8 @@ interface RepeatError {
 
 function buildAggregates(
   allRows: PlayerRow[],
-  allTeams: TeamGwSummary[]
+  allTeams: TeamGwSummary[],
+  targetGws: number[]
 ): {
   byTeam: TeamAggregate[];
   byLine: LineAggregate[];
@@ -318,7 +314,7 @@ function buildAggregates(
   repeatFalsePositives: RepeatError[];
   laneMismatches: number;
 } {
-  const byGw = TARGET_GWS.map((gw) => {
+  const byGw = targetGws.map((gw) => {
     const teams = allTeams.filter((t) => t.gameweek === gw);
     const hits = teams.reduce((s, t) => s + t.xiHits, 0);
     const misses = teams.reduce((s, t) => s + t.xiMisses, 0);
@@ -419,18 +415,21 @@ function buildAggregates(
 }
 
 async function main(): Promise<void> {
+  const targetGws = parseTargetGameweeks(process.argv.slice(2));
+  const rangeLabel = gameweekRangeLabel(targetGws);
+
   mkdirSync(OUT_DIR, { recursive: true });
 
   const bootstrap = await getOrFetchBootstrap(db);
   const season = deriveSeason(bootstrap.events);
   const allFixturesRaw = await getOrFetchAllFixtures(db);
-  const summariesFull = await loadAllSummaries(bootstrap, season);
+  const summariesFull = await loadAllSummaries(bootstrap, season, targetGws);
   const previousSeason = await loadPreviousSeasonFormationsByTeam(db, season);
 
   const allPlayerRows: PlayerRow[] = [];
   const allTeamSummaries: TeamGwSummary[] = [];
 
-  for (const gw of TARGET_GWS) {
+  for (const gw of targetGws) {
     console.log(`Evaluating GW${gw}...`);
     const { playerRows, teamSummaries } = await evaluateGameweek(
       gw,
@@ -465,16 +464,16 @@ async function main(): Promise<void> {
   const totalFp = allTeamSummaries.reduce((s, t) => s + t.xiFalsePositives, 0);
   const formationMatches = allTeamSummaries.filter((t) => t.formationMatch).length;
 
-  const aggregates = buildAggregates(allPlayerRows, allTeamSummaries);
+  const aggregates = buildAggregates(allPlayerRows, allTeamSummaries, targetGws);
 
-  const combined = {
-    gameweeks: [...TARGET_GWS],
+  const combined: CombinedSummary = {
+    gameweeks: targetGws,
     evaluatedAt: new Date().toISOString(),
-    modelVersion: 'lineup-v3',
+    modelVersion: 'lineup-v4',
     modelChanges: [
-      'v2 start score (recency, last-match boost, GK priority)',
-      'FWD x0.5 / MID x0.82 if did not start last match',
-      'Formation: max lineup score; tie-break within 2% prefers recent shape',
+      'v3 start score + FWD/MID gates + smart formation pick',
+      'Display formation derived from picked XI counts (derived)',
+      'Pitch lanes prefer last finished match slot (before target GW)',
     ],
     sampleSize: {
       teamMatches: allTeamSummaries.length,
@@ -494,7 +493,11 @@ async function main(): Promise<void> {
     repeatFalsePositives: aggregates.repeatFalsePositives,
   };
 
-  writeFileSync(join(OUT_DIR, 'summary-gw10-14.json'), JSON.stringify(combined, null, 2));
+  const summaryPath = join(OUT_DIR, `summary-gw${rangeLabel}.json`);
+  writeFileSync(summaryPath, JSON.stringify(combined, null, 2));
+
+  const reportPath = join(OUT_DIR, `REPORT-gw${rangeLabel}.md`);
+  writeFileSync(reportPath, writeFactualReport(combined, rangeLabel, 'output'));
 
   const csvHeader =
     'gameweek,team,player,fpl_line,verdict,predicted_starter,actual_starter,predicted_role,predicted_lane,actual_role,actual_lane,element_id,fpl_code\n';
@@ -524,10 +527,10 @@ async function main(): Promise<void> {
       ].join(',')
     )
     .join('\n');
-  writeFileSync(join(OUT_DIR, 'comparison-gw10-14.csv'), csvHeader + csvBody);
+  writeFileSync(join(OUT_DIR, `comparison-gw${rangeLabel}.csv`), csvHeader + csvBody);
 
   writeFileSync(
-    join(OUT_DIR, 'manual-review-gw10-14.csv'),
+    join(OUT_DIR, `manual-review-gw${rangeLabel}.csv`),
     'gameweek,team,player,your_check_correct_starter,notes\n' +
       allPlayerRows
         .filter((r) => r.verdict !== 'bench_both')
@@ -539,7 +542,9 @@ async function main(): Promise<void> {
   );
 
   console.log(JSON.stringify(combined, null, 2));
-  console.log(`\nWrote ${OUT_DIR}/comparison-gw10-14.csv and summary-gw10-14.json`);
+  console.log(
+    `\nWrote output/summary-gw${rangeLabel}.json, REPORT-gw${rangeLabel}.md, comparison-gw${rangeLabel}.csv`
+  );
 }
 
 main()

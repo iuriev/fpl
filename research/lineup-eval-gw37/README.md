@@ -2,32 +2,39 @@
 
 Backtest of the proxy **predicted lineups** algorithm against FPL actual starters.
 
-**Current holdout:** GW10–14 (2025/26), **lineup v3** (recency score + FWD/MID gates + smart formation pick).
+Use the **`lineup-model-eval`** skill (`.claude/skills/lineup-model-eval/`) when you want an agent to run eval for your gameweeks and write improvement proposals.
 
 ## Run
 
 From repo root (requires proxy DB with element-summary cache):
 
 ```bash
-npx tsx --env-file=proxy/.env research/lineup-eval-gw37/run-eval.ts
+npm run lineup:eval -- 10-14
+npm run lineup:eval -- 10 11 12 13 14
+npm run lineup:eval -- --gw=34,35,36,37
 ```
+
+Gameweek args are required (range `10-14`, list, or `--gw=`).
 
 ## Outputs (`output/`)
 
+Files are suffixed by the GW range label (e.g. `10-14` or `10-12-14`):
+
 | File | Purpose |
 | --- | --- |
-| `summary-gw10-14.json` | **Main aggregate** — metrics, per-GW, per-team |
-| `comparison-gw10-14.csv` | **Main review file** — column `gameweek` |
-| `manual-review-gw10-14.csv` | Same + empty column for your marks |
-| `summary-gw10.json` … `summary-gw14.json` | Per-gameweek detail |
+| `summary-gw{RANGE}.json` | **Main aggregate** — metrics, per-GW, per-team |
+| `REPORT-gw{RANGE}.md` | Auto factual summary |
+| `IMPROVEMENTS-gw{RANGE}.md` | Agent-written model proposals (skill step 3) |
+| `comparison-gw{RANGE}.csv` | Per-player verdicts |
+| `manual-review-gw{RANGE}.csv` | Same + empty column for your marks |
+| `summary-gw{N}.json` | Per-gameweek detail |
 
-## Model v3
+## Model v4
 
-**Start score** (`predicted-lineup-start-score.ts`): recency window, last-match boost, bench streak, GK priority.
+Includes all **v3** pieces (recency score, FWD/MID gates, smart formation pick) plus:
 
-**Effective score:** FWD ×0.5 / MID ×0.82 if did not start last match.
-
-**Formation** (`predicted-lineup-formation-pick.ts`): switch shape only if lineup score beats recent mode by ≥0.4; else pick best among top-3 scores closest to recent mode.
+- **Derived formation** — label from picked DEF/MID/FWD counts (`derived`).
+- **Last-match lanes** — pitch slots favour previous gameweek positions.
 
 ## Prediction cutoff
 

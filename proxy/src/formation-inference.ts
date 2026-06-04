@@ -5,7 +5,8 @@ export type FormationSource =
   | 'previous_season'
   | 'default'
   | 'squad_fit'
-  | 'lineup_fit';
+  | 'lineup_fit'
+  | 'derived';
 
 export interface FormationCounts {
   def: number;
@@ -21,6 +22,19 @@ export interface InferredFormation {
 
 export function formationLabel(counts: FormationCounts): string {
   return `${counts.def}-${counts.mid}-${counts.fwd}`;
+}
+
+export function formationFromPickedCounts(
+  def: number,
+  mid: number,
+  fwd: number
+): InferredFormation {
+  const counts: FormationCounts = { def, mid, fwd };
+  return {
+    counts,
+    label: formationLabel(counts),
+    source: 'derived',
+  };
 }
 
 export function isValidFormation(counts: FormationCounts): boolean {

@@ -1,13 +1,18 @@
 import * as cacheLayer from './cache';
 import { db } from './db/client';
 import * as fixturesService from './fixtures-service';
-import { type FormationCounts, inferFormationForTeam } from './formation-inference';
+import {
+  type FormationCounts,
+  formationFromPickedCounts,
+  inferFormationForTeam,
+} from './formation-inference';
 import { countEligibleByLine } from './formation-squad-fit';
 import { getOrFetchBootstrap } from './fpl-cache/db-cache';
 import { deriveSeason } from './fpl-cache/season';
 import type { FPLBootstrapStatic, FPLElementSummary, FPLFixture } from './fpl-client';
 import { getCachedElementSummary } from './fpl-element-summary-cache';
 import { getOrFetchAllFixtures } from './fpl-fixtures-cache';
+import { buildLastMatchLaneMap } from './last-match-lanes';
 import {
   hasInjuryWarning,
   isExcludedFromPredictedLineup,
@@ -91,6 +96,20 @@ export function buildTeamLineup(
   const midPick = pickOutfieldLine(scored, 3, formation.counts.mid, kickoffTime);
   const fwdPick = pickOutfieldLine(scored, 4, formation.counts.fwd, kickoffTime);
 
+  const displayFormation = formationFromPickedCounts(
+    defPick.length,
+    midPick.length,
+    fwdPick.length
+  );
+
+  const lastMatchLanes = buildLastMatchLaneMap(
+    teamId,
+    bootstrap,
+    summaries,
+    allFixtures,
+    targetGw
+  );
+
   const playerFlags = (el: FPLBootstrapStatic['elements'][number], startScore: number) => {
     const chance = el.chance_of_playing_next_round ?? el.chance_of_playing_this_round;
     return {
@@ -113,7 +132,9 @@ export function buildTeamLineup(
       code: p.el.code,
       startScore: p.startScore,
     }));
-    const assigned = assignPlayersToSlots(assignable, line, picks.length);
+    const assigned = assignPlayersToSlots(assignable, line, picks.length, {
+      lastMatchLaneById: lastMatchLanes,
+    });
     const slotById = new Map(assigned.map((a) => [a.id, a]));
     return picks.map((p, index) => {
       const slot = slotById.get(p.el.id);
@@ -168,7 +189,7 @@ export function buildTeamLineup(
     teamId: team.id,
     teamCode: team.code,
     shortName: team.short_name,
-    formation,
+    formation: displayFormation,
     nextFixture:
       fixtureRow || upcomingRow
         ? {

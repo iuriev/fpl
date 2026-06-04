@@ -84,6 +84,7 @@ Do not write application code until requirements and design are approved.
 | `.claude/skills/openspec-apply-change/` | Implementing an approved change |
 | `.claude/skills/openspec-archive-change/` | Finalizing a completed change |
 | `.claude/skills/finalize-task/` | **End-of-task wrap-up**: lint/test/build, backlog, docs, archive, propose commit |
+| `.claude/skills/lineup-model-eval/` | **Lineup backtest**: user GWs → `npm run lineup:eval` → metrics + `IMPROVEMENTS-gw*.md` proposals |
 | `.claude/skills/investor-product-overview/` | Investor product brief — HTML + PDF with live app screenshots |
 | `.claude/skills/investor-competitive-analysis/` | Competitor research — parity vs differentiation PDF |
 | `.claude/skills/openspec-explore/` | Exploring ideas before committing to a change |

@@ -352,7 +352,8 @@ export type FormationSource =
   | 'previous_season'
   | 'default'
   | 'squad_fit'
-  | 'lineup_fit';
+  | 'lineup_fit'
+  | 'derived';
 
 export interface FormationCounts {
   def: number;

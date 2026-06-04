@@ -1,30 +1,35 @@
 # Lineup model — GW10–14 holdout
 
-## Version comparison
+## Version ladder
 
-| Version | XI precision | Correct / 1100 | Formation label match |
-| --- | --- | --- | --- |
-| v2 (recency score only) | 72.2% | 794 | **44 / 100** |
-| **v3 (current)** | **74.1%** | **815** | 37 / 100 |
+| Version | XI precision | Correct | Formation vs FPL | Lane mismatch (correct XI) |
+| --- | --- | --- | --- | --- |
+| v2 | 72.2% | 794 | 44/100 | — |
+| v3 | 74.1% | 815 | 37/100 | 172 |
+| **v4 (current)** | **74.1%** | **815** | 37/100 | **127 (−45)** |
 
-**+21 correct starters** on GW10–14; formation labels trade ~7 matches for better XI (we only switch shape when score gain ≥ 0.4).
+## v4 changes
 
-## v3 components
+1. **`formationFromPickedCounts`** — UI label always matches the 11 picked (source `derived`). Pick logic still uses v3 formation search.
+2. **`buildLastMatchLaneMap`** — lane assignment prefers where each player played in the **last finished match before target GW**.
 
-1. `effectivePredictedStartScore` — FWD ×0.5, MID ×0.82 without last-match start.
-2. `pickFormationByLineupScore` — if historical shape fits squad and best alternative is <0.4 better, keep it; else top-3 by lineup score, pick closest to history.
+## Impact
 
-## By gameweek (v3)
+- **Pitch lanes:** 26% fewer wrong L/C/R among correctly picked starters (172 → 127).
+- **XI:** unchanged vs v3 on this holdout (same players, better slots).
+- **Formation label vs real match:** still ~37% — derived label reflects our XI, not the manager’s actual shape.
 
-See `output/summary-gw10-14.json` — typically **74–78%** precision GW10–12, weaker GW13–14.
+## Code map
 
-## Still weak
+| File | Role |
+| --- | --- |
+| `predicted-lineup-start-score.ts` | v2/v3 scoring + `effectivePredictedStartScore` |
+| `predicted-lineup-formation-pick.ts` | Shape selection before XI pick |
+| `last-match-lanes.ts` | Previous-match lane memory |
+| `player-lane-registry.ts` | `AssignLaneOptions.lastMatchLaneById` |
+| `predicted-lineup-service.ts` | Orchestration |
 
-- **MID** errors (rotation)
-- **NEW / AVL / WOL** clubs
-- **Lane** on pitch when player correct (~20% lane mismatch)
+## Next
 
-## Next iteration
-
-- Derive display formation from picked XI (label always consistent with players shown).
-- Last-fixture lane memory for `assignPlayersToSlots`.
+- Formation eval: compare **derived** XI counts to FPL actual counts (should align better with display).
+- MID rotation cluster / joint XI+shape search if we need +2pp XI precision.

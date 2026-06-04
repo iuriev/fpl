@@ -17,7 +17,8 @@
     "test": "npm run --workspaces test",
     "test:coverage": "npm run --workspaces test:coverage",
     "test:ui": "npm run --workspaces --if-present test:ui",
-    "deploy": "fly deploy"
+    "deploy": "fly deploy",
+    "lineup:eval": "npx tsx --env-file=proxy/.env research/lineup-eval-gw37/run-eval.ts"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
