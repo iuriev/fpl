@@ -52,7 +52,7 @@ const mockData: CalendarResponse = {
             defensiveDifficulty: 4,
             attackingDifficulty: 2,
             kickoffTime: '2025-08-09T15:00:00Z',
-            restDaysBefore: null,
+            restDaysBefore: 7,
           },
         ],
       },
@@ -71,7 +71,7 @@ const mockData: CalendarResponse = {
             defensiveDifficulty: 3,
             attackingDifficulty: 3,
             kickoffTime: '2025-08-09T15:00:00Z',
-            restDaysBefore: null,
+            restDaysBefore: 7,
           },
           {
             opponentShortName: 'MCI',
@@ -162,7 +162,7 @@ describe('FixturesCalendarScreen', () => {
     expect(screen.getByRole('tab', { name: 'Rest Days' })).toHaveAttribute('aria-selected', 'false');
   });
 
-  it('switching to Rest Days tab shows TBC for null-kickoff fixture', async () => {
+  it('switching to Rest Days tab shows TBC only for later GW with unknown kickoff', async () => {
     const user = userEvent.setup();
     mockQueries.useFixturesCalendar.mockReturnValue({
       data: mockData,

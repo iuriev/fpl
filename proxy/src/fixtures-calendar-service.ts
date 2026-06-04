@@ -51,6 +51,8 @@ export interface CalendarResponse {
 
 type DifficultyLevel = 1 | 2 | 3 | 4 | 5;
 
+const SEASON_OPENING_REST_DAYS = 7;
+
 function rankToDifficulty(rank: number): DifficultyLevel {
   if (rank <= 4) return 1;
   if (rank <= 8) return 2;
@@ -98,7 +100,7 @@ function computeRestDays(fixtures: Array<{ kickoffTime: string | null }>): (numb
   const restMap = new Map<string, number | null>();
   for (let i = 0; i < sorted.length; i++) {
     if (i === 0) {
-      restMap.set(sorted[i].kickoffTime, null);
+      restMap.set(sorted[i].kickoffTime, SEASON_OPENING_REST_DAYS);
     } else {
       const ms =
         new Date(sorted[i].kickoffTime).getTime() -
@@ -237,7 +239,9 @@ export async function getFixturesCalendar(): Promise<CalendarResponse> {
         defensiveDifficulty: defensiveDiff,
         attackingDifficulty: attackingDiff,
         kickoffTime: fixture.kickoff_time,
-        restDaysBefore: restDaysByFixtureId.get(fixture.id) ?? null,
+        restDaysBefore:
+          restDaysByFixtureId.get(fixture.id) ??
+          (fixture.event === 1 ? SEASON_OPENING_REST_DAYS : null),
       });
     }
 

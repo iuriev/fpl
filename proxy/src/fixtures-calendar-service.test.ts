@@ -107,28 +107,38 @@ describe('getFixturesCalendar', () => {
     const result = await getFixturesCalendar();
     const gw1 = result.byTeam[1].find((r) => r.gw === 1)!.fixtures[0];
     const gw2 = result.byTeam[1].find((r) => r.gw === 2)!.fixtures[0];
-    expect(gw1.restDaysBefore).toBeNull();
+    expect(gw1.restDaysBefore).toBe(7);
     expect(gw2.restDaysBefore).toBe(4);
   });
 
-  it('returns null restDaysBefore for fixture with no kickoffTime', async () => {
+  it('returns opening rest days for GW1 fixture with no kickoffTime', async () => {
     vi.mocked(fplFixturesCache.getOrFetchAllFixtures).mockResolvedValue([
       makeFixture(1, 1, 1, 2, null),
     ]);
 
     const result = await getFixturesCalendar();
     const gw1 = result.byTeam[1].find((r) => r.gw === 1)!.fixtures[0];
-    expect(gw1.restDaysBefore).toBeNull();
+    expect(gw1.restDaysBefore).toBe(7);
   });
 
-  it('returns null restDaysBefore for first fixture of season', async () => {
+  it('returns null restDaysBefore for later GW fixture with no kickoffTime', async () => {
+    vi.mocked(fplFixturesCache.getOrFetchAllFixtures).mockResolvedValue([
+      makeFixture(1, 2, 1, 2, null),
+    ]);
+
+    const result = await getFixturesCalendar();
+    const gw2 = result.byTeam[1].find((r) => r.gw === 2)!.fixtures[0];
+    expect(gw2.restDaysBefore).toBeNull();
+  });
+
+  it('returns opening rest days for first fixture of season', async () => {
     vi.mocked(fplFixturesCache.getOrFetchAllFixtures).mockResolvedValue([
       makeFixture(1, 1, 1, 2, '2025-08-01T15:00:00Z'),
     ]);
 
     const result = await getFixturesCalendar();
     const gw1 = result.byTeam[1].find((r) => r.gw === 1)!.fixtures[0];
-    expect(gw1.restDaysBefore).toBeNull();
+    expect(gw1.restDaysBefore).toBe(7);
   });
 
   it('normalises strength into difficulty buckets 1–5 across 20 teams', async () => {
