@@ -1,13 +1,17 @@
 import {
   boolean,
+  date,
+  doublePrecision,
   integer,
   jsonb,
   pgTable,
   primaryKey,
   serial,
+  smallint,
   text,
   timestamp,
   uniqueIndex,
+  uuid,
 } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
@@ -179,4 +183,15 @@ export const fplTransfersCache = pgTable(
     fetchedAt: timestamp('fetched_at').notNull(),
   },
   (t) => [primaryKey({ columns: [t.season, t.teamId] })],
+);
+
+export const fplElementSummaryCache = pgTable(
+  'fpl_element_summary_cache',
+  {
+    season: text('season').notNull(),
+    elementId: integer('element_id').notNull(),
+    data: jsonb('data').notNull(),
+    fetchedAt: timestamp('fetched_at').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.season, t.elementId] })],
 );

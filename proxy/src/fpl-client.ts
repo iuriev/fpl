@@ -3,8 +3,6 @@
  * Isolated module for all FPL endpoint calls.
  */
 
-const FPL_BASE_URL = 'https://fantasy.premierleague.com/api';
-
 export interface FPLBootstrapStatic {
   total_players: number;
   events: Array<{
@@ -218,32 +216,21 @@ export interface FPLFixture {
   finished: boolean;
 }
 
-let lastRequestTime = 0;
-const MAX_REQ_PER_SECOND = 10;
-const MIN_INTERVAL = 1000 / MAX_REQ_PER_SECOND;
+import {
+  type FplFetchPriority,
+  resetFplRequestQueueForTests,
+  scheduleFplFetch,
+} from './fpl-request-queue';
 
 export function resetRateLimiter(): void {
-  lastRequestTime = 0;
+  resetFplRequestQueueForTests();
 }
 
-async function fetchFPL<T>(path: string): Promise<T> {
-  const now = Date.now();
-  const waitTime = Math.max(0, lastRequestTime + MIN_INTERVAL - now);
-  lastRequestTime = Math.max(now, lastRequestTime + MIN_INTERVAL);
-
-  if (waitTime > 0) {
-    await new Promise((resolve) => setTimeout(resolve, waitTime));
-  }
-
-  const url = `${FPL_BASE_URL}${path}`;
-  const t0 = Date.now();
-  const response = await fetch(url);
-  const ms = Date.now() - t0;
-  console.log(`[fpl] ${new Date().toISOString()} ${response.status} ${ms}ms ${path}`);
-  if (!response.ok) {
-    throw new Error(`FPL API error: ${response.status} ${response.statusText}`);
-  }
-  return response.json() as Promise<T>;
+async function fetchFPL<T>(
+  path: string,
+  priority: FplFetchPriority = 'interactive'
+): Promise<T> {
+  return scheduleFplFetch<T>(path, priority);
 }
 
 export async function getBootstrapStatic(): Promise<FPLBootstrapStatic> {
@@ -285,8 +272,10 @@ export async function getFixtures(gameweek: number): Promise<FPLFixture[]> {
   return fetchFPL(`/fixtures/?event=${gameweek}`);
 }
 
-export async function getFixturesAll(): Promise<FPLFixture[]> {
-  return fetchFPL('/fixtures/');
+export async function getFixturesAll(
+  priority: FplFetchPriority = 'interactive'
+): Promise<FPLFixture[]> {
+  return fetchFPL('/fixtures/', priority);
 }
 
 export interface FPLElementSummary {
@@ -315,6 +304,9 @@ export interface FPLElementSummary {
   }>;
 }
 
-export async function getElementSummary(elementId: number): Promise<FPLElementSummary> {
-  return fetchFPL(`/element-summary/${elementId}/`);
+export async function getElementSummary(
+  elementId: number,
+  priority: FplFetchPriority = 'interactive'
+): Promise<FPLElementSummary> {
+  return fetchFPL(`/element-summary/${elementId}/`, priority);
 }

@@ -1,7 +1,9 @@
 import * as cacheLayer from './cache';
+import { db } from './db/client';
 import * as fixturesService from './fixtures-service';
+import { deriveSeason } from './fpl-cache/season';
 import type { FPLElementSummary } from './fpl-client';
-import * as fplClient from './fpl-client';
+import { getOrFetchElementSummary } from './fpl-element-summary-cache';
 import { getBootstrapWithCache, latestFinishedGw, POSITION_MAP } from './price-shared';
 import type { PlayerPosition,PlayerProfileResponse, PlayerProfileStat } from './types';
 
@@ -50,8 +52,9 @@ export async function getPlayerProfile(
   const position = (POSITION_MAP[element.element_type] ?? 'GK') as PlayerPosition;
 
   const targetGw = gwParam ?? latestFinishedGw(bootstrap);
+  const season = deriveSeason(bootstrap.events);
   const [summary, upcoming] = await Promise.all([
-    fplClient.getElementSummary(playerId),
+    getOrFetchElementSummary(db, season, playerId),
     fixturesService.getUpcomingFixtures(),
   ]);
 

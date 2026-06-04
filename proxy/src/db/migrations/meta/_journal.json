@@ -36,6 +36,13 @@
       "when": 1780498063434,
       "tag": "0004_spooky_arachne",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1780572000000,
+      "tag": "0006_lineups_warmup",
+      "breakpoints": true
     }
   ]
 }

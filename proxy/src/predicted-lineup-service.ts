@@ -6,6 +6,8 @@ import { getOrFetchBootstrap } from './fpl-cache/db-cache';
 import { deriveSeason } from './fpl-cache/season';
 import type { FPLBootstrapStatic, FPLElementSummary, FPLFixture } from './fpl-client';
 import * as fplClient from './fpl-client';
+import { getOrFetchElementSummary } from './fpl-element-summary-cache';
+import { activeSquadElements } from './lineups-player-sets';
 import {
   assignPlayersToSlots,
   getSlotLanes,
@@ -50,15 +52,6 @@ async function mapConcurrent<T, R>(
   return results;
 }
 
-async function getElementSummaryCached(elementId: number): Promise<FPLElementSummary> {
-  const key = `element-summary:${elementId}`;
-  const cached = cacheLayer.get<FPLElementSummary>(key);
-  if (cached) return cached;
-  const data = await fplClient.getElementSummary(elementId);
-  cacheLayer.set(key, data, cacheLayer.ttl.ELEMENT_SUMMARY);
-  return data;
-}
-
 async function getAllFixturesCached(): Promise<FPLFixture[]> {
   const key = 'fixtures:all';
   const cached = cacheLayer.get<FPLFixture[]>(key);
@@ -66,12 +59,6 @@ async function getAllFixturesCached(): Promise<FPLFixture[]> {
   const data = await fplClient.getFixturesAll();
   cacheLayer.set(key, data, cacheLayer.ttl.FIXTURES);
   return data;
-}
-
-function activeSquadElements(bootstrap: FPLBootstrapStatic, teamId: number) {
-  return bootstrap.elements.filter(
-    (el) => el.team === teamId && (el.minutes > 0 || el.total_points > 0)
-  );
 }
 
 function computeStartScore(
@@ -249,7 +236,8 @@ function buildTeamLineup(
 
 async function loadSummariesForTeams(
   bootstrap: FPLBootstrapStatic,
-  teamIds: number[]
+  teamIds: number[],
+  season: string
 ): Promise<Map<number, FPLElementSummary>> {
   const ids = new Set<number>();
   for (const teamId of teamIds) {
@@ -258,7 +246,9 @@ async function loadSummariesForTeams(
     }
   }
   const idList = [...ids];
-  const summaries = await mapConcurrent(idList, SUMMARY_CONCURRENCY, getElementSummaryCached);
+  const summaries = await mapConcurrent(idList, SUMMARY_CONCURRENCY, (id) =>
+    getOrFetchElementSummary(db, season, id, 'interactive')
+  );
   const map = new Map<number, FPLElementSummary>();
   idList.forEach((id, i) => map.set(id, summaries[i]));
   return map;
@@ -270,16 +260,16 @@ export async function getPredictedLineups(gwParam?: number): Promise<PredictedLi
   if (cached) return cached;
 
   const bootstrap = await getOrFetchBootstrap(db);
+  const season = deriveSeason(bootstrap.events);
   const targetGw = gwParam ?? resolveNextGw(bootstrap);
   const [allFixtures, upcoming] = await Promise.all([
     getAllFixturesCached(),
     fixturesService.getUpcomingFixtures(),
   ]);
 
-  const season = deriveSeason(bootstrap.events);
   const teamIds = bootstrap.teams.map((t) => t.id);
   const [summaries, previousSeasonFormations] = await Promise.all([
-    loadSummariesForTeams(bootstrap, teamIds),
+    loadSummariesForTeams(bootstrap, teamIds, season),
     loadPreviousSeasonFormationsByTeam(db, season),
   ]);
 

@@ -195,6 +195,18 @@ Persists `entry/{teamId}/transfers/` responses. Same refresh logic as `fpl_histo
 | `last_finished_gw` | integer | NO | Latest finished GW at fetch time |
 | `fetched_at` | timestamp | NO | |
 
+### `fpl_element_summary_cache`
+
+Persists FPL `element-summary/{id}/` for predicted lineups and player profile. Six-hour TTL;
+background warmup fills rows after proxy start.
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| `season` | text | NO | PK component |
+| `element_id` | integer | NO | PK component |
+| `data` | jsonb | NO | Full element-summary response |
+| `fetched_at` | timestamp | NO | |
+
 ## ER Diagram
 
 ```mermaid
@@ -315,6 +327,13 @@ erDiagram
         timestamp fetched_at
     }
 
+    fpl_element_summary_cache {
+        text season PK
+        integer element_id PK
+        jsonb data
+        timestamp fetched_at
+    }
+
     user ||--o{ session : "has"
     user ||--o{ account : "has"
     user ||--o{ watchlist_entry : "follows"
@@ -326,4 +345,5 @@ erDiagram
     fpl_meta ||--o{ fpl_dream_team_cache : "caches"
     fpl_meta ||--o{ fpl_history_cache : "caches"
     fpl_meta ||--o{ fpl_transfers_cache : "caches"
+    fpl_meta ||--o{ fpl_element_summary_cache : "caches"
 ```

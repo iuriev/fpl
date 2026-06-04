@@ -3,19 +3,25 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as cache from './cache';
 import * as fixturesService from './fixtures-service';
 import * as dbCache from './fpl-cache/db-cache';
-import * as fplClient from './fpl-client';
+import * as elementSummaryCache from './fpl-element-summary-cache';
 import * as playerProfileService from './player-profile-service';
 
 vi.mock('./db/client', () => ({ db: {} }));
 vi.mock('./fpl-cache/db-cache');
-vi.mock('./fpl-client');
+vi.mock('./fpl-element-summary-cache');
 vi.mock('./cache');
 vi.mock('./fixtures-service');
 
 const bootstrap = {
   events: [
-    { id: 37, finished: true, is_current: false },
-    { id: 38, finished: false, is_current: true },
+    {
+      id: 1,
+      finished: true,
+      is_current: false,
+      deadline_time: '2025-08-15T17:30:00Z',
+    },
+    { id: 37, finished: true, is_current: false, deadline_time: '2026-04-01T17:30:00Z' },
+    { id: 38, finished: false, is_current: true, deadline_time: '2026-05-01T17:30:00Z' },
   ],
   teams: [{ id: 1, short_name: 'ARS', name: 'Arsenal', code: 3 }],
   elements: [
@@ -45,7 +51,7 @@ describe('getPlayerProfile', () => {
   });
 
   it('maps last finished GW stats from element-summary', async () => {
-    vi.mocked(fplClient.getElementSummary).mockResolvedValue({
+    vi.mocked(elementSummaryCache.getOrFetchElementSummary).mockResolvedValue({
       history: [
         {
           round: 37,
@@ -77,7 +83,7 @@ describe('getPlayerProfile', () => {
   });
 
   it('returns profile without GW block when history missing', async () => {
-    vi.mocked(fplClient.getElementSummary).mockResolvedValue({ history: [] });
+    vi.mocked(elementSummaryCache.getOrFetchElementSummary).mockResolvedValue({ history: [] });
 
     const result = await playerProfileService.getPlayerProfile(100);
 

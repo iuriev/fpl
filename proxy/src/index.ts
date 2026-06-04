@@ -21,9 +21,11 @@ import * as historyService from './history-service';
 import * as leaderboardService from './leaderboard-service';
 import * as leagueStandingsService from './league-standings-service';
 import * as leaguesService from './leagues-service';
+import { getLineupsWarmupStatus, startLineupsWarmup } from './lineups-warmup';
 import { me } from './me-routes';
 import * as playerPoolService from './player-pool-service';
 import { predictedLineupsRoutes } from './predicted-lineups-routes';
+import { predictionRoutes } from './prediction-routes';
 import { priceRoutes } from './price-routes';
 import * as squadService from './squad-service';
 import * as teamOfTheWeekService from './team-of-the-week-service';
@@ -57,7 +59,7 @@ if (isDev) {
 
 // Health check
 app.get('/health', (c) => {
-  return c.json({ status: 'ok' });
+  return c.json({ status: 'ok', lineupsWarmup: getLineupsWarmupStatus() });
 });
 
 // GET /api/gameweeks
@@ -412,6 +414,7 @@ app.get('/api/leaderboard/season', async (c) => {
 
 app.route('/api', priceRoutes);
 app.route('/api', predictedLineupsRoutes);
+app.route('/api', predictionRoutes);
 
 app.on(['GET', 'POST'], '/api/auth/*', (c) => auth.handler(c.req.raw));
 app.route('/api/me', me);
@@ -431,6 +434,7 @@ serve({ fetch: app.fetch, port }, () => {
       prefetchMissingGwData(db, season, bootstrap.events).catch((err) =>
         console.error('[prefetch] error:', err),
       );
+      startLineupsWarmup(db);
     })
     .catch((err) => console.error('[prefetch] bootstrap error:', err));
 });
