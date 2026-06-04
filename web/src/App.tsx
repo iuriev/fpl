@@ -27,6 +27,7 @@ import {
   LeagueStandingsScreen,
   MyStatsScreen,
   PlayerWatchlistScreen,
+  PredictedLineupsScreen,
   PredictedPointsScreen,
   PriceChangesScreen,
   ResetPasswordScreen,
@@ -119,6 +120,14 @@ function AppContent() {
         element={
           <AuthAndTeamProtectedRoute>
             <PredictedPointsScreen />
+          </AuthAndTeamProtectedRoute>
+        }
+      />
+      <Route
+        path="/predicted-lineups"
+        element={
+          <AuthAndTeamProtectedRoute>
+            <PredictedLineupsScreen />
           </AuthAndTeamProtectedRoute>
         }
       />

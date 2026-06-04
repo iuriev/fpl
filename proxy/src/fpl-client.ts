@@ -44,6 +44,9 @@ export interface FPLBootstrapStatic {
     element_type: number;
     status: string;
     chance_of_playing_this_round: number | null;
+    chance_of_playing_next_round: number | null;
+    minutes: number;
+    code: number;
     news: string;
     total_points: number;
     first_name: string;
@@ -179,6 +182,7 @@ export interface FPLLive {
     stats: {
       total_points: number;
       minutes: number;
+      starts: number;
       goals_scored: number;
       assists: number;
       clean_sheets: number;
@@ -287,9 +291,14 @@ export async function getFixturesAll(): Promise<FPLFixture[]> {
 
 export interface FPLElementSummary {
   history: Array<{
+    fixture: number;
     round: number;
+    opponent_team: number;
+    was_home: boolean;
+    kickoff_time: string;
     total_points: number;
     minutes: number;
+    starts: number;
     goals_scored: number;
     assists: number;
     clean_sheets: number;

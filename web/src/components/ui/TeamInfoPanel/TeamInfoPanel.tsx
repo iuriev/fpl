@@ -35,6 +35,7 @@ const NAV_LINKS: { to: string; label: () => string; featured?: boolean; end?: bo
   { to: '/top-players', label: () => copy.topPlayersNavLink },
   { to: '/leaderboard', label: () => copy.leaderboardNavLink },
   { to: '/predicted-points', label: () => copy.predictedPointsNavLink },
+  { to: '/predicted-lineups', label: () => copy.predictedLineupsNavLink },
   { to: '/price-changes', label: () => copy.priceChangesNavLink },
   { to: '/fixtures', label: () => copy.fixturesCalendarNavLink },
 ];

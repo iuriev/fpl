@@ -23,6 +23,7 @@ import * as leagueStandingsService from './league-standings-service';
 import * as leaguesService from './leagues-service';
 import { me } from './me-routes';
 import * as playerPoolService from './player-pool-service';
+import { predictedLineupsRoutes } from './predicted-lineups-routes';
 import { priceRoutes } from './price-routes';
 import * as squadService from './squad-service';
 import * as teamOfTheWeekService from './team-of-the-week-service';
@@ -410,6 +411,7 @@ app.get('/api/leaderboard/season', async (c) => {
 });
 
 app.route('/api', priceRoutes);
+app.route('/api', predictedLineupsRoutes);
 
 app.on(['GET', 'POST'], '/api/auth/*', (c) => auth.handler(c.req.raw));
 app.route('/api/me', me);

@@ -343,3 +343,51 @@ export interface LeaderboardSeasonResponse {
   defcon: LeaderboardPlayer[];
   bps: LeaderboardPlayer[];
 }
+
+export type PlayerLane = 'L' | 'C' | 'R';
+
+export type FormationSource = 'recent_fixtures' | 'previous_season' | 'default';
+
+export interface FormationCounts {
+  def: number;
+  mid: number;
+  fwd: number;
+}
+
+export interface InferredFormation {
+  counts: FormationCounts;
+  label: string;
+  source: FormationSource;
+}
+
+export interface PredictedLineupPlayer {
+  id: number;
+  webName: string;
+  position: PlayerPosition;
+  teamCode: number;
+  lane: PlayerLane;
+  pitchOrder: number;
+  xMins: number;
+  xPts: number;
+  benchRisk: boolean;
+  chanceOfPlaying: number | null;
+  status: string;
+}
+
+export interface PredictedTeamLineup {
+  teamId: number;
+  teamCode: number;
+  shortName: string;
+  formation: InferredFormation;
+  nextFixture: {
+    opponentShortName: string;
+    isHome: boolean;
+    kickoffTime: string | null;
+  } | null;
+  players: PredictedLineupPlayer[];
+}
+
+export interface PredictedLineupsResponse {
+  gameweek: number;
+  teams: PredictedTeamLineup[];
+}

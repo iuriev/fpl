@@ -15,6 +15,7 @@ import {
   PlayerPoolResponse,
   PlayerProfileResponse,
   PositionFilter,
+  PredictedLineupsResponse,
   PriceChangeDirection,
   PriceChangePeriod,
   PriceChangesResponse,
@@ -157,4 +158,10 @@ export const api = {
   getLeaderboardSeason: () => request<LeaderboardSeasonResponse>('/leaderboard/season'),
 
   getFixturesCalendar: () => request<CalendarResponse>('/fixtures/calendar'),
+
+  getPredictedLineups: (gw?: number) =>
+    request<PredictedLineupsResponse>(
+      gw != null ? `/predicted-lineups?gw=${gw}` : '/predicted-lineups',
+      { credentials: 'include' }
+    ),
 };

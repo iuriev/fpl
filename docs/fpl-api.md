@@ -74,8 +74,13 @@ Used for: each player's points in the selected gameweek (`stats.total_points`).
 
 - `GET /entry/{teamId}/history/` — `current[]` per-gameweek history, `past[]`, `chips[]`.
 - `GET /element-summary/{elementId}/` — a player's per-fixture history (`history[]` includes
-  per-GW stats: `round`, `total_points`, `goals_scored`, `assists`, etc.). Used by
-  `GET /api/players/:playerId/profile`.
+  `fixture`, `starts`, `minutes`, `round`, `total_points`, `goals_scored`, `assists`, etc.).
+  Used by `GET /api/players/:playerId/profile` and predicted-lineups formation inference.
+  There is **no** official formation string or player flank (L/C/R) in the API.
+- **Predicted lineups (in-house)** — `GET /api/predicted-lineups` (premium) derives formation
+  counts from per-fixture `starts`, predicted XI from `chance_of_playing_*` / minutes / `ep_next`,
+  and horizontal pitch order from `proxy/src/data/player-lanes.json` (regenerate via
+  `node proxy/scripts/seed-player-lanes.mjs` — ICT/heuristic flanks + `player-lane-overrides.json`).
 - `GET /fixtures/?event={gw}` — fixtures for a gameweek. Each object: `id`, `event`,
   `team_h`, `team_a`, `team_h_difficulty`, `team_a_difficulty` (integer 1–5),
   `kickoff_time`, `finished`. Used for FDR chips in the Transfer Planner.

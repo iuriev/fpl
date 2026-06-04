@@ -1,0 +1,128 @@
+{
+  "ARS": {
+    "Saliba": "C",
+    "Gabriel": "C",
+    "Calafiori": "L",
+    "Timber": "R",
+    "Saka": "R",
+    "Martinelli": "L",
+    "Trossard": "L"
+  },
+  "AVL": {
+    "Digne": "L",
+    "Cash": "R",
+    "Rogers": "R",
+    "Bailey": "R"
+  },
+  "BOU": {
+    "Kerkez": "L",
+    "Smith": "R",
+    "Semenyo": "R",
+    "Tavernier": "R"
+  },
+  "BRE": {
+    "Henry": "L",
+    "Ajer": "R",
+    "Mbeumo": "R",
+    "Schade": "R"
+  },
+  "BHA": {
+    "Estupiñan": "L",
+    "Veltman": "R",
+    "Mitoma": "L",
+    "March": "R"
+  },
+  "CHE": {
+    "Cucurella": "L",
+    "James": "R",
+    "Palmer": "R",
+    "Sterling": "L"
+  },
+  "CRY": {
+    "Mitchell": "L",
+    "Muñoz": "R",
+    "Olise": "R",
+    "Eze": "C"
+  },
+  "EVE": {
+    "Mykolenko": "L",
+    "Patterson": "R",
+    "McNeil": "L",
+    "Harrison": "R"
+  },
+  "FUL": {
+    "Robinson": "L",
+    "Tete": "R",
+    "Wilson": "R",
+    "Reed": "C"
+  },
+  "IPS": {
+    "Davis": "L",
+    "Woolfenden": "R"
+  },
+  "LEI": {
+    "Thomas": "L",
+    "Justin": "R",
+    "Dewsbury-Hall": "L",
+    "Maddison": "C"
+  },
+  "LIV": {
+    "Robertson": "L",
+    "Alexander-Arnold": "R",
+    "Trent": "R",
+    "Salah": "R",
+    "Díaz": "L",
+    "Gakpo": "L"
+  },
+  "MCI": {
+    "Gvardiol": "L",
+    "Walker": "R",
+    "Foden": "R",
+    "Doku": "L",
+    "Grealish": "L"
+  },
+  "MUN": {
+    "Shaw": "L",
+    "Dalot": "R",
+    "Antony": "R",
+    "Rashford": "L",
+    "Garnacho": "L"
+  },
+  "NEW": {
+    "Hall": "L",
+    "Trippier": "R",
+    "Gordon": "L",
+    "Murphy": "R"
+  },
+  "NFO": {
+    "Aina": "R",
+    "Williams": "L",
+    "Gibbs-White": "C",
+    "Elanga": "R"
+  },
+  "SOU": {
+    "Manning": "L",
+    "Walker-Peters": "R",
+    "Dibling": "R",
+    "Armstrong": "L"
+  },
+  "TOT": {
+    "Udogie": "L",
+    "Porro": "R",
+    "Son": "L",
+    "Maddison": "C",
+    "Johnson": "R"
+  },
+  "WHU": {
+    "Emerson": "L",
+    "Coufal": "R",
+    "Bowen": "R",
+    "Kudus": "R"
+  },
+  "WOL": {
+    "Bueno": "L",
+    "Semedo": "R",
+    "Neto": "R",
+    "Cunha": "C"
+  }
+}

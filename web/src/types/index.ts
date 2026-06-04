@@ -411,3 +411,73 @@ export interface CalendarResponse {
   gameweeks: CalendarGameweek[];
   byTeam: Record<number, TeamGwRow[]>;
 }
+
+export type PlayerLane = 'L' | 'C' | 'R';
+
+export type FormationSource = 'recent_fixtures' | 'previous_season' | 'default';
+
+export interface FormationCounts {
+  def: number;
+  mid: number;
+  fwd: number;
+}
+
+export interface InferredFormation {
+  counts: FormationCounts;
+  label: string;
+  source: FormationSource;
+}
+
+export interface PredictedLineupPlayer {
+  id: number;
+  webName: string;
+  position: PlayerPosition;
+  teamCode: number;
+  lane: PlayerLane;
+  pitchOrder: number;
+  xMins: number;
+  xPts: number;
+  benchRisk: boolean;
+  chanceOfPlaying: number | null;
+  status: PlayerStatus;
+}
+
+export interface PredictedTeamLineup {
+  teamId: number;
+  teamCode: number;
+  shortName: string;
+  formation: InferredFormation;
+  nextFixture: {
+    opponentShortName: string;
+    isHome: boolean;
+    kickoffTime: string | null;
+  } | null;
+  players: PredictedLineupPlayer[];
+}
+
+export interface PredictedLineupsResponse {
+  gameweek: number;
+  teams: PredictedTeamLineup[];
+}
+
+export type PredictionConfidence = 'low' | 'medium' | 'high';
+
+export interface PlayerGameweekPrediction {
+  playerId: number;
+  event: number;
+  xPts: number;
+  xGoals: number;
+  xAssists: number;
+  csProb: number | null;
+  defconPts: number;
+  confidence: PredictionConfidence;
+  epNextAnchor: number;
+  modelXPts: number;
+}
+
+export interface PredictionsResponse {
+  event: number;
+  modelRunId: string | null;
+  ready: boolean;
+  players: PlayerGameweekPrediction[];
+}

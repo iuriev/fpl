@@ -9,6 +9,7 @@ export { LeagueStandingsScreen } from './LeagueStandingsScreen/LeagueStandingsSc
 export type { MyStatsScreenProps } from './MyStatsScreen/MyStatsScreen';
 export { MyStatsScreen } from './MyStatsScreen/MyStatsScreen';
 export { PlayerWatchlistScreen } from './PlayerWatchlistScreen/PlayerWatchlistScreen';
+export { PredictedLineupsScreen } from './PredictedLineupsScreen/PredictedLineupsScreen';
 export { PredictedPointsScreen } from './PredictedPointsScreen/PredictedPointsScreen';
 export { PriceChangesScreen } from './PriceChangesScreen/PriceChangesScreen';
 export { ResetPasswordScreen } from './ResetPasswordScreen/ResetPasswordScreen';

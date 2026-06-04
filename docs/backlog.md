@@ -37,73 +37,62 @@ matching FPL design conventions.
 
 | ID | Task | Effort | Why |
 |----|------|--------|-----|
-| PRED-09 | EPL statistical model research — xA, card & CS probabilities | L | Enables PRED-02+ enriched predictions and PRED-05/07. Must precede any prediction screen beyond xPts. |
+| PRED-09 | EPL statistical model — GW xPts, xG, xA, CS%, defcon (research) | L | OpenSpec `2026-06-04-pred-09-statistical-model-research`. Enables PRED-02+/05/07/10. Free data only. |
 
 ### Feature details
 
-#### PRED-09: EPL statistical model — per-player match prediction engine
+#### PRED-09: EPL statistical model — per-player gameweek prediction engine
 
-Research, design, and prototype a model that produces per-player, per-fixture probability predictions for the next GW:
+Research, offline validation, then (separate change) production API. **OpenSpec:**
+`openspec/changes/2026-06-04-pred-09-statistical-model-research/`.
 
-**Target outputs (per player × fixture)**
-- `xA_prob` — probability of 1+ assist in this match
-- `yellow_prob` — probability of receiving a yellow card
-- `red_prob` — probability of receiving a red card
-- `cs_prob` — clean sheet probability (defenders/GKs)
+**Horizon:** one **gameweek** per player. Two fixtures in the same GW → **sum** metrics; blank GW → **0**.
 
-**Input signals to evaluate**
+**Target outputs (per player × gameweek)**
 
-1. **Historical H2A results** — how often does Team A beat Team B at home/away over last N seasons? Player-level: does a player historically perform better vs certain opponents?
-2. **Current form** — team's rolling win/loss/draw rate (last 5–6 games); player's rolling xG, xA, goal/assist involvement rate.
-3. **Fixture difficulty** — FDR from FPL API; but build our own Offensive/Defensive strength index from the season's results.
-4. **Rest days** — days since the team's last match. Short rest → higher rotation risk, more cards from fatigue.
-5. **Squad availability** — injuries (`status: 'i'`/`'d'`), suspensions (`status: 's'`), `chance_of_playing_this_round`. Key absences (star striker missing → attack threat drops; key CB missing → CS% drops).
-6. **Player vs opponent history** — element-summary `history[]` across past seasons: goals, assists, cards against that specific team code.
+| Field | UI role |
+| --- | --- |
+| `xPts` | Headline number — lists, captain, sort |
+| `xGoals` | Expanded stat |
+| `xAssists` | Expanded stat |
+| `csProb` | Expanded stat (DEF/GK only; `null` for MID/FWD) |
+| `defconPts` | Expanded stat; included in xPts assembly from v1 |
+| `confidence` | Always shown (`low` / `medium` / `high`); breakdown stats never hidden |
 
-**Data sources to research**
+Disclaimer on prediction surfaces: approximate estimates, not betting advice.
 
-- FPL API: `bootstrap-static`, `element-summary/{id}`, `fixtures/` — free, no auth, already proxied.
-- [vaastav/FPL-data](https://github.com/vaastav/FPL-data) — historical FPL seasons back to 2016; merged results, player stats per GW.
-- [football-data.org](https://www.football-data.org/) — free tier (10 req/min): fixtures, standings, results, lineups.
-- [api-football (RapidAPI)](https://rapidapi.com/api-sports/api/api-football/) — richer stats: xG, xA, cards per match, head-to-head. Paid but affordable.
-- [understat.com](https://understat.com/) — xG/xA per shot, per player, per match. No official API but scrapeable.
-- [FBref.com](https://fbref.com/) — StatsBomb-powered xA, progressive passes, press stats. Best for deep xA modeling.
+**Out of scope:** yellow/red card probabilities; paid APIs; Understat/FBref scraping.
 
-**Modeling approach options**
+**xPts policy:** hybrid — model expected points blended with FPL `ep_next`; stronger anchor on `ep_next` when `confidence` is `low`.
 
-| Approach | Complexity | Accuracy | Notes |
-|----------|-----------|----------|-------|
-| Weighted form heuristic | XS | Low-medium | Fast to ship; use form + FDR + rest days |
-| Poisson model (goals) | S | Medium | Classic football stats method |
-| Logistic regression (card/CS) | S | Medium | Per-player card rate × opponent aggression |
-| Gradient boosting (xG-based) | M | High | Needs training data from vaastav/FPL-data |
-| LLM-assisted summary | M | Variable | Summarize stats → Claude API → risk score |
+**Validation (all required before prod API):** (A) calibration, (B) MAE/rank vs actual and vs `ep_next` on hold-out GW 30–38, (C) team CS sanity vs football-data.co.uk closing odds.
 
-**Recommended spike**
+**Data sources (free only)**
 
-1. Pull vaastav/FPL-data last 3 seasons into a local Postgres table.
-2. Build a per-player "form vector": last 5 GW xG, xA, minutes, card count, opponent strength.
-3. Implement Poisson attack/defence strength model for CS% and xG.
-4. Logistic regression for yellow card probability using: player's season yellow rate, opponent's press intensity, rest days.
-5. Validate: compare model output against actual outcomes for GW 30-38 of last season.
+- FPL API (live): `bootstrap-static`, `element-summary`, `fixtures`, `ep_next`, expected goals/assists, status, defcon in live explain.
+- [vaastav/Fantasy-Premier-League](https://github.com/vaastav/Fantasy-Premier-League) — player × GW history for training.
+- [football-data.co.uk](https://www.football-data.co.uk/data.php) — team match CSVs for Dixon–Coles / CS (primary; Kaggle EPL mirrors optional).
 
-**Output contract** (what PRED-02, PRED-05, PRED-07 will consume)
+**Feature priority (v1):** injuries → rotation → tactical drift → H2H vs opponent → referee → weather → low sample.
+
+**Phases**
+
+1. Research + OpenSpec (this change) — **data inventory done** (`research/pred-09/`).
+2. Offline spike under `research/pred-09/` — tasks in OpenSpec `tasks.md`.
+3. Follow-up: **`openspec/changes/2026-06-04-pred-09-prediction-api/`** — Postgres `pred_*` tables (migration `0005`), ingest jobs, `GET /api/predictions`, then PRED-02/05/07 UI.
 
 ```ts
-interface PlayerMatchPrediction {
+interface PlayerGameweekPrediction {
   playerId: number;
-  fixtureId: number;
-  xPts: number;          // already from FPL ep_next, possibly improved
-  xGoals: number;        // expected goals this match
-  xAssists: number;      // expected assists this match
-  csProb: number | null; // null for MID/FWD
-  yellowProb: number;
-  redProb: number;
+  event: number;
+  xPts: number;
+  xGoals: number;
+  xAssists: number;
+  csProb: number | null;
+  defconPts: number;
   confidence: 'low' | 'medium' | 'high';
 }
 ```
-
-**Promote to OpenSpec** once spike results are reviewed.
 
 ---
 
@@ -293,11 +282,11 @@ Useful for long-term planning — build a shortlist without committing a transfe
 | ~~PRED-06~~ | ~~FPL Price Change Predictions table~~ | M | ✅ Done — Tonight tab on `/price-changes` (OpenSpec `ana-03-pred-06-price-changes`). |
 | PRED-05 | Clean sheet probability & xG/xA market screen (per-team stats) | M | Unique angle. Helps evaluate defenders and attackers efficiently. |
 | PRED-07 | Predicted goals & assists screen | M | Complement to PRED-05; popular FPL decision-making tool. |
-| PRED-08 | Predicted lineups for all 20 PL teams | L | Data-heavy. Needs reliable lineup data source research. |
+| ~~PRED-08~~ | ~~Predicted lineups for all 20 PL teams~~ | L | ✅ Done — `/predicted-lineups`; premium-only; FPL formation inference + `player-lanes.json` (OpenSpec `archive/2026-06-04-pred-08-predicted-lineups`). |
 | PRED-10 | Textual prediction analytics in player profile sheet | S | Show a short natural-language explanation of why a player is expected to score that many xPts — form, fixture, ownership, threat. Depends on PRED-09 for richer signals; for now can use ep_next + FDR + minutes % heuristics. |
 | ~~PRED-02~~ | ~~Predicted points list screen (free: top 3, locked: rest)~~ | M | ✅ Done — `/predicted-points`; GK/DEF/MID/FWD tabs sorted by `ep_next`; free top-3 + blur+upsell; premium progressive load. |
 
-| MON-01 | Premium subscription flow (paywall, pricing page) | L | Unlocks revenue. Sequence: build the gate first, then the real feature (PRED-04). |
+| MON-01 | Premium subscription flow (paywall, pricing page) | L | Unlocks revenue. Pricing research: OpenSpec `2026-06-04-mon-01-pricing-market-research`; investor PDFs in `docs/investor/pdf/`. |
 | ~~MON-02~~ | ~~Blocking premium upsell dialog on Transfer (Predicted Points with PRED-02)~~ | S | ✅ Done — archived `2026-06-03-mon-02-premium-upsell-dialog`; spec `openspec/specs/premium-upsell-dialog/`. |
 | ~~MON-03~~ | ~~Donations / Monobank jar link in sidebar~~ | XS | ✅ Done — sidebar banner → `https://send.monobank.ua/jar/7UQvnCDwx8`; override via `VITE_DONATION_URL`. |
 
@@ -332,7 +321,7 @@ natural-language blurb below the xPts value explaining the reasoning behind the 
 **Phase 1 (before PRED-09):** heuristic sentences from FPL API fields only (ep_next, ict_index,
 threat, creativity, form, chance_of_playing, FDR). No model needed.
 
-**Phase 2 (after PRED-09):** enrich with model-derived probabilities (xA, CS%, card risk).
+**Phase 2 (after PRED-09):** enrich with model-derived xGoals, xAssists, CS%, defconPts.
 
 Depends on: PRED-09 for phase 2.
 
@@ -354,7 +343,9 @@ Separate ranked lists for Goals and Assists with probability values per player:
 - Green-blue gradient card background per player
 Reference: fpl.team predicted stats section.
 
-#### PRED-08: Predicted lineups for all 20 Premier League teams
+#### PRED-08: Predicted lineups for all 20 Premier League teams [SHIPPED]
+Premium `/predicted-lineups`: table + pitch for all 20 teams; in-house formation + XI; flank registry (`player-lanes.json`). OpenSpec `archive/2026-06-04-pred-08-predicted-lineups`.
+
 Before each GW deadline, show the predicted starting XI for every PL team:
 - Table view: Name | xMins | xPts (highlight yellow = rotation risk)
 - Pitch view: circular player photos on formation grid with match info
@@ -649,6 +640,7 @@ For reference — features that are live in the codebase:
 - **Auth (AUTH-01)** — login/password + Google OAuth, backend user profile; OpenSpec change 2026-06-02-auth-01-user-accounts.
 - **League participants browser (ANA-12)** — click a league in Stats to browse all participants and view their squads; OpenSpec change 2026-06-02-ana-12-league-participants-browser.
 - **Price changes & predictions (ANA-03, PRED-06)** — `/price-changes` screen: Actual (GW/season risers/fallers) + Tonight predictions; All FPL free, My squad premium; player profile sheet; OpenSpec `ana-03-pred-06-price-changes`.
+- **Predicted lineups (PRED-08)** — `/predicted-lineups`; premium-only predicted XI for all 20 PL teams (table + pitch, formation label, bench-risk); OpenSpec `archive/2026-06-04-pred-08-predicted-lineups`.
 - **DEFCON / BPS leaderboard (STAT-01)** — `/leaderboard` screen with GW and Season tabs; DEFCON worst-first, BPS best-first; `GET /api/leaderboard/gw/:gw` and `/api/leaderboard/season`.
 - **Fix bugs** — BUG-01 (position limits), BUG-02 (transfer arrows)
 - **Proxy/BFF** — services for squad, entry, gameweeks, history, leagues, dream-team, fixtures, player pool, top players, team

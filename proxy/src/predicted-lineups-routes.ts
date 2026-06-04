@@ -1,0 +1,32 @@
+import { Hono } from 'hono';
+
+import { type AuthVars, requireUser } from './auth/middleware';
+import * as predictedLineupService from './predicted-lineup-service';
+import { type PremiumVars, requirePremiumFplUser } from './premium-middleware';
+import { MAX_GAMEWEEK } from './types';
+
+export const predictedLineupsRoutes = new Hono<AuthVars & PremiumVars>();
+
+predictedLineupsRoutes.get(
+  '/predicted-lineups',
+  requireUser,
+  requirePremiumFplUser,
+  async (c) => {
+    const gwRaw = c.req.query('gw');
+    let gw: number | undefined;
+    if (gwRaw !== undefined) {
+      gw = parseInt(gwRaw, 10);
+      if (isNaN(gw) || gw < 1 || gw > MAX_GAMEWEEK) {
+        return c.json({ error: 'Invalid gameweek' }, 400);
+      }
+    }
+
+    try {
+      const result = await predictedLineupService.getPredictedLineups(gw);
+      return c.json(result);
+    } catch (error) {
+      console.error('Error fetching predicted lineups:', error);
+      return c.json({ error: 'Unable to fetch predicted lineups' }, { status: 500 });
+    }
+  }
+);

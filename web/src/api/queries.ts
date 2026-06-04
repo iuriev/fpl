@@ -295,3 +295,16 @@ export function useFixturesCalendar() {
     staleTime: 1000 * 60 * 60 * 12,
   });
 }
+
+export function usePredictedLineups(gw: number | null, enabled: boolean) {
+  return useQuery({
+    queryKey: ['predicted-lineups', gw],
+    queryFn: () => api.getPredictedLineups(gw ?? undefined),
+    enabled: enabled && gw !== null,
+    staleTime: 1000 * 60 * 10,
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && error.status === 403) return false;
+      return failureCount < 2;
+    },
+  });
+}
