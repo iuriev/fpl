@@ -5,6 +5,22 @@
   overflow: hidden;
 }
 
+.helpBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--fpl-muted);
+  cursor: pointer;
+  padding: 0;
+  transition: color 120ms;
+}
+
+.helpBtn:hover {
+  color: var(--fpl-text-soft);
+}
+
 .tabs {
   display: flex;
   border-bottom: 1px solid var(--fpl-bg-hair);

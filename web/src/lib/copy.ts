@@ -553,6 +553,35 @@ export const copy = {
   fixturesCalendarTabAttacking: 'Attacking',
   fixturesCalendarTabRestDays: 'Rest Days',
   fixturesCalendarRestDaysTbc: 'TBC',
+  fixturesCalendarHelpButton: 'Open help',
+  fixturesCalendarHelpTitle: 'Fixtures calendar guide',
+  fixturesCalendarHelpIntro:
+    'Teams are rows and gameweeks are columns. Scroll horizontally through all 38 gameweeks; the current gameweek has a dot under its number.',
+  fixturesCalendarHelpCell:
+    'Each cell shows the opponent code on the top line. On fixture tabs the second line is H (home) or A (away).',
+  fixturesCalendarHelpTabsHeading: 'Tabs',
+  fixturesCalendarHelpTabOfficial: "Official — FPL's own fixture difficulty rating.",
+  fixturesCalendarHelpTabOverall: 'Overall — opponent strength normalised to 1–5.',
+  fixturesCalendarHelpTabDefensive:
+    'Defensive — opponent attack strength; best for goalkeepers and defenders.',
+  fixturesCalendarHelpTabAttacking:
+    'Attacking — opponent defence strength; best for midfielders and forwards.',
+  fixturesCalendarHelpTabRestDays:
+    "Rest Days — days since the team's previous kick-off. Short gaps mean higher rotation risk.",
+  fixturesCalendarHelpSpecialHeading: 'Special cells',
+  fixturesCalendarHelpDgw: 'Double gameweek: two opponent chips side by side in one cell.',
+  fixturesCalendarHelpBgw: 'Blank gameweek: a dash (—) when the team has no fixture.',
+  fixturesCalendarHelpFdrHeading: 'Fixture difficulty colours',
+  fixturesCalendarHelpFdr1: 'Very easy',
+  fixturesCalendarHelpFdr2: 'Easy',
+  fixturesCalendarHelpFdr3: 'Medium',
+  fixturesCalendarHelpFdr4: 'Hard',
+  fixturesCalendarHelpFdr5: 'Very hard',
+  fixturesCalendarHelpRestHeading: 'Rest days colours',
+  fixturesCalendarHelpRestTight: '3 days or less — tight turnaround',
+  fixturesCalendarHelpRestModerate: '4–6 days between matches',
+  fixturesCalendarHelpRestEasy: '7 days or more',
+  fixturesCalendarHelpRestTbc: 'Kick-off not yet announced',
 };
 
 /**

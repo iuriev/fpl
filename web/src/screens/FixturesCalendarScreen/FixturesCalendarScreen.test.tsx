@@ -217,6 +217,42 @@ describe('FixturesCalendarScreen', () => {
     expect(screen.getByText('Loading…')).toBeInTheDocument();
   });
 
+  it('opens help bottom sheet from header button', async () => {
+    const user = userEvent.setup();
+    mockQueries.useFixturesCalendar.mockReturnValue({
+      data: mockData,
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof queries.useFixturesCalendar>);
+
+    renderScreen();
+
+    await user.click(screen.getByRole('button', { name: 'Open help' }));
+
+    expect(screen.getByRole('dialog', { name: 'Fixtures calendar guide' })).toBeInTheDocument();
+    expect(screen.getByText('Fixture difficulty colours')).toBeInTheDocument();
+    expect(screen.getByText('Very easy')).toBeInTheDocument();
+    expect(screen.getByText('Rest days colours')).toBeInTheDocument();
+  });
+
+  it('closes help bottom sheet via backdrop', async () => {
+    const user = userEvent.setup();
+    mockQueries.useFixturesCalendar.mockReturnValue({
+      data: mockData,
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof queries.useFixturesCalendar>);
+
+    renderScreen();
+
+    await user.click(screen.getByRole('button', { name: 'Open help' }));
+    await user.click(screen.getByTestId('bottom-sheet-backdrop'));
+
+    expect(screen.queryByRole('dialog', { name: 'Fixtures calendar guide' })).not.toBeInTheDocument();
+  });
+
   it('shows error message with retry button when request fails', () => {
     mockQueries.useFixturesCalendar.mockReturnValue({
       data: undefined,
