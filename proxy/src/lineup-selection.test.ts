@@ -1,30 +1,32 @@
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('./player-tactical-role', () => ({
-  playerFillsRole: (code: number, role: string) => {
-    const map: Record<number, string[]> = {
-      1: ['lb'],
-      2: ['cb'],
-      3: ['cb'],
-      4: ['rb'],
-      5: ['rb'],
-      6: ['cb'],
-    };
-    return map[code]?.includes(role) ?? false;
-  },
-  playerFillsAnyRole: (code: number, roles: string[]) =>
-    roles.some((r) => {
-      const map: Record<number, string[]> = {
-        1: ['lb'],
-        2: ['cb'],
-        3: ['cb'],
-        4: ['rb'],
-        5: ['rb'],
-        6: ['cb'],
-      };
-      return map[code]?.includes(r) ?? false;
-    }),
-}));
+vi.mock('./player-tactical-role', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./player-tactical-role')>();
+  const primary: Record<number, string> = {
+    1: 'lb',
+    2: 'cb',
+    3: 'cb',
+    4: 'rb',
+    5: 'rb',
+    6: 'cb',
+  };
+  const qualifies = (code: number, role: string) => primary[code] === role;
+  return {
+    ...actual,
+    playerQualifiesForQuotaRole: qualifies,
+    playerQualifiesForAnyQuotaRole: (code: number, roles: string[]) =>
+      roles.some((r) => qualifies(code, r)),
+    playerQualifiesForWingQuotaRole: qualifies,
+    playerQualifiesForAnyWingQuotaRole: (code: number, roles: string[]) =>
+      roles.some((r) => qualifies(code, r)),
+    bestQuotaRoleMeritScore: (
+      _code: number,
+      _roles: string[],
+      _line: string,
+      baseMerit: number
+    ) => baseMerit,
+  };
+});
 
 import { pickLineWithRoleQuotas } from './lineup-selection';
 

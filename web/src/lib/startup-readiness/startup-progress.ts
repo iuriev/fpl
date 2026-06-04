@@ -13,8 +13,7 @@ export function startupProgressPercent(health: HealthResponse | undefined): numb
     w.hotTotal > 0 ? Math.min(1, w.hotDone / w.hotTotal) * hotWeight : hotWeight;
   const coldPct =
     w.coldTotal > 0 ? Math.min(1, w.coldDone / w.coldTotal) * coldWeight : 0;
-  const phaseBoost =
-    w.phase === 'lineups_hot' || w.phase === 'lineups_full' ? 0.05 : w.phase === 'cold' ? 0 : 0;
+  const phaseBoost = w.phase === 'lineups' ? 0.05 : 0;
 
   return Math.round(Math.min(99, (hotPct + coldPct + phaseBoost) * 100));
 }

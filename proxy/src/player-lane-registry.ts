@@ -5,13 +5,16 @@ import {
   type LineupSlotSpec,
 } from './lineup-slot-requirements';
 import {
+  bestSlotMeritScore,
+  fillTierForRole,
   fillTierForSlot,
   type FillTierOptions,
   getPlayerLaneFromProfile,
+  getPlayerTacticalProfile,
   getPlayerTacticalRole,
   hasTacticalProfile,
   isCentralOnlyMidRole,
-  playerFillsSlot,
+  isWidePrimaryOnLine,
   prefersCentralSlot,
 } from './player-tactical-role';
 
@@ -93,27 +96,63 @@ function isCentralLineSlot(spec: LineupSlotSpec, line: LineGroup): boolean {
   return spec.lane === 'C' && (line === 'DEF' || line === 'MID' || line === 'FWD');
 }
 
+function canFillWingSlot(code: number, slot: LineupSlotSpec, line: LineGroup): boolean {
+  if (isWidePrimaryOnLine(code, line)) {
+    return fillTierForRole(code, slot.role, line) <= 1;
+  }
+  return fillTierForRole(code, slot.role, line) === 0;
+}
+
+function blocksWidePrimaryFromCentral(
+  code: number,
+  slot: LineupSlotSpec,
+  line: LineGroup,
+  options?: FillTierOptions
+): boolean {
+  if (!options?.blockWideFromCentral) return false;
+  if (!isCentralLineSlot(slot, line)) return false;
+  return isWidePrimaryOnLine(code, line);
+}
+
 function slotAssignmentCost(
   player: LaneAssignablePlayer,
   slot: LineupSlotSpec,
   line: LineGroup,
   options?: FillTierOptions
 ): number {
-  const fillTier = fillTierForSlot(player.code, slot, line, options);
+  if (blocksWidePrimaryFromCentral(player.code, slot, line, options)) {
+    return Number.POSITIVE_INFINITY;
+  }
+
+  let fillTier = fillTierForSlot(player.code, slot, line, options);
+  if (fillTier >= 3 && options?.allowCentralOnWide) {
+    fillTier = 2;
+  }
   if (fillTier >= 3) return Number.POSITIVE_INFINITY;
 
   const laneCost = laneMismatchCost(getPlayerLaneFromProfile(player.code), slot.lane);
   const role = getPlayerTacticalRole(player.code);
 
   let roleBias = 0;
-  if (prefersCentralSlot(player.code) && isWingSlot(slot)) roleBias += 500;
+  if (prefersCentralSlot(player.code, line) && isWingSlot(slot)) roleBias += 500;
   if (isWideProfileRole(role) && isCentralLineSlot(slot, line)) roleBias += 300;
   if (isCentralOnlyMidRole(role) && (slot.role === 'lm' || slot.role === 'rm')) {
     roleBias += 50_000;
   }
   if (role === 'st' && (slot.role === 'lw' || slot.role === 'rw')) roleBias += 50_000;
 
-  return fillTier * 10_000 + laneCost * 1_000 + roleBias;
+  const slotMerit = bestSlotMeritScore(player.code, slot, line, player.startScore);
+  return fillTier * 10_000 + laneCost * 1_000 + roleBias - slotMerit * 1_000;
+}
+
+function forceSlotAssignmentCost(
+  player: LaneAssignablePlayer,
+  slot: LineupSlotSpec,
+  line: LineGroup
+): number {
+  const laneCost = laneMismatchCost(getPlayerLaneFromProfile(player.code), slot.lane);
+  const slotMerit = bestSlotMeritScore(player.code, slot, line, player.startScore);
+  return laneCost * 1_000 - slotMerit * 1_000;
 }
 
 export interface LaneAssignablePlayer {
@@ -127,6 +166,88 @@ export interface LaneAssignedPlayer extends LaneAssignablePlayer {
   pitchOrder: number;
 }
 
+type SlotWithOrder = LineupSlotSpec & { pitchOrder: number };
+
+function isRightWingSlot(spec: SlotWithOrder, line: LineGroup): boolean {
+  if (spec.lane === 'R') return true;
+  if (line === 'DEF') return spec.role === 'rb';
+  if (line === 'MID') return spec.role === 'rm';
+  return spec.role === 'rw';
+}
+
+function wingSlotsAssignOrder(slots: SlotWithOrder[], line: LineGroup): SlotWithOrder[] {
+  return [...slots].sort((a, b) => {
+    const aRight = isRightWingSlot(a, line);
+    const bRight = isRightWingSlot(b, line);
+    if (aRight !== bRight) return aRight ? -1 : 1;
+    return a.pitchOrder - b.pitchOrder;
+  });
+}
+
+function assignOpenSlots(
+  openSlots: SlotWithOrder[],
+  remaining: LaneAssignablePlayer[],
+  assigned: LaneAssignedPlayer[],
+  line: LineGroup,
+  options?: FillTierOptions
+): void {
+  const ordered = options?.wingPrimaryOnly
+    ? wingSlotsAssignOrder(openSlots, line)
+    : [...openSlots].sort((a, b) => a.pitchOrder - b.pitchOrder);
+  for (const slot of ordered) {
+    let bestPi = -1;
+    let bestCost = Number.POSITIVE_INFINITY;
+    for (let pi = 0; pi < remaining.length; pi++) {
+      const player = remaining[pi]!;
+      if (options?.wingPrimaryOnly && !canFillWingSlot(player.code, slot, line)) {
+        continue;
+      }
+      const cost = slotAssignmentCost(player, slot, line, options);
+      if (cost < bestCost) {
+        bestCost = cost;
+        bestPi = pi;
+      }
+    }
+    if (bestPi < 0 || !Number.isFinite(bestCost)) continue;
+    const player = remaining.splice(bestPi, 1)[0]!;
+    const slotIdx = openSlots.findIndex((s) => s.pitchOrder === slot.pitchOrder);
+    if (slotIdx >= 0) openSlots.splice(slotIdx, 1);
+    assigned.push({
+      ...player,
+      lane: slot.lane,
+      pitchOrder: slot.pitchOrder,
+    });
+  }
+}
+
+function forceAssignRemaining(
+  openSlots: SlotWithOrder[],
+  remaining: LaneAssignablePlayer[],
+  assigned: LaneAssignedPlayer[],
+  line: LineGroup
+): void {
+  for (const player of [...remaining]) {
+    if (openSlots.length === 0) break;
+    let bestIdx = 0;
+    let bestCost = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < openSlots.length; i++) {
+      const cost = forceSlotAssignmentCost(player, openSlots[i]!, line);
+      if (cost < bestCost) {
+        bestCost = cost;
+        bestIdx = i;
+      }
+    }
+    const slot = openSlots.splice(bestIdx, 1)[0]!;
+    const pi = remaining.findIndex((p) => p.id === player.id);
+    if (pi >= 0) remaining.splice(pi, 1);
+    assigned.push({
+      ...player,
+      lane: slot.lane,
+      pitchOrder: slot.pitchOrder,
+    });
+  }
+}
+
 export function assignPlayersToSlots(
   players: LaneAssignablePlayer[],
   line: LineGroup,
@@ -138,44 +259,36 @@ export function assignPlayersToSlots(
     getLineupSlotSpecs(line, count) ??
     lanesOnlyToSpecs(line, getSlotLanes(line, count));
 
-  const openSlots = specs.map((spec, pitchOrder) => ({ ...spec, pitchOrder }));
-  const assigned: LaneAssignedPlayer[] = [];
-  const byMerit = [...players].sort((a, b) => b.startScore - a.startScore);
+  const openWingSlots = specs
+    .map((spec, pitchOrder) => ({ ...spec, pitchOrder }))
+    .filter(isWingSlot);
+  const openCentralSlots = specs
+    .map((spec, pitchOrder) => ({ ...spec, pitchOrder }))
+    .filter((s) => s.lane === 'C');
 
-  for (const player of byMerit) {
-    let bestIdx = -1;
-    let bestCost = Number.POSITIVE_INFINITY;
-    for (let i = 0; i < openSlots.length; i++) {
-      const cost = slotAssignmentCost(player, openSlots[i], line);
-      if (cost < bestCost) {
-        bestCost = cost;
-        bestIdx = i;
-      }
-    }
-    if (bestIdx < 0 || !Number.isFinite(bestCost)) {
-      for (let i = 0; i < openSlots.length; i++) {
-        const cost = slotAssignmentCost(player, openSlots[i], line, {
-          allowCentralOnWide: true,
-        });
-        if (cost < bestCost) {
-          bestCost = cost;
-          bestIdx = i;
-        }
-      }
-    }
-    if (bestIdx < 0) {
-      const fallbackIdx = openSlots.findIndex((slot) =>
-        playerFillsSlot(player.code, slot, line, { allowCentralOnWide: true })
-      );
-      if (fallbackIdx < 0) continue;
-      bestIdx = fallbackIdx;
-    }
-    const slot = openSlots.splice(bestIdx, 1)[0];
+  const remaining = [...players];
+  const assigned: LaneAssignedPlayer[] = [];
+
+  assignOpenSlots(openWingSlots, remaining, assigned, line, { wingPrimaryOnly: true });
+  assignOpenSlots(openCentralSlots, remaining, assigned, line, {
+    blockWideFromCentral: true,
+  });
+
+  const openAny = [...openWingSlots, ...openCentralSlots];
+  assignOpenSlots(openAny, remaining, assigned, line, { allowCentralOnWide: true });
+
+  forceAssignRemaining(openAny, remaining, assigned, line);
+
+  const assignedIds = new Set(assigned.map((a) => a.id));
+  for (const player of players) {
+    if (assignedIds.has(player.id)) continue;
+    const slot = openAny.shift();
     assigned.push({
       ...player,
-      lane: slot.lane,
-      pitchOrder: slot.pitchOrder,
+      lane: slot?.lane ?? getPlayerLaneFromProfile(player.code),
+      pitchOrder: slot?.pitchOrder ?? assigned.length,
     });
+    assignedIds.add(player.id);
   }
 
   return assigned.sort((a, b) => a.pitchOrder - b.pitchOrder);

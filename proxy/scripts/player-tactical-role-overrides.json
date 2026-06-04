@@ -1,4 +1,7 @@
 {
+  "ARS": {
+    "Madueke": { "role": "rw", "lane": "R", "secondary": ["lm"] }
+  },
   "MUN": {
     "Bruno F.": { "role": "am", "lane": "C", "secondary": ["cm"] },
     "Shaw": { "role": "lb", "lane": "L", "secondary": ["cb"] },

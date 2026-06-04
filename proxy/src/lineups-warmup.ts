@@ -23,9 +23,8 @@ export type LineupsWarmupPhase =
   | 'waiting'
   | 'fixtures'
   | 'hot'
-  | 'lineups_hot'
   | 'cold'
-  | 'lineups_full'
+  | 'lineups'
   | 'done'
   | 'error';
 
@@ -112,7 +111,7 @@ async function sleepWithProgress(delayMs: number): Promise<void> {
     waited += chunk;
     if (waited % 5_000 === 0 || waited >= delayMs) {
       logWarmup(
-        `waiting ${waited}/${delayMs}ms before background FPL (predicted lineups return 503 until hot tier is ready)`
+        `waiting ${waited}/${delayMs}ms before background FPL (predicted lineups return 503 until warmup completes)`
       );
     }
   }
@@ -187,7 +186,9 @@ export async function runLineupsWarmup(db: Db): Promise<void> {
   running = true;
   status.startedAt = new Date().toISOString();
   status.lastError = null;
-  logWarmup('background warmup started (GET /api/predicted-lineups returns 503 until hot tier completes)');
+  logWarmup(
+    'background warmup started (GET /api/predicted-lineups returns 503 until hot+cold summaries and cache are ready)'
+  );
 
   try {
     if (isShuttingDown()) return;
@@ -231,37 +232,36 @@ export async function runLineupsWarmup(db: Db): Promise<void> {
     if (isShuttingDown()) return;
 
     status.hotDone = await countFreshSummaries(db, season, hotIds);
-    status.ready = status.hotDone >= status.hotTotal;
-    status.phase = 'lineups_hot';
-    logWarmup(
-      `phase=lineups_hot ready=${status.ready} (${formatLineupsWarmupStatus()}) — first predicted-lineups cache build`
-    );
-    const hotCacheStart = Date.now();
-    await predictedLineupService.getPredictedLineups(undefined, {
-      skipReadyGuard: true,
-    });
-    if (isShuttingDown()) return;
-    logWarmup(
-      `predicted-lineups initial cache ready in ${Date.now() - hotCacheStart}ms — API may return 200 now`
-    );
 
     status.coldTotal = coldIds.length;
     status.coldDone = await countFreshSummaries(db, season, coldIds);
     status.phase = 'cold';
-    logWarmup(`cold tier: ${coldIds.length} players (${status.coldDone} already cached)`);
+    const coldCached = status.coldDone;
+    const coldToFetch = coldIds.length - coldCached;
+    logWarmup(
+      `cold tier: ${coldIds.length} players (${coldCached} in DB, ${coldToFetch} need FPL — ~${coldToFetch * 5}s at 5s/request)`
+    );
+    if (coldToFetch === 0) {
+      logWarmup('no FPL element-summary calls needed for cold tier');
+    }
     await warmElementIds(db, season, coldIds, 'cold', (done) => {
       status.coldDone = done;
     });
     if (isShuttingDown()) return;
 
-    status.phase = 'lineups_full';
-    logWarmup('phase=lineups_full — refreshing predicted-lineups with full squad coverage');
-    const fullCacheStart = Date.now();
+    status.coldDone = await countFreshSummaries(db, season, coldIds);
+    status.phase = 'lineups';
+    logWarmup(
+      `phase=lineups (${formatLineupsWarmupStatus()}) — building predicted-lineups cache with hot+cold summaries`
+    );
+    const lineupsCacheStart = Date.now();
     await predictedLineupService.getPredictedLineups(undefined, {
       skipReadyGuard: true,
-      refreshCache: true,
     });
-    logWarmup(`predicted-lineups full cache refreshed in ${Date.now() - fullCacheStart}ms`);
+    if (isShuttingDown()) return;
+    logWarmup(
+      `predicted-lineups cache ready in ${Date.now() - lineupsCacheStart}ms — API may return 200 now`
+    );
 
     status.phase = 'done';
     status.ready = true;

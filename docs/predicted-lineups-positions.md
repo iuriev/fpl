@@ -88,12 +88,17 @@ Among eligible players, quotas are satisfied using fill priority above.
 ## Selection algorithm (outline)
 
 1. Infer formation → DEF/MID/FWD counts.
-2. Filter candidates by FPL `element_type` and availability.
-3. If quotas exist for that row count, `pickLineWithRoleQuotas`:
-   - For each quota, take highest `startScore` players who can fill that role (primary →
-     secondary → group).
-   - Fill remaining slots up to row count by score.
-4. `assignPlayersToSlots`: map picked players to pitch lanes by **merit** (`startScore` from
+2. Pool: squad players with **≥1 minute in the current season**, except **GW1** (whole squad
+   eligible). No minutes after GW1 → excluded.
+3. `startScore`: recent starts/minutes from `element-summary` when cached; otherwise estimated
+   from bootstrap season minutes (so cold-tier players are not stuck at zero).
+4. Filter candidates by FPL `element_type` and availability.
+5. If quotas exist for that row count, `pickLineWithRoleQuotas`:
+   - For each quota, take highest **role merit** among players who match that role at
+     **primary or secondary** only (no group fallback for quotas — a `cm` cannot satisfy `lm`).
+   - Fill remaining slots up to row count by `startScore`.
+6. Role merit = `startScore × multiplier` (primary 1.0, secondary 0.85, group fallback 0.35).
+7. `assignPlayersToSlots`: map picked players to pitch lanes by **merit** (`startScore` from
    recent starts, minutes, and availability). Players are processed highest score first; each
    claims the open slot with the lowest fit penalty (primary role → secondary → line group,
    profile lane, central vs wing bias). Better centre-backs take central slots before

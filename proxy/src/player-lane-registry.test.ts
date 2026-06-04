@@ -21,6 +21,12 @@ vi.mock('./data/player-tactical-roles.json', () => ({
     '311': { role: 'lm', lane: 'L', secondary: [] },
     '312': { role: 'rm', lane: 'R', secondary: [] },
     '313': { role: 'dm', lane: 'C', secondary: [] },
+    '320': { role: 'cb', lane: 'C', secondary: [] },
+    '210': { role: 'lb', lane: 'L', secondary: ['cb'] },
+    '211': { role: 'cb', lane: 'C', secondary: [] },
+    '212': { role: 'rb', lane: 'R', secondary: ['cb'] },
+    '213': { role: 'rb', lane: 'R', secondary: ['cb', 'lb'] },
+    '214': { role: 'cb', lane: 'C', secondary: [] },
   },
 }));
 
@@ -115,5 +121,39 @@ describe('player-lane-registry', () => {
     expect(assigned.find((a) => a.id === 1)?.lane).toBe('C');
     expect(assigned.find((a) => a.id === 2)?.lane).toBe('L');
     expect(assigned.find((a) => a.id === 4)?.lane).toBe('R');
+  });
+
+  it('fills wings before centre and keeps the spare full-back off centre', () => {
+    const assigned = assignPlayersToSlots(
+      [
+        { id: 1, code: 210, startScore: 1.22 },
+        { id: 2, code: 211, startScore: 0.99 },
+        { id: 3, code: 212, startScore: 0.89 },
+        { id: 4, code: 214, startScore: 0.75 },
+      ],
+      'DEF',
+      4
+    );
+
+    const byId = new Map(assigned.map((a) => [a.id, a.lane]));
+    expect(byId.get(1)).toBe('L');
+    expect(byId.get(2)).toBe('C');
+    expect(byId.get(3)).toBe('R');
+    expect(byId.get(4)).toBe('C');
+  });
+
+  it('assigns every picked player even when tactical profile is for another line', () => {
+    const assigned = assignPlayersToSlots(
+      [
+        { id: 1, code: 201, startScore: 0.95 },
+        { id: 2, code: 202, startScore: 0.9 },
+        { id: 3, code: 320, startScore: 0.85 },
+        { id: 4, code: 310, startScore: 0.8 },
+        { id: 5, code: 311, startScore: 0.75 },
+      ],
+      'MID',
+      5
+    );
+    expect(assigned).toHaveLength(5);
   });
 });

@@ -500,9 +500,8 @@ export type LineupsWarmupPhase =
   | 'waiting'
   | 'fixtures'
   | 'hot'
-  | 'lineups_hot'
   | 'cold'
-  | 'lineups_full'
+  | 'lineups'
   | 'done'
   | 'error';
 

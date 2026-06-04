@@ -18,10 +18,11 @@ import {
 import { pickLine, pickLineWithRoleQuotas } from './lineup-selection';
 import type { LineGroup } from './lineup-slot-requirements';
 import { getRoleQuotasForLine } from './lineup-slot-requirements';
-import { activeSquadElements } from './lineups-player-sets';
 import { LineupsWarmingError } from './lineups-warming-error';
 import { getLineupsWarmupStatus } from './lineups-warmup';
 import { assignPlayersToSlots, type LaneAssignablePlayer } from './player-lane-registry';
+import { predictedLineupPoolElements } from './predicted-lineup-pool';
+import { computePredictedStartScore } from './predicted-lineup-start-score';
 import { loadPreviousSeasonFormationsByTeam } from './previous-season-formation';
 import { resolveNextGw } from './resolve-next-gw';
 import type {
@@ -39,29 +40,6 @@ const POSITION_MAP: Record<number, PlayerPosition> = {
   3: 'MID',
   4: 'FWD',
 };
-
-function computeStartScore(
-  el: FPLBootstrapStatic['elements'][number],
-  summary: FPLElementSummary | undefined
-): number {
-  const rows = summary?.history ?? [];
-  const recent = rows.slice(-8);
-  const startsScore =
-    recent.length === 0
-      ? 0
-      : recent.filter((r) => r.starts > 0).length / Math.min(5, recent.length);
-  const minutesScore =
-    recent.length === 0
-      ? 0
-      : recent.reduce((s, r) => s + r.minutes, 0) / recent.length / 90;
-  const chance = el.chance_of_playing_next_round ?? el.chance_of_playing_this_round ?? 100;
-  const chanceScore = chance / 100;
-  let statusMult = 1;
-  if (el.status === 'i' || el.status === 's' || el.status === 'u') statusMult = 0;
-  else if (el.status === 'd') statusMult = 0.5;
-
-  return (0.4 * startsScore + 0.3 * minutesScore + 0.3 * chanceScore) * statusMult;
-}
 
 const ELEMENT_LINE: Record<number, LineGroup> = {
   2: 'DEF',
@@ -100,10 +78,10 @@ function buildTeamLineup(
   const team = bootstrap.teams.find((t) => t.id === teamId)!;
   const getSummary = (id: number) => summaries.get(id);
 
-  const squad = activeSquadElements(bootstrap, teamId);
+  const squad = predictedLineupPoolElements(bootstrap, teamId, targetGw);
   const scored = squad.map((el) => ({
     el,
-    startScore: computeStartScore(el, summaries.get(el.id)),
+    startScore: computePredictedStartScore(el, summaries.get(el.id)),
   }));
 
   const fixtureRow = allFixtures.find(
@@ -160,17 +138,19 @@ function buildTeamLineup(
       startScore: p.startScore,
     }));
     const assigned = assignPlayersToSlots(assignable, line, picks.length);
-    return assigned.map((a) => {
-      const el = picks.find((p) => p.el.id === a.id)!.el;
-      const startScore = a.startScore;
+    const slotById = new Map(assigned.map((a) => [a.id, a]));
+    return picks.map((p, index) => {
+      const slot = slotById.get(p.el.id);
+      const el = p.el;
+      const startScore = p.startScore;
       const flags = playerFlags(el, startScore);
       return {
         id: el.id,
         webName: el.web_name,
         position: POSITION_MAP[el.element_type] ?? 'MID',
         teamCode: el.team_code,
-        lane: a.lane as PlayerLane,
-        pitchOrder: a.pitchOrder,
+        lane: (slot?.lane ?? 'C') as PlayerLane,
+        pitchOrder: slot?.pitchOrder ?? index,
         xMins: Math.round(Math.min(90, Math.max(0, startScore * 90))),
         xPts: parseFloat(el.ep_next) || 0,
         benchRisk: flags.benchRisk,
@@ -235,11 +215,12 @@ const SUMMARY_LOAD_LOG_EVERY = 50;
 async function loadSummariesForTeams(
   bootstrap: FPLBootstrapStatic,
   teamIds: number[],
-  season: string
+  season: string,
+  targetGw: number
 ): Promise<Map<number, FPLElementSummary>> {
   const ids = [...new Set(
     teamIds.flatMap((teamId) =>
-      activeSquadElements(bootstrap, teamId).map((el) => el.id)
+      predictedLineupPoolElements(bootstrap, teamId, targetGw).map((el) => el.id)
     )
   )];
   logPredictedLineups(`loading ${ids.length} element summaries from cache (DB per player)`);
@@ -289,11 +270,7 @@ export async function getPredictedLineups(
   const bootstrap = await getOrFetchBootstrap(db);
   const season = deriveSeason(bootstrap.events);
   const targetGw = gwParam ?? resolveNextGw(bootstrap);
-  const warmupTag = opts?.skipReadyGuard
-    ? opts.refreshCache
-      ? ' (warmup full)'
-      : ' (warmup hot)'
-    : '';
+  const warmupTag = opts?.skipReadyGuard ? ' (warmup)' : '';
   logPredictedLineups(`building cache gw=${targetGw} season=${season}${warmupTag}`);
 
   const fixturesStarted = Date.now();
@@ -312,7 +289,7 @@ export async function getPredictedLineups(
     `loading summaries + previous-season formations for ${teamIds.length} teams`
   );
   const [summaries, previousSeasonFormations] = await Promise.all([
-    loadSummariesForTeams(bootstrap, teamIds, season),
+    loadSummariesForTeams(bootstrap, teamIds, season, targetGw),
     loadPreviousSeasonFormationsByTeam(db, season).then((formations) => {
       logPredictedLineups(
         `previous-season formations: ${formations.size} teams (${Date.now() - depsStarted}ms)`
