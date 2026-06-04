@@ -7,10 +7,64 @@
   color: var(--fpl-text);
 }
 
-.gwLabel {
+.gwPickerBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--fpl-space-xs);
+  background: none;
+  border: none;
+  padding: 0;
   font: var(--fpl-fw-semibold) var(--fpl-fs-body-s) / 1 var(--fpl-font-display);
   color: var(--fpl-muted);
   letter-spacing: var(--fpl-tr-head-s);
+  cursor: pointer;
+  transition: color 120ms;
+}
+
+.gwPickerBtn:hover {
+  color: var(--fpl-text);
+}
+
+.gwPickerChevron {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex-shrink: 0;
+}
+
+.gwList {
+  display: flex;
+  flex-direction: column;
+  padding: var(--fpl-space-xs) 0 var(--fpl-space-xl4);
+}
+
+.gwOption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--fpl-space-base) var(--fpl-space-xl3);
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--fpl-bg-hair);
+  color: var(--fpl-text);
+  font: var(--fpl-fw-regular) var(--fpl-fs-body) var(--fpl-font-display);
+  cursor: pointer;
+  text-align: left;
+  transition: background 100ms;
+  min-height: 3rem;
+}
+
+.gwOption:last-child {
+  border-bottom: none;
+}
+
+.gwOption:active {
+  background: color-mix(in srgb, var(--fpl-text) 5%, transparent);
+}
+
+.gwOptionSelected {
+  color: var(--fpl-accent);
+  font-weight: var(--fpl-fw-semibold);
 }
 
 .teamScroller {

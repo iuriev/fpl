@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import { useGameweeks, usePredictedLineups } from '@/api/queries';
+import { BottomSheet } from '@/components/ui/BottomSheet/BottomSheet';
 import { PlayerProfileSheet } from '@/components/ui/PlayerProfileSheet/PlayerProfileSheet';
 import { PremiumLockedOverlay } from '@/components/ui/PremiumLockedOverlay/PremiumLockedOverlay';
 import { PremiumSheet } from '@/components/ui/PremiumSheet/PremiumSheet';
@@ -9,6 +11,7 @@ import { copy, interpolate } from '@/lib/copy';
 import { useRequestPremiumUpsell } from '@/lib/premium-upsell/PremiumUpsellContext';
 import { useFollowPlayer } from '@/lib/use-follow-player';
 import { usePremiumStatus } from '@/lib/use-premium-status';
+import { MAX_GAMEWEEK } from '@/types';
 
 import { PredictedLineupPitch } from './PredictedLineupPitch';
 import styles from './PredictedLineupsScreen.module.css';
@@ -17,19 +20,51 @@ import { PredictedLineupTable } from './PredictedLineupTable';
 type ViewMode = 'table' | 'pitch';
 
 export const PredictedLineupsScreen: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const isPremium = usePremiumStatus();
   const requestUpsell = useRequestPremiumUpsell();
   const [view, setView] = useState<ViewMode>('pitch');
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
   const [premiumOpen, setPremiumOpen] = useState(false);
   const [profilePlayerId, setProfilePlayerId] = useState<number | null>(null);
+  const [gwPickerOpen, setGwPickerOpen] = useState(false);
 
   const { data: gameweeksData } = useGameweeks();
-  const nextGw = gameweeksData?.next ?? gameweeksData?.current ?? null;
-  const gwLabel =
-    nextGw !== null ? interpolate(copy.predictedLineupsGwLabel, { n: nextGw }) : '';
+  const defaultGw = gameweeksData?.next ?? gameweeksData?.current ?? null;
 
-  const lineupsQuery = usePredictedLineups(nextGw, isPremium);
+  const selectableGws = useMemo(() => {
+    const current = gameweeksData?.current;
+    const next = gameweeksData?.next ?? gameweeksData?.current;
+    if (current == null || next == null) return [];
+    const low = Math.min(current, next);
+    const high = Math.max(current, next);
+    return Array.from({ length: high - low + 1 }, (_, i) => low + i);
+  }, [gameweeksData]);
+
+  const gwParam = searchParams.get('gw');
+  const selectedGw = useMemo(() => {
+    if (gwParam) {
+      const n = Number(gwParam);
+      if (Number.isInteger(n) && n >= 1 && n <= MAX_GAMEWEEK) {
+        if (selectableGws.length === 0 || selectableGws.includes(n)) return n;
+      }
+    }
+    return defaultGw;
+  }, [gwParam, defaultGw, selectableGws]);
+
+  const gwLabel =
+    selectedGw !== null ? interpolate(copy.predictedLineupsGwLabel, { n: selectedGw }) : '';
+
+  const selectGw = (gw: number) => {
+    setSearchParams((prev) => {
+      const p = new URLSearchParams(prev);
+      p.set('gw', String(gw));
+      return p;
+    });
+    setGwPickerOpen(false);
+  };
+
+  const lineupsQuery = usePredictedLineups(selectedGw, isPremium);
 
   useEffect(() => {
     if (!isPremium) {
@@ -83,7 +118,32 @@ export const PredictedLineupsScreen: React.FC = () => {
       <ScreenHeader
         backLabel={copy.squadGuestBack}
         title={copy.predictedLineupsTitle}
-        right={gwLabel ? <span className={styles.gwLabel}>{gwLabel}</span> : undefined}
+        right={
+          gwLabel ? (
+            <button
+              type="button"
+              className={styles.gwPickerBtn}
+              onClick={() => setGwPickerOpen(true)}
+              aria-label={gwLabel}
+            >
+              {gwLabel}
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                aria-hidden="true"
+                className={styles.gwPickerChevron}
+              >
+                <path
+                  d="M4 6l4 4 4-4"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          ) : undefined
+        }
       />
 
       {!isPremium && (
@@ -191,6 +251,28 @@ export const PredictedLineupsScreen: React.FC = () => {
         freeLabel={copy.predictedLineupsPremiumFreeLabel}
         premiumLabel={copy.predictedLineupsPremiumPremiumLabel}
       />
+
+      <BottomSheet
+        open={gwPickerOpen}
+        onClose={() => setGwPickerOpen(false)}
+        title={copy.predictedLineupsSelectGameweek}
+      >
+        {gwPickerOpen && (
+          <div className={styles.gwList}>
+            {selectableGws.map((id) => (
+              <button
+                key={id}
+                type="button"
+                className={`${styles.gwOption} ${id === selectedGw ? styles.gwOptionSelected : ''}`}
+                aria-pressed={id === selectedGw}
+                onClick={() => selectGw(id)}
+              >
+                {interpolate(copy.predictedLineupsGwLabel, { n: id })}
+              </button>
+            ))}
+          </div>
+        )}
+      </BottomSheet>
 
       <PlayerProfileSheet
         playerId={profilePlayerId}

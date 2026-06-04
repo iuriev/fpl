@@ -203,7 +203,14 @@ const mockLineups: PredictedLineupsResponse = {
 function renderScreen(isPremium: boolean) {
   vi.mocked(usePremiumStatus).mockReturnValue(isPremium);
   vi.mocked(useGameweeks).mockReturnValue({
-    data: { current: 9, next: 10, gameweeks: [] },
+    data: {
+      current: 9,
+      next: 10,
+      gameweeks: [
+        { id: 9, name: 'Gameweek 9', finished: false },
+        { id: 10, name: 'Gameweek 10', finished: false },
+      ],
+    },
     isLoading: false,
     isError: false,
   } as never);
@@ -264,5 +271,21 @@ describe('PredictedLineupsScreen', () => {
     renderScreen(true);
     await user.click(screen.getByRole('tab', { name: 'Table' }));
     expect(screen.getAllByText(/Rotation risk/i).length).toBeGreaterThan(0);
+  });
+
+  it('opens gameweek picker bottom sheet from header', async () => {
+    const user = userEvent.setup();
+    renderScreen(true);
+    await user.click(screen.getByRole('button', { name: /GW 10/ }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'GW 9' })).toBeInTheDocument();
+  });
+
+  it('refetches lineups when a different gameweek is selected', async () => {
+    const user = userEvent.setup();
+    renderScreen(true);
+    await user.click(screen.getByRole('button', { name: /GW 10/ }));
+    await user.click(screen.getByRole('button', { name: 'GW 9' }));
+    expect(usePredictedLineups).toHaveBeenLastCalledWith(9, true);
   });
 });

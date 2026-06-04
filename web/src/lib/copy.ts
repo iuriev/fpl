@@ -286,6 +286,7 @@ export const copy = {
   predictedLineupsNavLink: 'Predicted Lineups',
   predictedLineupsTitle: 'Predicted Lineups',
   predictedLineupsGwLabel: 'GW {n}',
+  predictedLineupsSelectGameweek: 'Select gameweek',
   predictedLineupsFormationLabel: 'Formation',
   predictedLineupsTableView: 'Table',
   predictedLineupsPitchView: 'Pitch',
