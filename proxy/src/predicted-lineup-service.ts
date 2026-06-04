@@ -2,10 +2,7 @@ import * as cacheLayer from './cache';
 import { db } from './db/client';
 import * as fixturesService from './fixtures-service';
 import { type FormationCounts, inferFormationForTeam } from './formation-inference';
-import {
-  adjustFormationForSquad,
-  countEligibleByLine,
-} from './formation-squad-fit';
+import { countEligibleByLine } from './formation-squad-fit';
 import { getOrFetchBootstrap } from './fpl-cache/db-cache';
 import { deriveSeason } from './fpl-cache/season';
 import type { FPLBootstrapStatic, FPLElementSummary, FPLFixture } from './fpl-client';
@@ -15,14 +12,16 @@ import {
   hasInjuryWarning,
   isExcludedFromPredictedLineup,
 } from './lineup-availability';
-import { pickLine, pickLineWithRoleQuotas } from './lineup-selection';
-import type { LineGroup } from './lineup-slot-requirements';
-import { getRoleQuotasForLine } from './lineup-slot-requirements';
+import { pickLine } from './lineup-selection';
 import { LineupsWarmingError } from './lineups-warming-error';
 import { getLineupsWarmupStatus } from './lineups-warmup';
 import { assignPlayersToSlots, type LaneAssignablePlayer } from './player-lane-registry';
+import {
+  pickFormationByLineupScore,
+  pickOutfieldLine,
+} from './predicted-lineup-formation-pick';
 import { predictedLineupPoolElements } from './predicted-lineup-pool';
-import { computePredictedStartScore } from './predicted-lineup-start-score';
+import { effectivePredictedStartScore } from './predicted-lineup-start-score';
 import { loadPreviousSeasonFormationsByTeam } from './previous-season-formation';
 import { resolveNextGw } from './resolve-next-gw';
 import type {
@@ -41,32 +40,7 @@ const POSITION_MAP: Record<number, PlayerPosition> = {
   4: 'FWD',
 };
 
-const ELEMENT_LINE: Record<number, LineGroup> = {
-  2: 'DEF',
-  3: 'MID',
-  4: 'FWD',
-};
-
-function pickOutfieldLine(
-  scored: Array<{ el: FPLBootstrapStatic['elements'][number]; startScore: number }>,
-  elementType: number,
-  count: number,
-  kickoffTime: string | null
-) {
-  const eligible = scored.filter(
-    (p) =>
-      p.el.element_type === elementType &&
-      !isExcludedFromPredictedLineup(p.el, kickoffTime)
-  );
-  const line = ELEMENT_LINE[elementType];
-  const quotas = line ? getRoleQuotasForLine(line, count) : null;
-  if (quotas && line) {
-    return pickLineWithRoleQuotas(eligible, count, quotas, line);
-  }
-  return pickLine(eligible, count);
-}
-
-function buildTeamLineup(
+export function buildTeamLineup(
   teamId: number,
   bootstrap: FPLBootstrapStatic,
   summaries: Map<number, FPLElementSummary>,
@@ -81,7 +55,7 @@ function buildTeamLineup(
   const squad = predictedLineupPoolElements(bootstrap, teamId, targetGw);
   const scored = squad.map((el) => ({
     el,
-    startScore: computePredictedStartScore(el, summaries.get(el.id)),
+    startScore: effectivePredictedStartScore(el, summaries.get(el.id)),
   }));
 
   const fixtureRow = allFixtures.find(
@@ -100,9 +74,11 @@ function buildTeamLineup(
     getSummary,
     previousSeasonFormation
   );
-  const formation = adjustFormationForSquad(
+  const formation = pickFormationByLineupScore(
     inferredFormation,
-    countEligibleByLine(squad, kickoffTime)
+    countEligibleByLine(squad, kickoffTime),
+    scored,
+    kickoffTime
   );
 
   const gkPick = pickLine(

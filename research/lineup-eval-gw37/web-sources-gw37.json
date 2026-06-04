@@ -1,0 +1,88 @@
+{
+  "gameweek": 37,
+  "season": "2025/26",
+  "sources": "Sky Sports / BBC confirmed teams pages (May 2026). FPL fixture ids from fantasy.premierleague.com.",
+  "fixtures": [
+    {
+      "fplFixtureId": 362,
+      "home": "AVL",
+      "away": "LIV",
+      "kickoff": "2026-05-15",
+      "urls": [
+        "https://www.skysports.com/football/aston-villa-vs-liverpool/teams/531490",
+        "https://www.bbc.com/sport/football/articles/c78k41e713go"
+      ]
+    },
+    {
+      "fplFixtureId": 368,
+      "home": "MUN",
+      "away": "NFO",
+      "kickoff": "2026-05-17",
+      "urls": [
+        "https://www.skysports.com/football/manchester-united-vs-nottingham-forest/teams/531491",
+        "https://www.bbc.com/sport/football/articles/cgqp7yzgdp0o"
+      ]
+    },
+    {
+      "fplFixtureId": 364,
+      "home": "BRE",
+      "away": "CRY",
+      "kickoff": "2026-05-17",
+      "urls": [
+        "https://www.skysports.com/football/brentford-vs-crystal-palace/teams/531492"
+      ]
+    },
+    {
+      "fplFixtureId": 366,
+      "home": "EVE",
+      "away": "SUN",
+      "kickoff": "2026-05-17",
+      "urls": []
+    },
+    {
+      "fplFixtureId": 367,
+      "home": "LEE",
+      "away": "BHA",
+      "kickoff": "2026-05-17",
+      "urls": []
+    },
+    {
+      "fplFixtureId": 370,
+      "home": "WOL",
+      "away": "FUL",
+      "kickoff": "2026-05-17",
+      "urls": []
+    },
+    {
+      "fplFixtureId": 369,
+      "home": "NEW",
+      "away": "WHU",
+      "kickoff": "2026-05-17",
+      "urls": []
+    },
+    {
+      "fplFixtureId": 361,
+      "home": "ARS",
+      "away": "BUR",
+      "kickoff": "2026-05-18",
+      "urls": [
+        "https://www.skysports.com/football/arsenal-vs-burnley/teams/531489",
+        "https://www.premierleague.com/en/match/2562256/arsenal-vs-burnley"
+      ]
+    },
+    {
+      "fplFixtureId": 363,
+      "home": "BOU",
+      "away": "MCI",
+      "kickoff": "2026-05-19",
+      "urls": []
+    },
+    {
+      "fplFixtureId": 365,
+      "home": "CHE",
+      "away": "TOT",
+      "kickoff": "2026-05-19",
+      "urls": []
+    }
+  ]
+}

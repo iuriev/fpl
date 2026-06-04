@@ -4,7 +4,8 @@ export type FormationSource =
   | 'recent_fixtures'
   | 'previous_season'
   | 'default'
-  | 'squad_fit';
+  | 'squad_fit'
+  | 'lineup_fit';
 
 export interface FormationCounts {
   def: number;

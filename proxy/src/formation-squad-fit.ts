@@ -41,7 +41,7 @@ export function allValidFormations(): FormationCounts[] {
   return out;
 }
 
-function formationDistance(a: FormationCounts, b: FormationCounts): number {
+export function formationDistance(a: FormationCounts, b: FormationCounts): number {
   return Math.abs(a.def - b.def) + Math.abs(a.mid - b.mid) + Math.abs(a.fwd - b.fwd);
 }
 
