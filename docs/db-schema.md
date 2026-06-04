@@ -195,6 +195,17 @@ Persists `entry/{teamId}/transfers/` responses. Same refresh logic as `fpl_histo
 | `last_finished_gw` | integer | NO | Latest finished GW at fetch time |
 | `fetched_at` | timestamp | NO | |
 
+### `fpl_fixtures_cache`
+
+Persists FPL `/fixtures/` (full-season list) when the season is **complete**. One row per season;
+seven-day TTL aligned with bootstrap. In-memory key `fixtures:all` mirrors this for all season states.
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| `season` | text | NO | PK, FK → `fpl_meta.season` |
+| `data` | jsonb | NO | Full `/fixtures/` response array |
+| `fetched_at` | timestamp | NO | |
+
 ### `fpl_element_summary_cache`
 
 Persists FPL `element-summary/{id}/` for predicted lineups and player profile. Six-hour TTL;
@@ -206,6 +217,103 @@ background warmup fills rows after proxy start.
 | `element_id` | integer | NO | PK component |
 | `data` | jsonb | NO | Full element-summary response |
 | `fetched_at` | timestamp | NO | |
+
+## PRED-09 prediction tables (`pred_*`)
+
+Normalized model data and published predictions. **Not** stored in `fpl_*_cache` JSON.
+Ingest from football-data.co.uk + vaastav; batch scorer writes predictions per `model_run_id`.
+See `research/pred-09/DATABASE_PLAN.md` and OpenSpec `2026-06-04-pred-09-prediction-api`.
+
+### `pred_model_run`
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| `id` | uuid | NO | PK |
+| `kind` | text | NO | `train` or `score` |
+| `season` | text | NO | e.g. `2024-25` |
+| `target_event` | integer | YES | FPL GW for score runs |
+| `params` | jsonb | YES | Hyperparameters |
+| `metrics` | jsonb | YES | Validation metrics |
+| `created_at` | timestamp | NO | |
+
+### `pred_epl_match`
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| `season` | text | NO | PK |
+| `match_date` | date | NO | PK |
+| `home_slug` | text | NO | PK |
+| `away_slug` | text | NO | |
+| `fthg`, `ftag` | smallint | NO | Goals |
+| `ftr` | text | NO | H/D/A |
+| `referee` | text | YES | |
+| `home_shots`, `away_shots` | smallint | YES | |
+| `odds_home`, `odds_draw`, `odds_away` | double precision | YES | B365 |
+| `odds_over25`, `odds_under25` | double precision | YES | |
+| `ingested_at` | timestamp | NO | |
+
+### `pred_team_alias`
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| `slug` | text | NO | PK |
+| `fpl_team_id` | integer | NO | |
+| `fd_name` | text | YES | football-data label |
+| `vaastav_name` | text | YES | |
+
+### `pred_player_gw_fact`
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| `season` | text | NO | PK |
+| `round` | integer | NO | PK — GW |
+| `element` | integer | NO | PK — FPL player id |
+| `fixture` | integer | NO | PK — `0` if unknown |
+| `team_id` | integer | YES | |
+| `position` | text | YES | |
+| `minutes`, `starts` | smallint | YES | |
+| `goals`, `assists` | smallint | YES | |
+| `total_points` | smallint | YES | Actual label |
+| `xp` | double precision | YES | vaastav xP |
+| `expected_goals`, `expected_assists` | double precision | YES | |
+| `defensive_contribution` | smallint | YES | 2025/26+ |
+| `ingested_at` | timestamp | NO | |
+
+### `pred_team_strength`
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| `model_run_id` | uuid | NO | PK, FK → `pred_model_run` |
+| `season` | text | NO | PK |
+| `team_slug` | text | NO | PK |
+| `attack`, `defence`, `home_adv`, `mu` | double precision | NO | Poisson params |
+
+### `pred_fixture_team`
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| `model_run_id` | uuid | NO | PK, FK |
+| `season` | text | NO | PK |
+| `fixture_id` | integer | NO | PK — FPL fixture |
+| `team_id` | integer | NO | PK |
+| `event` | integer | YES | GW |
+| `opponent_team_id` | integer | YES | |
+| `is_home` | boolean | NO | |
+| `lambda_for`, `lambda_against`, `cs_prob` | double precision | NO | |
+
+### `pred_player_gw`
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| `model_run_id` | uuid | NO | PK, FK |
+| `event` | integer | NO | PK — GW |
+| `player_id` | integer | NO | PK |
+| `x_pts` | double precision | NO | Headline hybrid |
+| `x_goals`, `x_assists` | double precision | NO | |
+| `cs_prob` | double precision | YES | null MID/FWD |
+| `defcon_pts` | double precision | NO | |
+| `confidence` | text | NO | low/medium/high |
+| `ep_next_anchor`, `model_x_pts` | double precision | NO | Audit |
 
 ## ER Diagram
 
@@ -333,6 +441,11 @@ erDiagram
         jsonb data
         timestamp fetched_at
     }
+    fpl_fixtures_cache {
+        text season PK
+        jsonb data
+        timestamp fetched_at
+    }
 
     user ||--o{ session : "has"
     user ||--o{ account : "has"
@@ -346,4 +459,8 @@ erDiagram
     fpl_meta ||--o{ fpl_history_cache : "caches"
     fpl_meta ||--o{ fpl_transfers_cache : "caches"
     fpl_meta ||--o{ fpl_element_summary_cache : "caches"
+    fpl_meta ||--o| fpl_fixtures_cache : "caches"
+    pred_model_run ||--o{ pred_team_strength : "fits"
+    pred_model_run ||--o{ pred_fixture_team : "scores"
+    pred_model_run ||--o{ pred_player_gw : "publishes"
 ```

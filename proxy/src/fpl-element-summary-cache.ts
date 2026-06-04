@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm';
+import { and, eq, gt, inArray, sql } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
 import * as cacheLayer from './cache';
@@ -32,6 +32,22 @@ export async function getFreshElementSummaryRow(
   if (ageSeconds >= ELEMENT_SUMMARY_TTL_SECONDS) return null;
 
   return row.data as FPLElementSummary;
+}
+
+export async function getCachedElementSummary(
+  db: Db,
+  season: string,
+  elementId: number
+): Promise<FPLElementSummary | undefined> {
+  const memKey = `element-summary:${elementId}`;
+  const memCached = cacheLayer.get<FPLElementSummary>(memKey);
+  if (memCached) return memCached;
+
+  const dbCached = await getFreshElementSummaryRow(db, season, elementId);
+  if (!dbCached) return undefined;
+
+  cacheLayer.set(memKey, dbCached, ELEMENT_SUMMARY_TTL_SECONDS);
+  return dbCached;
 }
 
 export async function getOrFetchElementSummary(
@@ -78,10 +94,16 @@ export async function countFreshSummaries(
   elementIds: number[]
 ): Promise<number> {
   if (elementIds.length === 0) return 0;
-  let count = 0;
-  for (const id of elementIds) {
-    const row = await getFreshElementSummaryRow(db, season, id);
-    if (row) count++;
-  }
-  return count;
+  const cutoff = new Date(Date.now() - ELEMENT_SUMMARY_TTL_SECONDS * 1000);
+  const [row] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(schema.fplElementSummaryCache)
+    .where(
+      and(
+        eq(schema.fplElementSummaryCache.season, season),
+        inArray(schema.fplElementSummaryCache.elementId, elementIds),
+        gt(schema.fplElementSummaryCache.fetchedAt, cutoff)
+      )
+    );
+  return Number(row?.count ?? 0);
 }

@@ -24,6 +24,11 @@ export function getBootstrapTtlSeconds(state: SeasonState): number {
   return 43200; // 12 hours for both pre-season and active
 }
 
+export function getFixturesTtlSeconds(state: SeasonState): number {
+  if (state === 'complete') return getBootstrapTtlSeconds('complete');
+  return 3600;
+}
+
 export function getLiveTtlSeconds(): number {
   return 10800; // 3 hours
 }

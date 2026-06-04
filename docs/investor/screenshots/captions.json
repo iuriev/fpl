@@ -1,0 +1,42 @@
+[
+  {
+    "file": "01-squad.png",
+    "caption": "Squad view — pitch layout, chips, live GW context"
+  },
+  {
+    "file": "02-transfers.png",
+    "caption": "Transfer planner — budget, chips, swap planning"
+  },
+  {
+    "file": "03-fixtures.png",
+    "caption": "Fixtures calendar — FDR, DGW/BGW, recovery view"
+  },
+  {
+    "file": "04-price-changes.png",
+    "caption": "Price changes — actual movers and tonight predictions"
+  },
+  {
+    "file": "05-predicted-points.png",
+    "caption": "Predicted points — ranked by expected points"
+  },
+  {
+    "file": "06-gameweek-review.png",
+    "caption": "Gameweek review — what worked, transfers, what-if"
+  },
+  {
+    "file": "07-stats.png",
+    "caption": "My stats — leagues and gameweek history"
+  },
+  {
+    "file": "08-leaderboard.png",
+    "caption": "DEFCON / BPS leaderboard"
+  },
+  {
+    "file": "09-watchlist.png",
+    "caption": "Manager watchlist — track rivals"
+  },
+  {
+    "file": "10-player-watchlist.png",
+    "caption": "Player watchlist — shortlist before transfers"
+  }
+]

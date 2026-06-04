@@ -3,11 +3,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as cacheLayer from './cache';
 import { getFixturesCalendar } from './fixtures-calendar-service';
 import * as dbCache from './fpl-cache/db-cache';
-import * as fplClient from './fpl-client';
+import * as fplFixturesCache from './fpl-fixtures-cache';
 
 vi.mock('./db/client', () => ({ db: {} }));
 vi.mock('./fpl-cache/db-cache');
-vi.mock('./fpl-client');
+vi.mock('./fpl-fixtures-cache');
 
 function makeTeam(id: number, name: string, shortName: string) {
   return {
@@ -78,7 +78,7 @@ describe('getFixturesCalendar', () => {
   });
 
   it('detects DGW: team with two fixtures in same GW', async () => {
-    vi.mocked(fplClient.getFixturesAll).mockResolvedValue([
+    vi.mocked(fplFixturesCache.getOrFetchAllFixtures).mockResolvedValue([
       makeFixture(1, 1, 1, 2, '2025-08-01T12:00:00Z'),
       makeFixture(2, 1, 1, 3, '2025-08-01T17:00:00Z'),
     ]);
@@ -89,7 +89,7 @@ describe('getFixturesCalendar', () => {
   });
 
   it('detects BGW: team with no fixtures in a GW', async () => {
-    vi.mocked(fplClient.getFixturesAll).mockResolvedValue([
+    vi.mocked(fplFixturesCache.getOrFetchAllFixtures).mockResolvedValue([
       makeFixture(1, 2, 1, 2),
     ]);
 
@@ -99,7 +99,7 @@ describe('getFixturesCalendar', () => {
   });
 
   it('computes rest days between consecutive fixtures', async () => {
-    vi.mocked(fplClient.getFixturesAll).mockResolvedValue([
+    vi.mocked(fplFixturesCache.getOrFetchAllFixtures).mockResolvedValue([
       makeFixture(1, 1, 1, 2, '2025-08-01T15:00:00Z'),
       makeFixture(2, 2, 1, 3, '2025-08-05T15:00:00Z'),
     ]);
@@ -112,7 +112,7 @@ describe('getFixturesCalendar', () => {
   });
 
   it('returns null restDaysBefore for fixture with no kickoffTime', async () => {
-    vi.mocked(fplClient.getFixturesAll).mockResolvedValue([
+    vi.mocked(fplFixturesCache.getOrFetchAllFixtures).mockResolvedValue([
       makeFixture(1, 1, 1, 2, null),
     ]);
 
@@ -122,7 +122,7 @@ describe('getFixturesCalendar', () => {
   });
 
   it('returns null restDaysBefore for first fixture of season', async () => {
-    vi.mocked(fplClient.getFixturesAll).mockResolvedValue([
+    vi.mocked(fplFixturesCache.getOrFetchAllFixtures).mockResolvedValue([
       makeFixture(1, 1, 1, 2, '2025-08-01T15:00:00Z'),
     ]);
 
@@ -132,7 +132,7 @@ describe('getFixturesCalendar', () => {
   });
 
   it('normalises strength into difficulty buckets 1–5 across 20 teams', async () => {
-    vi.mocked(fplClient.getFixturesAll).mockResolvedValue([
+    vi.mocked(fplFixturesCache.getOrFetchAllFixtures).mockResolvedValue([
       makeFixture(1, 1, 1, 20),
     ]);
 
@@ -154,7 +154,7 @@ describe('getFixturesCalendar', () => {
   });
 
   it('returns teams sorted alphabetically', async () => {
-    vi.mocked(fplClient.getFixturesAll).mockResolvedValue([]);
+    vi.mocked(fplFixturesCache.getOrFetchAllFixtures).mockResolvedValue([]);
 
     const result = await getFixturesCalendar();
     const names = result.teams.map((t) => t.name);
@@ -162,7 +162,7 @@ describe('getFixturesCalendar', () => {
   });
 
   it('returns 38 rows per team', async () => {
-    vi.mocked(fplClient.getFixturesAll).mockResolvedValue([]);
+    vi.mocked(fplFixturesCache.getOrFetchAllFixtures).mockResolvedValue([]);
 
     const result = await getFixturesCalendar();
     for (const rows of Object.values(result.byTeam)) {
@@ -171,7 +171,7 @@ describe('getFixturesCalendar', () => {
   });
 
   it('caches result with CALENDAR TTL', async () => {
-    vi.mocked(fplClient.getFixturesAll).mockResolvedValue([]);
+    vi.mocked(fplFixturesCache.getOrFetchAllFixtures).mockResolvedValue([]);
     const setSpy = vi.spyOn(cacheLayer, 'set');
 
     await getFixturesCalendar();
@@ -184,11 +184,11 @@ describe('getFixturesCalendar', () => {
   });
 
   it('returns cached result on second call', async () => {
-    vi.mocked(fplClient.getFixturesAll).mockResolvedValue([]);
+    vi.mocked(fplFixturesCache.getOrFetchAllFixtures).mockResolvedValue([]);
 
     await getFixturesCalendar();
     await getFixturesCalendar();
 
-    expect(fplClient.getFixturesAll).toHaveBeenCalledTimes(1);
+    expect(fplFixturesCache.getOrFetchAllFixtures).toHaveBeenCalledTimes(1);
   });
 });

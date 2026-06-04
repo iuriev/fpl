@@ -2,7 +2,7 @@ import * as cacheLayer from './cache';
 import { db } from './db/client';
 import { getOrFetchBootstrap } from './fpl-cache/db-cache';
 import type { FPLFixture } from './fpl-client';
-import * as fplClient from './fpl-client';
+import { getOrFetchAllFixtures } from './fpl-fixtures-cache';
 import { MAX_GAMEWEEK } from './types';
 
 export interface CalendarTeam {
@@ -116,7 +116,7 @@ export async function getFixturesCalendar(): Promise<CalendarResponse> {
 
   const [bootstrap, allFixtures] = await Promise.all([
     getOrFetchBootstrap(db),
-    fplClient.getFixturesAll(),
+    getOrFetchAllFixtures(db),
   ]);
 
   const teamMap = new Map(

@@ -15,6 +15,9 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
+    "pred:ingest": "tsx --env-file=.env src/pred-cli.ts ingest",
+    "pred:score": "tsx --env-file=.env src/pred-cli.ts score",
+    "pred:verify": "tsx --env-file=.env src/pred-verify.ts",
     "lineups:warmup": "tsx --env-file=.env src/lineups-warmup-cli.ts"
   },
   "dependencies": {

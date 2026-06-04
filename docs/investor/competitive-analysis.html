@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Competitive Analysis — FPL Decision Companion</title>
+  <link rel="stylesheet" href="investor.css" />
+</head>
+<body>
+
+<section class="cover">
+  <p class="kicker">Competitive intelligence · June 2026</p>
+  <h1>Competitive analysis</h1>
+  <p class="lead">How our product maps to ten FPL tools — what we match on the roadmap, what we add net-new, and where we deliberately stay free.</p>
+</section>
+
+<h2>Competitor set</h2>
+<table>
+  <thead>
+    <tr><th>#</th><th>Product</th><th>Price (entry premium)</th><th>Core promise</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td>fpl.team</td><td>£25–50/yr</td><td>All-in-one planner + solver + live</td></tr>
+    <tr><td>2</td><td>Fantasy Football Scout</td><td>£60/yr</td><td>Opta data + articles + planners</td></tr>
+    <tr><td>3</td><td>Fantasy Football Fix</td><td>~£38–47/yr</td><td>Elite reveals + AI + extension</td></tr>
+    <tr><td>4</td><td>FPL Review</td><td>~£36/yr (Patreon)</td><td>MILP optimiser + elite 1k data</td></tr>
+    <tr><td>5</td><td>Fantasy Football Hub</td><td>~£60–96/yr</td><td>AI + expert reveals + community</td></tr>
+    <tr><td>6</td><td>FPL Focal (fpl.page)</td><td>~£30/yr</td><td>Free live dashboard; premium = no ads</td></tr>
+    <tr><td>7</td><td>Plan FPL</td><td>Free</td><td>Multi-GW planner + widgets</td></tr>
+    <tr><td>8</td><td>LiveFPL</td><td>Free</td><td>Live rank + EO</td></tr>
+    <tr><td>9</td><td>LazyFPL</td><td>£50/yr</td><td>Newsletter + WhatsApp community</td></tr>
+    <tr><td>10</td><td>ChatFPL.ai</td><td>£96+/yr</td><td>AI chat only</td></tr>
+  </tbody>
+</table>
+
+<h2>Feature matrix — shipped vs competitors</h2>
+<p>Legend: <span class="tag tag-shipped">Us today</span> <span class="tag tag-roadmap">Roadmap</span> <span class="tag tag-new">Differentiator</span></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>Us</th>
+      <th>fpl.team</th>
+      <th>Scout</th>
+      <th>Fix</th>
+      <th>FPL Review</th>
+      <th>Focal</th>
+      <th>Plan FPL</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>Squad / GW view</td><td><span class="tag tag-shipped">Yes</span></td><td>Yes</td><td>Partial</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+    <tr><td>Transfer planner</td><td><span class="tag tag-shipped">Yes</span></td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>No</td><td>Yes</td></tr>
+    <tr><td>Cloud draft sync</td><td><span class="tag tag-shipped">Yes</span></td><td>Yes</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+    <tr><td>Fixtures / FDR calendar</td><td><span class="tag tag-shipped">Yes</span></td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+    <tr><td>Recovery / rotation calendar</td><td><span class="tag tag-shipped">Yes</span></td><td>Yes</td><td>Partial</td><td>—</td><td>—</td><td>Partial</td><td>—</td></tr>
+    <tr><td>Price changes + predictions</td><td><span class="tag tag-new">Unified screen</span></td><td>Split</td><td>Partial</td><td>Yes</td><td>—</td><td>Yes</td><td>—</td></tr>
+    <tr><td>Predicted points list</td><td><span class="tag tag-shipped">ep_next</span></td><td>Yes</td><td>Yes</td><td>Yes</td><td>ML</td><td>Partial</td><td>Yes</td></tr>
+    <tr><td>Gameweek review</td><td><span class="tag tag-shipped">Yes</span></td><td>Partial</td><td>—</td><td>—</td><td>Yes</td><td>—</td><td>—</td></tr>
+    <tr><td>DEFCON / BPS board</td><td><span class="tag tag-shipped">Yes</span></td><td>—</td><td>Yes</td><td>—</td><td>—</td><td>Live</td><td>—</td></tr>
+    <tr><td>Manager watchlist</td><td><span class="tag tag-shipped">Yes</span></td><td>Live leagues</td><td>—</td><td>Rivals</td><td>Elite</td><td>—</td><td>—</td></tr>
+    <tr><td>Player watchlist</td><td><span class="tag tag-shipped">Yes</span></td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+    <tr><td>League participant browser</td><td><span class="tag tag-shipped">Yes</span></td><td>Yes</td><td>—</td><td>Yes</td><td>—</td><td>Yes</td><td>—</td></tr>
+    <tr><td>Predicted lineups (20)</td><td><span class="tag tag-roadmap">Q3</span></td><td>Yes</td><td>Partial</td><td>Yes</td><td>—</td><td>Partial</td><td>—</td></tr>
+    <tr><td>Live rank</td><td><span class="tag tag-roadmap">Q3</span></td><td>Yes</td><td>—</td><td>Yes</td><td>—</td><td>Yes</td><td>—</td></tr>
+    <tr><td>Transfer solver</td><td><span class="tag tag-roadmap">Q4</span></td><td>Yes</td><td>AI</td><td>AI</td><td>MILP</td><td>—</td><td>—</td></tr>
+    <tr><td>Chip advisors</td><td><span class="tag tag-roadmap">Q4</span></td><td>Yes</td><td>Partial</td><td>—</td><td>Yes</td><td>—</td><td>—</td></tr>
+    <tr><td>Proprietary xPts + confidence</td><td><span class="tag tag-new">PRED-09</span></td><td>Partial</td><td>Opta</td><td>Yes</td><td>ML</td><td>—</td><td>—</td></tr>
+    <tr><td>NL “why xPts” copy</td><td><span class="tag tag-new">PRED-10</span></td><td>AI chat</td><td>Articles</td><td>ChatFPL</td><td>—</td><td>—</td><td>—</td></tr>
+    <tr><td>Opta / StatsBomb</td><td>No (v1)</td><td>—</td><td>Yes</td><td>Yes</td><td>—</td><td>—</td><td>—</td></tr>
+    <tr><td>Elite manager reveals</td><td>No</td><td>—</td><td>—</td><td>Plus</td><td>Ownership</td><td>—</td><td>—</td></tr>
+  </tbody>
+</table>
+
+<div class="page-break"></div>
+
+<h2>What we will cover (parity roadmap)</h2>
+<p>These are <strong>table stakes</strong> for Premium/Pro credibility — users already get them elsewhere:</p>
+<ul>
+  <li><strong>Predicted lineups</strong> for all Premier League clubs before each deadline (fpl.team, Fix).</li>
+  <li><strong>Live rank and live mini-league movement</strong> on matchdays (fpl.team, LiveFPL, Fix).</li>
+  <li><strong>Transfer solver / multi-GW optimiser</strong> (fpl.team, FPL Review MILP, Fix AI).</li>
+  <li><strong>Chip timing assistants</strong> — Wildcard, Free Hit, Triple Captain, Bench Boost (fpl.team, Review).</li>
+  <li><strong>Full predicted points</strong> without blur (all paid tools).</li>
+  <li><strong>Expanded watchlist</strong> — comparable to tracking rivals in Fix / live leagues in fpl.team.</li>
+</ul>
+
+<h2>What we add net-new</h2>
+<table>
+  <thead><tr><th>Capability</th><th>Why it matters</th><th>Competitor gap</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Unified price intelligence</strong></td>
+      <td>One workflow: season/GW movers + tonight likelihood + “my squad” filter</td>
+      <td>Others split across FPL Statistics, Fix, spreadsheets</td>
+    </tr>
+    <tr>
+      <td><strong>Gameweek review + transfer what-if</strong></td>
+      <td>Learning loop after the deadline; reduces repeated mistakes</td>
+      <td>FPL Review has charts; not mobile-first unified with planner</td>
+    </tr>
+    <tr>
+      <td><strong>Dual watchlists</strong> (managers + players)</td>
+      <td>Long-horizon planning without committing transfers</td>
+      <td>Rarely combined in one signed-in mobile product</td>
+    </tr>
+    <tr>
+      <td><strong>PRED-09 model on free data + confidence badge</strong></td>
+      <td>Trust UX; no Opta bill at launch</td>
+      <td>Review/Scout need paid data or opaque ep_next</td>
+    </tr>
+    <tr>
+      <td><strong>PRED-10 natural-language rationale</strong></td>
+      <td>Makes projections actionable for non-quants</td>
+      <td>Chat tools answer ad hoc; not embedded in player sheet</td>
+    </tr>
+    <tr>
+      <td><strong>Transfer help tour + mobile pitch UX</strong></td>
+      <td>Lowers churn for new users; improves conversion to paid</td>
+      <td>fpl.team powerful but steep; Plan FPL simpler but fewer analytics</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>What we will NOT prioritise (and why)</h2>
+<ul>
+  <li><strong>Long-form editorial / Scout Picks</strong> — Scout’s moat; we stay tool-first.</li>
+  <li><strong>Elite XI live reveals</strong> — Fix’s moat; expensive data relationships.</li>
+  <li><strong>WhatsApp communities</strong> — LazyFPL model; ops-heavy, low margin.</li>
+  <li><strong>Standalone AI chat SKU</strong> — ChatFPL competes on messages; we bundle AI later inside squad context.</li>
+</ul>
+
+<h2>Pricing position</h2>
+<p>Consumer-grade mobile UI (live app) vs spreadsheet-first legacy tools:</p>
+<div class="shot-grid">
+  <figure class="figure">
+    <img src="screenshots/01-squad.png" alt="Squad" />
+    <figcaption>Pitch-first squad — weekly anchor screen</figcaption>
+  </figure>
+  <figure class="figure">
+    <img src="screenshots/02-transfers.png" alt="Transfers" />
+    <figcaption>Integrated planner — not a separate website</figcaption>
+  </figure>
+  <figure class="figure">
+    <img src="screenshots/04-price-changes.png" alt="Price changes" />
+    <figcaption>Unified price intelligence — rare in one screen</figcaption>
+  </figure>
+  <figure class="figure">
+    <img src="screenshots/06-gameweek-review.png" alt="Review" />
+    <figcaption>Post-GW learning loop — retention driver</figcaption>
+  </figure>
+</div>
+
+<table>
+  <thead><tr><th>Segment</th><th>Incumbent</th><th>Our plan</th></tr></thead>
+  <tbody>
+    <tr><td>Budget planner</td><td>Plan FPL free, FPL Form free</td><td>Free planner + stats; monetise predictions</td></tr>
+    <tr><td>Mid toolkit</td><td>fpl.team £25–50, Focal £30</td><td>Premium £25 season</td></tr>
+    <tr><td>Optimiser</td><td>FPL Review ~£36, Scout £60</td><td>Pro £45 when solver + model live</td></tr>
+    <tr><td>Premium content</td><td>Hub £60–360, LazyFPL £50</td><td>Not competing</td></tr>
+  </tbody>
+</table>
+
+<h2>Win / loss scenarios</h2>
+<div class="grid-2">
+  <div class="card"><strong>We win</strong><br />Manager wants one mobile tab for planner + review + prices; hates juggling Scout + LiveFPL + spreadsheet.</div>
+  <div class="card"><strong>We lose</strong><br />Manager already pays Review + fpl.team for MILP + multi-GW; needs elite reveals or Opta heatmaps today.</div>
+</div>
+
+<h2>Strategic takeaway</h2>
+<p>Compete on <strong>integration and mobile UX</strong> at <strong>£25 season</strong>, not on being the deepest data shop on day one. Close the solver/live gap in H2 2026, then raise Pro ARPU. Avoid naming collision with fpl.team / Scout / Review — see brand-naming-options.pdf.</p>
+
+<p class="footer-note">Sources: public pricing and feature pages, footyapps.com guide, June 2026. Internal backlog cross-check: docs/backlog.md.</p>
+
+</body>
+</html>

@@ -57,10 +57,12 @@ if (isDev) {
   app.use('*', logger());
 }
 
-// Health check
-app.get('/health', (c) => {
-  return c.json({ status: 'ok', lineupsWarmup: getLineupsWarmupStatus() });
-});
+function healthPayload() {
+  return { status: 'ok', lineupsWarmup: getLineupsWarmupStatus() };
+}
+
+app.get('/health', (c) => c.json(healthPayload()));
+app.get('/api/health', (c) => c.json(healthPayload()));
 
 // GET /api/gameweeks
 app.get('/api/gameweeks', async (c) => {

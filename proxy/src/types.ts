@@ -391,3 +391,25 @@ export interface PredictedLineupsResponse {
   gameweek: number;
   teams: PredictedTeamLineup[];
 }
+
+export type PredictionConfidence = 'low' | 'medium' | 'high';
+
+export interface PlayerGameweekPrediction {
+  playerId: number;
+  event: number;
+  xPts: number;
+  xGoals: number;
+  xAssists: number;
+  csProb: number | null;
+  defconPts: number;
+  confidence: PredictionConfidence;
+  epNextAnchor: number;
+  modelXPts: number;
+}
+
+export interface PredictionsResponse {
+  event: number;
+  modelRunId: string | null;
+  ready: boolean;
+  players: PlayerGameweekPrediction[];
+}

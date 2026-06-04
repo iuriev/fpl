@@ -5,9 +5,11 @@ import { type FormationCounts, inferFormationForTeam } from './formation-inferen
 import { getOrFetchBootstrap } from './fpl-cache/db-cache';
 import { deriveSeason } from './fpl-cache/season';
 import type { FPLBootstrapStatic, FPLElementSummary, FPLFixture } from './fpl-client';
-import * as fplClient from './fpl-client';
-import { getOrFetchElementSummary } from './fpl-element-summary-cache';
+import { getCachedElementSummary } from './fpl-element-summary-cache';
+import { getOrFetchAllFixtures } from './fpl-fixtures-cache';
 import { activeSquadElements } from './lineups-player-sets';
+import { LineupsWarmingError } from './lineups-warming-error';
+import { getLineupsWarmupStatus } from './lineups-warmup';
 import {
   assignPlayersToSlots,
   getSlotLanes,
@@ -30,36 +32,6 @@ const POSITION_MAP: Record<number, PlayerPosition> = {
   3: 'MID',
   4: 'FWD',
 };
-
-const SUMMARY_CONCURRENCY = 8;
-
-async function mapConcurrent<T, R>(
-  items: T[],
-  limit: number,
-  fn: (item: T) => Promise<R>
-): Promise<R[]> {
-  const results: R[] = new Array(items.length);
-  let index = 0;
-
-  async function worker(): Promise<void> {
-    while (index < items.length) {
-      const i = index++;
-      results[i] = await fn(items[i]);
-    }
-  }
-
-  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, () => worker()));
-  return results;
-}
-
-async function getAllFixturesCached(): Promise<FPLFixture[]> {
-  const key = 'fixtures:all';
-  const cached = cacheLayer.get<FPLFixture[]>(key);
-  if (cached) return cached;
-  const data = await fplClient.getFixturesAll();
-  cacheLayer.set(key, data, cacheLayer.ttl.FIXTURES);
-  return data;
-}
 
 function computeStartScore(
   el: FPLBootstrapStatic['elements'][number],
@@ -245,25 +217,31 @@ async function loadSummariesForTeams(
       ids.add(el.id);
     }
   }
-  const idList = [...ids];
-  const summaries = await mapConcurrent(idList, SUMMARY_CONCURRENCY, (id) =>
-    getOrFetchElementSummary(db, season, id, 'interactive')
-  );
   const map = new Map<number, FPLElementSummary>();
-  idList.forEach((id, i) => map.set(id, summaries[i]));
+  for (const id of ids) {
+    const summary = await getCachedElementSummary(db, season, id);
+    if (summary) map.set(id, summary);
+  }
   return map;
 }
 
-export async function getPredictedLineups(gwParam?: number): Promise<PredictedLineupsResponse> {
+export async function getPredictedLineups(
+  gwParam?: number,
+  opts?: { skipReadyGuard?: boolean }
+): Promise<PredictedLineupsResponse> {
   const cacheKey = `predicted-lineups:${gwParam ?? 'next'}`;
   const cached = cacheLayer.get<PredictedLineupsResponse>(cacheKey);
   if (cached) return cached;
+
+  if (!opts?.skipReadyGuard && !getLineupsWarmupStatus().ready) {
+    throw new LineupsWarmingError();
+  }
 
   const bootstrap = await getOrFetchBootstrap(db);
   const season = deriveSeason(bootstrap.events);
   const targetGw = gwParam ?? resolveNextGw(bootstrap);
   const [allFixtures, upcoming] = await Promise.all([
-    getAllFixturesCached(),
+    getOrFetchAllFixtures(db),
     fixturesService.getUpcomingFixtures(),
   ]);
 

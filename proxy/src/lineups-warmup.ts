@@ -3,12 +3,12 @@ import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import * as schema from './db/schema';
 import { getOrFetchBootstrap } from './fpl-cache/db-cache';
 import { deriveSeason } from './fpl-cache/season';
-import * as fplClient from './fpl-client';
 import {
   countFreshSummaries,
   getFreshElementSummaryRow,
   getOrFetchElementSummary,
 } from './fpl-element-summary-cache';
+import { getOrFetchAllFixtures } from './fpl-fixtures-cache';
 import {
   coldElementIds,
   hotElementIdsPerTeam,
@@ -76,8 +76,12 @@ export function getLineupsWarmupStatus(): LineupsWarmupStatus {
   return { ...status };
 }
 
-async function fetchFixturesBackground(): Promise<void> {
-  await fplClient.getFixturesAll('background');
+function logWarmup(message: string): void {
+  console.log(`[lineups:warmup] ${message}`);
+}
+
+async function fetchFixturesBackground(db: Db): Promise<void> {
+  await getOrFetchAllFixtures(db, 'background');
 }
 
 async function warmElementIds(
@@ -90,6 +94,7 @@ async function warmElementIds(
   for (const elementId of ids) {
     const fresh = await getFreshElementSummaryRow(db, season, elementId);
     if (!fresh) {
+      logWarmup(`fetch element-summary/${elementId} (${done + 1}/${ids.length})`);
       await getOrFetchElementSummary(db, season, elementId, 'background');
     }
     done++;
@@ -108,12 +113,17 @@ export async function runLineupsWarmup(db: Db): Promise<void> {
   status.lastError = null;
 
   try {
+    const delayMs = startDelayMs();
     status.phase = 'waiting';
-    await sleep(startDelayMs());
+    logWarmup(`started — waiting ${delayMs}ms before FPL (interactive API traffic goes first)`);
+    await sleep(delayMs);
 
     status.phase = 'fixtures';
-    await fetchFixturesBackground();
+    logWarmup('fetching fixtures (background queue, ~5s gap vs other FPL calls)');
+    await fetchFixturesBackground(db);
+    logWarmup('fixtures cached');
 
+    logWarmup('loading bootstrap for player list');
     const bootstrap = await getOrFetchBootstrap(db);
     const season = deriveSeason(bootstrap.events);
     const hotIds = hotElementIdsPerTeam(bootstrap, hotPerTeam());
@@ -121,28 +131,42 @@ export async function runLineupsWarmup(db: Db): Promise<void> {
     const coldIds = coldElementIds(bootstrap, hotSet);
 
     status.hotTotal = hotIds.length;
+    logWarmup(`counting cached summaries for ${hotIds.length} hot players…`);
     status.hotDone = await countFreshSummaries(db, season, hotIds);
+    const hotCached = status.hotDone;
     status.phase = 'hot';
+    const toFetch = hotIds.length - hotCached;
+    logWarmup(
+      `hot tier: ${hotIds.length} players (${hotCached} in DB, ${toFetch} need FPL — ~${toFetch * 5}s at 5s/request)`
+    );
+    if (toFetch === 0) {
+      logWarmup('no FPL element-summary calls needed for hot tier');
+    }
     await warmElementIds(db, season, hotIds, (done) => {
       status.hotDone = done;
     });
 
+    status.hotDone = await countFreshSummaries(db, season, hotIds);
     status.ready = status.hotDone >= status.hotTotal;
     status.phase = 'lineups_hot';
-    await predictedLineupService.getPredictedLineups();
+    logWarmup(`ready=${status.ready} — building predicted-lineups cache`);
+    await predictedLineupService.getPredictedLineups(undefined, { skipReadyGuard: true });
 
     status.coldTotal = coldIds.length;
     status.coldDone = await countFreshSummaries(db, season, coldIds);
     status.phase = 'cold';
+    logWarmup(`cold tier: ${coldIds.length} players (${status.coldDone} already cached)`);
     await warmElementIds(db, season, coldIds, (done) => {
       status.coldDone = done;
     });
 
     status.phase = 'lineups_full';
-    await predictedLineupService.getPredictedLineups();
+    logWarmup('refreshing full predicted-lineups cache');
+    await predictedLineupService.getPredictedLineups(undefined, { skipReadyGuard: true });
 
     status.phase = 'done';
     status.ready = true;
+    logWarmup('done');
   } catch (err) {
     status.phase = 'error';
     status.lastError = err instanceof Error ? err.message : String(err);

@@ -15,6 +15,7 @@ vi.mock('./predicted-lineup-service', () => ({
 
 import { auth } from './auth/auth';
 import { db } from './db/client';
+import { LineupsWarmingError } from './lineups-warming-error';
 import * as predictedLineupService from './predicted-lineup-service';
 import { predictedLineupsRoutes } from './predicted-lineups-routes';
 
@@ -84,5 +85,28 @@ describe('GET /api/predicted-lineups', () => {
     });
     expect(res.status).toBe(200);
     expect(predictedLineupService.getPredictedLineups).toHaveBeenCalled();
+  });
+
+  it('returns 503 while lineups cache is warming', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValue(mockSession);
+    vi.mocked(db.select).mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          limit: vi.fn().mockResolvedValue([
+            { subscriptionTier: 'premium', fplTeamId: 72828, email: 'test@example.com' },
+          ]),
+        }),
+      }),
+    } as never);
+    vi.mocked(predictedLineupService.getPredictedLineups).mockRejectedValueOnce(
+      new LineupsWarmingError()
+    );
+
+    const res = await app.request('/api/predicted-lineups', {
+      headers: { cookie: 'session=1' },
+    });
+    expect(res.status).toBe(503);
+    const body = (await res.json()) as { error: string };
+    expect(body.error).toBe('lineups_warming');
   });
 });

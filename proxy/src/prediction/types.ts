@@ -1,0 +1,68 @@
+export interface EplMatchRow {
+  season: string;
+  matchDate: string;
+  homeSlug: string;
+  awaySlug: string;
+  fthg: number;
+  ftag: number;
+  ftr: string;
+  referee?: string;
+  homeShots?: number;
+  awayShots?: number;
+  oddsHome?: number;
+  oddsDraw?: number;
+  oddsAway?: number;
+  oddsOver25?: number;
+  oddsUnder25?: number;
+}
+
+export interface PlayerGwFactRow {
+  season: string;
+  round: number;
+  element: number;
+  fixture: number;
+  teamId?: number;
+  teamName?: string;
+  position: string;
+  minutes: number;
+  starts: number;
+  goals: number;
+  assists: number;
+  totalPoints: number;
+  xp: number;
+  expectedGoals: number;
+  expectedAssists: number;
+  defensiveContribution?: number;
+  opponentTeam: number;
+  wasHome: boolean;
+}
+
+export interface TeamPoissonFit {
+  mu: number;
+  homeAdv: number;
+  attack: Map<string, number>;
+  defence: Map<string, number>;
+  teams: string[];
+}
+
+export type PredictionConfidence = 'low' | 'medium' | 'high';
+
+export interface PlayerGameweekPrediction {
+  playerId: number;
+  event: number;
+  xPts: number;
+  xGoals: number;
+  xAssists: number;
+  csProb: number | null;
+  defconPts: number;
+  confidence: PredictionConfidence;
+  epNextAnchor: number;
+  modelXPts: number;
+}
+
+export interface PredictionsResponse {
+  event: number;
+  modelRunId: string | null;
+  ready: boolean;
+  players: PlayerGameweekPrediction[];
+}

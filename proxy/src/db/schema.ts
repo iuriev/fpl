@@ -195,3 +195,140 @@ export const fplElementSummaryCache = pgTable(
   },
   (t) => [primaryKey({ columns: [t.season, t.elementId] })],
 );
+
+export const fplFixturesCache = pgTable('fpl_fixtures_cache', {
+  season: text('season')
+    .notNull()
+    .primaryKey()
+    .references(() => fplMeta.season),
+  data: jsonb('data').notNull(),
+  fetchedAt: timestamp('fetched_at').notNull(),
+});
+
+// ─── PRED-09 prediction model tables (relational source of truth) ───────────
+
+export const predModelRun = pgTable('pred_model_run', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  kind: text('kind').notNull(),
+  season: text('season').notNull(),
+  targetEvent: integer('target_event'),
+  params: jsonb('params'),
+  metrics: jsonb('metrics'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
+export const predEplMatch = pgTable(
+  'pred_epl_match',
+  {
+    season: text('season').notNull(),
+    matchDate: date('match_date').notNull(),
+    homeSlug: text('home_slug').notNull(),
+    awaySlug: text('away_slug').notNull(),
+    fthg: smallint('fthg').notNull(),
+    ftag: smallint('ftag').notNull(),
+    ftr: text('ftr').notNull(),
+    referee: text('referee'),
+    homeShots: smallint('home_shots'),
+    awayShots: smallint('away_shots'),
+    oddsHome: doublePrecision('odds_home'),
+    oddsDraw: doublePrecision('odds_draw'),
+    oddsAway: doublePrecision('odds_away'),
+    oddsOver25: doublePrecision('odds_over25'),
+    oddsUnder25: doublePrecision('odds_under25'),
+    ingestedAt: timestamp('ingested_at').notNull().defaultNow(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.season, t.matchDate, t.homeSlug] }),
+  ],
+);
+
+export const predTeamAlias = pgTable('pred_team_alias', {
+  slug: text('slug').primaryKey(),
+  fplTeamId: integer('fpl_team_id').notNull(),
+  fdName: text('fd_name'),
+  vaastavName: text('vaastav_name'),
+});
+
+export const predPlayerGwFact = pgTable(
+  'pred_player_gw_fact',
+  {
+    season: text('season').notNull(),
+    round: integer('round').notNull(),
+    element: integer('element').notNull(),
+    fixture: integer('fixture').notNull().default(0),
+    teamId: integer('team_id'),
+    position: text('position'),
+    minutes: smallint('minutes'),
+    starts: smallint('starts'),
+    goals: smallint('goals'),
+    assists: smallint('assists'),
+    totalPoints: smallint('total_points'),
+    xp: doublePrecision('xp'),
+    expectedGoals: doublePrecision('expected_goals'),
+    expectedAssists: doublePrecision('expected_assists'),
+    defensiveContribution: smallint('defensive_contribution'),
+    ingestedAt: timestamp('ingested_at').notNull().defaultNow(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.season, t.round, t.element, t.fixture] }),
+  ],
+);
+
+export const predTeamStrength = pgTable(
+  'pred_team_strength',
+  {
+    modelRunId: uuid('model_run_id')
+      .notNull()
+      .references(() => predModelRun.id, { onDelete: 'cascade' }),
+    season: text('season').notNull(),
+    teamSlug: text('team_slug').notNull(),
+    attack: doublePrecision('attack').notNull(),
+    defence: doublePrecision('defence').notNull(),
+    homeAdv: doublePrecision('home_adv').notNull(),
+    mu: doublePrecision('mu').notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.modelRunId, t.season, t.teamSlug] }),
+  ],
+);
+
+export const predFixtureTeam = pgTable(
+  'pred_fixture_team',
+  {
+    modelRunId: uuid('model_run_id')
+      .notNull()
+      .references(() => predModelRun.id, { onDelete: 'cascade' }),
+    season: text('season').notNull(),
+    event: integer('event'),
+    fixtureId: integer('fixture_id').notNull().default(0),
+    teamId: integer('team_id').notNull().default(0),
+    opponentTeamId: integer('opponent_team_id'),
+    isHome: boolean('is_home').notNull(),
+    lambdaFor: doublePrecision('lambda_for').notNull(),
+    lambdaAgainst: doublePrecision('lambda_against').notNull(),
+    csProb: doublePrecision('cs_prob').notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.modelRunId, t.season, t.fixtureId, t.teamId] }),
+  ],
+);
+
+export const predPlayerGw = pgTable(
+  'pred_player_gw',
+  {
+    modelRunId: uuid('model_run_id')
+      .notNull()
+      .references(() => predModelRun.id, { onDelete: 'cascade' }),
+    event: integer('event').notNull(),
+    playerId: integer('player_id').notNull(),
+    xPts: doublePrecision('x_pts').notNull(),
+    xGoals: doublePrecision('x_goals').notNull(),
+    xAssists: doublePrecision('x_assists').notNull(),
+    csProb: doublePrecision('cs_prob'),
+    defconPts: doublePrecision('defcon_pts').notNull(),
+    confidence: text('confidence').notNull(),
+    epNextAnchor: doublePrecision('ep_next_anchor').notNull(),
+    modelXPts: doublePrecision('model_x_pts').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.modelRunId, t.event, t.playerId] })],
+);

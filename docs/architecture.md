@@ -70,6 +70,13 @@ ADR 0018 for the full rationale and design.
 The in-memory `cache.ts` is retained only for computed, non-FPL results (player pool,
 fixtures).
 
+## PRED-09 statistical predictions
+
+Per-player gameweek estimates (`xPts`, `xGoals`, `xAssists`, `csProb`, `defconPts`) live in
+Postgres `pred_*` tables (not `fpl_*_cache`). Ingest vaastav + football-data CSVs, batch-score
+before each deadline, expose via `GET /api/predictions?event=`. Ops: `research/pred-09/README.md`
+(proxy pipeline + cron sketch).
+
 ## Production
 
 Live at **https://fpl-squad-viewer.fly.dev/** — single Hono service on Fly.io (London, `shared-cpu-1x`, 256 MB RAM, 1 machine, always-on).

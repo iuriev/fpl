@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Product Overview — FPL Decision Companion</title>
+  <link rel="stylesheet" href="investor.css" />
+</head>
+<body>
+
+<section class="cover">
+  <p class="kicker">Investor brief · June 2026</p>
+  <h1>FPL Decision Companion</h1>
+  <p class="lead">Mobile-first Fantasy Premier League toolkit for UK, European, and North American managers — plan transfers, read the gameweek, and track rivals in one product.</p>
+  <p class="meta">Working codebase title: FPL Squad Viewer · Commercial brand: see Brand Naming Options<br />
+  Production: https://fpl-squad-viewer.fly.dev · Stack: React SPA + Hono BFF + Postgres cache</p>
+</section>
+
+<h2>Executive summary</h2>
+<p>We are building a <strong>subscription freemium</strong> companion to the official Fantasy Premier League game. Users link a public FPL team ID (or sign in to sync drafts and watchlists). The product focuses on <strong>weekly decision quality</strong> — not replacing FPL, not betting, not daily fantasy.</p>
+<div class="grid-2">
+  <div class="card"><strong>Problem</strong><br />Serious managers juggle 4–6 websites before each deadline: live rank, fixtures, price changes, predictions, and transfer notes.</div>
+  <div class="card"><strong>Solution</strong><br />One fast mobile web app with planning, review, predictions, and league intelligence — priced below the mid-tier incumbents.</div>
+</div>
+
+<h2>Market</h2>
+<ul>
+  <li><strong>TAM:</strong> ~11M FPL managers worldwide (Premier League official game, 2025/26 season).</li>
+  <li><strong>SAM:</strong> ~1–2M “active optimisers” who use third-party tools weekly (Scout, Fix, fpl.team, FPL Review cohort).</li>
+  <li><strong>SOM (Year 1 target):</strong> 5,000 paying Premium users × £25 season ≈ <strong>£125k gross</strong> before payment fees; stretch 15k × blended ARPU £30.</li>
+</ul>
+<p>Geography: primary UK; secondary Western Europe and US/Canada English-speaking FPL communities. Single English product, GBP-led pricing with multi-currency checkout.</p>
+
+<h2>Business model</h2>
+<table>
+  <thead><tr><th>Tier</th><th>Season (one-time)</th><th>Annual</th><th>Monthly</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Free</strong></td><td>£0</td><td>£0</td><td>£0</td></tr>
+    <tr><td><strong>Premium</strong></td><td><strong>£25</strong></td><td>£29/year</td><td>£3.99/mo</td></tr>
+    <tr><td><strong>Pro</strong> (2026 H2)</td><td>£45</td><td>£48/year</td><td>£5.99/mo</td></tr>
+  </tbody>
+</table>
+<p>Premium launch aligns with <strong>fpl.team Wonderkid (~£25/yr)</strong> and <strong>FPL Focal (~£30/yr)</strong>. Pro tier deferred until live rank + transfer solver + proprietary xPts model ship.</p>
+
+<h2>The product experience</h2>
+<p>Screenshots from the running application (local dev, team ID 72828). This is what managers see each gameweek — one app instead of a tab stack.</p>
+
+<figure class="figure shot-hero">
+  <img src="screenshots/01-squad.png" alt="Squad screen" width="280" />
+  <figcaption><strong>Home base.</strong> Pitch-first squad with chips, player context, and gameweek navigation — faster to scan than the official app.</figcaption>
+</figure>
+
+<div class="shot-grid">
+  <figure class="figure">
+    <img src="screenshots/02-transfers.png" alt="Transfer planner" />
+    <figcaption><strong>Plan before the deadline.</strong> Drag-and-drop transfers, chip-aware costs, budget strip.</figcaption>
+  </figure>
+  <figure class="figure">
+    <img src="screenshots/03-fixtures.png" alt="Fixtures calendar" />
+    <figcaption><strong>See the season.</strong> FDR heatmap, blanks/doubles, recovery for rotation calls.</figcaption>
+  </figure>
+  <figure class="figure">
+    <img src="screenshots/04-price-changes.png" alt="Price changes" />
+    <figcaption><strong>Protect squad value.</strong> Risers/fallers plus tonight prediction in one place.</figcaption>
+  </figure>
+  <figure class="figure">
+    <img src="screenshots/05-predicted-points.png" alt="Predicted points" />
+    <figcaption><strong>Pick with confidence.</strong> Players ranked by expected points; premium unlocks full list.</figcaption>
+  </figure>
+  <figure class="figure">
+    <img src="screenshots/06-gameweek-review.png" alt="Gameweek review" />
+    <figcaption><strong>Learn every week.</strong> Who delivered, transfer outcomes, what-if you had held.</figcaption>
+  </figure>
+  <figure class="figure">
+    <img src="screenshots/07-stats.png" alt="My stats" />
+    <figcaption><strong>League context.</strong> Rank trajectory and mini-league performance at a glance.</figcaption>
+  </figure>
+  <figure class="figure">
+    <img src="screenshots/08-leaderboard.png" alt="Leaderboard" />
+    <figcaption><strong>Spot trends.</strong> DEFCON and BPS leaderboards for differential hunting.</figcaption>
+  </figure>
+  <figure class="figure">
+    <img src="screenshots/09-watchlist.png" alt="Manager watchlist" />
+    <figcaption><strong>Track rivals.</strong> Follow managers — points, rank movement, recent transfers.</figcaption>
+  </figure>
+  <figure class="figure">
+    <img src="screenshots/10-player-watchlist.png" alt="Player watchlist" />
+    <figcaption><strong>Shortlist targets.</strong> Track players before committing a transfer.</figcaption>
+  </figure>
+</div>
+
+<h2>Capabilities shipped</h2>
+<table>
+  <thead><tr><th>Area</th><th>Capability</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>Squad</td><td>Pitch + list views, GW navigation, chips, player cards (FDR, ownership, form badges)</td><td><span class="tag tag-shipped">Live</span></td></tr>
+    <tr><td>Planning</td><td>Transfer planner, budget validation, cloud draft sync when signed in</td><td><span class="tag tag-shipped">Live</span></td></tr>
+    <tr><td>Review</td><td>Gameweek review — performers, transfers, what-if</td><td><span class="tag tag-shipped">Live</span></td></tr>
+    <tr><td>Fixtures</td><td>Season calendar — FDR, DGW/BGW, recovery / rotation view</td><td><span class="tag tag-shipped">Live</span></td></tr>
+    <tr><td>Market</td><td>Price changes (actual + tonight predictions); predicted points (freemium)</td><td><span class="tag tag-shipped">Live</span></td></tr>
+    <tr><td>Social</td><td>Manager + player watchlists; league participant browser</td><td><span class="tag tag-shipped">Live</span></td></tr>
+    <tr><td>Stats</td><td>My stats, leagues, top players, DEFCON/BPS leaderboard</td><td><span class="tag tag-shipped">Live</span></td></tr>
+    <tr><td>Accounts</td><td>Email + Google auth; premium upsell flows (paywall UI ready)</td><td><span class="tag tag-shipped">Live</span></td></tr>
+  </tbody>
+</table>
+
+<div class="page-break"></div>
+
+<h2>Product roadmap (monetised)</h2>
+<table>
+  <thead><tr><th>Initiative</th><th>Investor value</th><th>ETA</th></tr></thead>
+  <tbody>
+    <tr><td>Premium checkout (MON-01)</td><td>Revenue switch</td><td>Q3 2026</td></tr>
+    <tr><td>Predicted lineups (20 clubs)</td><td>Parity with fpl.team</td><td>Q3 2026</td></tr>
+    <tr><td>Live rank + mini-league live</td><td>Matchday retention</td><td>Q3–Q4 2026</td></tr>
+    <tr><td>Statistical xPts model (PRED-09)</td><td>Differentiated predictions + confidence</td><td>Q4 2026</td></tr>
+    <tr><td>Transfer solver</td><td>Pro tier anchor vs FPL Review</td><td>Q4 2026</td></tr>
+    <tr><td>Chip advisors (WC/FH/TC/BB)</td><td>High-intent premium moments</td><td>Q4 2026 – Q1 2027</td></tr>
+    <tr><td>AI analyst chat</td><td>ARPU expansion</td><td>2027</td></tr>
+  </tbody>
+</table>
+
+<h2>Technology moat (pragmatic)</h2>
+<ul>
+  <li><strong>BFF + Postgres cache</strong> — trims official FPL API payloads; frozen GW rows; rate-limited prefetch (ADR 0018).</li>
+  <li><strong>Spec-first delivery</strong> — OpenSpec capabilities reduce rework; faster iteration than content-heavy incumbents.</li>
+  <li><strong>Free-data ML path</strong> — PRED-09 avoids Opta licence cost at launch; upgrade path when revenue supports data deals.</li>
+  <li><strong>Mobile UX</strong> — native-feel pitch UI; guided transfer tour; lower cognitive load than desktop-first Scout.</li>
+</ul>
+
+<h2>Go-to-market</h2>
+<ol>
+  <li><strong>Community</strong> — r/FantasyPL, FPL Twitter/X, Discord servers; compare threads vs fpl.team / Plan FPL.</li>
+  <li><strong>Content SEO</strong> — “price change tonight”, “FDR calendar”, “gameweek review” landing pages.</li>
+  <li><strong>Free tier virality</strong> — guest squad view via team ID link; league browser for rival scouting.</li>
+  <li><strong>Seasonal campaigns</strong> — GW1 draft assistant; DGW chip push notifications (when live).</li>
+</ol>
+
+<h2>Use of funds (illustrative)</h2>
+<table>
+  <thead><tr><th>Category</th><th>%</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Engineering</td><td>55%</td><td>MON-01, live rank, PRED-09, solver</td></tr>
+    <tr><td>Infrastructure</td><td>15%</td><td>Fly → Cloudflare migration, Supabase, Redis at scale</td></tr>
+    <tr><td>Data / ML</td><td>15%</td><td>Model validation, optional Opta later</td></tr>
+    <tr><td>Growth</td><td>10%</td><td>Paid tests, creator partnerships</td></tr>
+    <tr><td>Legal / ops</td><td>5%</td><td>Stripe, privacy, terms</td></tr>
+  </tbody>
+</table>
+
+<h2>Team & stage</h2>
+<p>Product is <strong>pre-scale revenue</strong>: core screens shipped; payment integration and brand launch are the next gates. Spec-driven monorepo (web + proxy) with unit tests and Storybook on critical UI.</p>
+
+<p class="footer-note">Confidential — for investor discussion only. App screenshots captured from dev build, June 2026. Full competitive matrix: competitive-analysis.pdf. Naming: brand-naming-options.pdf.</p>
+
+</body>
+</html>

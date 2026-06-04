@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 
 import { type AuthVars, requireUser } from './auth/middleware';
+import { LineupsWarmingError } from './lineups-warming-error';
 import * as predictedLineupService from './predicted-lineup-service';
 import { type PremiumVars, requirePremiumFplUser } from './premium-middleware';
 import { MAX_GAMEWEEK } from './types';
@@ -25,6 +26,9 @@ predictedLineupsRoutes.get(
       const result = await predictedLineupService.getPredictedLineups(gw);
       return c.json(result);
     } catch (error) {
+      if (error instanceof LineupsWarmingError) {
+        return c.json({ error: 'lineups_warming' }, 503);
+      }
       console.error('Error fetching predicted lineups:', error);
       return c.json({ error: 'Unable to fetch predicted lineups' }, { status: 500 });
     }

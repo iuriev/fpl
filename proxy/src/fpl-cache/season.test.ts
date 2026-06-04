@@ -4,6 +4,7 @@ import type { FPLBootstrapStatic } from '../fpl-client';
 import {
   deriveSeason,
   getBootstrapTtlSeconds,
+  getFixturesTtlSeconds,
   getLiveTtlSeconds,
   getSeasonState,
   latestFinishedGw,
@@ -74,6 +75,17 @@ describe('getBootstrapTtlSeconds', () => {
 
   it('returns 12 hours for pre-season', () => {
     expect(getBootstrapTtlSeconds('pre-season')).toBe(43200);
+  });
+});
+
+describe('getFixturesTtlSeconds', () => {
+  it('returns 1 week for complete season', () => {
+    expect(getFixturesTtlSeconds('complete')).toBe(604800);
+  });
+
+  it('returns 1 hour for active and pre-season', () => {
+    expect(getFixturesTtlSeconds('active')).toBe(3600);
+    expect(getFixturesTtlSeconds('pre-season')).toBe(3600);
   });
 });
 
