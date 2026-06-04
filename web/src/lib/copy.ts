@@ -506,6 +506,15 @@ export const copy = {
   playerWatchlistAddSearch: 'Search players…',
   playerWatchlistNavLink: 'Player Watchlist',
   playerWatchlistRemove: 'Unfollow player',
+
+  fixturesCalendarNavLink: 'Fixtures',
+  fixturesCalendarTitle: 'Fixtures Calendar',
+  fixturesCalendarTabOfficial: 'Official',
+  fixturesCalendarTabOverall: 'Overall',
+  fixturesCalendarTabDefensive: 'Defensive',
+  fixturesCalendarTabAttacking: 'Attacking',
+  fixturesCalendarTabRestDays: 'Rest Days',
+  fixturesCalendarRestDaysTbc: 'TBC',
 };
 
 /**

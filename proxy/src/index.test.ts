@@ -2,6 +2,8 @@ import { Hono } from 'hono';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as entryService from './entry-service';
+import type { CalendarResponse } from './fixtures-calendar-service';
+import * as fixturesCalendarService from './fixtures-calendar-service';
 import * as fixturesService from './fixtures-service';
 import * as gameweeksService from './gameweeks-service';
 import * as playerPoolService from './player-pool-service';
@@ -12,6 +14,7 @@ vi.mock('./gameweeks-service');
 vi.mock('./entry-service');
 vi.mock('./squad-service');
 vi.mock('./fixtures-service');
+vi.mock('./fixtures-calendar-service');
 vi.mock('./player-pool-service');
 
 describe('Proxy Endpoints', () => {
@@ -44,6 +47,15 @@ describe('Proxy Endpoints', () => {
           return c.json({ error: 'Team not found' }, { status: 404 });
         }
         return c.json({ error: 'Unable to fetch team information' }, { status: 500 });
+      }
+    });
+
+    app.get('/api/fixtures/calendar', async (c) => {
+      try {
+        const result = await fixturesCalendarService.getFixturesCalendar();
+        return c.json(result);
+      } catch {
+        return c.json({ error: 'Unable to fetch fixtures calendar' }, { status: 500 });
       }
     });
 
@@ -154,6 +166,28 @@ describe('Proxy Endpoints', () => {
       const res = await app.fetch(req);
 
       expect(res.status).toBe(404);
+    });
+  });
+
+  describe('GET /api/fixtures/calendar', () => {
+    it('returns 200 with calendar data', async () => {
+      const mockData: CalendarResponse = { teams: [], gameweeks: [], byTeam: {} };
+      vi.mocked(fixturesCalendarService.getFixturesCalendar).mockResolvedValue(mockData);
+
+      const res = await app.request('/api/fixtures/calendar');
+
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual(mockData);
+    });
+
+    it('returns 500 on service error', async () => {
+      vi.mocked(fixturesCalendarService.getFixturesCalendar).mockRejectedValue(
+        new Error('fail')
+      );
+
+      const res = await app.request('/api/fixtures/calendar');
+
+      expect(res.status).toBe(500);
     });
   });
 

@@ -21,8 +21,13 @@ export function set<T>(key: string, data: T, ttlSeconds: number): void {
   cache.set(key, { data, expiresAt });
 }
 
+export function clearCache(): void {
+  cache.clear();
+}
+
 export const ttl = {
   ENTRY: 86400,
   FIXTURES: 3600,
   PLAYER_POOL: 3600,
+  CALENDAR: 43200,
 };

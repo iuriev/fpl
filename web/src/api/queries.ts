@@ -287,3 +287,11 @@ export function useLeaderboardSeason() {
     },
   });
 }
+
+export function useFixturesCalendar() {
+  return useQuery({
+    queryKey: ['fixtures-calendar'],
+    queryFn: () => api.getFixturesCalendar(),
+    staleTime: 1000 * 60 * 60 * 12,
+  });
+}

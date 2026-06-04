@@ -23,6 +23,12 @@ export interface FPLBootstrapStatic {
     name: string;
     short_name: string;
     code: number;
+    strength_overall_home: number;
+    strength_overall_away: number;
+    strength_attack_home: number;
+    strength_attack_away: number;
+    strength_defence_home: number;
+    strength_defence_away: number;
   }>;
   chips: Array<{
     chip_type: string;
@@ -273,6 +279,10 @@ export async function getDreamTeam(gameweek: number): Promise<FPLDreamTeam> {
 
 export async function getFixtures(gameweek: number): Promise<FPLFixture[]> {
   return fetchFPL(`/fixtures/?event=${gameweek}`);
+}
+
+export async function getFixturesAll(): Promise<FPLFixture[]> {
+  return fetchFPL('/fixtures/');
 }
 
 export interface FPLElementSummary {

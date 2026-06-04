@@ -27,7 +27,9 @@ The catalogue. Top-level keys: `events`, `teams`, `elements`, `element_types`, `
 - `events[]` (gameweeks): `id`, `name` ("Gameweek 37"), `deadline_time`, `is_current`,
   `is_next`, `is_previous`, `finished`, `data_checked`, `average_entry_score`, `highest_score`,
   `most_captained`, `top_element`.
-- `teams[]`: `id`, `code`, `name`, `short_name` ("ARS"), strength ratings.
+- `teams[]`: `id`, `code`, `name`, `short_name` ("ARS"), `strength_overall_home`,
+  `strength_overall_away`, `strength_attack_home`, `strength_attack_away`,
+  `strength_defence_home`, `strength_defence_away`.
 - `elements[]` (players): `id`, `code`, `web_name`, `first_name`, `second_name`, `team`,
   `team_code`, `element_type`, `now_cost`, `total_points`, `event_points`, `status`,
   `chance_of_playing_this_round`, `news`, `news_added`, `selected_by_percent`,
@@ -73,6 +75,8 @@ Used for: each player's points in the selected gameweek (`stats.total_points`).
 - `GET /fixtures/?event={gw}` — fixtures for a gameweek. Each object: `id`, `event`,
   `team_h`, `team_a`, `team_h_difficulty`, `team_a_difficulty` (integer 1–5),
   `kickoff_time`, `finished`. Used for FDR chips in the Transfer Planner.
+- `GET /fixtures/` (no param) — all fixtures for the season (~380 objects, same shape).
+  Used for the full-season Fixtures Calendar.
 
 ## Proxy mapping (see `openspec/changes/mvp-squad-viewer/design.md`, decision D1)
 
@@ -85,5 +89,8 @@ Used for: each player's points in the selected gameweek (`stats.total_points`).
 
 - `/api/fixtures/upcoming` ← `GET /fixtures/?event={gw}` × 3 (next 3 GWs), returns
   per-team fixture list with `{ gw, opponent, home, difficulty }`. Cache: 1 hour.
+- `/api/fixtures/calendar` ← `GET /fixtures/` (full season) + `bootstrap-static` teams,
+  returns per-team per-GW structure with DGW/BGW flags, difficulty variants (official,
+  overall, defensive, attacking), rest days between fixtures. Cache: 12 hours.
 - `/api/player-pool` ← `bootstrap-static` `elements` + upcoming fixture data merged per
   `team` id. Returns all players with `next_fixtures[]`. Cache: 10 min.

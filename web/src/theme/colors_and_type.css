@@ -87,6 +87,16 @@ body {
   --fpl-fdr-5-bg:  #730c18;
   --fpl-fdr-5-ink: #ffb8b8;
 
+  /* ── rest days palette (fixtures calendar) ─────────────────────── */
+  --fpl-rest-tight-bg:    #c0392b;
+  --fpl-rest-tight-ink:   #ffffff;
+  --fpl-rest-moderate-bg: #e67e22;
+  --fpl-rest-moderate-ink:#ffffff;
+  --fpl-rest-easy-bg:     #27ae60;
+  --fpl-rest-easy-ink:    #ffffff;
+  --fpl-rest-tbc-bg:      var(--fpl-bg-hair);
+  --fpl-rest-tbc-ink:     var(--fpl-muted);
+
   /* ── active chip palette ────────────────────────────────────────── */
   --fpl-chip-wc-bg:  rgba(255, 192, 0, 0.14);
   --fpl-chip-wc-ink: #ffc000;

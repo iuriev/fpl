@@ -1,0 +1,66 @@
+.screen {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--fpl-bg-hair);
+  flex-shrink: 0;
+}
+
+.tab {
+  flex: 1;
+  padding: 0.75rem 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--fpl-muted);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  text-align: center;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.tab:hover {
+  color: var(--fpl-text-soft);
+}
+
+.tabActive {
+  color: var(--fpl-accent);
+  border-bottom-color: var(--fpl-accent);
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.message {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--fpl-muted);
+  font-size: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.retry {
+  padding: 0.5rem 1.25rem;
+  background: var(--fpl-accent);
+  color: var(--fpl-accent-ink);
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}

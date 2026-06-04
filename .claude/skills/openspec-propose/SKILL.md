@@ -22,6 +22,8 @@ When ready to implement, run /opsx:apply
 
 **Input**: The user's request should include a change name (kebab-case) OR a description of what they want to build.
 
+**Naming convention**: All directory names — both changes (`openspec/changes/`) and specs (`openspec/specs/`) — MUST always be prefixed with today's date in `YYYY-MM-DD` format, followed by a kebab-case slug — e.g., `2026-06-04-add-user-auth` or `2026-06-04-spec-transfer-planner`. Never create a change or spec without the date prefix.
+
 **Steps**
 
 1. **If no clear input provided, ask what they want to build**
@@ -29,14 +31,15 @@ When ready to implement, run /opsx:apply
    Use the **AskUserQuestion tool** (open-ended, no preset options) to ask:
    > "What change do you want to work on? Describe what you want to build or fix."
 
-   From their description, derive a kebab-case name (e.g., "add user authentication" → `add-user-auth`).
+   From their description, derive a kebab-case slug (e.g., "add user authentication" → `add-user-auth`), then prepend today's date: `YYYY-MM-DD-add-user-auth`.
 
    **IMPORTANT**: Do NOT proceed without understanding what the user wants to build.
 
 2. **Create the change directory**
    ```bash
-   openspec new change "<name>"
+   openspec new change "<YYYY-MM-DD-slug>"
    ```
+   Use today's date as the prefix (e.g., `2026-06-04-add-user-auth`).
    This creates a scaffolded change in the planning home resolved by the CLI with `.openspec.yaml`.
 
 3. **Get the artifact build order**
@@ -104,6 +107,7 @@ After completing all artifacts, summarize:
   - These guide what you write, but should never appear in the output
 
 **Guardrails**
+- Change names MUST follow the `YYYY-MM-DD-<slug>` pattern — never omit the date prefix
 - Create ALL artifacts needed for implementation (as defined by schema's `apply.requires`)
 - Always read dependency artifacts before creating a new one
 - If context is critically unclear, ask the user - but prefer making reasonable decisions to keep momentum

@@ -4,6 +4,7 @@
  */
 
 import {
+  CalendarResponse,
   EntryResponse,
   GameweeksResponse,
   HistoryResponse,
@@ -154,4 +155,6 @@ export const api = {
   getLeaderboardGw: (gw: number) => request<LeaderboardGwResponse>(`/leaderboard/gw/${gw}`),
 
   getLeaderboardSeason: () => request<LeaderboardSeasonResponse>('/leaderboard/season'),
+
+  getFixturesCalendar: () => request<CalendarResponse>('/fixtures/calendar'),
 };

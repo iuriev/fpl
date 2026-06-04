@@ -1,0 +1,80 @@
+/* ── размеры чипа ── */
+/* обычная колонка: 5.5rem, ячейка 3.75rem высотой */
+.cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 3.75rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* DGW: чипы в ряд */
+.cellRow {
+  flex-direction: row;
+  gap: 0.1875rem;
+  padding: 0 0.1875rem;
+}
+
+.bgw {
+  background: var(--fpl-bg-hair);
+  border-radius: 0.5rem;
+  color: var(--fpl-muted);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.separator {
+  width: 1px;
+  height: 65%;
+  background: rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
+}
+
+/* обычный чип — заполняет колонку */
+.chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 4.875rem;
+  height: 3.25rem;
+  border-radius: 0.5rem;
+  padding: 0.25rem 0;
+  flex-shrink: 0;
+}
+
+/* в DGW-ряду оба чипа поровну делят ширину */
+.cellRow .chip {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+}
+
+.chipName {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+}
+
+.chipSub {
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  opacity: 0.85;
+}
+
+/* FDR difficulty colours */
+.fdr1 { background: var(--fpl-fdr-1-bg); color: var(--fpl-fdr-1-ink); }
+.fdr2 { background: var(--fpl-fdr-2-bg); color: var(--fpl-fdr-2-ink); }
+.fdr3 { background: var(--fpl-fdr-3-bg); color: var(--fpl-fdr-3-ink); }
+.fdr4 { background: var(--fpl-fdr-4-bg); color: var(--fpl-fdr-4-ink); }
+.fdr5 { background: var(--fpl-fdr-5-bg); color: var(--fpl-fdr-5-ink); }
+
+/* Rest days colours */
+.restTight    { background: var(--fpl-rest-tight-bg);    color: var(--fpl-rest-tight-ink); }
+.restModerate { background: var(--fpl-rest-moderate-bg); color: var(--fpl-rest-moderate-ink); }
+.restEasy     { background: var(--fpl-rest-easy-bg);     color: var(--fpl-rest-easy-ink); }
+.restTbc      { background: var(--fpl-rest-tbc-bg);      color: var(--fpl-rest-tbc-ink); }

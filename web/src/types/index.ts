@@ -365,3 +365,49 @@ export interface LeaderboardSeasonResponse {
   defcon: LeaderboardPlayer[];
   bps: LeaderboardPlayer[];
 }
+
+export interface CalendarTeam {
+  id: number;
+  code: number;
+  name: string;
+  shortName: string;
+  strengthOverallHome: number;
+  strengthOverallAway: number;
+  strengthAttackHome: number;
+  strengthAttackAway: number;
+  strengthDefenceHome: number;
+  strengthDefenceAway: number;
+}
+
+export interface CalendarGameweek {
+  id: number;
+  name: string;
+  finished: boolean;
+  isCurrent: boolean;
+  deadline: string;
+}
+
+export type CalendarDifficulty = 1 | 2 | 3 | 4 | 5;
+
+export interface CalendarFixture {
+  opponentShortName: string;
+  opponentId: number;
+  home: boolean;
+  officialDifficulty: CalendarDifficulty;
+  overallDifficulty: CalendarDifficulty;
+  defensiveDifficulty: CalendarDifficulty;
+  attackingDifficulty: CalendarDifficulty;
+  kickoffTime: string | null;
+  restDaysBefore: number | null;
+}
+
+export interface TeamGwRow {
+  gw: number;
+  fixtures: CalendarFixture[];
+}
+
+export interface CalendarResponse {
+  teams: CalendarTeam[];
+  gameweeks: CalendarGameweek[];
+  byTeam: Record<number, TeamGwRow[]>;
+}

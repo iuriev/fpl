@@ -115,7 +115,7 @@ These features give the app reasons to return every gameweek — essential for g
 | ~~ANA-03~~ | ~~Price change risers & fallers~~ | M | ✅ Done — combined with PRED-06 on `/price-changes` (OpenSpec `ana-03-pred-06-price-changes`). |
 | ~~ANA-12~~ | ~~League participants browser (click league on Stats to see all members)~~ | S | ✅ Done — OpenSpec change 2026-06-02-ana-12-league-participants-browser. |
 | ~~MGR-01~~ | ~~Manager Watchlist — follow managers, see their points/transfers in a table~~ | M | ✅ Done — OpenSpec change 2026-06-01-manager-watchlist. localStorage phase, max 5. |
-| MGR-02 | Backend watchlist — migrate MGR-01 from localStorage to backend API | S | Depends on AUTH-01. Swap LocalStorageWatchlistRepository → ApiWatchlistRepository; no UI changes. |
+| ~~MGR-02~~ | ~~Backend watchlist — migrate MGR-01 from localStorage to backend API~~ | S | ✅ Done — `ApiWatchlistRepository` + `ApiPlayerWatchlistRepository` swapped in; syncs across devices via `/api/user/watchlist` and `/api/user/player-watchlist`. |
 | ~~MGR-03~~ | ~~Freemium watchlist limits — 2 entries free, 10 with subscription~~ | S | ✅ Done — limits implemented in LocalStorageWatchlistRepository (2 managers) and LocalStoragePlayerWatchlistRepository (2 players); upsell PremiumSheet wired via use-follow-team / use-follow-player. |
 | ~~WATCH-01~~ | ~~Player Watchlist — shortlist of players you're tracking but not yet transferring~~ | S | ✅ Done. |
 | ~~AUTH-01~~ | ~~Login / password + Google OAuth, backend user profile~~ | M | ✅ Done — OpenSpec change 2026-06-02-auth-01-user-accounts. |
@@ -329,7 +329,6 @@ Tell the user the optimal gameweek to play Bench Boost, based on:
 | ID | Task | Effort | Why |
 |----|------|--------|-----|
 | ~~PLAN-00~~ | ~~Backend transfer draft — migrate `fpl-transfer-draft-*` from localStorage to Postgres~~ | S | ✅ Done — `/api/me/transfer-draft`; one draft per user (OpenSpec `archive/2026-06-03-transfer-draft-backend`). |
-| PLAN-01 | Multi-GW transfer planner with saved plans (1 free, more = paid) | L | "Plan transfers before your rivals do." Strong monetisation anchor. |
 | PLAN-02 | Transfer solver / AI optimizer | L | Suggests optimal transfers automatically. High perceived value. |
 
 ### Feature details
@@ -338,14 +337,6 @@ Tell the user the optimal gameweek to play Bench Boost, based on:
 Transfer planner drafts persist in Postgres via `GET/PUT/DELETE /api/me/transfer-draft` (one per
 user). Stale GW and team change clear the draft; one-shot import from `fpl-transfer-draft-*`
 localStorage keys. OpenSpec `archive/2026-06-03-transfer-draft-backend`.
-
-#### PLAN-01: Multi-GW transfer planner with saved plans
-Extend the transfer planner to support:
-- Multiple saved plans (name each plan, compare them side by side)
-- Multi-GW planning: plan transfers for GW N, N+1, N+2... tracking xPts improvement per GW
-- Header showing Transfers used / Cost / Bank / xFTs
-- **Monetisation:** 1 free plan; additional plans require subscription
-Reference: fpl.team "Plan transfers before your rivals do".
 
 #### PLAN-02: Transfer solver / AI optimizer
 Automatically suggest the optimal 1–2 transfers for the current GW:
@@ -360,7 +351,7 @@ Reference: fpl.team Transfer Solver.
 
 | ID | Task | Effort | Why |
 |----|------|--------|-----|
-| FIX-02 | Full-season Fixtures Calendar (FDR heatmap, DGW/BGW, Recovery views) | L | One of fpl.team's most-used features. Long build but very high utility. |
+| ~~FIX-02~~ | ~~Full-season Fixtures Calendar (FDR heatmap, DGW/BGW, Recovery views)~~ | L | ✅ Done — `/fixtures` screen; 5 tabs (Official/Overall/Defensive/Attacking/Rest Days); DGW/BGW detection; 12h cache. OpenSpec `2026-06-04-fix-02-fixtures-calendar`. |
 | ANA-06 | Captain Poll (community vote each GW) | M | Social feature; drives pre-deadline engagement and return visits. |
 | APP-01 | About page | S | Builds trust. Needed before wider launch. |
 
@@ -375,10 +366,6 @@ Full-season fixture calendar with multiple view modes:
 
 Filter tabs: Custom | Official | Rest Days | Overall | Defensive | Attacking
 Reference: fpl.team Fixtures Calendar feature.
-
-#### SOC-02: Mini-league invite link
-Register a custom mini-league within the app with a shareable invite link.
-Users click the link to join and view the league's live standings.
 
 #### APP-01: About page
 Create an "About" menu item that tells the story of the project.
@@ -419,7 +406,6 @@ Can be integrated into the player info popup or as a standalone screen.
 | AUTH-02 | FPL OAuth / transfer execution | XL | Complex. Needs FPL API capability research first (may not be possible). |
 | START-01 | GW1 draft assistant | L | Seasonal feature (once a year). High viral potential before season start. |
 | DES-01 | Desktop responsive layout | L | Low priority while the app is pre-launch / mobile-first. |
-| SOC-02 | Mini-league invite link | M | Viral acquisition channel. Deprioritised — revisit after core analytics features are done. |
 | ANA-10 | Player detail stats (points breakdown) | M | Nice-to-have. FPL app does this — we can differentiate with AI commentary. |
 | LIVE-03 | Live in-match scoring | L | Complex edge cases. Research spikes needed. |
 | VIS-02 | Team of the Week badge on squad screen | S | Polish feature. Simple once data source is confirmed. |

@@ -20,6 +20,7 @@ import {
 } from '@/lib/watchlist-repository';
 import {
   EntryScreen,
+  FixturesCalendarScreen,
   ForgotPasswordScreen,
   GameweekHistoryScreen,
   GameweekReviewScreen,
@@ -135,6 +136,14 @@ function AppContent() {
         element={
           <AuthAndTeamProtectedRoute>
             <PriceChangesScreen />
+          </AuthAndTeamProtectedRoute>
+        }
+      />
+      <Route
+        path="/fixtures"
+        element={
+          <AuthAndTeamProtectedRoute>
+            <FixturesCalendarScreen />
           </AuthAndTeamProtectedRoute>
         }
       />

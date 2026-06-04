@@ -11,6 +11,7 @@ import { runMigrations } from './db/client';
 import { db } from './db/client';
 import { playerWatchlistEntry } from './db/schema';
 import * as entryService from './entry-service';
+import * as fixturesCalendarService from './fixtures-calendar-service';
 import * as fixturesService from './fixtures-service';
 import { getOrFetchBootstrap } from './fpl-cache/db-cache';
 import { prefetchMissingGwData } from './fpl-cache/prefetch';
@@ -188,6 +189,17 @@ app.get('/api/squad/:teamId/:gw', optionalUser, async (c) => {
     }
     console.error('Error fetching squad:', error);
     return c.json({ error: 'Unable to fetch squad' }, { status: 500 });
+  }
+});
+
+// GET /api/fixtures/calendar
+app.get('/api/fixtures/calendar', async (c) => {
+  try {
+    const result = await fixturesCalendarService.getFixturesCalendar();
+    return c.json(result);
+  } catch (error) {
+    console.error('Error fetching fixtures calendar:', error);
+    return c.json({ error: 'Unable to fetch fixtures calendar' }, { status: 500 });
   }
 });
 
