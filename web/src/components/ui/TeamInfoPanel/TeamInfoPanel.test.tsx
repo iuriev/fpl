@@ -69,12 +69,7 @@ describe('TeamInfoPanel', () => {
     expect(screen.getByText('67')).toBeInTheDocument();
   });
 
-  it('renders total players formatted', () => {
-    renderPanel({ totalPlayers: 10500000 });
-    expect(screen.getByText('10,500,000')).toBeInTheDocument();
-  });
-
-  it('does not render Follow button by default (own team)', () => {
+it('does not render Follow button by default (own team)', () => {
     renderPanel();
     expect(screen.queryByRole('button', { name: /follow/i })).toBeNull();
   });
@@ -144,12 +139,7 @@ describe('TeamInfoPanel — user block', () => {
     expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument();
   });
 
-  it('shows Change your team ID button in full mode', () => {
-    renderPanelWithUser();
-    expect(screen.getByRole('button', { name: /change your team id/i })).toBeInTheDocument();
-  });
-
-  it('does not show user block in demo mode', () => {
+it('does not show user block in demo mode', () => {
     renderPanelWithUser({}, 'demo');
     expect(screen.queryByRole('button', { name: /sign out/i })).toBeNull();
   });

@@ -52,9 +52,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--fpl-space-md) var(--fpl-space-sm);
+  padding: var(--fpl-space-base) var(--fpl-space-xl3);
   border-bottom: 1px solid var(--fpl-bg-hair);
-  background: rgba(255, 255, 255, 0.03);
 }
 
 .title {
@@ -95,4 +94,5 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+  padding: var(--fpl-space-xl3) var(--fpl-space-xl3) var(--fpl-space-xl5);
 }

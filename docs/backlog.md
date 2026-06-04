@@ -33,6 +33,80 @@ matching FPL design conventions.
 
 ---
 
+## 🟠 P1 — Research & Data
+
+| ID | Task | Effort | Why |
+|----|------|--------|-----|
+| PRED-09 | EPL statistical model research — xA, card & CS probabilities | L | Enables PRED-02+ enriched predictions and PRED-05/07. Must precede any prediction screen beyond xPts. |
+
+### Feature details
+
+#### PRED-09: EPL statistical model — per-player match prediction engine
+
+Research, design, and prototype a model that produces per-player, per-fixture probability predictions for the next GW:
+
+**Target outputs (per player × fixture)**
+- `xA_prob` — probability of 1+ assist in this match
+- `yellow_prob` — probability of receiving a yellow card
+- `red_prob` — probability of receiving a red card
+- `cs_prob` — clean sheet probability (defenders/GKs)
+
+**Input signals to evaluate**
+
+1. **Historical H2A results** — how often does Team A beat Team B at home/away over last N seasons? Player-level: does a player historically perform better vs certain opponents?
+2. **Current form** — team's rolling win/loss/draw rate (last 5–6 games); player's rolling xG, xA, goal/assist involvement rate.
+3. **Fixture difficulty** — FDR from FPL API; but build our own Offensive/Defensive strength index from the season's results.
+4. **Rest days** — days since the team's last match. Short rest → higher rotation risk, more cards from fatigue.
+5. **Squad availability** — injuries (`status: 'i'`/`'d'`), suspensions (`status: 's'`), `chance_of_playing_this_round`. Key absences (star striker missing → attack threat drops; key CB missing → CS% drops).
+6. **Player vs opponent history** — element-summary `history[]` across past seasons: goals, assists, cards against that specific team code.
+
+**Data sources to research**
+
+- FPL API: `bootstrap-static`, `element-summary/{id}`, `fixtures/` — free, no auth, already proxied.
+- [vaastav/FPL-data](https://github.com/vaastav/FPL-data) — historical FPL seasons back to 2016; merged results, player stats per GW.
+- [football-data.org](https://www.football-data.org/) — free tier (10 req/min): fixtures, standings, results, lineups.
+- [api-football (RapidAPI)](https://rapidapi.com/api-sports/api/api-football/) — richer stats: xG, xA, cards per match, head-to-head. Paid but affordable.
+- [understat.com](https://understat.com/) — xG/xA per shot, per player, per match. No official API but scrapeable.
+- [FBref.com](https://fbref.com/) — StatsBomb-powered xA, progressive passes, press stats. Best for deep xA modeling.
+
+**Modeling approach options**
+
+| Approach | Complexity | Accuracy | Notes |
+|----------|-----------|----------|-------|
+| Weighted form heuristic | XS | Low-medium | Fast to ship; use form + FDR + rest days |
+| Poisson model (goals) | S | Medium | Classic football stats method |
+| Logistic regression (card/CS) | S | Medium | Per-player card rate × opponent aggression |
+| Gradient boosting (xG-based) | M | High | Needs training data from vaastav/FPL-data |
+| LLM-assisted summary | M | Variable | Summarize stats → Claude API → risk score |
+
+**Recommended spike**
+
+1. Pull vaastav/FPL-data last 3 seasons into a local Postgres table.
+2. Build a per-player "form vector": last 5 GW xG, xA, minutes, card count, opponent strength.
+3. Implement Poisson attack/defence strength model for CS% and xG.
+4. Logistic regression for yellow card probability using: player's season yellow rate, opponent's press intensity, rest days.
+5. Validate: compare model output against actual outcomes for GW 30-38 of last season.
+
+**Output contract** (what PRED-02, PRED-05, PRED-07 will consume)
+
+```ts
+interface PlayerMatchPrediction {
+  playerId: number;
+  fixtureId: number;
+  xPts: number;          // already from FPL ep_next, possibly improved
+  xGoals: number;        // expected goals this match
+  xAssists: number;      // expected assists this match
+  csProb: number | null; // null for MID/FWD
+  yellowProb: number;
+  redProb: number;
+  confidence: 'low' | 'medium' | 'high';
+}
+```
+
+**Promote to OpenSpec** once spike results are reviewed.
+
+---
+
 ## 🟠 P1 — Transfer screen polish
 
 | ID | Task | Effort | Why |
@@ -220,7 +294,8 @@ Useful for long-term planning — build a shortlist without committing a transfe
 | PRED-05 | Clean sheet probability & xG/xA market screen (per-team stats) | M | Unique angle. Helps evaluate defenders and attackers efficiently. |
 | PRED-07 | Predicted goals & assists screen | M | Complement to PRED-05; popular FPL decision-making tool. |
 | PRED-08 | Predicted lineups for all 20 PL teams | L | Data-heavy. Needs reliable lineup data source research. |
-| PRED-02 | Predicted points list screen (free: top 3, locked: rest) | M | Monetisation hook + genuinely useful feature. Needs xPts source. |
+| PRED-10 | Textual prediction analytics in player profile sheet | S | Show a short natural-language explanation of why a player is expected to score that many xPts — form, fixture, ownership, threat. Depends on PRED-09 for richer signals; for now can use ep_next + FDR + minutes % heuristics. |
+| ~~PRED-02~~ | ~~Predicted points list screen (free: top 3, locked: rest)~~ | M | ✅ Done — `/predicted-points`; GK/DEF/MID/FWD tabs sorted by `ep_next`; free top-3 + blur+upsell; premium progressive load. |
 
 | MON-01 | Premium subscription flow (paywall, pricing page) | L | Unlocks revenue. Sequence: build the gate first, then the real feature (PRED-04). |
 | ~~MON-02~~ | ~~Blocking premium upsell dialog on Transfer (Predicted Points with PRED-02)~~ | S | ✅ Done — archived `2026-06-03-mon-02-premium-upsell-dialog`; spec `openspec/specs/premium-upsell-dialog/`. |
@@ -237,6 +312,29 @@ On screen load (data ready), call `requestUpsell('predictions')` from `PremiumUp
 - Subtitle: "Click on a player to view their profile and compare predictions."
 - Free rows: `[club badge] [player photo] {Name} {price}m {pos}/{team}/{ownership%}` → `xPts {value}` large right-aligned
 - Locked rows: blurred photo + name, "🔒 Become a seasoned veteran to see all players", blurred xPts
+
+#### PRED-10: Textual prediction analytics in player profile sheet
+
+When a user opens a player's profile from the Predicted Points screen (or any screen), show a short
+natural-language blurb below the xPts value explaining the reasoning behind the estimate.
+
+**Examples:**
+- "Haaland has an easy home fixture (FDR 2), averaged 7.4 pts over the last 5 GWs, and is 99% likely to start."
+- "Salah faces a tough away trip (FDR 4) but has scored in 3 of his last 4 and has the highest threat rating in the squad."
+- "Raya is expected to keep a clean sheet (CS% 42%) against Wolves at home — their attack ranks 18th in xG this season."
+
+**Signals to surface (in priority order):**
+1. Fixture difficulty (FDR 1–5, home/away)
+2. Recent form (last 5 GW pts average, goal/assist involvement)
+3. Minutes confidence (chance_of_playing, injury status)
+4. Season-level rank in threat / creativity / influence (ICT)
+
+**Phase 1 (before PRED-09):** heuristic sentences from FPL API fields only (ep_next, ict_index,
+threat, creativity, form, chance_of_playing, FDR). No model needed.
+
+**Phase 2 (after PRED-09):** enrich with model-derived probabilities (xA, CS%, card risk).
+
+Depends on: PRED-09 for phase 2.
 
 #### PRED-05: Clean sheet probability & xG/xA market screen
 Per-team market screen inspired by fplukraine.com:

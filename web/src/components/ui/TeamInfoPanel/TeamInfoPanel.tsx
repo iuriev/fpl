@@ -34,6 +34,7 @@ const NAV_LINKS: { to: string; label: () => string; featured?: boolean; end?: bo
   { to: '/player-watchlist', label: () => copy.playerWatchlistNavLink },
   { to: '/top-players', label: () => copy.topPlayersNavLink },
   { to: '/leaderboard', label: () => copy.leaderboardNavLink },
+  { to: '/predicted-points', label: () => copy.predictedPointsNavLink },
   { to: '/price-changes', label: () => copy.priceChangesNavLink },
   { to: '/fixtures', label: () => copy.fixturesCalendarNavLink },
   { to: '/history', label: () => copy.teamInfoGwHistory },
@@ -61,11 +62,7 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({
     }
   };
 
-  const handleChangeTeam = () => {
-    navigate('/entry');
-  };
-
-  const userInitial = user ? (user.name || user.email).charAt(0).toUpperCase() : '';
+const userInitial = user ? (user.name || user.email).charAt(0).toUpperCase() : '';
 
   const repo = useWatchlistRepository();
   const [following, setFollowing] = useState(false);
@@ -121,9 +118,6 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({
               {copy.drawerSignOut}
             </button>
           </div>
-          <button className={styles.changeTeamRow} onClick={handleChangeTeam}>
-            {copy.drawerChangeTeam}
-          </button>
         </>
       )}
 
@@ -141,10 +135,6 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({
         <div className={styles.stat}>
           <span className={styles.statValue}>{fmt(entry.eventPoints)}</span>
           <span className={styles.statLabel}>{copy.teamInfoGwPts}</span>
-        </div>
-        <div className={styles.stat}>
-          <span className={styles.statValue}>{fmt(entry.totalPlayers)}</span>
-          <span className={styles.statLabel}>{copy.teamInfoTotalPlayers}</span>
         </div>
       </div>
 

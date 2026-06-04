@@ -11,6 +11,7 @@ export type { LeaguesStatsScreenProps } from './LeaguesStatsScreen/LeaguesStatsS
 export { LeaguesStatsScreen } from './LeaguesStatsScreen/LeaguesStatsScreen';
 export { LeagueStandingsScreen } from './LeagueStandingsScreen/LeagueStandingsScreen';
 export { PlayerWatchlistScreen } from './PlayerWatchlistScreen/PlayerWatchlistScreen';
+export { PredictedPointsScreen } from './PredictedPointsScreen/PredictedPointsScreen';
 export { PriceChangesScreen } from './PriceChangesScreen/PriceChangesScreen';
 export { ResetPasswordScreen } from './ResetPasswordScreen/ResetPasswordScreen';
 export { SignInScreen } from './SignInScreen/SignInScreen';

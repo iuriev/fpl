@@ -251,6 +251,20 @@ export const copy = {
   priceChangesFilterMID: 'MID',
   priceChangesFilterFWD: 'FWD',
   priceChangesUnlockSquad: 'Unlock my squad view',
+
+  // Predicted Points screen (PRED-02)
+  predictedPointsNavLink: 'Predicted Points',
+  predictedPointsTitle: 'Predicted Points',
+  predictedPointsGwLabel: 'GW {n}',
+  predictedPointsXptsLabel: 'xPts',
+  predictedPointsUnlockLabel: 'Unlock all predictions',
+  predictedPointsPremiumTitle: 'See all predicted points',
+  predictedPointsPremiumDescription:
+    'Subscribe to unlock the full ranked list — all players per position for the next gameweek.',
+  predictedPointsPremiumFreeLabel: 'Top 3 per position',
+  predictedPointsPremiumPremiumLabel: 'Full ranked list',
+  predictedPointsEmptyPosition: 'No prediction data available for this position.',
+
   topPlayersTabTeam: 'By Team',
   topPlayersTabTotw: 'TOTW',
   topPlayersTeamSelectLabel: 'Select team',

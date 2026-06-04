@@ -29,10 +29,34 @@
   white-space: nowrap;
 }
 
+.teamIdRow {
+  display: flex;
+  align-items: center;
+  gap: var(--fpl-space-sm);
+}
+
 .teamId {
   font-family: var(--fpl-font-mono), serif;
   font-size: var(--fpl-fs-micro);
   color: var(--fpl-muted-soft);
   font-weight: var(--fpl-fw-medium);
   letter-spacing: var(--fpl-tr-cap-s);
+}
+
+.changeTeamBtn {
+  background: none;
+  border: 1px solid var(--fpl-bg-hair);
+  border-radius: var(--fpl-radius-sm);
+  color: var(--fpl-muted-soft);
+  font-size: var(--fpl-fs-micro);
+  font-weight: var(--fpl-fw-medium);
+  padding: 0.125rem var(--fpl-space-xs);
+  cursor: pointer;
+  transition: border-color 120ms, color 120ms;
+  white-space: nowrap;
+}
+
+.changeTeamBtn:hover {
+  border-color: var(--fpl-accent);
+  color: var(--fpl-accent);
 }

@@ -8,7 +8,8 @@
 
 .tilePrice,
 .tileChange,
-.tileSecondary {
+.tileSecondary,
+.tileXpts {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -56,4 +57,25 @@
 .tileSecondaryStrong {
   background: rgba(74, 222, 128, 0.22);
   border-color: rgba(74, 222, 128, 0.5);
+}
+
+.tileXpts {
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 3.5rem;
+  color: var(--fpl-accent);
+  background: var(--fpl-accent-faint);
+  border-color: color-mix(in srgb, var(--fpl-accent) 45%, transparent);
+}
+
+.tileXptsValue {
+  font: var(--fpl-fw-heavy) var(--fpl-fs-title-l) / 1 var(--fpl-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.tileXptsLabel {
+  font: var(--fpl-fw-semibold) var(--fpl-fs-micro) / 1 var(--fpl-font-display);
+  color: var(--fpl-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }

@@ -17,30 +17,36 @@
   padding: var(--fpl-space-xl) var(--fpl-space-xl3);
 }
 
-/* ── Stats grid ────────────────────────────────────────────── */
+/* ── Stats strip ───────────────────────────────────────────── */
 
 .stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--fpl-space-sm);
+  display: flex;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--fpl-bg-hair);
+  border-radius: var(--fpl-radius-md);
+  overflow: hidden;
 }
 
 .stat {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.125rem;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--fpl-bg-hair);
-  border-radius: var(--fpl-radius-md);
-  padding: var(--fpl-space-sm);
+  padding: var(--fpl-space-sm) var(--fpl-space-xs);
+}
+
+.stat + .stat {
+  border-left: 1px solid var(--fpl-bg-hair);
 }
 
 .statValue {
   font-family: var(--fpl-font-mono), serif;
-  font-size: var(--fpl-fs-title);
+  font-size: var(--fpl-fs-body-m);
   font-weight: var(--fpl-fw-bold);
   color: var(--fpl-text);
+  white-space: nowrap;
 }
 
 .statLabel {
@@ -50,6 +56,7 @@
   text-transform: uppercase;
   letter-spacing: var(--fpl-tr-cap-s);
   text-align: center;
+  white-space: nowrap;
 }
 
 /* ── Nav links ─────────────────────────────────────────────── */
@@ -187,8 +194,9 @@
 
 .skeletonStat {
   composes: skeletonBase;
-  border-radius: var(--fpl-radius-md);
-  height: 3.5rem;
+  flex: 1;
+  border-radius: 0;
+  height: 3rem;
 }
 
 .skeletonNavBar {
@@ -280,32 +288,6 @@
   opacity: 0.5;
 }
 
-.changeTeamRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  background: none;
-  border: 1px solid var(--fpl-bg-hair);
-  border-radius: var(--fpl-radius-md);
-  padding: var(--fpl-space-sm) var(--fpl-space-md);
-  color: var(--fpl-muted);
-  font-size: var(--fpl-fs-body-s);
-  cursor: pointer;
-  text-align: left;
-  transition: border-color 120ms, color 120ms;
-}
-
-.changeTeamRow::after {
-  content: '→';
-  color: var(--fpl-accent);
-  font-size: var(--fpl-fs-body-s);
-}
-
-.changeTeamRow:hover {
-  border-color: var(--fpl-accent);
-  color: var(--fpl-text);
-}
 
 /* ── Donation banner ───────────────────────────────────────── */
 

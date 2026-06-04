@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { useEntry } from '@/api/queries';
 import { Drawer } from '@/components/ui/Drawer/Drawer';
@@ -23,6 +24,7 @@ export const TeamNavDrawer: React.FC<TeamNavDrawerProps> = ({
   navLinksMode = 'full',
   showFollow = false,
 }) => {
+  const navigate = useNavigate();
   const { data: entry, isError: entryIsError } = useEntry(teamId);
 
   const flag = useMemo(() => {
@@ -41,7 +43,17 @@ export const TeamNavDrawer: React.FC<TeamNavDrawerProps> = ({
           {entry.managerName}
         </span>
       </div>
-      <span className={styles.teamId}>{'ID · ' + teamId}</span>
+      <div className={styles.teamIdRow}>
+        <span className={styles.teamId}>{'ID · ' + teamId}</span>
+        {navLinksMode === 'full' && (
+          <button
+            className={styles.changeTeamBtn}
+            onClick={() => navigate('/entry')}
+          >
+            {copy.drawerChangeTeam}
+          </button>
+        )}
+      </div>
     </div>
   ) : null;
 

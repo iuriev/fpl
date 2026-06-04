@@ -36,6 +36,10 @@ The catalogue. Top-level keys: `events`, `teams`, `elements`, `element_types`, `
   `cost_change_event`, `cost_change_start`, `transfers_in_event`, `transfers_out_event`,
   `price_change_percent`.
 - `element_types[]`: `id`, `singular_name`, `singular_name_short` (GKP/DEF/MID/FWD), squad rules.
+- `ep_next` (per element): FPL's official expected-points estimate for the next GW (string, e.g.
+  `"8.5"`). Surfaced on `PredictedPointsScreen` to rank all players per position. Not a
+  custom model — this is the value FPL itself publishes. Exposed as `expectedPoints` in our
+  `PoolPlayer` type and the `/api/player-pool` response.
 
 Used for: player metadata (name/position/club/status), the gameweek list and current gameweek,
 and the gameweek average/highest scores for the summary.

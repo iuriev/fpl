@@ -28,6 +28,7 @@ import {
   LeaguesStatsScreen,
   LeagueStandingsScreen,
   PlayerWatchlistScreen,
+  PredictedPointsScreen,
   PriceChangesScreen,
   ResetPasswordScreen,
   SignInScreen,
@@ -119,6 +120,14 @@ function AppContent() {
         element={
           <AuthAndTeamProtectedRoute>
             <LeaderboardScreen />
+          </AuthAndTeamProtectedRoute>
+        }
+      />
+      <Route
+        path="/predicted-points"
+        element={
+          <AuthAndTeamProtectedRoute>
+            <PredictedPointsScreen />
           </AuthAndTeamProtectedRoute>
         }
       />

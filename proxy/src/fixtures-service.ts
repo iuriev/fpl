@@ -20,8 +20,16 @@ export async function getUpcomingFixtures(): Promise<Record<number, FixtureInfo[
 
   const bootstrap = await getBootstrapWithCache();
   const teamMap = new Map(bootstrap.teams.map((t) => [t.id, t.short_name]));
+  const finishedGwIds = new Set(bootstrap.events.filter((e) => e.finished).map((e) => e.id));
   const nextGw = resolveNextGw(bootstrap);
-  const gwIds = [nextGw, nextGw + 1, nextGw + 2].filter((id) => id <= MAX_GAMEWEEK);
+  const gwIds = [nextGw, nextGw + 1, nextGw + 2].filter(
+    (id) => id <= MAX_GAMEWEEK && !finishedGwIds.has(id)
+  );
+
+  if (gwIds.length === 0) {
+    cacheLayer.set(cacheKey, {}, cacheLayer.ttl.FIXTURES);
+    return {};
+  }
 
   const allFixtures = await Promise.all(gwIds.map((gw) => fplClient.getFixtures(gw)));
 
