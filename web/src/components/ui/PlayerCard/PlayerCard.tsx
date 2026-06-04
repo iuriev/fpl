@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 
-import { copy } from '@/lib/copy';
+import { copy, interpolate } from '@/lib/copy';
 import { chipColorKey, formatStatLabel, HIDDEN_STATS } from '@/lib/stat-chips';
 import type { FixtureInfo, PlayerStatus, SquadPlayer, StatEntry } from '@/types';
 
@@ -20,10 +20,13 @@ export interface PlayerCardProps {
   player: SquadPlayer;
   size?: 'large' | 'medium';
   hidePoints?: boolean;
+  showXMinsPill?: boolean;
+  showLineupPlayRisk?: boolean;
   hideStats?: boolean;
   nextFixture?: FixtureInfo;
   hideClub?: boolean;
   footBadge?: React.ReactNode;
+  hideAvailabilityBadge?: boolean;
   onSubClick?: () => void;
   playerInfo?: PlayerInfo;
   hideCaptaincy?: boolean;
@@ -58,10 +61,13 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   player,
   size = 'medium',
   hidePoints = false,
+  showXMinsPill = false,
+  showLineupPlayRisk = false,
   hideStats = false,
   nextFixture,
   hideClub = false,
   footBadge,
+  hideAvailabilityBadge = false,
   onSubClick,
   playerInfo,
   hideCaptaincy = false,
@@ -73,9 +79,11 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   const [showInfo, setShowInfo] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const popupId = useId();
-  const badge = availBadge(player.status);
+  const badge = hideAvailabilityBadge ? null : availBadge(player.status);
   const isFlagged = badge !== null;
   const isClickable = !!playerInfo || isFlagged;
+  const xMins = showXMinsPill ? player.stats.minutes : null;
+  const showPointsPill = !hidePoints && xMins == null;
 
   const toggle = useCallback(() => {
     if (playerInfo) {
@@ -154,7 +162,10 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
       }
     >
       <div className={styles.jerseyWrap}>
-        {(footBadge || badge || (!hideCaptaincy && (player.isCaptain || player.isViceCaptain))) && (
+        {(footBadge ||
+          badge ||
+          showLineupPlayRisk ||
+          (!hideCaptaincy && (player.isCaptain || player.isViceCaptain))) && (
           <div className={styles.badgeRow}>
             <div className={styles.badgeRow_left}>
               {footBadge && <span aria-hidden="true">{footBadge}</span>}
@@ -168,6 +179,25 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
               )}
             </div>
             <div className={styles.badgeRow_right}>
+              {showLineupPlayRisk && (
+                <span className={styles.lineupRiskIcon} aria-label={copy.predictedLineupsPlayRiskAria}>
+                  <svg viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                    <path
+                      d="M6 1.25L10.5 9.75H1.5L6 1.25Z"
+                      fill="var(--fpl-warn)"
+                      stroke="var(--fpl-bg-deep)"
+                      strokeWidth="1.25"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M6 4.25V6.75M6 8.25H6.01"
+                      stroke="var(--fpl-warn-ink)"
+                      strokeWidth="1.25"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </span>
+              )}
               {!hideCaptaincy && (player.isCaptain || player.isViceCaptain) && (
                 <span
                   className={`${styles.capBadge}${player.isViceCaptain ? ` ${styles.capBadge_vice}` : ''}`}
@@ -199,7 +229,12 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
 
       <div className={styles.pill}>
         <span className={styles.name}>{player.name}</span>
-        {!hidePoints && <span className={styles.points}>{player.points}</span>}
+        {xMins != null && (
+          <span className={`${styles.xMinsPill} ${styles.xMinsPill_prominent}`}>
+            {interpolate(copy.predictedLineupsXMinsPill, { n: xMins })}
+          </span>
+        )}
+        {showPointsPill && <span className={styles.points}>{player.points}</span>}
       </div>
       {playerInfo && (
         <span className={styles.ownershipPill} data-tour="step-4">

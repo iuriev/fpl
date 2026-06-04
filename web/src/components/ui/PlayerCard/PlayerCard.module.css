@@ -101,6 +101,21 @@
   color: #ffffff;
 }
 
+.lineupRiskIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.375rem;
+  height: 1.375rem;
+  filter: drop-shadow(var(--fpl-shadow-status-dot));
+  pointer-events: none;
+}
+
+.lineupRiskIcon svg {
+  width: 100%;
+  height: 100%;
+}
+
 .pill {
   display: flex;
   flex-direction: column;
@@ -138,6 +153,30 @@
   text-align: center;
   font-variant-numeric: tabular-nums;
   line-height: 1;
+}
+
+.xMinsPill {
+  background: var(--fpl-pill-pts-bg);
+  color: var(--fpl-pill-pts-ink);
+  font-family: var(--fpl-font-display);
+  font-size: var(--fpl-fs-nano);
+  font-weight: var(--fpl-fw-bold);
+  padding: 0.1875rem 0.25rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: var(--fpl-tr-head-s);
+  white-space: nowrap;
+}
+
+.xMinsPill_prominent {
+  font-size: var(--fpl-fs-cap);
+  padding: 0.3125rem 0.4375rem;
+  line-height: 1.15;
+  min-height: 1.375rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .statusPopup {

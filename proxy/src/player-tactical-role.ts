@@ -34,6 +34,32 @@ const ROLE_GROUPS: Record<LineGroup, TacticalRole[]> = {
   FWD: ['lw', 'rw', 'st'],
 };
 
+const WIDE_MID_ROLES: TacticalRole[] = ['lm', 'rm'];
+const WIDE_FWD_ROLES: TacticalRole[] = ['lw', 'rw'];
+const CENTRAL_MID_ROLES: TacticalRole[] = ['dm', 'cm', 'am'];
+
+export interface FillTierOptions {
+  allowCentralOnWide?: boolean;
+}
+
+export function isCentralOnlyMidRole(role: TacticalRole): boolean {
+  return CENTRAL_MID_ROLES.includes(role);
+}
+
+function blocksCentralOnlyFromWideSlot(
+  profileRole: TacticalRole,
+  slotRole: TacticalRole,
+  line: LineGroup
+): boolean {
+  if (line === 'MID' && isCentralOnlyMidRole(profileRole) && WIDE_MID_ROLES.includes(slotRole)) {
+    return true;
+  }
+  if (line === 'FWD' && profileRole === 'st' && WIDE_FWD_ROLES.includes(slotRole)) {
+    return true;
+  }
+  return false;
+}
+
 export function laneForRole(role: TacticalRole): PlayerLane {
   if (role === 'lb' || role === 'lm' || role === 'lw') return 'L';
   if (role === 'rb' || role === 'rm' || role === 'rw') return 'R';
@@ -67,9 +93,16 @@ export function getPlayerLaneFromProfile(code: number): PlayerLane {
 export function fillTierForRole(
   code: number,
   slotRole: TacticalRole,
-  line: LineGroup
+  line: LineGroup,
+  options?: FillTierOptions
 ): number {
   const profile = getPlayerTacticalProfile(code);
+  if (
+    !options?.allowCentralOnWide &&
+    blocksCentralOnlyFromWideSlot(profile.role, slotRole, line)
+  ) {
+    return 3;
+  }
   if (profile.role === slotRole) return 0;
   if (profile.secondary?.includes(slotRole)) return 1;
   const group = ROLE_GROUPS[line];
@@ -96,12 +129,13 @@ export function playerFillsAnyRole(
 export function fillTierForSlot(
   code: number,
   slot: LineupSlotSpec,
-  line: LineGroup
+  line: LineGroup,
+  options?: FillTierOptions
 ): number {
   const roles = slotAcceptsRoles(slot);
   let best = 3;
   for (const r of roles) {
-    best = Math.min(best, fillTierForRole(code, r, line));
+    best = Math.min(best, fillTierForRole(code, r, line, options));
   }
   return best;
 }
@@ -109,9 +143,10 @@ export function fillTierForSlot(
 export function playerFillsSlot(
   code: number,
   slot: LineupSlotSpec,
-  line: LineGroup
+  line: LineGroup,
+  options?: FillTierOptions
 ): boolean {
-  return fillTierForSlot(code, slot, line) < 3;
+  return fillTierForSlot(code, slot, line, options) < 3;
 }
 
 export function prefersCentralSlot(code: number): boolean {

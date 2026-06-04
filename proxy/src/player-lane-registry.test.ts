@@ -10,6 +10,17 @@ vi.mock('./data/player-tactical-roles.json', () => ({
     '101': { role: 'cb', lane: 'C', secondary: [] },
     '102': { role: 'cb', lane: 'C', secondary: [] },
     '103': { role: 'rb', lane: 'R', secondary: ['cb'] },
+    '200': { role: 'lb', lane: 'L', secondary: ['cb'] },
+    '201': { role: 'cb', lane: 'C', secondary: [] },
+    '202': { role: 'cb', lane: 'C', secondary: [] },
+    '203': { role: 'cb', lane: 'C', secondary: [] },
+    '300': { role: 'st', lane: 'C', secondary: [] },
+    '301': { role: 'lw', lane: 'L', secondary: [] },
+    '302': { role: 'rw', lane: 'R', secondary: [] },
+    '310': { role: 'am', lane: 'C', secondary: [] },
+    '311': { role: 'lm', lane: 'L', secondary: [] },
+    '312': { role: 'rm', lane: 'R', secondary: [] },
+    '313': { role: 'dm', lane: 'C', secondary: [] },
   },
 }));
 
@@ -54,5 +65,55 @@ describe('player-lane-registry', () => {
     expect(byId.get(2)).toBe('C');
     expect(byId.get(3)).toBe('C');
     expect(byId.get(4)).toBe('R');
+  });
+
+  it('puts best centre-backs in the middle and lower-rated cb on the flank', () => {
+    const assigned = assignPlayersToSlots(
+      [
+        { id: 1, code: 200, startScore: 0.75 },
+        { id: 2, code: 201, startScore: 0.95 },
+        { id: 3, code: 202, startScore: 0.92 },
+        { id: 4, code: 203, startScore: 0.55 },
+      ],
+      'DEF',
+      4
+    );
+
+    const byId = new Map(assigned.map((a) => [a.id, a.lane]));
+    expect(byId.get(2)).toBe('C');
+    expect(byId.get(3)).toBe('C');
+    expect(byId.get(1)).toBe('L');
+    expect(byId.get(4)).toBe('R');
+  });
+
+  it('keeps the best striker in the centre in a 3-forward line', () => {
+    const assigned = assignPlayersToSlots(
+      [
+        { id: 1, code: 300, startScore: 0.98 },
+        { id: 2, code: 301, startScore: 0.7 },
+        { id: 3, code: 302, startScore: 0.65 },
+      ],
+      'FWD',
+      3
+    );
+    expect(assigned.find((a) => a.id === 1)?.lane).toBe('C');
+    expect(assigned.find((a) => a.id === 2)?.lane).toBe('L');
+    expect(assigned.find((a) => a.id === 3)?.lane).toBe('R');
+  });
+
+  it('keeps a central attacking mid off lm and rm in a 4-mid line', () => {
+    const assigned = assignPlayersToSlots(
+      [
+        { id: 1, code: 310, startScore: 0.95 },
+        { id: 2, code: 311, startScore: 0.8 },
+        { id: 3, code: 313, startScore: 0.75 },
+        { id: 4, code: 312, startScore: 0.7 },
+      ],
+      'MID',
+      4
+    );
+    expect(assigned.find((a) => a.id === 1)?.lane).toBe('C');
+    expect(assigned.find((a) => a.id === 2)?.lane).toBe('L');
+    expect(assigned.find((a) => a.id === 4)?.lane).toBe('R');
   });
 });

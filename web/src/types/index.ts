@@ -288,6 +288,12 @@ export interface PlayerProfileStat {
   value: number;
 }
 
+export interface PlayerProfileLineupAlerts {
+  injuryWarning?: boolean;
+  benchRisk?: boolean;
+  chanceOfPlaying?: number | null;
+}
+
 export interface PlayerProfileResponse {
   player: {
     id: number;
@@ -415,7 +421,11 @@ export interface CalendarResponse {
 
 export type PlayerLane = 'L' | 'C' | 'R';
 
-export type FormationSource = 'recent_fixtures' | 'previous_season' | 'default';
+export type FormationSource =
+  | 'recent_fixtures'
+  | 'previous_season'
+  | 'default'
+  | 'squad_fit';
 
 export interface FormationCounts {
   def: number;

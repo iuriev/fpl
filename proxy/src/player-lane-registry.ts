@@ -6,9 +6,13 @@ import {
 } from './lineup-slot-requirements';
 import {
   fillTierForSlot,
+  type FillTierOptions,
   getPlayerLaneFromProfile,
+  getPlayerTacticalRole,
   hasTacticalProfile,
+  isCentralOnlyMidRole,
   playerFillsSlot,
+  prefersCentralSlot,
 } from './player-tactical-role';
 
 export type PlayerLane = 'L' | 'C' | 'R';
@@ -70,6 +74,48 @@ function laneMismatchCost(playerLane: PlayerLane, slotLane: PlayerLane): number 
   return 2;
 }
 
+function isWingSlot(spec: LineupSlotSpec): boolean {
+  return spec.lane === 'L' || spec.lane === 'R';
+}
+
+function isWideProfileRole(role: ReturnType<typeof getPlayerTacticalRole>): boolean {
+  return (
+    role === 'lb' ||
+    role === 'rb' ||
+    role === 'lm' ||
+    role === 'rm' ||
+    role === 'lw' ||
+    role === 'rw'
+  );
+}
+
+function isCentralLineSlot(spec: LineupSlotSpec, line: LineGroup): boolean {
+  return spec.lane === 'C' && (line === 'DEF' || line === 'MID' || line === 'FWD');
+}
+
+function slotAssignmentCost(
+  player: LaneAssignablePlayer,
+  slot: LineupSlotSpec,
+  line: LineGroup,
+  options?: FillTierOptions
+): number {
+  const fillTier = fillTierForSlot(player.code, slot, line, options);
+  if (fillTier >= 3) return Number.POSITIVE_INFINITY;
+
+  const laneCost = laneMismatchCost(getPlayerLaneFromProfile(player.code), slot.lane);
+  const role = getPlayerTacticalRole(player.code);
+
+  let roleBias = 0;
+  if (prefersCentralSlot(player.code) && isWingSlot(slot)) roleBias += 500;
+  if (isWideProfileRole(role) && isCentralLineSlot(slot, line)) roleBias += 300;
+  if (isCentralOnlyMidRole(role) && (slot.role === 'lm' || slot.role === 'rm')) {
+    roleBias += 50_000;
+  }
+  if (role === 'st' && (slot.role === 'lw' || slot.role === 'rw')) roleBias += 50_000;
+
+  return fillTier * 10_000 + laneCost * 1_000 + roleBias;
+}
+
 export interface LaneAssignablePlayer {
   id: number;
   code: number;
@@ -92,40 +138,41 @@ export function assignPlayersToSlots(
     getLineupSlotSpecs(line, count) ??
     lanesOnlyToSpecs(line, getSlotLanes(line, count));
 
-  const slots = specs.map((spec, pitchOrder) => ({ ...spec, pitchOrder }));
-  const remaining = [...players];
+  const openSlots = specs.map((spec, pitchOrder) => ({ ...spec, pitchOrder }));
   const assigned: LaneAssignedPlayer[] = [];
+  const byMerit = [...players].sort((a, b) => b.startScore - a.startScore);
 
-  const slotOrder = [...slots].sort((a, b) => {
-    const tier = (s: LineupSlotSpec) => {
-      if (s.role === 'lb' || s.role === 'lm' || s.role === 'lw') return 0;
-      if (s.role === 'rb' || s.role === 'rm' || s.role === 'rw') return 0;
-      return 1;
-    };
-    return tier(a) - tier(b) || a.pitchOrder - b.pitchOrder;
-  });
-
-  for (const slot of slotOrder) {
-    let pool = remaining.filter((p) => playerFillsSlot(p.code, slot, line));
-    if (pool.length === 0) pool = remaining;
-
-    let bestIdx = 0;
-    let bestKey = Number.POSITIVE_INFINITY;
-    for (let i = 0; i < pool.length; i++) {
-      const p = pool[i];
-      const fillTier = fillTierForSlot(p.code, slot, line);
-      const cost = laneMismatchCost(getPlayerLaneFromProfile(p.code), slot.lane);
-      const key = fillTier * 10_000 + cost * 1000 - p.startScore;
-      if (key < bestKey) {
-        bestKey = key;
+  for (const player of byMerit) {
+    let bestIdx = -1;
+    let bestCost = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < openSlots.length; i++) {
+      const cost = slotAssignmentCost(player, openSlots[i], line);
+      if (cost < bestCost) {
+        bestCost = cost;
         bestIdx = i;
       }
     }
-    const pickedFromPool = pool[bestIdx];
-    const bestIdxInRemaining = remaining.findIndex((p) => p.id === pickedFromPool.id);
-    const [picked] = remaining.splice(bestIdxInRemaining, 1);
+    if (bestIdx < 0 || !Number.isFinite(bestCost)) {
+      for (let i = 0; i < openSlots.length; i++) {
+        const cost = slotAssignmentCost(player, openSlots[i], line, {
+          allowCentralOnWide: true,
+        });
+        if (cost < bestCost) {
+          bestCost = cost;
+          bestIdx = i;
+        }
+      }
+    }
+    if (bestIdx < 0) {
+      const fallbackIdx = openSlots.findIndex((slot) =>
+        playerFillsSlot(player.code, slot, line, { allowCentralOnWide: true })
+      );
+      if (fallbackIdx < 0) continue;
+      bestIdx = fallbackIdx;
+    }
+    const slot = openSlots.splice(bestIdx, 1)[0];
     assigned.push({
-      ...picked,
+      ...player,
       lane: slot.lane,
       pitchOrder: slot.pitchOrder,
     });

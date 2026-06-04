@@ -45,6 +45,12 @@ const FWD_3_QUOTAS: RoleQuota[] = [
   { kind: 'role', role: 'rw', min: 1 },
 ];
 
+const MID_5_QUOTAS: RoleQuota[] = [
+  { kind: 'group', roles: ['dm', 'cm', 'am'], min: 2 },
+  { kind: 'role', role: 'lm', min: 1 },
+  { kind: 'role', role: 'rm', min: 1 },
+];
+
 const SLOT_SPECS: Record<string, LineupSlotSpec[]> = {
   'DEF-4': [
     { lane: 'L', role: 'lb' },
@@ -63,6 +69,13 @@ const SLOT_SPECS: Record<string, LineupSlotSpec[]> = {
     { lane: 'C', role: 'st' },
     { lane: 'R', role: 'rw' },
   ],
+  'MID-5': [
+    { lane: 'L', role: 'lm' },
+    { lane: 'C', role: 'dm', altRoles: ['cm', 'am'] },
+    { lane: 'C', role: 'cm', altRoles: ['dm', 'am'] },
+    { lane: 'C', role: 'am', altRoles: ['dm', 'cm'] },
+    { lane: 'R', role: 'rm' },
+  ],
 };
 
 export function getRoleQuotasForLine(line: LineGroup, count: number): RoleQuota[] | null {
@@ -70,6 +83,7 @@ export function getRoleQuotasForLine(line: LineGroup, count: number): RoleQuota[
   if (key === 'DEF-4') return DEF_4_QUOTAS;
   if (key === 'MID-4') return MID_4_QUOTAS;
   if (key === 'FWD-3') return FWD_3_QUOTAS;
+  if (key === 'MID-5') return MID_5_QUOTAS;
   return null;
 }
 

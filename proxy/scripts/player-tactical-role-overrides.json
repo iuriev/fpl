@@ -1,5 +1,6 @@
 {
   "MUN": {
+    "Bruno F.": { "role": "am", "lane": "C", "secondary": ["cm"] },
     "Shaw": { "role": "lb", "lane": "L", "secondary": ["cb"] },
     "Dalot": { "role": "rb", "lane": "R", "secondary": ["cb"] },
     "Mazraoui": { "role": "rb", "lane": "R", "secondary": ["cb", "lb"] },

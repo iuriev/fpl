@@ -7,8 +7,9 @@ import { copy, interpolate } from '@/lib/copy';
 import { formatPriceTenths } from '@/lib/format-price';
 import { profileStatLabel } from '@/lib/profile-stat-label';
 import { chipColorKey } from '@/lib/stat-chips';
-import type { PlayerProfileResponse } from '@/types';
+import type { PlayerProfileLineupAlerts, PlayerProfileResponse } from '@/types';
 
+import { buildAvailabilityAlerts } from './player-profile-alerts';
 import styles from './PlayerProfileSheet.module.css';
 
 export interface PlayerProfileSheetProps {
@@ -17,18 +18,22 @@ export interface PlayerProfileSheetProps {
   onClose: () => void;
   onFollow?: (playerId: number) => void;
   isFollowing?: boolean;
+  lineupAlerts?: PlayerProfileLineupAlerts;
 }
 
 function ProfileBody({
   data,
   onFollow,
   isFollowing,
+  lineupAlerts,
 }: {
   data: PlayerProfileResponse;
   onFollow?: (playerId: number) => void;
   isFollowing?: boolean;
+  lineupAlerts?: PlayerProfileLineupAlerts;
 }) {
   const { player, gw, gwPoints, gwStats, nextFixtures } = data;
+  const availabilityAlerts = buildAvailabilityAlerts(player, lineupAlerts);
 
   return (
     <>
@@ -49,6 +54,19 @@ function ProfileBody({
           </button>
         )}
       </div>
+
+      {availabilityAlerts.length > 0 && (
+        <div className={styles.alertBlock} role="status">
+          {availabilityAlerts.map((line) => (
+            <p
+              key={line.key}
+              className={`${styles.alertLine} ${styles[`alertLine_${line.variant}`]}`}
+            >
+              {line.text}
+            </p>
+          ))}
+        </div>
+      )}
 
       {gw != null && gwPoints != null && (
         <p className={styles.gwHeading}>
@@ -90,6 +108,7 @@ export const PlayerProfileSheet: React.FC<PlayerProfileSheetProps> = ({
   onClose,
   onFollow,
   isFollowing = false,
+  lineupAlerts,
 }) => {
   const { data, isLoading, isError } = usePlayerProfile(open ? playerId : null);
 
@@ -99,7 +118,14 @@ export const PlayerProfileSheet: React.FC<PlayerProfileSheetProps> = ({
     <BottomSheet open={open} onClose={onClose} title={title}>
       {isLoading && <p className={styles.status}>{copy.loadingPlaceholder}</p>}
       {isError && <p className={styles.status}>{copy.priceChangesLoadError}</p>}
-      {data && <ProfileBody data={data} onFollow={onFollow} isFollowing={isFollowing} />}
+      {data && (
+        <ProfileBody
+          data={data}
+          onFollow={onFollow}
+          isFollowing={isFollowing}
+          lineupAlerts={lineupAlerts}
+        />
+      )}
     </BottomSheet>
   );
 };

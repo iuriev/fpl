@@ -2,6 +2,10 @@ import * as cacheLayer from './cache';
 import { db } from './db/client';
 import * as fixturesService from './fixtures-service';
 import { type FormationCounts, inferFormationForTeam } from './formation-inference';
+import {
+  adjustFormationForSquad,
+  countEligibleByLine,
+} from './formation-squad-fit';
 import { getOrFetchBootstrap } from './fpl-cache/db-cache';
 import { deriveSeason } from './fpl-cache/season';
 import type { FPLBootstrapStatic, FPLElementSummary, FPLFixture } from './fpl-client';
@@ -96,14 +100,6 @@ function buildTeamLineup(
   const team = bootstrap.teams.find((t) => t.id === teamId)!;
   const getSummary = (id: number) => summaries.get(id);
 
-  const formation = inferFormationForTeam(
-    teamId,
-    bootstrap,
-    allFixtures,
-    getSummary,
-    previousSeasonFormation
-  );
-
   const squad = activeSquadElements(bootstrap, teamId);
   const scored = squad.map((el) => ({
     el,
@@ -118,6 +114,18 @@ function buildTeamLineup(
   );
   const upcomingRow = (upcoming[teamId] ?? []).find((f) => f.gw === targetGw);
   const kickoffTime = fixtureRow?.kickoff_time ?? null;
+
+  const inferredFormation = inferFormationForTeam(
+    teamId,
+    bootstrap,
+    allFixtures,
+    getSummary,
+    previousSeasonFormation
+  );
+  const formation = adjustFormationForSquad(
+    inferredFormation,
+    countEligibleByLine(squad, kickoffTime)
+  );
 
   const gkPick = pickLine(
     scored.filter(

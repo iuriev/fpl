@@ -111,6 +111,28 @@ const makePlayerInfo = (overrides?: Partial<PlayerInfo>): PlayerInfo => ({
   ...overrides,
 });
 
+describe('PlayerCard xMins pill', () => {
+  it('shows expected minutes instead of points when enabled', () => {
+    render(
+      <PlayerCard
+        player={makePlayer({
+          stats: { ...makePlayer().stats, minutes: 72 },
+        })}
+        hidePoints
+        showXMinsPill
+      />
+    );
+    expect(screen.getByText('exp 72 min')).toBeInTheDocument();
+  });
+});
+
+describe('PlayerCard lineup play risk', () => {
+  it('shows warning icon when lineup play risk is flagged', () => {
+    render(<PlayerCard player={makePlayer()} showLineupPlayRisk />);
+    expect(screen.getByLabelText(/May not start/i)).toBeInTheDocument();
+  });
+});
+
 describe('PlayerCard info popup', () => {
   it('renders ⓘ button when playerInfo is provided', () => {
     render(<PlayerCard player={makePlayer()} playerInfo={makePlayerInfo()} />);

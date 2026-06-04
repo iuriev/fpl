@@ -93,7 +93,14 @@ Among eligible players, quotas are satisfied using fill priority above.
    - For each quota, take highest `startScore` players who can fill that role (primary →
      secondary → group).
    - Fill remaining slots up to row count by score.
-4. `assignPlayersToSlots`: map picked players to lane/role slots using the same fill priority.
+4. `assignPlayersToSlots`: map picked players to pitch lanes by **merit** (`startScore` from
+   recent starts, minutes, and availability). Players are processed highest score first; each
+   claims the open slot with the lowest fit penalty (primary role → secondary → line group,
+   profile lane, central vs wing bias). Better centre-backs take central slots before
+   lower-rated peers are pushed to the flanks; profile full-backs keep wide slots when their
+   score still wins the wing. **Central-only mids** (`dm`, `cm`, `am`) cannot take `lm`/`rm`
+   slots; **strikers** (`st`) cannot take `lw`/`rw` unless no legal slot remains (emergency
+   fallback). Same merit rules apply to DEF, MID, and FWD rows.
 
 ## Transfermarkt ingest
 

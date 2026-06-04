@@ -52,6 +52,20 @@ export const PredictedLineupsScreen: React.FC = () => {
 
   const activeTeam = teams.find((t) => t.teamId === resolvedTeamId) ?? teams[0];
 
+  const selectedLineupPlayer =
+    profilePlayerId != null
+      ? activeTeam?.players.find((p) => p.id === profilePlayerId)
+      : undefined;
+
+  const profileLineupAlerts =
+    selectedLineupPlayer != null
+      ? {
+          injuryWarning: selectedLineupPlayer.injuryWarning,
+          benchRisk: selectedLineupPlayer.benchRisk,
+          chanceOfPlaying: selectedLineupPlayer.chanceOfPlaying,
+        }
+      : undefined;
+
   const { following, toggle: toggleFollow } = useFollowPlayer(profilePlayerId ?? 0);
 
   const fixtureLabel =
@@ -184,6 +198,7 @@ export const PredictedLineupsScreen: React.FC = () => {
         onClose={() => setProfilePlayerId(null)}
         onFollow={() => toggleFollow()}
         isFollowing={following}
+        lineupAlerts={profileLineupAlerts}
       />
     </div>
   );

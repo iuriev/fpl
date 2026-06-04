@@ -347,7 +347,11 @@ export interface LeaderboardSeasonResponse {
 
 export type PlayerLane = 'L' | 'C' | 'R';
 
-export type FormationSource = 'recent_fixtures' | 'previous_season' | 'default';
+export type FormationSource =
+  | 'recent_fixtures'
+  | 'previous_season'
+  | 'default'
+  | 'squad_fit';
 
 export interface FormationCounts {
   def: number;

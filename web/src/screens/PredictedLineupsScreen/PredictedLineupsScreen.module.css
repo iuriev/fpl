@@ -177,12 +177,6 @@
   color: var(--fpl-warn);
 }
 
-.injuryWarningBadge {
-  font: var(--fpl-fw-semibold) var(--fpl-fs-body-xs) var(--fpl-font-display);
-  color: var(--fpl-danger);
-  white-space: nowrap;
-}
-
 .tableNum {
   font: var(--fpl-fw-regular) var(--fpl-fs-body-m) var(--fpl-font-display);
   color: var(--fpl-text-soft);
@@ -231,7 +225,7 @@
 }
 
 .playerRow:has(> :nth-child(5)) {
-  --_card-max-w: 4.25rem;
+  --_card-max-w: 4.75rem;
   gap: var(--fpl-space-xs);
 }
 
@@ -244,6 +238,7 @@
   min-width: 0;
   display: flex;
   justify-content: center;
+  --_card-max-w: 5.5rem;
 }
 
 .skeletonBar {

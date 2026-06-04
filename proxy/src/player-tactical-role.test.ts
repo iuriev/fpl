@@ -8,6 +8,10 @@ vi.mock('./data/player-tactical-roles.json', () => ({
     '103': { role: 'dm', lane: 'C', secondary: ['cm'] },
     '104': { role: 'lm', lane: 'L', secondary: [] },
     '105': { role: 'lw', lane: 'L', secondary: [] },
+    '106': { role: 'am', lane: 'C', secondary: [] },
+    '107': { role: 'st', lane: 'C', secondary: [] },
+    '108': { role: 'rw', lane: 'R', secondary: [] },
+    '109': { role: 'rm', lane: 'R', secondary: [] },
   },
 }));
 
@@ -40,5 +44,14 @@ describe('player-tactical-role', () => {
     expect(playerFillsRole(104, 'lw', 'FWD')).toBe(false);
     expect(playerFillsRole(105, 'lw', 'FWD')).toBe(true);
     expect(playerFillsRole(105, 'lm', 'MID')).toBe(false);
+  });
+
+  it('blocks central mids and strikers from wide slots', () => {
+    expect(fillTierForRole(106, 'lm', 'MID')).toBe(3);
+    expect(fillTierForRole(106, 'rm', 'MID')).toBe(3);
+    expect(fillTierForRole(106, 'cm', 'MID')).toBe(2);
+    expect(fillTierForRole(107, 'lw', 'FWD')).toBe(3);
+    expect(fillTierForRole(107, 'rw', 'FWD')).toBe(3);
+    expect(fillTierForRole(107, 'st', 'FWD')).toBe(0);
   });
 });

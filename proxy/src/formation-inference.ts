@@ -1,6 +1,10 @@
 import type { FPLBootstrapStatic, FPLElementSummary,FPLFixture } from './fpl-client';
 
-export type FormationSource = 'recent_fixtures' | 'previous_season' | 'default';
+export type FormationSource =
+  | 'recent_fixtures'
+  | 'previous_season'
+  | 'default'
+  | 'squad_fit';
 
 export interface FormationCounts {
   def: number;

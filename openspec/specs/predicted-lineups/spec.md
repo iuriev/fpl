@@ -69,6 +69,16 @@ The system SHALL apply fallbacks when current-season match data is insufficient.
 - **WHEN** neither current-season nor previous-season fixture data yields a valid formation
 - **THEN** the formation defaults to `4-3-3` (4 DEF, 3 MID, 3 FWD)
 
+#### Scenario: Squad-fit formation adjustment
+
+- **WHEN** the inferred formation requires more players in an FPL position line than the squad
+  can supply after availability exclusions (e.g. `4-3-3` but fewer than three `element_type`
+  forwards)
+- **THEN** the system selects the closest valid alternative formation that the squad can fill
+  (e.g. `4-5-1` when only one forward is available)
+- **AND** the response `formation.label` reflects the formation actually used for selection
+- **AND** exactly eleven players are still returned
+
 ### Requirement: In-house predicted eleven
 
 The system SHALL select eleven players per team using FPL availability and playing-time signals

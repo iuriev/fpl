@@ -103,6 +103,18 @@ describe('PlayerProfileSheet', () => {
     expect(onFollow).toHaveBeenCalledWith(100);
   });
 
+  it('shows lineup injury warning when lineupAlerts provided', () => {
+    mockUsePlayerProfile.mockReturnValue({
+      data: { ...profileWithGw, player: { ...profileWithGw.player, status: 'd', news: '' } },
+      isLoading: false,
+      isError: false,
+    } as ReturnType<typeof queries.usePlayerProfile>);
+
+    renderSheet({ lineupAlerts: { injuryWarning: true, chanceOfPlaying: 50 } });
+    expect(screen.getByText(/Injury doubt/i)).toBeInTheDocument();
+    expect(screen.getByText(/50% chance of playing/i)).toBeInTheDocument();
+  });
+
   it('shows active follow state', () => {
     mockUsePlayerProfile.mockReturnValue({
       data: profileWithGw,

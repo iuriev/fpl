@@ -3,6 +3,7 @@ import React from 'react';
 import { copy } from '@/lib/copy';
 import type { PredictedLineupPlayer } from '@/types';
 
+import { displayPredictedXMins } from './predicted-lineup-display';
 import styles from './PredictedLineupsScreen.module.css';
 
 export interface PredictedLineupTableProps {
@@ -28,7 +29,6 @@ export const PredictedLineupTable: React.FC<PredictedLineupTableProps> = ({
         <tr>
           <th scope="col">{copy.predictedLineupsColumnName}</th>
           <th scope="col">{copy.predictedLineupsColumnXMins}</th>
-          <th scope="col">{copy.predictedLineupsColumnXPts}</th>
         </tr>
       </thead>
       <tbody>
@@ -41,18 +41,12 @@ export const PredictedLineupTable: React.FC<PredictedLineupTableProps> = ({
                 onClick={() => onSelect(player.id)}
               >
                 <span className={styles.tableName}>{player.webName}</span>
-                {player.injuryWarning && (
-                  <span className={styles.injuryWarningBadge}>
-                    {copy.predictedLineupsInjuryWarning}
-                  </span>
-                )}
                 {player.benchRisk && (
                   <span className={styles.benchRiskBadge}>{copy.predictedLineupsBenchRisk}</span>
                 )}
               </button>
             </td>
-            <td className={styles.tableNum}>{player.xMins}</td>
-            <td className={styles.tableXpts}>{player.xPts.toFixed(1)}</td>
+            <td className={styles.tableNum}>{displayPredictedXMins(player.xMins)}</td>
           </tr>
         ))}
       </tbody>

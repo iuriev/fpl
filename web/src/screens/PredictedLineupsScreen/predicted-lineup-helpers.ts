@@ -1,5 +1,7 @@
 import type { PlayerPosition, PredictedLineupPlayer, SquadPlayer } from '@/types';
 
+import { displayPredictedXMins } from './predicted-lineup-display';
+
 const EMPTY_STATS = {
   minutes: 0,
   goals_scored: 0,
@@ -29,12 +31,16 @@ export function toSquadPlayer(
     teamCode: player.teamCode,
     teamId,
     nowCost: 0,
-    points: player.xPts,
+    points: 0,
     isCaptain: false,
     isViceCaptain: false,
     status: player.status,
     chanceOfPlaying: player.chanceOfPlaying,
-    stats: { ...EMPTY_STATS, minutes: player.xMins, total_points: player.xPts },
+    stats: {
+      ...EMPTY_STATS,
+      minutes: displayPredictedXMins(player.xMins),
+      total_points: player.xPts,
+    },
     isWatchlisted: false,
   };
 }
