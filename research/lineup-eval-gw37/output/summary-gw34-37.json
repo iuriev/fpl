@@ -1,0 +1,799 @@
+{
+  "gameweeks": [
+    34,
+    35,
+    36,
+    37
+  ],
+  "evaluatedAt": "2026-06-04T15:57:20.973Z",
+  "sampleSize": {
+    "teamMatches": 74,
+    "starterSlots": 814
+  },
+  "starterMetrics": {
+    "correct": 584,
+    "missed": 233,
+    "falsePositives": 230,
+    "precision": 0.7174447174447175,
+    "recall": 0.7148102815177478,
+    "xiAccuracyPerPlayer": 0.5577841451766953
+  },
+  "formationMatches": "34/74",
+  "roleAccuracy": {
+    "matches": 524,
+    "compared": 524,
+    "laneMismatchesOnCorrectXi": 109
+  },
+  "byGameweek": [
+    {
+      "gameweek": 34,
+      "metrics": {
+        "correct": 110,
+        "missed": 44,
+        "falsePositives": 44,
+        "precision": 0.7142857142857143,
+        "recall": 0.7142857142857143,
+        "xiAccuracyPerPlayer": 0.5555555555555556
+      },
+      "formationMatches": "8/20"
+    },
+    {
+      "gameweek": 35,
+      "metrics": {
+        "correct": 155,
+        "missed": 66,
+        "falsePositives": 65,
+        "precision": 0.7045454545454546,
+        "recall": 0.7013574660633484,
+        "xiAccuracyPerPlayer": 0.541958041958042
+      },
+      "formationMatches": "9/20"
+    },
+    {
+      "gameweek": 36,
+      "metrics": {
+        "correct": 154,
+        "missed": 66,
+        "falsePositives": 66,
+        "precision": 0.7,
+        "recall": 0.7,
+        "xiAccuracyPerPlayer": 0.5384615384615384
+      },
+      "formationMatches": "7/20"
+    },
+    {
+      "gameweek": 37,
+      "metrics": {
+        "correct": 165,
+        "missed": 57,
+        "falsePositives": 55,
+        "precision": 0.75,
+        "recall": 0.7432432432432432,
+        "xiAccuracyPerPlayer": 0.5956678700361011
+      },
+      "formationMatches": "10/20"
+    }
+  ],
+  "byTeam": [
+    {
+      "teamShort": "NEW",
+      "gameweeks": 4,
+      "xiHits": 19,
+      "xiMisses": 25,
+      "xiFalsePositives": 25,
+      "formationMatches": 0,
+      "avgXiCorrect": 0.4318181818181818,
+      "xiAccuracy": {
+        "correct": 19,
+        "missed": 25,
+        "falsePositives": 25,
+        "precision": 0.4318181818181818,
+        "recall": 0.4318181818181818,
+        "xiAccuracyPerPlayer": 0.2753623188405797
+      }
+    },
+    {
+      "teamShort": "AVL",
+      "gameweeks": 4,
+      "xiHits": 22,
+      "xiMisses": 22,
+      "xiFalsePositives": 22,
+      "formationMatches": 1,
+      "avgXiCorrect": 0.5,
+      "xiAccuracy": {
+        "correct": 22,
+        "missed": 22,
+        "falsePositives": 22,
+        "precision": 0.5,
+        "recall": 0.5,
+        "xiAccuracyPerPlayer": 0.3333333333333333
+      }
+    },
+    {
+      "teamShort": "WOL",
+      "gameweeks": 4,
+      "xiHits": 25,
+      "xiMisses": 19,
+      "xiFalsePositives": 19,
+      "formationMatches": 0,
+      "avgXiCorrect": 0.5681818181818182,
+      "xiAccuracy": {
+        "correct": 25,
+        "missed": 19,
+        "falsePositives": 19,
+        "precision": 0.5681818181818182,
+        "recall": 0.5681818181818182,
+        "xiAccuracyPerPlayer": 0.3968253968253968
+      }
+    },
+    {
+      "teamShort": "BUR",
+      "gameweeks": 3,
+      "xiHits": 20,
+      "xiMisses": 13,
+      "xiFalsePositives": 13,
+      "formationMatches": 1,
+      "avgXiCorrect": 0.6060606060606061,
+      "xiAccuracy": {
+        "correct": 20,
+        "missed": 13,
+        "falsePositives": 13,
+        "precision": 0.6060606060606061,
+        "recall": 0.6060606060606061,
+        "xiAccuracyPerPlayer": 0.43478260869565216
+      }
+    },
+    {
+      "teamShort": "NFO",
+      "gameweeks": 4,
+      "xiHits": 28,
+      "xiMisses": 16,
+      "xiFalsePositives": 16,
+      "formationMatches": 1,
+      "avgXiCorrect": 0.6363636363636364,
+      "xiAccuracy": {
+        "correct": 28,
+        "missed": 16,
+        "falsePositives": 16,
+        "precision": 0.6363636363636364,
+        "recall": 0.6363636363636364,
+        "xiAccuracyPerPlayer": 0.4666666666666667
+      }
+    },
+    {
+      "teamShort": "FUL",
+      "gameweeks": 4,
+      "xiHits": 29,
+      "xiMisses": 15,
+      "xiFalsePositives": 15,
+      "formationMatches": 3,
+      "avgXiCorrect": 0.6590909090909091,
+      "xiAccuracy": {
+        "correct": 29,
+        "missed": 15,
+        "falsePositives": 15,
+        "precision": 0.6590909090909091,
+        "recall": 0.6590909090909091,
+        "xiAccuracyPerPlayer": 0.4915254237288136
+      }
+    },
+    {
+      "teamShort": "SUN",
+      "gameweeks": 4,
+      "xiHits": 29,
+      "xiMisses": 16,
+      "xiFalsePositives": 15,
+      "formationMatches": 1,
+      "avgXiCorrect": 0.6590909090909091,
+      "xiAccuracy": {
+        "correct": 29,
+        "missed": 16,
+        "falsePositives": 15,
+        "precision": 0.6590909090909091,
+        "recall": 0.6444444444444445,
+        "xiAccuracyPerPlayer": 0.48333333333333334
+      }
+    },
+    {
+      "teamShort": "CHE",
+      "gameweeks": 3,
+      "xiHits": 22,
+      "xiMisses": 11,
+      "xiFalsePositives": 11,
+      "formationMatches": 0,
+      "avgXiCorrect": 0.6666666666666666,
+      "xiAccuracy": {
+        "correct": 22,
+        "missed": 11,
+        "falsePositives": 11,
+        "precision": 0.6666666666666666,
+        "recall": 0.6666666666666666,
+        "xiAccuracyPerPlayer": 0.5
+      }
+    },
+    {
+      "teamShort": "LIV",
+      "gameweeks": 4,
+      "xiHits": 30,
+      "xiMisses": 14,
+      "xiFalsePositives": 14,
+      "formationMatches": 0,
+      "avgXiCorrect": 0.6818181818181818,
+      "xiAccuracy": {
+        "correct": 30,
+        "missed": 14,
+        "falsePositives": 14,
+        "precision": 0.6818181818181818,
+        "recall": 0.6818181818181818,
+        "xiAccuracyPerPlayer": 0.5172413793103449
+      }
+    },
+    {
+      "teamShort": "TOT",
+      "gameweeks": 4,
+      "xiHits": 31,
+      "xiMisses": 13,
+      "xiFalsePositives": 13,
+      "formationMatches": 4,
+      "avgXiCorrect": 0.7045454545454546,
+      "xiAccuracy": {
+        "correct": 31,
+        "missed": 13,
+        "falsePositives": 13,
+        "precision": 0.7045454545454546,
+        "recall": 0.7045454545454546,
+        "xiAccuracyPerPlayer": 0.543859649122807
+      }
+    },
+    {
+      "teamShort": "ARS",
+      "gameweeks": 4,
+      "xiHits": 32,
+      "xiMisses": 12,
+      "xiFalsePositives": 12,
+      "formationMatches": 1,
+      "avgXiCorrect": 0.7272727272727273,
+      "xiAccuracy": {
+        "correct": 32,
+        "missed": 12,
+        "falsePositives": 12,
+        "precision": 0.7272727272727273,
+        "recall": 0.7272727272727273,
+        "xiAccuracyPerPlayer": 0.5714285714285714
+      }
+    },
+    {
+      "teamShort": "BHA",
+      "gameweeks": 3,
+      "xiHits": 24,
+      "xiMisses": 10,
+      "xiFalsePositives": 9,
+      "formationMatches": 0,
+      "avgXiCorrect": 0.7272727272727273,
+      "xiAccuracy": {
+        "correct": 24,
+        "missed": 10,
+        "falsePositives": 9,
+        "precision": 0.7272727272727273,
+        "recall": 0.7058823529411765,
+        "xiAccuracyPerPlayer": 0.5581395348837209
+      }
+    },
+    {
+      "teamShort": "CRY",
+      "gameweeks": 4,
+      "xiHits": 34,
+      "xiMisses": 10,
+      "xiFalsePositives": 10,
+      "formationMatches": 3,
+      "avgXiCorrect": 0.7727272727272727,
+      "xiAccuracy": {
+        "correct": 34,
+        "missed": 10,
+        "falsePositives": 10,
+        "precision": 0.7727272727272727,
+        "recall": 0.7727272727272727,
+        "xiAccuracyPerPlayer": 0.6296296296296297
+      }
+    },
+    {
+      "teamShort": "MUN",
+      "gameweeks": 4,
+      "xiHits": 34,
+      "xiMisses": 10,
+      "xiFalsePositives": 10,
+      "formationMatches": 3,
+      "avgXiCorrect": 0.7727272727272727,
+      "xiAccuracy": {
+        "correct": 34,
+        "missed": 10,
+        "falsePositives": 10,
+        "precision": 0.7727272727272727,
+        "recall": 0.7727272727272727,
+        "xiAccuracyPerPlayer": 0.6296296296296297
+      }
+    },
+    {
+      "teamShort": "LEE",
+      "gameweeks": 3,
+      "xiHits": 27,
+      "xiMisses": 6,
+      "xiFalsePositives": 6,
+      "formationMatches": 1,
+      "avgXiCorrect": 0.8181818181818182,
+      "xiAccuracy": {
+        "correct": 27,
+        "missed": 6,
+        "falsePositives": 6,
+        "precision": 0.8181818181818182,
+        "recall": 0.8181818181818182,
+        "xiAccuracyPerPlayer": 0.6923076923076923
+      }
+    },
+    {
+      "teamShort": "BOU",
+      "gameweeks": 3,
+      "xiHits": 29,
+      "xiMisses": 4,
+      "xiFalsePositives": 4,
+      "formationMatches": 3,
+      "avgXiCorrect": 0.8787878787878788,
+      "xiAccuracy": {
+        "correct": 29,
+        "missed": 4,
+        "falsePositives": 4,
+        "precision": 0.8787878787878788,
+        "recall": 0.8787878787878788,
+        "xiAccuracyPerPlayer": 0.7837837837837838
+      }
+    },
+    {
+      "teamShort": "MCI",
+      "gameweeks": 3,
+      "xiHits": 29,
+      "xiMisses": 4,
+      "xiFalsePositives": 4,
+      "formationMatches": 3,
+      "avgXiCorrect": 0.8787878787878788,
+      "xiAccuracy": {
+        "correct": 29,
+        "missed": 4,
+        "falsePositives": 4,
+        "precision": 0.8787878787878788,
+        "recall": 0.8787878787878788,
+        "xiAccuracyPerPlayer": 0.7837837837837838
+      }
+    },
+    {
+      "teamShort": "BRE",
+      "gameweeks": 4,
+      "xiHits": 40,
+      "xiMisses": 4,
+      "xiFalsePositives": 4,
+      "formationMatches": 3,
+      "avgXiCorrect": 0.9090909090909091,
+      "xiAccuracy": {
+        "correct": 40,
+        "missed": 4,
+        "falsePositives": 4,
+        "precision": 0.9090909090909091,
+        "recall": 0.9090909090909091,
+        "xiAccuracyPerPlayer": 0.8333333333333334
+      }
+    },
+    {
+      "teamShort": "EVE",
+      "gameweeks": 4,
+      "xiHits": 40,
+      "xiMisses": 4,
+      "xiFalsePositives": 4,
+      "formationMatches": 4,
+      "avgXiCorrect": 0.9090909090909091,
+      "xiAccuracy": {
+        "correct": 40,
+        "missed": 4,
+        "falsePositives": 4,
+        "precision": 0.9090909090909091,
+        "recall": 0.9090909090909091,
+        "xiAccuracyPerPlayer": 0.8333333333333334
+      }
+    },
+    {
+      "teamShort": "WHU",
+      "gameweeks": 4,
+      "xiHits": 40,
+      "xiMisses": 5,
+      "xiFalsePositives": 4,
+      "formationMatches": 2,
+      "avgXiCorrect": 0.9090909090909091,
+      "xiAccuracy": {
+        "correct": 40,
+        "missed": 5,
+        "falsePositives": 4,
+        "precision": 0.9090909090909091,
+        "recall": 0.8888888888888888,
+        "xiAccuracyPerPlayer": 0.8163265306122449
+      }
+    }
+  ],
+  "byFplLine": [
+    {
+      "line": "MID",
+      "missed": 107,
+      "falsePositives": 112,
+      "correct": 223
+    },
+    {
+      "line": "DEF",
+      "missed": 89,
+      "falsePositives": 83,
+      "correct": 229
+    },
+    {
+      "line": "FWD",
+      "missed": 23,
+      "falsePositives": 21,
+      "correct": 72
+    },
+    {
+      "line": "GK",
+      "missed": 14,
+      "falsePositives": 14,
+      "correct": 60
+    }
+  ],
+  "repeatMissedStarters": [
+    {
+      "teamShort": "AVL",
+      "webName": "Tielemans",
+      "elementId": 48,
+      "missedCount": 4,
+      "falsePositiveCount": 0
+    },
+    {
+      "teamShort": "LIV",
+      "webName": "C.Jones",
+      "elementId": 388,
+      "missedCount": 4,
+      "falsePositiveCount": 0
+    },
+    {
+      "teamShort": "NEW",
+      "webName": "Pope",
+      "elementId": 469,
+      "missedCount": 4,
+      "falsePositiveCount": 0
+    },
+    {
+      "teamShort": "NEW",
+      "webName": "Bruno G.",
+      "elementId": 488,
+      "missedCount": 4,
+      "falsePositiveCount": 0
+    },
+    {
+      "teamShort": "NEW",
+      "webName": "Tonali",
+      "elementId": 491,
+      "missedCount": 4,
+      "falsePositiveCount": 0
+    },
+    {
+      "teamShort": "SUN",
+      "webName": "Alderete",
+      "elementId": 683,
+      "missedCount": 4,
+      "falsePositiveCount": 0
+    },
+    {
+      "teamShort": "SUN",
+      "webName": "Mukiele",
+      "elementId": 694,
+      "missedCount": 4,
+      "falsePositiveCount": 0
+    },
+    {
+      "teamShort": "ARS",
+      "webName": "White",
+      "elementId": 11,
+      "missedCount": 3,
+      "falsePositiveCount": 0
+    },
+    {
+      "teamShort": "AVL",
+      "webName": "McGinn",
+      "elementId": 54,
+      "missedCount": 3,
+      "falsePositiveCount": 0
+    },
+    {
+      "teamShort": "FUL",
+      "webName": "Andersen",
+      "elementId": 317,
+      "missedCount": 3,
+      "falsePositiveCount": 0
+    },
+    {
+      "teamShort": "FUL",
+      "webName": "Lukić",
+      "elementId": 332,
+      "missedCount": 3,
+      "falsePositiveCount": 0
+    },
+    {
+      "teamShort": "FUL",
+      "webName": "Chukwueze",
+      "elementId": 727,
+      "missedCount": 3,
+      "falsePositiveCount": 1
+    },
+    {
+      "teamShort": "MUN",
+      "webName": "Amad",
+      "elementId": 452,
+      "missedCount": 3,
+      "falsePositiveCount": 0
+    },
+    {
+      "teamShort": "TOT",
+      "webName": "Bentancur",
+      "elementId": 585,
+      "missedCount": 3,
+      "falsePositiveCount": 0
+    },
+    {
+      "teamShort": "WOL",
+      "webName": "Toti",
+      "elementId": 637,
+      "missedCount": 3,
+      "falsePositiveCount": 1
+    },
+    {
+      "teamShort": "WOL",
+      "webName": "Pedro Lima",
+      "elementId": 640,
+      "missedCount": 3,
+      "falsePositiveCount": 0
+    },
+    {
+      "teamShort": "AVL",
+      "webName": "Lindelöf",
+      "elementId": 719,
+      "missedCount": 3,
+      "falsePositiveCount": 0
+    },
+    {
+      "teamShort": "BHA",
+      "webName": "Baleba",
+      "elementId": 167,
+      "missedCount": 3,
+      "falsePositiveCount": 0
+    },
+    {
+      "teamShort": "EVE",
+      "webName": "Röhl",
+      "elementId": 728,
+      "missedCount": 3,
+      "falsePositiveCount": 0
+    },
+    {
+      "teamShort": "LEE",
+      "webName": "Stach",
+      "elementId": 660,
+      "missedCount": 3,
+      "falsePositiveCount": 0
+    },
+    {
+      "teamShort": "NFO",
+      "webName": "Morato",
+      "elementId": 511,
+      "missedCount": 3,
+      "falsePositiveCount": 0
+    },
+    {
+      "teamShort": "NFO",
+      "webName": "Dominguez",
+      "elementId": 519,
+      "missedCount": 3,
+      "falsePositiveCount": 0
+    },
+    {
+      "teamShort": "NFO",
+      "webName": "Netz",
+      "elementId": 814,
+      "missedCount": 3,
+      "falsePositiveCount": 0
+    },
+    {
+      "teamShort": "TOT",
+      "webName": "Richarlison",
+      "elementId": 597,
+      "missedCount": 3,
+      "falsePositiveCount": 0
+    },
+    {
+      "teamShort": "WOL",
+      "webName": "Mané",
+      "elementId": 749,
+      "missedCount": 3,
+      "falsePositiveCount": 0
+    }
+  ],
+  "repeatFalsePositives": [
+    {
+      "teamShort": "AVL",
+      "webName": "Bailey",
+      "elementId": 49,
+      "missedCount": 0,
+      "falsePositiveCount": 4
+    },
+    {
+      "teamShort": "MUN",
+      "webName": "Yoro",
+      "elementId": 444,
+      "missedCount": 0,
+      "falsePositiveCount": 4
+    },
+    {
+      "teamShort": "NEW",
+      "webName": "Gordon",
+      "elementId": 485,
+      "missedCount": 0,
+      "falsePositiveCount": 4
+    },
+    {
+      "teamShort": "NEW",
+      "webName": "Ramsdale",
+      "elementId": 674,
+      "missedCount": 0,
+      "falsePositiveCount": 4
+    },
+    {
+      "teamShort": "TOT",
+      "webName": "Gray",
+      "elementId": 591,
+      "missedCount": 0,
+      "falsePositiveCount": 4
+    },
+    {
+      "teamShort": "WOL",
+      "webName": "Bellegarde",
+      "elementId": 644,
+      "missedCount": 0,
+      "falsePositiveCount": 4
+    },
+    {
+      "teamShort": "WOL",
+      "webName": "Tchatchoua",
+      "elementId": 695,
+      "missedCount": 0,
+      "falsePositiveCount": 4
+    },
+    {
+      "teamShort": "ARS",
+      "webName": "J.Timber",
+      "elementId": 8,
+      "missedCount": 0,
+      "falsePositiveCount": 3
+    },
+    {
+      "teamShort": "AVL",
+      "webName": "Onana",
+      "elementId": 59,
+      "missedCount": 0,
+      "falsePositiveCount": 3
+    },
+    {
+      "teamShort": "AVL",
+      "webName": "Sancho",
+      "elementId": 456,
+      "missedCount": 0,
+      "falsePositiveCount": 3
+    },
+    {
+      "teamShort": "FUL",
+      "webName": "Diop",
+      "elementId": 320,
+      "missedCount": 0,
+      "falsePositiveCount": 3
+    },
+    {
+      "teamShort": "FUL",
+      "webName": "Iwobi",
+      "elementId": 324,
+      "missedCount": 0,
+      "falsePositiveCount": 3
+    },
+    {
+      "teamShort": "LIV",
+      "webName": "A.Becker",
+      "elementId": 366,
+      "missedCount": 0,
+      "falsePositiveCount": 3
+    },
+    {
+      "teamShort": "NEW",
+      "webName": "Trippier",
+      "elementId": 478,
+      "missedCount": 0,
+      "falsePositiveCount": 3
+    },
+    {
+      "teamShort": "NEW",
+      "webName": "Barnes",
+      "elementId": 487,
+      "missedCount": 0,
+      "falsePositiveCount": 3
+    },
+    {
+      "teamShort": "SUN",
+      "webName": "O'Nien",
+      "elementId": 539,
+      "missedCount": 0,
+      "falsePositiveCount": 3
+    },
+    {
+      "teamShort": "SUN",
+      "webName": "Angulo",
+      "elementId": 813,
+      "missedCount": 0,
+      "falsePositiveCount": 3
+    },
+    {
+      "teamShort": "WOL",
+      "webName": "Krejčí",
+      "elementId": 709,
+      "missedCount": 1,
+      "falsePositiveCount": 3
+    },
+    {
+      "teamShort": "BOU",
+      "webName": "Adli",
+      "elementId": 697,
+      "missedCount": 0,
+      "falsePositiveCount": 3
+    },
+    {
+      "teamShort": "EVE",
+      "webName": "McNeil",
+      "elementId": 300,
+      "missedCount": 0,
+      "falsePositiveCount": 3
+    },
+    {
+      "teamShort": "LIV",
+      "webName": "M.Salah",
+      "elementId": 381,
+      "missedCount": 0,
+      "falsePositiveCount": 3
+    },
+    {
+      "teamShort": "LIV",
+      "webName": "Isak",
+      "elementId": 499,
+      "missedCount": 0,
+      "falsePositiveCount": 3
+    },
+    {
+      "teamShort": "NFO",
+      "webName": "Aina",
+      "elementId": 507,
+      "missedCount": 0,
+      "falsePositiveCount": 3
+    },
+    {
+      "teamShort": "NFO",
+      "webName": "Sangaré",
+      "elementId": 521,
+      "missedCount": 0,
+      "falsePositiveCount": 3
+    },
+    {
+      "teamShort": "TOT",
+      "webName": "Solanke",
+      "elementId": 596,
+      "missedCount": 0,
+      "falsePositiveCount": 3
+    }
+  ]
+}
