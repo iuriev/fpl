@@ -102,10 +102,14 @@ export const PredictedPointsScreen: React.FC = () => {
   const freeVisible = freeRows.slice(0, FREE_VISIBLE);
   const freeLocked = freeRows.slice(FREE_VISIBLE);
 
-  const isLoading = poolLoading;
+  const isLoading = poolLoading || predictionsLoading;
   const modelReady = predictionsData?.ready === true;
   const showFplFallback =
     !predictionsLoading && nextGw != null && predictionsData != null && !modelReady;
+  const profilePrediction =
+    predictionsData?.ready === true
+      ? predictionsData.players.find((p) => p.playerId === profilePlayerId)
+      : undefined;
 
   return (
     <div className={styles.screen}>
@@ -198,6 +202,7 @@ export const PredictedPointsScreen: React.FC = () => {
         onClose={() => setProfilePlayerId(null)}
         onFollow={() => toggleFollow()}
         isFollowing={following}
+        prediction={profilePrediction}
       />
     </div>
   );
