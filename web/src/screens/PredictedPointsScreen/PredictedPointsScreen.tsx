@@ -76,7 +76,7 @@ export const PredictedPointsScreen: React.FC = () => {
   const [profilePlayerId, setProfilePlayerId] = useState<number | null>(null);
 
   const { data: poolData, isLoading: poolLoading } = usePlayerPool();
-  const { data: gameweeksData } = useGameweeks();
+  const { data: gameweeksData, isLoading: gameweeksLoading } = useGameweeks();
   const { following, toggle: toggleFollow } = useFollowPlayer(profilePlayerId ?? 0);
 
   const nextGw = gameweeksData?.next ?? gameweeksData?.current ?? null;
@@ -102,7 +102,7 @@ export const PredictedPointsScreen: React.FC = () => {
   const freeVisible = freeRows.slice(0, FREE_VISIBLE);
   const freeLocked = freeRows.slice(FREE_VISIBLE);
 
-  const isLoading = poolLoading || predictionsLoading;
+  const isLoading = poolLoading || gameweeksLoading || predictionsLoading;
   const modelReady = predictionsData?.ready === true;
   const showFplFallback =
     !predictionsLoading && nextGw != null && predictionsData != null && !modelReady;
