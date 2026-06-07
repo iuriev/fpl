@@ -3,11 +3,12 @@ import React from 'react';
 import { usePlayerProfile } from '@/api/queries';
 import { BottomSheet } from '@/components/ui/BottomSheet/BottomSheet';
 import { FdrChip } from '@/components/ui/FdrChip/FdrChip';
+import { buildPredictionBlurb } from '@/lib/prediction-blurb';
 import { copy, interpolate } from '@/lib/copy';
 import { formatPriceTenths } from '@/lib/format-price';
 import { profileStatLabel } from '@/lib/profile-stat-label';
 import { chipColorKey } from '@/lib/stat-chips';
-import type { PlayerProfileLineupAlerts, PlayerProfileResponse } from '@/types';
+import type { PlayerProfileLineupAlerts, PlayerProfileResponse, PlayerGameweekPrediction } from '@/types';
 
 import { buildAvailabilityAlerts } from './player-profile-alerts';
 import styles from './PlayerProfileSheet.module.css';
@@ -19,6 +20,7 @@ export interface PlayerProfileSheetProps {
   onFollow?: (playerId: number) => void;
   isFollowing?: boolean;
   lineupAlerts?: PlayerProfileLineupAlerts;
+  prediction?: PlayerGameweekPrediction;
 }
 
 function ProfileBody({
@@ -26,11 +28,13 @@ function ProfileBody({
   onFollow,
   isFollowing,
   lineupAlerts,
+  prediction,
 }: {
   data: PlayerProfileResponse;
   onFollow?: (playerId: number) => void;
   isFollowing?: boolean;
   lineupAlerts?: PlayerProfileLineupAlerts;
+  prediction?: PlayerGameweekPrediction;
 }) {
   const { player, gw, gwPoints, gwStats, nextFixtures } = data;
   const availabilityAlerts = buildAvailabilityAlerts(player, lineupAlerts);
@@ -54,6 +58,12 @@ function ProfileBody({
           </button>
         )}
       </div>
+
+      {prediction && (
+        <p className={styles.predictionBlurb}>
+          {buildPredictionBlurb(prediction, player.position, nextFixtures[0])}
+        </p>
+      )}
 
       {availabilityAlerts.length > 0 && (
         <div className={styles.alertBlock} role="status">
@@ -109,6 +119,7 @@ export const PlayerProfileSheet: React.FC<PlayerProfileSheetProps> = ({
   onFollow,
   isFollowing = false,
   lineupAlerts,
+  prediction,
 }) => {
   const { data, isLoading, isError } = usePlayerProfile(open ? playerId : null);
 
@@ -124,6 +135,7 @@ export const PlayerProfileSheet: React.FC<PlayerProfileSheetProps> = ({
           onFollow={onFollow}
           isFollowing={isFollowing}
           lineupAlerts={lineupAlerts}
+          prediction={prediction}
         />
       )}
     </BottomSheet>

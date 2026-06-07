@@ -144,3 +144,9 @@
   color: var(--fpl-muted);
   margin: 0;
 }
+
+.predictionBlurb {
+  font: var(--fpl-fw-regular) var(--fpl-fs-body-s) / 1.5 var(--fpl-font-display);
+  color: var(--fpl-text-soft);
+  margin: 0 0 var(--fpl-space-base);
+}
