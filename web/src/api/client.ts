@@ -13,6 +13,7 @@ import {
   LeaderboardSeasonResponse,
   LeaguesResponse,
   LeagueStandingsResponse,
+  MarketResponse,
   PlayerPoolResponse,
   PlayerProfileResponse,
   PositionFilter,
@@ -171,4 +172,7 @@ export const api = {
 
   getPredictions: (event: number) =>
     request<PredictionsResponse>(`/predictions?event=${event}`),
+
+  getMarket: (event: number) =>
+    request<MarketResponse>(`/market?event=${event}`),
 };

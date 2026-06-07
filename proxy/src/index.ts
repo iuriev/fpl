@@ -25,6 +25,7 @@ import * as leagueStandingsService from './league-standings-service';
 import * as leaguesService from './leagues-service';
 import { maybeRunLineupsSeedOnStart } from './lineups-seed-on-start';
 import { startLineupsWarmup } from './lineups-warmup';
+import { marketRoutes } from './market-routes';
 import { me } from './me-routes';
 import * as playerPoolService from './player-pool-service';
 import { predictedLineupsRoutes } from './predicted-lineups-routes';
@@ -426,6 +427,7 @@ app.get('/api/leaderboard/season', async (c) => {
 app.route('/api', priceRoutes);
 app.route('/api', predictedLineupsRoutes);
 app.route('/api', predictionRoutes);
+app.route('/api', marketRoutes);
 
 app.on(['GET', 'POST'], '/api/auth/*', (c) => auth.handler(c.req.raw));
 app.route('/api/me', me);

@@ -326,3 +326,21 @@ export function usePredictedLineups(gw: number | null, enabled: boolean) {
     },
   });
 }
+
+export function useMarket(event: number | null) {
+  return useQuery({
+    queryKey: ['market', event],
+    queryFn: () => {
+      if (event === null) throw new Error('Gameweek required');
+      return api.getMarket(event);
+    },
+    enabled: event !== null,
+    staleTime: 1000 * 60 * 30,
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && (error.status === 400 || error.status === 404)) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+  });
+}

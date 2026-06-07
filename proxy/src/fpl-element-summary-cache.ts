@@ -88,6 +88,32 @@ export async function getOrFetchElementSummary(
   return data;
 }
 
+export async function getBulkFreshElementSummaries(
+  db: Db,
+  season: string,
+  elementIds: number[]
+): Promise<Map<number, FPLElementSummary>> {
+  if (elementIds.length === 0) return new Map();
+  const cutoff = new Date(Date.now() - ELEMENT_SUMMARY_TTL_SECONDS * 1000);
+  const rows = await db
+    .select()
+    .from(schema.fplElementSummaryCache)
+    .where(
+      and(
+        eq(schema.fplElementSummaryCache.season, season),
+        inArray(schema.fplElementSummaryCache.elementId, elementIds),
+        gt(schema.fplElementSummaryCache.fetchedAt, cutoff)
+      )
+    );
+  const result = new Map<number, FPLElementSummary>();
+  for (const row of rows) {
+    const data = row.data as FPLElementSummary;
+    result.set(row.elementId, data);
+    cacheLayer.set(`element-summary:${row.elementId}`, data, ELEMENT_SUMMARY_TTL_SECONDS);
+  }
+  return result;
+}
+
 export async function countFreshSummaries(
   db: Db,
   season: string,

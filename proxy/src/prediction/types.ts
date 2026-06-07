@@ -67,3 +67,26 @@ export interface PredictionsResponse {
   ready: boolean;
   players: PlayerGameweekPrediction[];
 }
+
+export interface TeamFixtureSummary {
+  opponentTeamId: number;
+  opponentShortName: string;
+  isHome: boolean;
+}
+
+export interface TeamMarketDto {
+  teamId: number;
+  teamName: string;
+  teamShortName: string;
+  fixtures: TeamFixtureSummary[];
+  csProb: number;
+  xG: number;
+  xGA: number;
+}
+
+export interface MarketResponse {
+  event: number;
+  modelRunId: string | null;
+  ready: boolean;
+  teams: TeamMarketDto[];
+}

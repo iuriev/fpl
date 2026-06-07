@@ -29,4 +29,4 @@
 ## 5. Verification
 
 - [x] 5.1 Reconcile DB row counts vs spike CSV exports — `npm run pred:verify -w proxy` (expect ~106k facts, ~2280 EPL matches for 4 seasons)
-- [ ] 5.2 MAE/Spearman on GW 30–38 within tolerance of `SPIKE_RESULTS.md` — re-run Python `score_holdout_gw.py` after TS blend tuning
+- [x] 5.2 MAE/Spearman on GW 30–38 within tolerance of `SPIKE_RESULTS.md` — re-run Python `score_holdout_gw.py` after TS blend tuning

@@ -69,15 +69,10 @@
 
 .teamScroller {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--fpl-space-sm);
-  overflow-x: auto;
   flex-shrink: 0;
   padding: var(--fpl-space-md) var(--fpl-space-xl3);
-  scrollbar-width: none;
-}
-
-.teamScroller::-webkit-scrollbar {
-  display: none;
 }
 
 .teamChip {

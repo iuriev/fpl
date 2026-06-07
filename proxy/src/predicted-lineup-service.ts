@@ -10,7 +10,7 @@ import { countEligibleByLine } from './formation-squad-fit';
 import { getOrFetchBootstrap } from './fpl-cache/db-cache';
 import { deriveSeason } from './fpl-cache/season';
 import type { FPLBootstrapStatic, FPLElementSummary, FPLFixture } from './fpl-client';
-import { getCachedElementSummary } from './fpl-element-summary-cache';
+import { getBulkFreshElementSummaries } from './fpl-element-summary-cache';
 import { getOrFetchAllFixtures } from './fpl-fixtures-cache';
 import { buildLastMatchLaneMap } from './last-match-lanes';
 import {
@@ -207,8 +207,6 @@ export function buildTeamLineup(
   };
 }
 
-const SUMMARY_LOAD_LOG_EVERY = 50;
-
 async function loadSummariesForTeams(
   bootstrap: FPLBootstrapStatic,
   teamIds: number[],
@@ -220,24 +218,12 @@ async function loadSummariesForTeams(
       predictedLineupPoolElements(bootstrap, teamId, targetGw).map((el) => el.id)
     )
   )];
-  logPredictedLineups(`loading ${ids.length} element summaries from cache (DB per player)`);
+  logPredictedLineups(`loading ${ids.length} element summaries from cache (bulk DB query)`);
   const started = Date.now();
-  const map = new Map<number, FPLElementSummary>();
-  let loaded = 0;
-  for (let i = 0; i < ids.length; i++) {
-    const id = ids[i]!;
-    const summary = await getCachedElementSummary(db, season, id);
-    if (summary) {
-      map.set(id, summary);
-      loaded++;
-    }
-    const done = i + 1;
-    if (done === ids.length || done % SUMMARY_LOAD_LOG_EVERY === 0) {
-      logPredictedLineups(
-        `summaries ${done}/${ids.length} checked, ${loaded} hit (${Date.now() - started}ms)`
-      );
-    }
-  }
+  const map = await getBulkFreshElementSummaries(db, season, ids);
+  logPredictedLineups(
+    `summaries loaded: ${map.size}/${ids.length} hit in ${Date.now() - started}ms`
+  );
   return map;
 }
 

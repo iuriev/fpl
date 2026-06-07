@@ -603,6 +603,21 @@ export const copy = {
   fixturesCalendarHelpRestModerate: '4–6 days between matches',
   fixturesCalendarHelpRestEasy: '7 days or more',
   fixturesCalendarHelpRestTbc: 'Kick-off not yet announced',
+
+  marketNavLink: 'Market',
+  marketTitle: 'Market',
+  marketGwLabel: 'GW {n}',
+  marketTabCS: 'CS%',
+  marketTabXG: 'xG',
+  marketUnlockLabel: 'Unlock full market view',
+  marketPremiumTitle: 'See the full market',
+  marketPremiumDescription:
+    'CS probability and expected goals for all 20 teams — identify clean sheet defenders and high-xG attackers.',
+  marketPremiumFreeLabel: 'Top 5 teams',
+  marketPremiumPremiumLabel: 'All 20 teams',
+  marketEmptyState: 'Market predictions not yet available for GW {n}.',
+  marketDisclaimer:
+    'CS% and xG are model estimates based on Poisson ratings. For research purposes only.',
 };
 
 /**

@@ -37,7 +37,7 @@ matching FPL design conventions.
 
 | ID | Task | Effort | Why |
 |----|------|--------|-----|
-| PRED-09 | EPL statistical model — GW xPts, xG, xA, CS%, defcon (research) | L | OpenSpec `2026-06-04-pred-09-statistical-model-research`. Enables PRED-02+/05/07/10. Free data only. |
+| ~~PRED-09~~ | ~~EPL statistical model — GW xPts, xG, xA, CS%, defcon (research)~~ | L | ✅ Done — offline spike complete; hold-out validation passed; follow-up OpenSpec `2026-06-04-pred-09-prediction-api` ready for implementation. |
 
 ### Feature details
 
@@ -280,11 +280,11 @@ Useful for long-term planning — build a shortlist without committing a transfe
 | ID | Task | Effort | Why |
 |----|------|--------|-----|
 | ~~PRED-06~~ | ~~FPL Price Change Predictions table~~ | M | ✅ Done — Tonight tab on `/price-changes` (OpenSpec `ana-03-pred-06-price-changes`). |
-| PRED-05 | Clean sheet probability & xG/xA market screen (per-team stats) | M | Unique angle. Helps evaluate defenders and attackers efficiently. |
-| PRED-07 | Predicted goals & assists screen | M | Complement to PRED-05; popular FPL decision-making tool. |
+| PRED-05 | Clean sheet probability & xG/xA market screen (per-team stats) | M | Unique angle. Helps evaluate defenders and attackers efficiently. Depends on PRED-09 production API. |
+| PRED-07 | Predicted goals & assists screen | M | Complement to PRED-05; popular FPL decision-making tool. Depends on PRED-09 production API. |
 | ~~PRED-08~~ | ~~Predicted lineups for all 20 PL teams~~ | L | ✅ Done — `/predicted-lineups`; premium-only; FPL formation inference + `player-lanes.json` (OpenSpec `archive/2026-06-04-pred-08-predicted-lineups`). |
-| PRED-10 | Textual prediction analytics in player profile sheet | S | Show a short natural-language explanation of why a player is expected to score that many xPts — form, fixture, ownership, threat. Depends on PRED-09 for richer signals; for now can use ep_next + FDR + minutes % heuristics. |
-| ~~PRED-02~~ | ~~Predicted points list screen (free: top 3, locked: rest)~~ | M | ✅ Done — `/predicted-points`; GK/DEF/MID/FWD tabs sorted by `ep_next`; free top-3 + blur+upsell; premium progressive load. |
+| PRED-10 | Textual prediction analytics in player profile sheet | S | Show a short natural-language explanation of why a player is expected to score that many xPts — form, fixture, ownership, threat. Phase 1 uses ep_next + FDR heuristics; Phase 2 enriched by PRED-09 production API. |
+| ~~PRED-02~~ | ~~Predicted points list screen (free: top 3, locked: rest)~~ | M | ✅ Done — `/predicted-points`; GK/DEF/MID/FWD tabs sorted by `ep_next`; free top-3 + blur+upsell; premium progressive load. Upgrade to PRED-09 xPts once production API is live. |
 
 | MON-01 | Premium subscription flow (paywall, pricing page) | L | Unlocks revenue. Pricing research: OpenSpec `2026-06-04-mon-01-pricing-market-research`; investor PDFs in `docs/investor/pdf/`. |
 | ~~MON-02~~ | ~~Blocking premium upsell dialog on Transfer (Predicted Points with PRED-02)~~ | S | ✅ Done — archived `2026-06-03-mon-02-premium-upsell-dialog`; spec `openspec/specs/premium-upsell-dialog/`. |
