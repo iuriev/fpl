@@ -1,8 +1,9 @@
-import { and, desc, eq, isNotNull } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 
 import { db } from './db/client';
-import { predFixtureTeam, predModelRun } from './db/schema';
+import { predModelRun, predPlayerGw } from './db/schema';
 import { getOrFetchBootstrap } from './fpl-cache/db-cache';
+import * as fplClient from './fpl-client';
 import type { MarketResponse, TeamMarketDto } from './prediction/types';
 
 export async function getMarketForEvent(event: number): Promise<MarketResponse> {
@@ -19,51 +20,70 @@ export async function getMarketForEvent(event: number): Promise<MarketResponse> 
 
   const rows = await db
     .select()
-    .from(predFixtureTeam)
-    .where(
-      and(
-        eq(predFixtureTeam.modelRunId, run.id),
-        eq(predFixtureTeam.event, event),
-        isNotNull(predFixtureTeam.opponentTeamId),
-      ),
-    );
+    .from(predPlayerGw)
+    .where(and(eq(predPlayerGw.modelRunId, run.id), eq(predPlayerGw.event, event)));
 
   if (rows.length === 0) {
     return { event, modelRunId: run.id, ready: false, teams: [] };
   }
 
-  const bootstrap = await getOrFetchBootstrap(db);
-  const teamById = new Map(bootstrap.teams.map((t) => [t.id, t]));
+  const [bootstrap, fixtures] = await Promise.all([
+    getOrFetchBootstrap(db),
+    fplClient.getFixtures(event).catch(() => [] as fplClient.FPLFixture[]),
+  ]);
 
-  const byTeamId = new Map<number, typeof rows>();
+  const teamById = new Map(bootstrap.teams.map((t) => [t.id, t]));
+  const codeToElement = new Map(bootstrap.elements.map((el) => [el.code, el]));
+
+  // Build per-team aggregates from player predictions
+  const teamXGoals = new Map<number, number>();
+  const teamCsProbs = new Map<number, number[]>();
+
   for (const row of rows) {
-    const existing = byTeamId.get(row.teamId) ?? [];
-    existing.push(row);
-    byTeamId.set(row.teamId, existing);
+    const el = codeToElement.get(row.fplCode);
+    if (!el) continue;
+    const teamId = el.team;
+
+    teamXGoals.set(teamId, (teamXGoals.get(teamId) ?? 0) + row.xGoals);
+
+    // csProb is only set for GK/DEF and equals csTeam * minsProb
+    // Use the GK's csProb as the best proxy for team CS probability
+    const position = el.element_type; // 1=GK, 2=DEF, 3=MID, 4=FWD
+    if ((position === 1 || position === 2) && row.csProb !== null) {
+      const bucket = teamCsProbs.get(teamId) ?? [];
+      bucket.push(row.csProb);
+      teamCsProbs.set(teamId, bucket);
+    }
+  }
+
+  // Build fixture map: teamId -> [{opponentId, isHome}]
+  const teamFixtures = new Map<number, Array<{ opponentTeamId: number; isHome: boolean }>>();
+  for (const fix of fixtures) {
+    const home = teamFixtures.get(fix.team_h) ?? [];
+    home.push({ opponentTeamId: fix.team_a, isHome: true });
+    teamFixtures.set(fix.team_h, home);
+
+    const away = teamFixtures.get(fix.team_a) ?? [];
+    away.push({ opponentTeamId: fix.team_h, isHome: false });
+    teamFixtures.set(fix.team_a, away);
   }
 
   const teams: TeamMarketDto[] = [];
 
-  for (const [teamId, fixtures] of byTeamId) {
+  for (const [teamId, xG] of teamXGoals) {
     const team = teamById.get(teamId);
     if (!team) continue;
 
-    const csProb =
-      fixtures.length === 1
-        ? fixtures[0].csProb
-        : 1 - fixtures.reduce((acc, f) => acc * (1 - f.csProb), 1);
+    const csProbs = teamCsProbs.get(teamId) ?? [];
+    // Take max csProb among GK/DEF — best represents the team's actual clean sheet chance
+    const csProb = csProbs.length > 0 ? Math.max(...csProbs) : 0;
 
-    const xG = fixtures.reduce((acc, f) => acc + f.lambdaFor, 0);
-    const xGA = fixtures.reduce((acc, f) => acc + f.lambdaAgainst, 0);
-
-    const fixturesSummary = fixtures.map((f) => {
-      const opp = teamById.get(f.opponentTeamId!);
-      return {
-        opponentTeamId: f.opponentTeamId!,
-        opponentShortName: opp?.short_name ?? String(f.opponentTeamId),
-        isHome: f.isHome,
-      };
-    });
+    const fixList = teamFixtures.get(teamId) ?? [];
+    const fixturesSummary = fixList.map((f) => ({
+      opponentTeamId: f.opponentTeamId,
+      opponentShortName: teamById.get(f.opponentTeamId)?.short_name ?? String(f.opponentTeamId),
+      isHome: f.isHome,
+    }));
 
     teams.push({
       teamId,
@@ -72,7 +92,7 @@ export async function getMarketForEvent(event: number): Promise<MarketResponse> 
       fixtures: fixturesSummary,
       csProb,
       xG,
-      xGA,
+      xGA: 0,
     });
   }
 

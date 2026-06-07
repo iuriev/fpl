@@ -27,6 +27,7 @@ import {
   GameweekReviewScreen,
   LeaderboardScreen,
   LeagueStandingsScreen,
+  MarketScreen,
   MyStatsScreen,
   PlayerWatchlistScreen,
   PredictedLineupsScreen,
@@ -130,6 +131,14 @@ function AppContent() {
         element={
           <AuthAndTeamProtectedRoute>
             <PredictedLineupsScreen />
+          </AuthAndTeamProtectedRoute>
+        }
+      />
+      <Route
+        path="/market"
+        element={
+          <AuthAndTeamProtectedRoute>
+            <MarketScreen />
           </AuthAndTeamProtectedRoute>
         }
       />

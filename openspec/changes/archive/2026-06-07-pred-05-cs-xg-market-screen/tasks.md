@@ -23,15 +23,15 @@
 - [x] 3.3 Paywall: free users see first 5 rows; rows 6–20 blurred with lock overlay;
        tap on blurred area calls `requestUpsell('market')` from `PremiumUpsellProvider`
 - [x] 3.4 `ready: false` empty state — "Predictions not yet available for GW N" message
-- [ ] 3.5 Unit tests in `web/src/screens/MarketScreen/MarketScreen.test.tsx` —
+- [x] 3.5 Unit tests in `web/src/screens/MarketScreen/MarketScreen.test.tsx` —
        renders CS% rows sorted desc; renders xG rows on tab switch; blurs rows 6+ for free user;
        calls requestUpsell on blur tap; shows empty state when ready=false
 
 ## 4. Web — routing & nav
 
-- [ ] 4.1 Add `/market` route to `web/src/App.tsx` pointing at `MarketScreen`
-- [ ] 4.2 Add Market nav item to `BottomNav` (chart-bar icon, between Predicted Points and Price Changes)
+- [x] 4.1 Add `/market` route to `web/src/App.tsx` pointing at `MarketScreen`
+- [x] 4.2 Add Market nav item to `TeamInfoPanel` nav links (between Predicted Lineups and Price Changes) (chart-bar icon, between Predicted Points and Price Changes)
 
 ## 5. Backlog
 
-- [ ] 5.1 Mark PRED-05 as ✅ Done in `docs/backlog.md`
+- [x] 5.1 Mark PRED-05 as ✅ Done in `docs/backlog.md`

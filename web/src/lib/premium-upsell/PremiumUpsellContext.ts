@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 
-export type PremiumUpsellScreen = 'transfer' | 'predictions';
+export type PremiumUpsellScreen = 'transfer' | 'predictions' | 'market';
 
 type RequestPremiumUpsell = (screen: PremiumUpsellScreen) => void;
 

@@ -3,6 +3,7 @@ import type { PremiumUpsellScreen } from './PremiumUpsellContext';
 const KEYS: Record<PremiumUpsellScreen, string> = {
   transfer: 'fpl_premium_upsell_last_transfer',
   predictions: 'fpl_premium_upsell_last_predictions',
+  market: 'fpl_premium_upsell_last_market',
 };
 
 export function getLastShown(screen: PremiumUpsellScreen): number | null {

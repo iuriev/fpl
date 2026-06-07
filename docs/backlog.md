@@ -280,7 +280,7 @@ Useful for long-term planning — build a shortlist without committing a transfe
 | ID | Task | Effort | Why |
 |----|------|--------|-----|
 | ~~PRED-06~~ | ~~FPL Price Change Predictions table~~ | M | ✅ Done — Tonight tab on `/price-changes` (OpenSpec `ana-03-pred-06-price-changes`). |
-| PRED-05 | Clean sheet probability & xG/xA market screen (per-team stats) | M | Unique angle. Helps evaluate defenders and attackers efficiently. Depends on PRED-09 production API. |
+| ~~PRED-05~~ | ~~Clean sheet probability & xG/xA market screen (per-team stats)~~ | M | ✅ Done — `/market`; CS% and xG panels, DGW aggregation, free top-5 + upsell; OpenSpec `archive/2026-06-07-pred-05-cs-xg-market-screen`. |
 | PRED-07 | Predicted goals & assists screen | M | Complement to PRED-05; popular FPL decision-making tool. Depends on PRED-09 production API. |
 | ~~PRED-08~~ | ~~Predicted lineups for all 20 PL teams~~ | L | ✅ Done — `/predicted-lineups`; premium-only; FPL formation inference + `player-lanes.json` (OpenSpec `archive/2026-06-04-pred-08-predicted-lineups`). |
 | PRED-10 | Textual prediction analytics in player profile sheet | S | Show a short natural-language explanation of why a player is expected to score that many xPts — form, fixture, ownership, threat. Phase 1 uses ep_next + FDR heuristics; Phase 2 enriched by PRED-09 production API. |

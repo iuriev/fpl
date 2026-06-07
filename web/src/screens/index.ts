@@ -6,6 +6,7 @@ export type { GameweekReviewScreenProps } from './GameweekReviewScreen/GameweekR
 export { GameweekReviewScreen } from './GameweekReviewScreen/GameweekReviewScreen';
 export { LeaderboardScreen } from './LeaderboardScreen/LeaderboardScreen';
 export { LeagueStandingsScreen } from './LeagueStandingsScreen/LeagueStandingsScreen';
+export { MarketScreen } from './MarketScreen/MarketScreen';
 export type { MyStatsScreenProps } from './MyStatsScreen/MyStatsScreen';
 export { MyStatsScreen } from './MyStatsScreen/MyStatsScreen';
 export { PlayerWatchlistScreen } from './PlayerWatchlistScreen/PlayerWatchlistScreen';

@@ -1,6 +1,6 @@
 import type { FixtureInfo, PlayerGameweekPrediction, PlayerPosition } from '@/types';
 
-const CS_POSITIONS = new Set<PlayerPosition>(['GKP', 'DEF']);
+const CS_POSITIONS = new Set<PlayerPosition>(['GK', 'DEF']);
 const CS_THRESHOLD = 0.35;
 
 export function buildPredictionBlurb(

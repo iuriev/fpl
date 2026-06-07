@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { buildPredictionBlurb } from '@/lib/prediction-blurb';
-import type { FixtureInfo, PlayerGameweekPrediction, PlayerPosition } from '@/types';
+import type { FixtureInfo, PlayerGameweekPrediction } from '@/types';
 
 function makePrediction(overrides: Partial<PlayerGameweekPrediction> = {}): PlayerGameweekPrediction {
   return {
@@ -44,10 +44,10 @@ describe('buildPredictionBlurb', () => {
     expect(result).toContain('(A)');
   });
 
-  it('appends CS chance for GKP when csProb >= 0.35', () => {
+  it('appends CS chance for GK when csProb >= 0.35', () => {
     const result = buildPredictionBlurb(
       makePrediction({ csProb: 0.41 }),
-      'GKP',
+      'GK',
       makeFixture(),
     );
     expect(result).toContain('CS chance 41%');
