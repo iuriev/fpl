@@ -4,7 +4,6 @@ export { FixturesCalendarScreen } from './FixturesCalendarScreen/FixturesCalenda
 export { ForgotPasswordScreen } from './ForgotPasswordScreen/ForgotPasswordScreen';
 export type { GameweekReviewScreenProps } from './GameweekReviewScreen/GameweekReviewScreen';
 export { GameweekReviewScreen } from './GameweekReviewScreen/GameweekReviewScreen';
-export { LeaderboardScreen } from './LeaderboardScreen/LeaderboardScreen';
 export { LeagueStandingsScreen } from './LeagueStandingsScreen/LeagueStandingsScreen';
 export { MarketScreen } from './MarketScreen/MarketScreen';
 export type { MyStatsScreenProps } from './MyStatsScreen/MyStatsScreen';

@@ -25,7 +25,6 @@ import {
   FixturesCalendarScreen,
   ForgotPasswordScreen,
   GameweekReviewScreen,
-  LeaderboardScreen,
   LeagueStandingsScreen,
   MarketScreen,
   MyStatsScreen,
@@ -107,14 +106,6 @@ function AppContent() {
         element={
           <AuthAndTeamProtectedRoute>
             <TopPlayersScreen />
-          </AuthAndTeamProtectedRoute>
-        }
-      />
-      <Route
-        path="/leaderboard"
-        element={
-          <AuthAndTeamProtectedRoute>
-            <LeaderboardScreen />
           </AuthAndTeamProtectedRoute>
         }
       />

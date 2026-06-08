@@ -33,7 +33,6 @@ const NAV_LINKS: { to: string; label: () => string; featured?: boolean; end?: bo
   { to: '/watchlist', label: () => copy.watchlistNavLink },
   { to: '/player-watchlist', label: () => copy.playerWatchlistNavLink },
   { to: '/top-players', label: () => copy.topPlayersNavLink },
-  { to: '/leaderboard', label: () => copy.leaderboardNavLink },
   { to: '/predicted-points', label: () => copy.predictedPointsNavLink },
   { to: '/predicted-lineups', label: () => copy.predictedLineupsNavLink },
   { to: '/market', label: () => copy.marketNavLink },
