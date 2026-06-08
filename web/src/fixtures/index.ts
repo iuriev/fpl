@@ -413,7 +413,7 @@ function mkLeaderboardPlayer(
   value: number,
   position: LeaderboardPlayer['position'] = 'MID'
 ): LeaderboardPlayer {
-  return { id, webName, position, teamCode: 3, teamShortName: 'ARS', value };
+  return { id, webName, position, teamCode: 3, teamShortName: 'ARS', nowCost: 55, value };
 }
 
 export const fixtureLeaderboardGw: LeaderboardGwResponse = {

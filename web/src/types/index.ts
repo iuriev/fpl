@@ -358,6 +358,7 @@ export interface LeaderboardPlayer {
   position: PlayerPosition;
   teamCode: number;
   teamShortName: string;
+  nowCost: number;
   value: number;
   avg?: number;
 }
