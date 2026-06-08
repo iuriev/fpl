@@ -210,17 +210,16 @@ export const copy = {
   // Top Players screen
   topPlayersTitle: 'Top Players',
   topPlayersBack: 'Squad',
-  topPlayersTabGw: 'This GW',
+  topPlayersTabPoints: 'Points',
+  topPlayersTabDefcon: 'DEFCON',
+  topPlayersTabBps: 'BPS',
   topPlayersTabSeason: 'Season',
+  topPlayersSeasonSubPoints: 'Points',
+  topPlayersSeasonSubDefcon: 'DEFCON',
+  topPlayersSeasonSubBps: 'BPS',
   topPlayersLoadError: "Couldn't load top players",
   topPlayersRetry: 'Try again',
   topPlayersNavLink: 'Top Players',
-
-  // Leaderboard screen
-  leaderboardNavLink: 'DEFCON/BPS leaders',
-  leaderboardBack: 'Squad',
-  leaderboardLoadError: 'Failed to load leaderboard',
-  leaderboardRetry: 'Retry',
   priceChangesNavLink: 'Price changes',
   priceChangesTitle: 'Price changes',
   priceChangesActualTab: 'Actual',
@@ -314,7 +313,6 @@ export const copy = {
   predictedLineupsVsAway: 'vs {opponent} (A)',
 
   topPlayersTabTeam: 'By Team',
-  topPlayersTabTotw: 'TOTW',
   topPlayersTeamSelectLabel: 'Select team',
   topPlayersTeamLoadError: "Couldn't load team players",
 
