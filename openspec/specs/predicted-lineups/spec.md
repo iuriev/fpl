@@ -3,9 +3,11 @@
 ### Requirement: Predicted lineups API
 
 The system SHALL expose `GET /api/predicted-lineups` returning predicted starting elevens and
-formation counts for all 20 Premier League teams for the requested or next gameweek, computed
-from public FPL data only. The system SHALL NOT call paid third-party lineup or tactical
-providers at any time.
+formation counts for all 20 Premier League teams for the requested or next gameweek. Formation
+and XI selection SHALL use public FPL data. Player tactical roles and flanks for pitch ordering
+SHALL come from an in-repo registry built by an **offline** ingest process (Transfermarkt squad
+data). The system SHALL NOT call Transfermarkt or other external position providers during HTTP
+requests. The system SHALL NOT call paid third-party lineup or tactical providers at any time.
 
 #### Scenario: Premium required
 
@@ -99,7 +101,9 @@ combined with the inferred formation slot counts.
 ### Requirement: Flank-aware pitch ordering
 
 The system SHALL place DEF and MID (and FWD where applicable) players left-to-right on the pitch
-according to football flank, using an in-repo player lane registry keyed by FPL element `code`.
+according to football flank, using an in-repo player tactical registry keyed by FPL element
+`code`. Registry entries SHALL be produced by offline Transfermarkt squad ingest (with manual
+override file for unmatched players), not by FPL creativity/threat heuristics.
 
 #### Scenario: Registry lane on pitch
 
@@ -111,12 +115,18 @@ according to football flank, using an in-repo player lane registry keyed by FPL 
 - **WHEN** a formation row has multiple players
 - **THEN** each player is assigned to a slot lane template for that row (e.g. four defenders:
   L, C, C, R)
-- **AND** assignment prefers registry lane matches over default centre placement
+- **AND** assignment prefers registry role and lane matches over default centre placement
 
 #### Scenario: Unknown lane
 
 - **WHEN** a player has no registry entry
 - **THEN** the default lane is centre (`C`) for assignment purposes
+
+#### Scenario: Offline registry refresh
+
+- **WHEN** maintainers refresh positions for a new season or after major transfers
+- **THEN** they run the documented offline ingest CLI (Transfermarkt → JSON)
+- **AND** commit the updated registry without changing runtime API behaviour
 
 ### Requirement: Predicted Lineups screen
 
@@ -186,3 +196,50 @@ The system SHALL link to Predicted Lineups from the team info panel.
 
 - **WHEN** the predicted lineups request fails
 - **THEN** an inline error with retry is shown
+
+### Requirement: Element summary persistent cache
+
+The system SHALL store FPL `element-summary` responses in PostgreSQL keyed by season and
+element id, and SHALL prefer that cache over live FPL when the row is younger than six hours.
+
+#### Scenario: Cache hit on read
+
+- **WHEN** predicted lineups or another feature requests element summary for a cached player
+- **THEN** the proxy does not call the FPL API for that player
+
+#### Scenario: Cache miss
+
+- **WHEN** no fresh row exists for the player in the current season
+- **THEN** the proxy fetches from FPL through the shared request queue and upserts the row
+
+### Requirement: Background lineups warmup
+
+The system SHALL run a background warmup job after the proxy starts (unless disabled by env)
+that prefetches fixtures and element summaries in priority order (hot players before cold),
+with at least five seconds between background FPL requests by default.
+
+#### Scenario: Hot tier before cold
+
+- **WHEN** warmup runs after startup
+- **THEN** high-minutes squad players per Premier League team are fetched before remaining
+  active squad players
+
+#### Scenario: Lineups ready flag
+
+- **WHEN** hot-tier summaries for the current season are complete
+- **THEN** health status reports `lineupsWarmup.ready` as true
+
+#### Scenario: Disabled in development
+
+- **WHEN** `LINEUPS_WARMUP_ENABLED` is `false`
+- **THEN** no background warmup FPL requests are scheduled
+
+### Requirement: Interactive FPL priority
+
+The system SHALL process user-driven FPL fetches ahead of background warmup fetches in the
+shared request queue.
+
+#### Scenario: User request during warmup
+
+- **WHEN** a user API call needs FPL data while warmup is running
+- **THEN** the user request is not blocked behind the full cold-tier queue

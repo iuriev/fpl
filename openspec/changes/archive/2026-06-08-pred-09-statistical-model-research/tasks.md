@@ -29,9 +29,9 @@ after spike sign-off.
 
 ## 4. Sign-off & follow-up proposals
 
-- [ ] 4.1 Review spike README with stakeholder; adjust design if hold-out fails any criterion
-- [x] 4.2 Propose OpenSpec change `pred-09-prediction-api` (proxy batch + Postgres + endpoint) — `openspec/changes/2026-06-04-pred-09-prediction-api/`
-- [ ] 4.3 Update backlog entries PRED-02 / PRED-05 / PRED-07 / PRED-10 with dependency notes
+- [x] 4.1 Review spike README with stakeholder; adjust design if hold-out fails any criterion — signed off 2026-06-08; criterion B partial (MAE), A+C pass; production API shipped separately
+- [x] 4.2 Propose OpenSpec change `pred-09-prediction-api` (proxy batch + Postgres + endpoint) — `openspec/changes/archive/2026-06-07-pred-09-prediction-api/`
+- [x] 4.3 Update backlog entries PRED-02 / PRED-05 / PRED-07 / PRED-10 with dependency notes
 
 ## 5. Backlog & docs (this change)
 

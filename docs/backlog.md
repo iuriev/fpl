@@ -37,14 +37,15 @@ matching FPL design conventions.
 
 | ID | Task | Effort | Why |
 |----|------|--------|-----|
-| ~~PRED-09~~ | ~~EPL statistical model — GW xPts, xG, xA, CS%, defcon (research)~~ | L | ✅ Done — offline spike complete; hold-out validation passed; follow-up OpenSpec `2026-06-04-pred-09-prediction-api` ready for implementation. |
+| ~~PRED-09~~ | ~~EPL statistical model — GW xPts, xG, xA, CS%, defcon (research)~~ | L | ✅ Done — offline spike complete; hold-out validation passed; OpenSpec `archive/2026-06-08-pred-09-statistical-model-research`; production API `archive/2026-06-07-pred-09-prediction-api`. |
 
 ### Feature details
 
-#### PRED-09: EPL statistical model — per-player gameweek prediction engine
+#### PRED-09: EPL statistical model — per-player gameweek prediction engine [SHIPPED]
 
 Research, offline validation, then (separate change) production API. **OpenSpec:**
-`openspec/changes/2026-06-04-pred-09-statistical-model-research/`.
+`archive/2026-06-08-pred-09-statistical-model-research` (research) +
+`archive/2026-06-07-pred-09-prediction-api` (production API).
 
 **Horizon:** one **gameweek** per player. Two fixtures in the same GW → **sum** metrics; blank GW → **0**.
 
@@ -79,7 +80,7 @@ Disclaimer on prediction surfaces: approximate estimates, not betting advice.
 
 1. Research + OpenSpec (this change) — **data inventory done** (`research/pred-09/`).
 2. Offline spike under `research/pred-09/` — tasks in OpenSpec `tasks.md`.
-3. Follow-up: **`openspec/changes/2026-06-04-pred-09-prediction-api/`** — Postgres `pred_*` tables (migration `0005`), ingest jobs, `GET /api/predictions`, then PRED-02/05/07 UI.
+3. Follow-up: **`openspec/changes/archive/2026-06-07-pred-09-prediction-api/`** — Postgres `pred_*` tables, ingest jobs, `GET /api/predictions` (✅ shipped).
 
 ```ts
 interface PlayerGameweekPrediction {
@@ -275,9 +276,10 @@ Useful for long-term planning — build a shortlist without committing a transfe
 |----|------|--------|-----|
 | ~~PRED-06~~ | ~~FPL Price Change Predictions table~~ | M | ✅ Done — Tonight tab on `/price-changes` (OpenSpec `ana-03-pred-06-price-changes`). |
 | ~~PRED-05~~ | ~~Clean sheet probability & xG/xA market screen (per-team stats)~~ | M | ✅ Done — `/market`; CS% and xG panels, DGW aggregation, free top-5 + upsell; OpenSpec `archive/2026-06-07-pred-05-cs-xg-market-screen`. |
-| PRED-07 | Predicted goals & assists screen | M | Complement to PRED-05; popular FPL decision-making tool. Depends on PRED-09 production API. |
-| ~~PRED-08~~ | ~~Predicted lineups for all 20 PL teams~~ | L | ✅ Done — `/predicted-lineups`; premium-only; FPL formation inference + `player-lanes.json` (OpenSpec `archive/2026-06-04-pred-08-predicted-lineups`). |
-| ~~PRED-02~~ | ~~Predicted points list screen (free: top 3, locked: rest)~~ | M | ✅ Done — `/predicted-points`; GK/DEF/MID/FWD tabs sorted by `ep_next`; free top-3 + blur+upsell; premium progressive load. Upgrade to PRED-09 xPts once production API is live. |
+| PRED-07 | Predicted goals & assists screen | M | Complement to PRED-05; popular FPL decision-making tool. PRED-09 production API shipped — ready to implement. |
+| ~~PRED-08~~ | ~~Predicted lineups for all 20 PL teams~~ | L | ✅ Done — `/predicted-lineups`; premium-only; FPL formation inference + Transfermarkt flank registry; background warmup (OpenSpec `archive/2026-06-04-pred-08-predicted-lineups`, `archive/2026-06-08-pred-08-lineups-warmup`, `archive/2026-06-08-pred-10-transfermarkt-tactical-positions`). |
+| ~~PRED-10~~ | ~~Transfermarkt tactical positions (offline ingest)~~ | M | ✅ Done — `player-tactical-roles.json` from TM ingest CLI; heuristic seed retired (OpenSpec `archive/2026-06-08-pred-10-transfermarkt-tactical-positions`). |
+| ~~PRED-02~~ | ~~Predicted points list screen (free: top 3, locked: rest)~~ | M | ✅ Done — `/predicted-points`; GK/DEF/MID/FWD tabs sorted by `ep_next`; free top-3 + blur+upsell; premium progressive load. Upgrade to PRED-09 model `xPts` via `GET /api/predictions` (API shipped). |
 
 | MON-01 | Premium subscription flow (paywall, pricing page) | L | Unlocks revenue. Pricing research: OpenSpec `2026-06-04-mon-01-pricing-market-research`; investor PDFs in `docs/investor/pdf/`. |
 | ~~MON-02~~ | ~~Blocking premium upsell dialog on Transfer (Predicted Points with PRED-02)~~ | S | ✅ Done — archived `2026-06-03-mon-02-premium-upsell-dialog`; spec `openspec/specs/premium-upsell-dialog/`. |
@@ -314,17 +316,15 @@ Separate ranked lists for Goals and Assists with probability values per player:
 Reference: fpl.team predicted stats section.
 
 #### PRED-08: Predicted lineups for all 20 Premier League teams [SHIPPED]
-Premium `/predicted-lineups`: table + pitch for all 20 teams; in-house formation + XI; flank registry (`player-lanes.json`). OpenSpec `archive/2026-06-04-pred-08-predicted-lineups`.
+Premium `/predicted-lineups`: table + pitch for all 20 teams; in-house formation + XI;
+Transfermarkt flank registry (`player-tactical-roles.json`); background element-summary warmup.
+OpenSpec `archive/2026-06-04-pred-08-predicted-lineups`, `archive/2026-06-08-pred-08-lineups-warmup`,
+`archive/2026-06-08-pred-10-transfermarkt-tactical-positions`.
 
-#### PRED-10: Transfermarkt tactical positions (one-time ingest)
-Replace FPL-stat heuristics in `player-tactical-roles.json` with offline Transfermarkt squad positions for all PL players; no production hosting, no runtime TM calls. OpenSpec `openspec/changes/2026-06-04-pred-10-transfermarkt-tactical-positions`.
-
-Before each GW deadline, show the predicted starting XI for every PL team:
-- Table view: Name | xMins | xPts (highlight yellow = rotation risk)
-- Pitch view: circular player photos on formation grid with match info
-- Confidence % badge + match date shown
-- "Bench risk" highlighting for players likely to be rotated
-Reference: fpl.team Predicted Lineups + LazyFPL.
+#### PRED-10: Transfermarkt tactical positions (one-time ingest) [SHIPPED]
+Replaced FPL-stat heuristics in `player-tactical-roles.json` with offline Transfermarkt squad
+positions for all PL players; no production hosting, no runtime TM calls. Ingest CLI:
+`npm run lineups:ingest-tm -w proxy`. OpenSpec `archive/2026-06-08-pred-10-transfermarkt-tactical-positions`.
 
 #### MON-01: Premium subscription gate
 All "premium" features (AI sort, full predicted points list, chip strategy advisor, etc.) require
@@ -610,7 +610,8 @@ For reference — features that are live in the codebase:
 - **Auth (AUTH-01)** — login/password + Google OAuth, backend user profile; OpenSpec change 2026-06-02-auth-01-user-accounts.
 - **League participants browser (ANA-12)** — click a league in Stats to browse all participants and view their squads; OpenSpec change 2026-06-02-ana-12-league-participants-browser.
 - **Price changes & predictions (ANA-03, PRED-06)** — `/price-changes` screen: Actual (GW/season risers/fallers) + Tonight predictions; All FPL free, My squad premium; player profile sheet; OpenSpec `ana-03-pred-06-price-changes`.
-- **Predicted lineups (PRED-08)** — `/predicted-lineups`; premium-only predicted XI for all 20 PL teams (table + pitch, formation label, bench-risk); OpenSpec `archive/2026-06-04-pred-08-predicted-lineups`.
+- **Predicted lineups (PRED-08, PRED-10)** — `/predicted-lineups`; premium-only predicted XI for all 20 PL teams (table + pitch, formation label, bench-risk); Transfermarkt tactical positions offline ingest; background element-summary warmup; OpenSpec `archive/2026-06-04-pred-08-predicted-lineups`, `archive/2026-06-08-pred-08-lineups-warmup`, `archive/2026-06-08-pred-10-transfermarkt-tactical-positions`.
+- **EPL statistical model research (PRED-09)** — offline spike validated (calibration + market sanity pass; hybrid rank beats xP); production `GET /api/predictions`; OpenSpec `archive/2026-06-08-pred-09-statistical-model-research`, `archive/2026-06-07-pred-09-prediction-api`.
 - **DEFCON / BPS leaderboard (STAT-01)** — merged into `/top-players` as DEFCON + BPS tabs; `/leaderboard` route deleted; `GET /api/leaderboard/gw/:gw` and `/api/leaderboard/season` retained.
 - **Fix bugs** — BUG-01 (position limits), BUG-02 (transfer arrows)
 - **Proxy/BFF** — services for squad, entry, gameweeks, history, leagues, dream-team, fixtures, player pool, top players, team
