@@ -10,11 +10,13 @@ describe('LocalStoragePlayerWatchlistRepository', () => {
 
   beforeEach(() => {
     localStorage.removeItem('fpl-player-watchlist-v1');
+    localStorage.removeItem('fpl-player-watchlist-v2');
     repo = new LocalStoragePlayerWatchlistRepository();
   });
 
   afterEach(() => {
     localStorage.removeItem('fpl-player-watchlist-v1');
+    localStorage.removeItem('fpl-player-watchlist-v2');
   });
 
   it('starts empty', async () => {
@@ -103,48 +105,48 @@ describe('ApiPlayerWatchlistRepository', () => {
     } as Response);
   }
 
-  it('list() returns playerIds from API', async () => {
-    mockFetch(200, { playerIds: [300, 400] });
-    expect(await repo.list()).toEqual([300, 400]);
+  it('list() returns fplCodes from API', async () => {
+    mockFetch(200, { fplCodes: [90001, 90002], playerIds: [300, 400] });
+    expect(await repo.list()).toEqual([90001, 90002]);
   });
 
   it('list() returns empty array when API returns empty', async () => {
-    mockFetch(200, { playerIds: [] });
+    mockFetch(200, { fplCodes: [], playerIds: [] });
     expect(await repo.list()).toEqual([]);
   });
 
   it('add() returns ok on 200', async () => {
-    mockFetch(200, { playerId: 300 });
-    expect(await repo.add(300)).toBe('ok');
+    mockFetch(200, { fplCode: 90001, playerId: 300 });
+    expect(await repo.add(90001)).toBe('ok');
   });
 
   it('add() returns limit on 409 limit', async () => {
     mockFetch(409, { error: 'limit' });
-    expect(await repo.add(300)).toBe('limit');
+    expect(await repo.add(90001)).toBe('limit');
   });
 
   it('add() returns duplicate on 409 duplicate', async () => {
     mockFetch(409, { error: 'duplicate' });
-    expect(await repo.add(300)).toBe('duplicate');
+    expect(await repo.add(90001)).toBe('duplicate');
   });
 
   it('remove() calls DELETE endpoint', async () => {
     mockFetch(204, null);
-    await repo.remove(300);
+    await repo.remove(90001);
     expect(fetch).toHaveBeenCalledWith(
-      '/api/me/player-watchlist/300',
+      '/api/me/player-watchlist/90001',
       expect.objectContaining({ method: 'DELETE' }),
     );
   });
 
-  it('has() returns true when playerId is in list', async () => {
-    mockFetch(200, { playerIds: [300, 400] });
-    expect(await repo.has(300)).toBe(true);
+  it('has() returns true when fplCode is in list', async () => {
+    mockFetch(200, { fplCodes: [90001, 90002], playerIds: [300, 400] });
+    expect(await repo.has(90001)).toBe(true);
   });
 
-  it('has() returns false when playerId is not in list', async () => {
-    mockFetch(200, { playerIds: [300, 400] });
-    expect(await repo.has(999)).toBe(false);
+  it('has() returns false when fplCode is not in list', async () => {
+    mockFetch(200, { fplCodes: [90001, 90002], playerIds: [300, 400] });
+    expect(await repo.has(99999)).toBe(false);
   });
 
   it('getLimit() returns 2', () => {
@@ -152,13 +154,13 @@ describe('ApiPlayerWatchlistRepository', () => {
   });
 
   it('list() deduplicates concurrent calls — only one fetch', async () => {
-    mockFetch(200, { playerIds: [300] });
+    mockFetch(200, { fplCodes: [90001] });
     await Promise.all([repo.list(), repo.list(), repo.list()]);
     expect(fetch).toHaveBeenCalledTimes(1);
   });
 
   it('list() refetches on sequential calls', async () => {
-    mockFetch(200, { playerIds: [300] });
+    mockFetch(200, { fplCodes: [90001] });
     await repo.list();
     await repo.list();
     expect(fetch).toHaveBeenCalledTimes(2);
@@ -166,23 +168,23 @@ describe('ApiPlayerWatchlistRepository', () => {
 
   it('cache is invalidated after add()', async () => {
     vi.mocked(fetch)
-      .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ playerIds: [] }) } as Response)
-      .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ playerId: 300 }) } as Response)
-      .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ playerIds: [300] }) } as Response);
+      .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ fplCodes: [] }) } as Response)
+      .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ fplCode: 90001 }) } as Response)
+      .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ fplCodes: [90001] }) } as Response);
     await repo.list();
-    await repo.add(300);
+    await repo.add(90001);
     const ids = await repo.list();
     expect(fetch).toHaveBeenCalledTimes(3);
-    expect(ids).toEqual([300]);
+    expect(ids).toEqual([90001]);
   });
 
   it('cache is invalidated after remove()', async () => {
     vi.mocked(fetch)
-      .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ playerIds: [300] }) } as Response)
+      .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ fplCodes: [90001] }) } as Response)
       .mockResolvedValueOnce({ ok: true, status: 204, json: () => Promise.resolve(null) } as Response)
-      .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ playerIds: [] }) } as Response);
+      .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ fplCodes: [] }) } as Response);
     await repo.list();
-    await repo.remove(300);
+    await repo.remove(90001);
     const ids = await repo.list();
     expect(fetch).toHaveBeenCalledTimes(3);
     expect(ids).toEqual([]);

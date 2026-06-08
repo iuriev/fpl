@@ -10,7 +10,7 @@ model spec that depends on it.
 
 | Source | What it provides | Format |
 |--------|-----------------|--------|
-| vaastav Fantasy-Premier-League repo | Historical player GW facts per season (goals, assists, xG, xA, minutes, starts, `defensive_contribution`) | CSV (`merged_gw.csv`) |
+| vaastav Fantasy-Premier-League repo | Historical player GW facts per season (goals, assists, xG, xA, minutes, starts, `defensive_contribution`, `bonus`, `yellow_cards`, `saves`, `clean_sheets`) | CSV (`merged_gw.csv`) |
 | football-data.co.uk E0 CSVs | Historical EPL match results: scores, shots, betting odds | CSV (`E0_XXXX.csv`) |
 | FPL element-summary API | Current-season per-player fixture history (same fields as vaastav but live) | JSON (cached in `fpl_element_summary_cache`) |
 | FPL bootstrap-static API | Element metadata: position, team, `ep_next`, `code` | JSON (cached in `fpl_bootstrap_cache`) |
@@ -87,15 +87,26 @@ The fit produces a `TeamPoissonFit` record:
 { mu, homeAdv, attack: Map<teamSlug, number>, defence: Map<teamSlug, number>, teams: string[] }
 ```
 
-Team slugs come from `slugFromVaastav` / `slugFromFd` normalisation functions.
-The mapping from FPL `team_id` to slug is stored in `pred_team_alias`.
+Team slugs are resolved through `FplIdentityMapper` (`proxy/src/fpl-identity/`):
+- FPL `team_id` → slug via the season team registry (vaastav snapshot or live bootstrap)
+- Vaastav team names in merged_gw → slug via `resolveTeamSlug`
+- Football-data team names → slug via `slugFromFd`, validated against the season registry at ingest
+
+`pred_team_alias` is populated from the 2023-24 vaastav registry via `ingestTeamAlias` (canonical
+`team_id` → slug). At score time, `softTeamSlugLookup(identity)` replaces ad-hoc
+`slugFromVaastav` / map lookups in `player-layer`. Legacy helpers `buildFplTeamIdToSlug` /
+`mergeTeamIdToSlug` in `team-names.ts` remain for identity audits only — not used in scoring.
+
+Player `fplCode` attachment at score time uses `FplIdentityMapper.attachFplCodes` (strict:
+throws `FplIdentityError` when any `seasonElementId` lacks a mapping).
 
 ---
 
 ## Minutes probability (minsProb)
 
-`minsProb` is the probability that a player plays at least 60 minutes in a fixture.
-It is used as a scaling factor in every per-player prediction.
+`minsProb` = `avg_minutes / 90` — represents the player's expected playing time as a
+fraction of 90 minutes. Used as a scaling factor for xGoals, xAssists, defconPts,
+bonusPts, savesPts, and yellow card rate.
 
 ```
 recent5 = last 5 GW rows in player history (sorted by round, fixture)
@@ -104,6 +115,29 @@ minsProb = clamp(avgMins / 90, 0.05, 1)
 ```
 
 If the player has no history: `minsProb = 0.5`.
+
+**`minsProb` is not the same as `prob60Plus`** — see below.
+
+---
+
+## Probability of playing 60+ minutes (prob60Plus)
+
+`prob60Plus` is the fraction of recent appearances in which the player played at least
+60 minutes. Used **only** in the appearance bonus formula in `fpl-points-prediction.md`.
+
+```
+recent5 = last 5 GW rows in player history
+prob60Plus = count(recent5.minutes ≥ 60) / recent5.length
+```
+
+If the player has no history: `prob60Plus = 0.5`.
+
+**Why separate from `minsProb`?**
+A player who averages 70 min has `minsProb ≈ 0.78`, but almost always earns the 2-pt
+appearance bonus (prob60Plus ≈ 1.0). A substitute who averages 45 min has `minsProb = 0.5`
+but never earns the 60-min bonus (prob60Plus ≈ 0.0). Using `minsProb` as a proxy for
+`prob60Plus` overestimates appearance pts for subs and underestimates them for rotational
+starters.
 
 ---
 

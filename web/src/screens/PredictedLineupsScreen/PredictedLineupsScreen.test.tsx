@@ -253,17 +253,12 @@ describe('PredictedLineupsScreen', () => {
     const white = screen.getByText('White');
     const row = white.closest('[class*="playerRow"]');
     expect(row).toBeTruthy();
-    const names = Array.from(row!.querySelectorAll('[class*="PlayerCard"]')).map((el) =>
-      el.textContent?.includes('Timber') ? 'Timber' : el.textContent?.includes('White') ? 'White' : ''
-    );
-    const timberIdx = [...row!.querySelectorAll('button')].findIndex((b) =>
-      b.textContent?.includes('Timber')
-    );
-    const whiteIdx = [...row!.querySelectorAll('button')].findIndex((b) =>
-      b.textContent?.includes('White')
-    );
+    const cards = [...row!.querySelectorAll('[class*="pitchCardBtn"]')];
+    const timberIdx = cards.findIndex((el) => el.textContent?.includes('Timber'));
+    const whiteIdx = cards.findIndex((el) => el.textContent?.includes('White'));
+    expect(timberIdx).toBeGreaterThanOrEqual(0);
+    expect(whiteIdx).toBeGreaterThanOrEqual(0);
     expect(timberIdx).toBeLessThan(whiteIdx);
-    void names;
   });
 
   it('highlights bench risk in table view', async () => {

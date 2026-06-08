@@ -91,12 +91,18 @@ describe('scoreGameweekFacts', () => {
     );
 
     const fit = fitTeamPoisson(SAMPLE_MATCHES);
-    const idToSlug = new Map([
-      [1, 'arsenal'],
-      [2, 'wolves'],
-    ]);
+    const resolveTeamSlug = (value: string | number) => {
+      const id = typeof value === 'number' ? value : Number(value);
+      if (Number.isInteger(id)) {
+        return new Map([
+          [1, 'arsenal'],
+          [2, 'wolves'],
+        ]).get(id);
+      }
+      return undefined;
+    };
 
-    const preds = scoreGameweekFacts(facts, fit, idToSlug, 6, 5);
+    const preds = scoreGameweekFacts(facts, fit, resolveTeamSlug, 6, 5);
     const defender = preds.find((p) => p.seasonElementId === 10);
     const forward = preds.find((p) => p.seasonElementId === 11);
 
@@ -150,12 +156,18 @@ describe('scoreGameweekFacts', () => {
     );
 
     const fit = fitTeamPoisson(SAMPLE_MATCHES);
-    const idToSlug = new Map([
-      [1, 'arsenal'],
-      [2, 'wolves'],
-    ]);
+    const resolveTeamSlug = (value: string | number) => {
+      const id = typeof value === 'number' ? value : Number(value);
+      if (Number.isInteger(id)) {
+        return new Map([
+          [1, 'arsenal'],
+          [2, 'wolves'],
+        ]).get(id);
+      }
+      return undefined;
+    };
 
-    const preds = scoreGameweekFacts(facts, fit, idToSlug, 6, 5);
+    const preds = scoreGameweekFacts(facts, fit, resolveTeamSlug, 6, 5);
     const forward = preds.find((p) => p.seasonElementId === 20);
     const playmaker = preds.find((p) => p.seasonElementId === 21);
 

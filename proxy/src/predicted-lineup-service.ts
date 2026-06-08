@@ -143,6 +143,7 @@ export function buildTeamLineup(
       const flags = playerFlags(el, startScore);
       return {
         id: el.id,
+        fplCode: el.code,
         webName: el.web_name,
         position: POSITION_MAP[el.element_type] ?? 'MID',
         teamCode: el.team_code,
@@ -162,6 +163,7 @@ export function buildTeamLineup(
     const flags = playerFlags(p.el, p.startScore);
     return {
       id: p.el.id,
+      fplCode: p.el.code,
       webName: p.el.web_name,
       position: 'GK',
       teamCode: p.el.team_code,

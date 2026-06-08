@@ -60,11 +60,28 @@ export function buildTargetEventRows(
       expectedGoals: 0,
       expectedAssists: 0,
       defensiveContribution: 0,
+      bonus: 0,
+      yellowCards: 0,
+      saves: 0,
+      cleanSheets: 0,
       opponentTeam: fix.opponentTeam,
       wasHome: fix.wasHome,
     });
   }
   return rows;
+}
+
+export function applyEpNextAnchorToTargetEvent(
+  facts: PlayerGwFactRow[],
+  bootstrap: FPLBootstrapStatic,
+  targetEvent: number,
+): PlayerGwFactRow[] {
+  const epByElement = new Map(
+    bootstrap.elements.map((e) => [e.id, Number(e.ep_next) || 0]),
+  );
+  return facts.map((f) =>
+    f.round === targetEvent ? { ...f, xp: epByElement.get(f.element) ?? 0 } : f,
+  );
 }
 
 export async function loadCurrentSeasonFacts(
@@ -81,7 +98,7 @@ export async function loadCurrentSeasonFacts(
   const hasTargetInHistory = historyFacts.some((f) => f.round === targetEvent);
   if (hasTargetInHistory) {
     console.log(`[pred:score] season=${season} targetEvent=${targetEvent} already in element-summary cache`);
-    return historyFacts;
+    return applyEpNextAnchorToTargetEvent(historyFacts, bootstrap, targetEvent);
   }
 
   const targetRows = buildTargetEventRows(bootstrap, fixtures, season, targetEvent);

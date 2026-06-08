@@ -6,6 +6,13 @@ import { type AuthVars, requireUser } from './auth/middleware';
 import { db } from './db/client';
 import { playerWatchlistEntry, transferDraft, user, watchlistEntry } from './db/schema';
 import * as entryService from './entry-service';
+import { getOrFetchBootstrap } from './fpl-cache/db-cache';
+import {
+  loadWatchlistedFplCodes,
+  PLAYER_WATCHLIST_FREE_LIMIT,
+  resolveCurrentPlayerIds,
+  resolveFplCodeFromBody,
+} from './player-watchlist-service';
 import { resolveSubscriptionTier } from './subscription';
 import {
   draftToRow,
@@ -197,26 +204,25 @@ me.delete('/managers-watchlist/:teamId', requireUser, async (c) => {
 });
 
 me.get('/player-watchlist', requireUser, async (c) => {
-  const rows = await db
-    .select({ playerId: playerWatchlistEntry.playerId })
-    .from(playerWatchlistEntry)
-    .where(eq(playerWatchlistEntry.userId, c.var.user.id))
-    .orderBy(playerWatchlistEntry.createdAt);
-  return c.json({ playerIds: rows.map((r) => r.playerId) });
+  const bootstrap = await getOrFetchBootstrap(db);
+  const fplCodes = [...(await loadWatchlistedFplCodes(c.var.user.id))];
+  const playerIds = resolveCurrentPlayerIds(fplCodes, bootstrap);
+  return c.json({ fplCodes, playerIds });
 });
 
 me.post('/player-watchlist', requireUser, async (c) => {
-  const body = await c.req.json<{ playerId: unknown }>();
-  const playerId = Number(body?.playerId);
-  if (!Number.isInteger(playerId) || playerId <= 0) {
-    return c.json({ error: 'Invalid player ID' }, 400);
+  const body = await c.req.json<{ fplCode?: unknown; playerId?: unknown }>();
+  const bootstrap = await getOrFetchBootstrap(db);
+  const fplCode = await resolveFplCodeFromBody(body, bootstrap);
+  if (fplCode === null) {
+    return c.json({ error: 'Invalid player' }, 400);
   }
 
   const [{ total }] = await db
     .select({ total: count() })
     .from(playerWatchlistEntry)
     .where(eq(playerWatchlistEntry.userId, c.var.user.id));
-  if (total >= FREE_LIMIT) {
+  if (total >= PLAYER_WATCHLIST_FREE_LIMIT) {
     return c.json({ error: 'limit' }, 409);
   }
 
@@ -224,26 +230,27 @@ me.post('/player-watchlist', requireUser, async (c) => {
     await db.insert(playerWatchlistEntry).values({
       id: crypto.randomUUID(),
       userId: c.var.user.id,
-      playerId,
+      fplCode,
     });
   } catch {
     return c.json({ error: 'duplicate' }, 409);
   }
 
-  return c.json({ playerId });
+  const playerId = resolveCurrentPlayerIds([fplCode], bootstrap)[0];
+  return c.json({ fplCode, playerId });
 });
 
-me.delete('/player-watchlist/:playerId', requireUser, async (c) => {
-  const playerId = Number(c.req.param('playerId'));
-  if (!Number.isInteger(playerId) || playerId <= 0) {
-    return c.json({ error: 'Invalid player ID' }, 400);
+me.delete('/player-watchlist/:fplCode', requireUser, async (c) => {
+  const fplCode = Number(c.req.param('fplCode'));
+  if (!Number.isInteger(fplCode) || fplCode <= 0) {
+    return c.json({ error: 'Invalid player code' }, 400);
   }
   await db
     .delete(playerWatchlistEntry)
     .where(
       and(
         eq(playerWatchlistEntry.userId, c.var.user.id),
-        eq(playerWatchlistEntry.playerId, playerId),
+        eq(playerWatchlistEntry.fplCode, fplCode),
       ),
     );
   return new Response(null, { status: 204 });

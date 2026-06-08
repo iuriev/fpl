@@ -33,6 +33,10 @@ export interface PlayerGwFactRow {
   expectedGoals: number;
   expectedAssists: number;
   defensiveContribution?: number;
+  bonus?: number;
+  yellowCards?: number;
+  saves?: number;
+  cleanSheets?: number;
   opponentTeam: number;
   wasHome: boolean;
 }

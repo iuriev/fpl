@@ -62,6 +62,7 @@ export async function getTopPlayersGameweek(gw: number): Promise<TopPlayersGamew
       return [
         {
           id: live.id,
+          fplCode: element.code,
           webName: element.web_name,
           position: POSITION_MAP[element.element_type] ?? 'GK',
           teamCode: element.team_code,
@@ -103,6 +104,7 @@ export async function getPlayersLiveGw(
       return [
         {
           id: live.id,
+          fplCode: element.code,
           webName: element.web_name,
           position: POSITION_MAP[element.element_type] ?? 'GK',
           teamCode: element.team_code,
@@ -127,6 +129,7 @@ export async function getTopPlayersSeason(): Promise<TopPlayersSeasonResponse> {
       const team = teamMap.get(element.team);
       return {
         id: element.id,
+        fplCode: element.code,
         webName: element.web_name,
         position: POSITION_MAP[element.element_type] ?? 'GK',
         teamCode: element.team_code,

@@ -7,7 +7,7 @@ Sub-models consumed (all values must come from these specs — never recomputed 
 - `team-xg-prediction.md` → `λ_for`, `λ_against`
 - `team-cleansheet-prediction.md` → `csProb`
 - `xa-prediction.md` → `xAssists`
-- `shared.md` → `minsProb`, `confidence`, `shareXg`
+- `shared.md` → `minsProb`, `prob60Plus`, `confidence`, `shareXg`
 
 ---
 
@@ -47,7 +47,7 @@ xGoals = λ_for × shareXg × minsProb
 
 ---
 
-## Step 3 — Defcon points
+## Step 3a — Defcon points
 
 Defcon = FPL's "defensive contribution" bonus (tackles + interceptions reaching threshold).
 
@@ -78,6 +78,93 @@ defconPts = DEFCON_PTS × defconHitRate × minsProb
 
 ---
 
+## Step 3b — Bonus points
+
+FPL bonus points (1–3 pts) are awarded via the BPS system to the top 3 scorers per match.
+Expected bonus is modelled as a 50/50 blend of a context-based estimate and a player-level
+rolling average. GK uses rolling average only (context formula would double-count CS/saves).
+
+### Position-level prior
+
+```
+BONUS_PRIOR = { FWD: 0.39, MID: 0.16, DEF: 0.12, GK: 0.16 }
+```
+Calibrated from 2024-25 EPL season (N ≈ 11 000 player-game rows, minutes > 0).
+
+### Player rolling average
+
+```
+BONUS_WINDOW = 10 appearances (minutes > 0)
+BONUS_FULL_WEIGHT_GAMES = 8
+
+rollingBonusAvg = mean(bonus) over last BONUS_WINDOW played games
+weight = min(games / BONUS_FULL_WEIGHT_GAMES, 1)
+blendedBonusRate = weight × rollingBonusAvg + (1 − weight) × BONUS_PRIOR[position]
+```
+
+### Context-based estimate (non-GK)
+
+Uses Poisson(λ_gi) where `λ_gi = xGoals + xAssists`, weighted by empirical bonus rates:
+
+```
+BONUS_RATE_BY_GI = [0.042, 0.860, 2.224, 2.690]  // indexed by g+a bucket: 0, 1, 2, 3+
+
+p0      = e^(−λ_gi)
+p1      = λ_gi × e^(−λ_gi)
+p2      = (λ_gi² / 2) × e^(−λ_gi)
+p3plus  = 1 − p0 − p1 − p2
+
+contextBonus = p0×0.042 + p1×0.860 + p2×2.224 + p3plus×2.690
+```
+
+### Final bonus pts
+
+```
+// Non-GK:
+bonusPts = (0.5 × contextBonus + 0.5 × blendedBonusRate) × minsProb
+
+// GK:
+bonusPts = blendedBonusRate × minsProb
+```
+
+---
+
+## Step 3c — GK saves points
+
+GK earns 1 pt per 3 saves. Only applies when `position = GK`.
+
+```
+SAVES_WINDOW = 8 played appearances
+SAVES_PRIOR_PER90 = 3.0
+
+avgSaves = mean(saves) over last SAVES_WINDOW played games
+         // fallback to SAVES_PRIOR_PER90 if no history
+
+savesPts = (avgSaves / 3) × minsProb
+```
+
+For non-GK positions, `savesPts = 0`.
+
+---
+
+## Step 3d — Yellow card deduction
+
+FPL deducts 1 pt per yellow card.
+
+```
+YELLOW_PRIOR = { FWD: 0.08, MID: 0.10, DEF: 0.12, GK: 0.02 }
+YC_WINDOW = 10 played appearances
+YC_FULL_WEIGHT_GAMES = 8
+
+ycRate = mean(yellowCards) over last YC_WINDOW played games
+weight = min(games / YC_FULL_WEIGHT_GAMES, 1)
+blendedYcRate = weight × ycRate + (1 − weight) × YELLOW_PRIOR[position]
+
+yellowDeduction = blendedYcRate × minsProb × (−1)
+```
+
+---
+
 ## Step 4 — modelXPts
 
 FPL scoring rules translated into expected value:
@@ -86,21 +173,24 @@ FPL scoring rules translated into expected value:
 POS_GOAL_PTS = { GK: 6, DEF: 6, MID: 5, FWD: 4 }
 POS_CS_PTS   = { GK: 4, DEF: 4, MID: 1, FWD: 0 }
 
-appearance = (1 − minsProb) × 1 + minsProb × 2
+appearance = (1 − prob60Plus) × 1 + prob60Plus × 2
              // 1 pt for playing any minutes, +1 pt for playing 60+
+             // Uses prob60Plus (not minsProb) — see shared.md
 
-goals  = xGoals × POS_GOAL_PTS[position]
+goals   = xGoals × POS_GOAL_PTS[position]
 assists = xAssists × 3
 
-cs = (position ∈ {GK, DEF}) ? csProb × minsProb × POS_CS_PTS[position] : 0
+cs = (position ∈ {GK, DEF, MID}) ? csProb × minsProb × POS_CS_PTS[position] : 0
+     // csProb is set for GK, DEF, and MID (MID earns 1 pt for CS)
      // csProb already contains one minsProb factor (see team-cleansheet-prediction.md),
-     // so the p60 × csProb product effectively gives: csProbTeam × minsProb²
+     // so the minsProb × csProb product effectively gives: csProbTeam × minsProb²
      // This is intentional — both conditions (playing 60+ AND team keeping CS) must hold.
 
 gc = (position ∈ {GK, DEF}) ? floor(λ_against × minsProb / 2) × (−1) : 0
      // −1 pt per 2 goals conceded while on pitch (integer penalty)
 
-modelXPts = appearance + goals + assists + cs + gc + defconPts
+modelXPts = appearance + goals + assists + cs + gc
+          + defconPts + bonusPts + savesPts + yellowDeduction
 ```
 
 ---
@@ -116,7 +206,10 @@ EP_WEIGHT = { high: 0.25, medium: 0.45, low: 0.65 }
 xPts = (1 − EP_WEIGHT[confidence]) × modelXPts + EP_WEIGHT[confidence] × epNext
 ```
 
-`epNext` = `ep_next` from FPL bootstrap-static for the target event.
+`epNext` = `ep_next` from FPL bootstrap-static for the target event. Element-summary
+history rows do not carry per-GW expected points (`xp` is 0 in cache); when the target
+event is already cached, `loadCurrentSeasonFacts` overwrites `xp` on target-event rows
+from bootstrap `ep_next` before scoring.
 `confidence` is computed from `shared.md`.
 
 | Confidence | Model weight | EP weight | Interpretation |
@@ -133,5 +226,7 @@ xPts = (1 − EP_WEIGHT[confidence]) × modelXPts + EP_WEIGHT[confidence] × epN
   They are never recalculated inline with different formulas.
 - `λ_for` and `λ_against` are always resolved from the **same** `TeamPoissonFit` run —
   not from separate fits for different sub-models.
+- `csProb` is set for GK, DEF, and MID. FWD always receives `csProb = null`.
+- `savesPts` is non-zero only for GK.
 - `modelXPts` is stored in `pred_player_gw.model_x_pts` independently of `xPts`,
   so the EP blend can be audited or changed without re-running the full scoring pipeline.

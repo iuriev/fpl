@@ -20,14 +20,14 @@ vi.mock('@/api/queries', () => ({
 vi.mock('./WatchedPlayerRow', () => ({
   WatchedPlayerRow: ({
     rank,
-    playerId,
+    fplCode,
     onRemove,
   }: {
     rank: number;
-    playerId: number;
+    fplCode: number;
     onRemove: () => void;
   }) => (
-    <div data-testid={`watched-${playerId}`}>
+    <div data-testid={`watched-${fplCode}`}>
       <span>{rank}</span>
       <button onClick={onRemove} aria-label="Unfollow player">
         ✕
@@ -55,7 +55,10 @@ function renderScreen(repo = new LocalStoragePlayerWatchlistRepository()) {
 import { PlayerWatchlistScreen as PlayerWatchlistScreenLazy } from './PlayerWatchlistScreen';
 
 describe('PlayerWatchlistScreen', () => {
-  beforeEach(() => localStorage.removeItem('fpl-player-watchlist-v1'));
+  beforeEach(() => {
+    localStorage.removeItem('fpl-player-watchlist-v1');
+    localStorage.removeItem('fpl-player-watchlist-v2');
+  });
 
   it('renders empty state when watchlist is empty', async () => {
     renderScreen();
@@ -73,8 +76,8 @@ describe('PlayerWatchlistScreen', () => {
 
   it('shows capacity badge at limit when full', async () => {
     const repo = new LocalStoragePlayerWatchlistRepository();
-    await repo.add(1);
-    await repo.add(2);
+    await repo.add(90001);
+    await repo.add(90002);
     renderScreen(repo);
     await waitFor(() => {
       expect(screen.getByText(/2\/2 following/i)).toBeInTheDocument();
@@ -83,46 +86,45 @@ describe('PlayerWatchlistScreen', () => {
 
   it('renders watched player rows', async () => {
     const repo = new LocalStoragePlayerWatchlistRepository();
-    await repo.add(1);
-    await repo.add(2);
+    await repo.add(90001);
+    await repo.add(90002);
     renderScreen(repo);
     await waitFor(() => {
-      expect(screen.getByTestId('watched-1')).toBeInTheDocument();
-      expect(screen.getByTestId('watched-2')).toBeInTheDocument();
+      expect(screen.getByTestId('watched-90001')).toBeInTheDocument();
+      expect(screen.getByTestId('watched-90002')).toBeInTheDocument();
     });
   });
 
   it('removes player when unfollow is clicked', async () => {
     const repo = new LocalStoragePlayerWatchlistRepository();
-    await repo.add(1);
+    await repo.add(90001);
     renderScreen(repo);
     await waitFor(() => {
-      expect(screen.getByTestId('watched-1')).toBeInTheDocument();
+      expect(screen.getByTestId('watched-90001')).toBeInTheDocument();
     });
     await userEvent.click(screen.getByRole('button', { name: /unfollow player/i }));
     await waitFor(() => {
-      expect(screen.queryByTestId('watched-1')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('watched-90001')).not.toBeInTheDocument();
     });
   });
 
   it('filters rows by search query', async () => {
     const gwPlayer = fixtureTopPlayersGw.players[0];
     const repo = new LocalStoragePlayerWatchlistRepository();
-    await repo.add(gwPlayer.id);
+    await repo.add(gwPlayer.fplCode);
     renderScreen(repo);
     await waitFor(() => {
-      expect(screen.getByTestId(`watched-${gwPlayer.id}`)).toBeInTheDocument();
+      expect(screen.getByTestId(`watched-${gwPlayer.fplCode}`)).toBeInTheDocument();
     });
     await userEvent.type(screen.getByRole('searchbox'), 'zzznomatch');
     await waitFor(() => {
-      expect(screen.queryByTestId(`watched-${gwPlayer.id}`)).not.toBeInTheDocument();
+      expect(screen.queryByTestId(`watched-${gwPlayer.fplCode}`)).not.toBeInTheDocument();
     });
   });
 
   it('opens add sheet when add button is clicked', async () => {
     renderScreen();
     await waitFor(() => screen.getByText(/add player by name/i));
-    // AddPlayerSheet is mocked as null but the button should be present
     expect(screen.getByText(/add player by name/i)).toBeInTheDocument();
   });
 });

@@ -48,6 +48,7 @@ export interface PlayerStats {
 
 export interface SquadPlayer {
   id: number;
+  fplCode: number;
   name: string;
   position: PlayerPosition;
   club: string;
@@ -62,6 +63,7 @@ export interface SquadPlayer {
   news?: string;
   stats: PlayerStats;
   statBreakdown?: StatEntry[];
+  isWatchlisted?: boolean;
 }
 
 export interface SquadSummary {
@@ -170,6 +172,7 @@ export interface StatEntry {
 
 export interface TopPlayersPlayer {
   id: number;
+  fplCode: number;
   webName: string;
   position: PlayerPosition;
   teamCode: number;
@@ -297,6 +300,7 @@ export interface PlayerProfileLineupAlerts {
 export interface PlayerProfileResponse {
   player: {
     id: number;
+    fplCode: number;
     webName: string;
     position: PlayerPosition;
     teamCode: number;
@@ -444,6 +448,7 @@ export interface InferredFormation {
 
 export interface PredictedLineupPlayer {
   id: number;
+  fplCode: number;
   webName: string;
   position: PlayerPosition;
   teamCode: number;

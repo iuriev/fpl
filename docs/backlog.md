@@ -280,6 +280,8 @@ Useful for long-term planning — build a shortlist without committing a transfe
 | ~~PRED-08~~ | ~~Predicted lineups for all 20 PL teams~~ | L | ✅ Done — `/predicted-lineups`; premium-only; FPL formation inference + Transfermarkt flank registry; background warmup (OpenSpec `archive/2026-06-04-pred-08-predicted-lineups`, `archive/2026-06-08-pred-08-lineups-warmup`, `archive/2026-06-08-pred-10-transfermarkt-tactical-positions`). |
 | ~~PRED-10~~ | ~~Transfermarkt tactical positions (offline ingest)~~ | M | ✅ Done — `player-tactical-roles.json` from TM ingest CLI; heuristic seed retired (OpenSpec `archive/2026-06-08-pred-10-transfermarkt-tactical-positions`). |
 | ~~PRED-02~~ | ~~Predicted points list screen (free: top 3, locked: rest)~~ | M | ✅ Done — `/predicted-points`; GK/DEF/MID/FWD tabs sorted by `ep_next`; free top-3 + blur+upsell; premium progressive load. Upgrade to PRED-09 model `xPts` via `GET /api/predictions` (API shipped). |
+| ~~PRED-11~~ | ~~Prediction scoring model extension (bonus, saves, yellow cards, prob60Plus)~~ | M | ✅ Done — extended `modelXPts`; DB migration 0009; ADR 0019; OpenSpec `archive/2026-06-08-pred-11-scoring-improvements`. |
+| ~~IDENTITY-01~~ | ~~FPL canonical identity (`element.code` / `team.code`)~~ | M | ✅ Done — `proxy/src/fpl-identity/`, ADR 0020, watchlist `fplCode`, strict prediction mapper; identity audit CLI. |
 
 | MON-01 | Premium subscription flow (paywall, pricing page) | L | Unlocks revenue. Pricing research: OpenSpec `2026-06-04-mon-01-pricing-market-research`; investor PDFs in `docs/investor/pdf/`. |
 | ~~MON-02~~ | ~~Blocking premium upsell dialog on Transfer (Predicted Points with PRED-02)~~ | S | ✅ Done — archived `2026-06-03-mon-02-premium-upsell-dialog`; spec `openspec/specs/premium-upsell-dialog/`. |
@@ -325,6 +327,16 @@ OpenSpec `archive/2026-06-04-pred-08-predicted-lineups`, `archive/2026-06-08-pre
 Replaced FPL-stat heuristics in `player-tactical-roles.json` with offline Transfermarkt squad
 positions for all PL players; no production hosting, no runtime TM calls. Ingest CLI:
 `npm run lineups:ingest-tm -w proxy`. OpenSpec `archive/2026-06-08-pred-10-transfermarkt-tactical-positions`.
+
+#### PRED-11: Prediction scoring model extension [SHIPPED]
+Bonus points, GK saves, yellow-card deduction, MID clean sheet fix, and `prob60Plus` split from
+`minsProb` in `modelXPts`. New ingest columns on `pred_player_gw_fact`. ADR 0019; OpenSpec
+`archive/2026-06-08-pred-11-scoring-improvements`.
+
+#### IDENTITY-01: FPL canonical identity [SHIPPED]
+Stable `element.code` / `team.code` as cross-season keys; seasonal `element.id` for FPL API calls
+only. `FplIdentityMapper` module, identity audits (`npm run identity:audit -w proxy`), player
+watchlist keyed by `fplCode`. ADR 0020.
 
 #### MON-01: Premium subscription gate
 All "premium" features (AI sort, full predicted points list, chip strategy advisor, etc.) require
@@ -617,6 +629,8 @@ For reference — features that are live in the codebase:
 - **Price changes & predictions (ANA-03, PRED-06)** — `/price-changes` screen: Actual (GW/season risers/fallers) + Tonight predictions; All FPL free, My squad premium; player profile sheet; OpenSpec `ana-03-pred-06-price-changes`.
 - **Predicted lineups (PRED-08, PRED-10)** — `/predicted-lineups`; premium-only predicted XI for all 20 PL teams (table + pitch, formation label, bench-risk); Transfermarkt tactical positions offline ingest; background element-summary warmup; OpenSpec `archive/2026-06-04-pred-08-predicted-lineups`, `archive/2026-06-08-pred-08-lineups-warmup`, `archive/2026-06-08-pred-10-transfermarkt-tactical-positions`.
 - **EPL statistical model research (PRED-09)** — offline spike validated (calibration + market sanity pass; hybrid rank beats xP); production `GET /api/predictions`; OpenSpec `archive/2026-06-08-pred-09-statistical-model-research`, `archive/2026-06-07-pred-09-prediction-api`.
+- **Prediction scoring extension (PRED-11)** — bonus, saves, yellow cards, MID CS, `prob60Plus` in `modelXPts`; migration 0009; ADR 0019; OpenSpec `archive/2026-06-08-pred-11-scoring-improvements`.
+- **FPL canonical identity (IDENTITY-01)** — `fpl-identity` module, `fplCode` on API responses and watchlist, strict prediction attach; ADR 0020; audit CLI `identity:audit`.
 - **DEFCON / BPS leaderboard (STAT-01)** — merged into `/top-players` as DEFCON + BPS tabs; `/leaderboard` route deleted; `GET /api/leaderboard/gw/:gw` and `/api/leaderboard/season` retained.
 - **Fix bugs** — BUG-01 (position limits), BUG-02 (transfer arrows)
 - **Proxy/BFF** — services for squad, entry, gameweeks, history, leagues, dream-team, fixtures, player pool, top players, team

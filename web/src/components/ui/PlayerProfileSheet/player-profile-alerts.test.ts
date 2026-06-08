@@ -7,6 +7,7 @@ import { buildAvailabilityAlerts } from './player-profile-alerts';
 
 const basePlayer: PlayerProfileResponse['player'] = {
   id: 1,
+  fplCode: 90001,
   webName: 'Test',
   position: 'MID',
   teamCode: 1,

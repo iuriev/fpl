@@ -741,7 +741,7 @@ function FollowableRankRow({
   rank: number;
   player: import('@/types').TopPlayersPlayer;
 }) {
-  const { following, toggle } = useFollowPlayer(player.id);
+  const { following, toggle } = useFollowPlayer(player.fplCode);
   return (
     <PlayerRankRow
       rank={rank}

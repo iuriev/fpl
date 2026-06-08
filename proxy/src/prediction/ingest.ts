@@ -11,8 +11,9 @@ import {
   predPlayerGwFact,
   predTeamAlias,
 } from '../db/schema';
+import { loadIdentityMapper } from '../fpl-identity/load-mapper';
+import { resolveFdTeamSlug } from '../fpl-identity/team-slug-lookup';
 import { parseCsv } from './csv';
-import { slugFromFd, slugFromVaastav } from './team-names';
 import type { EplMatchRow, PlayerGwFactRow } from './types';
 
 const VAASTAV_BASE =
@@ -42,6 +43,15 @@ function parseDateUk(value: string): string | null {
 export async function loadEplMatchesFromDisk(
   dataDir = defaultDataDir(),
 ): Promise<EplMatchRow[]> {
+  const seasonMappers = new Map<string, Awaited<ReturnType<typeof loadIdentityMapper>>>();
+  for (const season of Object.keys(FD_CODES)) {
+    try {
+      seasonMappers.set(season, await loadIdentityMapper(season, dataDir));
+    } catch {
+      // vaastav snapshot unavailable for this season — FD slugs are not validated
+    }
+  }
+
   const rows: EplMatchRow[] = [];
   for (const [season, code] of Object.entries(FD_CODES)) {
     const path = join(dataDir, 'football-data', `E0_${code}.csv`);
@@ -51,9 +61,10 @@ export async function loadEplMatchesFromDisk(
     } catch {
       continue;
     }
+    const mapper = seasonMappers.get(season);
     for (const r of parseCsv(text)) {
-      const homeSlug = slugFromFd(r.HomeTeam);
-      const awaySlug = slugFromFd(r.AwayTeam);
+      const homeSlug = resolveFdTeamSlug(r.HomeTeam, mapper);
+      const awaySlug = resolveFdTeamSlug(r.AwayTeam, mapper);
       const matchDate = parseDateUk(r.Date);
       if (!homeSlug || !awaySlug || !matchDate) continue;
       rows.push({
@@ -111,6 +122,10 @@ export async function loadMergedGwFromDisk(
       defensiveContribution: r.defensive_contribution
         ? Number(r.defensive_contribution)
         : undefined,
+      bonus: Number(r.bonus) || 0,
+      yellowCards: Number(r.yellow_cards) || 0,
+      saves: Number(r.saves) || 0,
+      cleanSheets: Number(r.clean_sheets) || 0,
       opponentTeam: Number(r.opponent_team),
       wasHome: r.was_home === 'True' || r.was_home === 'true',
     });
@@ -122,13 +137,20 @@ export async function ingestTeamAlias(
   db: PostgresJsDatabase<typeof DbSchema>,
   dataDir = defaultDataDir(),
 ): Promise<number> {
+  const aliasSeason = '2023-24';
+  const mapper = await loadIdentityMapper(aliasSeason, dataDir);
   const path = join(dataDir, 'vaastav', 'master_team_list.csv');
   const text = await readFile(path, 'utf8');
   let count = 0;
   for (const r of parseCsv(text)) {
-    if (r.season !== '2023-24') continue;
-    const slug = slugFromVaastav(r.team_name);
-    if (!slug) continue;
+    if (r.season !== aliasSeason) continue;
+    const teamId = Number(r.team);
+    let slug: string;
+    try {
+      slug = mapper.teamSlug(teamId);
+    } catch {
+      continue;
+    }
     await db
       .insert(predTeamAlias)
       .values({
@@ -225,6 +247,10 @@ export async function ingestPlayerGwFacts(
       expectedGoals: f.expectedGoals,
       expectedAssists: f.expectedAssists,
       defensiveContribution: f.defensiveContribution ?? null,
+      bonus: f.bonus ?? 0,
+      yellowCards: f.yellowCards ?? 0,
+      saves: f.saves ?? 0,
+      cleanSheets: f.cleanSheets ?? 0,
     }));
     await db
       .insert(predPlayerGwFact)
@@ -240,6 +266,10 @@ export async function ingestPlayerGwFacts(
           totalPoints: sql`excluded.total_points`,
           xp: sql`excluded.xp`,
           expectedGoals: sql`excluded.expected_goals`,
+          bonus: sql`excluded.bonus`,
+          yellowCards: sql`excluded.yellow_cards`,
+          saves: sql`excluded.saves`,
+          cleanSheets: sql`excluded.clean_sheets`,
           ingestedAt: new Date(),
         },
       });
@@ -278,6 +308,10 @@ export async function fetchMergedGwRemote(season: string): Promise<PlayerGwFactR
       defensiveContribution: r.defensive_contribution
         ? Number(r.defensive_contribution)
         : undefined,
+      bonus: Number(r.bonus) || 0,
+      yellowCards: Number(r.yellow_cards) || 0,
+      saves: Number(r.saves) || 0,
+      cleanSheets: Number(r.clean_sheets) || 0,
       opponentTeam: Number(r.opponent_team),
       wasHome: r.was_home === 'True' || r.was_home === 'true',
     });

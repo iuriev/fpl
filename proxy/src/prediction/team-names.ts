@@ -47,6 +47,7 @@ export const VAASTAV_TO_SLUG: Record<string, string> = {
   Leeds: 'leeds',
   Leicester: 'leicester',
   Liverpool: 'liverpool',
+  Luton: 'luton',
   'Man City': 'man-city',
   'Man Utd': 'man-united',
   Newcastle: 'newcastle',
@@ -70,6 +71,35 @@ export function slugFromVaastav(name: string): string | undefined {
   return VAASTAV_TO_SLUG[name.trim()];
 }
 
+export function slugFromFplTeamName(name: string): string | undefined {
+  return slugFromVaastav(name) ?? slugFromFd(name);
+}
+
+/** Audit/legacy only — prediction scoring uses `FplIdentityMapper.teamIdToSlugMap()`. */
+export function buildFplTeamIdToSlug(
+  teams: ReadonlyArray<{ id: number; name: string }>,
+): Map<number, string> {
+  const map = new Map<number, string>();
+  for (const team of teams) {
+    const slug = slugFromFplTeamName(team.name);
+    if (slug) map.set(team.id, slug);
+  }
+  return map;
+}
+
+/** Audit/legacy only — prediction scoring uses `FplIdentityMapper.teamIdToSlugMap()`. */
+export function mergeTeamIdToSlug(
+  aliasRows: ReadonlyArray<{ fplTeamId: number; slug: string }>,
+  bootstrapTeams: ReadonlyArray<{ id: number; name: string }>,
+): Map<number, string> {
+  const map = new Map(aliasRows.map((a) => [a.fplTeamId, a.slug]));
+  for (const [id, slug] of buildFplTeamIdToSlug(bootstrapTeams)) {
+    map.set(id, slug);
+  }
+  return map;
+}
+
+/** Audit/legacy only — prediction scoring uses `FplIdentityMapper.resolveTeamSlug()`. */
 export function resolveTeamSlug(
   value: string | number,
   idToSlug: Map<number, string>,

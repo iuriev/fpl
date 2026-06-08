@@ -91,10 +91,10 @@ Player IDs shortlisted by a user (player watchlist).
 |--------|------|----------|-------|
 | `id` | text | NO | Primary key (`crypto.randomUUID()`) |
 | `user_id` | text | NO | FK → `user.id` (cascade delete) |
-| `player_id` | integer | NO | FPL player ID being tracked |
+| `fpl_code` | integer | NO | Stable FPL player code (`element.code`) being tracked |
 | `created_at` | timestamp | NO | Default now() |
 
-Unique index on `(user_id, player_id)` prevents duplicates.
+Unique index on `(user_id, fpl_code)` prevents duplicates.
 
 ### `transfer_draft`
 
@@ -277,6 +277,10 @@ See `research/pred-09/DATABASE_PLAN.md` and OpenSpec `2026-06-04-pred-09-predict
 | `xp` | double precision | YES | vaastav xP |
 | `expected_goals`, `expected_assists` | double precision | YES | |
 | `defensive_contribution` | smallint | YES | 2025/26+ |
+| `bonus` | smallint | YES | FPL bonus points earned |
+| `yellow_cards` | smallint | YES | Yellow cards in match |
+| `saves` | smallint | YES | GK saves (non-GK always 0) |
+| `clean_sheets` | smallint | YES | 1 if CS, 0 otherwise |
 | `ingested_at` | timestamp | NO | |
 
 ### `pred_team_strength`
@@ -373,7 +377,7 @@ erDiagram
     player_watchlist_entry {
         text id PK
         text user_id FK
-        integer player_id
+        integer fpl_code
         timestamp created_at
     }
     transfer_draft {

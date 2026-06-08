@@ -27,6 +27,7 @@ const bootstrap = {
   elements: [
     {
       id: 100,
+      code: 123456,
       web_name: 'Saka',
       team: 1,
       team_code: 3,
@@ -85,6 +86,7 @@ describe('getPlayerProfile', () => {
 
     expect(result.gw).toBe(37);
     expect(result.gwPoints).toBe(8);
+    expect(result.player.fplCode).toBe(123456);
     expect(result.gwStats.some((s) => s.identifier === 'goals_scored')).toBe(true);
     expect(result.nextFixtures).toHaveLength(1);
   });
@@ -98,6 +100,7 @@ describe('getPlayerProfile', () => {
     expect(result.gwPoints).toBeNull();
     expect(result.gwStats).toEqual([]);
     expect(result.player.webName).toBe('Saka');
+    expect(result.player.fplCode).toBe(123456);
   });
 
   it('throws when player not in bootstrap', async () => {

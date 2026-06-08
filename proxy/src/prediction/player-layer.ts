@@ -1,8 +1,10 @@
+import type { TeamSlugLookup } from '../fpl-identity/team-slug-lookup';
 import type { PlayerPosition } from '../types';
+import { expectedBonusPts } from './bonus';
 import { expectedDefconPts, rollingDefconHitRate } from './defcon';
 import { modelXPts } from './fpl-points';
 import { blendXPts, inferConfidence } from './hybrid';
-import { slugFromVaastav } from './team-names';
+import { expectedSavesPts } from './saves';
 import {
   csProbAway,
   csProbHome,
@@ -15,8 +17,10 @@ import type {
   PredictionConfidence,
   TeamPoissonFit,
 } from './types';
+import { expectedYellowDeduction } from './yellow-card';
 
-// xA/90 prior by tactical role (calibrated to 2024-25 EPL medians)
+export type { TeamSlugLookup } from '../fpl-identity/team-slug-lookup';
+
 const XA_PRIOR_BY_ROLE: Record<string, number> = {
   am: 0.32,   // Attacking MID / CAM
   rw: 0.28,   // Right Winger
@@ -47,6 +51,10 @@ interface PlayerHistory {
   minutes: number;
   starts: number;
   defensiveContribution: number;
+  bonus: number;
+  yellowCards: number;
+  saves: number;
+  cleanSheets: number;
 }
 
 interface EnrichedFact extends PlayerGwFactRow {
@@ -207,19 +215,26 @@ function minutesProb(history: PlayerHistory[]): number {
   return Math.min(Math.max(avg / 90, 0.05), 1);
 }
 
+function prob60Plus(history: PlayerHistory[]): number {
+  if (history.length === 0) return 0.5;
+  const recent = history.slice(-5);
+  const over60 = recent.filter((h) => h.minutes >= 60).length;
+  return over60 / recent.length;
+}
+
 function predictFixture(
   row: EnrichedFact,
   fit: TeamPoissonFit,
-  idToSlug: Map<number, string>,
+  resolveTeamSlug: TeamSlugLookup,
   history: PlayerHistory[],
   tacticalRole?: string,
   teamXgPer90?: number,
-): Omit<PlayerGameweekPrediction, 'event'> & { round: number; fixture: number } {
+): Omit<PlayerGameweekPrediction, 'event' | 'fplCode'> & { round: number; fixture: number } {
   const position = row.position as PlayerPosition;
   const teamSlug =
-    (row.teamName ? slugFromVaastav(row.teamName) : undefined) ??
-    (row.teamId !== undefined ? idToSlug.get(row.teamId) : undefined);
-  const oppSlug = idToSlug.get(row.opponentTeam);
+    (row.teamName ? resolveTeamSlug(row.teamName) : undefined) ??
+    (row.teamId !== undefined ? resolveTeamSlug(row.teamId) : undefined);
+  const oppSlug = resolveTeamSlug(row.opponentTeam);
   const homeSlug = row.wasHome ? teamSlug : oppSlug;
   const awaySlug = row.wasHome ? oppSlug : teamSlug;
 
@@ -239,6 +254,7 @@ function predictFixture(
   }
 
   const minsProb = minutesProb(history);
+  const p60 = prob60Plus(history);
   const xGoals = lamFor * row.shareXg * minsProb;
   const xAssists = predictXAssists(
     position,
@@ -260,9 +276,16 @@ function predictFixture(
   const defconPts = expectedDefconPts(defconHit, minsProb, position);
 
   let csProb: number | null = null;
-  if ((position === 'GK' || position === 'DEF') && csTeam !== null) {
+  if (
+    (position === 'GK' || position === 'DEF' || position === 'MID') &&
+    csTeam !== null
+  ) {
     csProb = csTeam * minsProb;
   }
+
+  const bonusPts = expectedBonusPts(position, history, xGoals, xAssists, minsProb);
+  const savesPts = position === 'GK' ? expectedSavesPts(history, minsProb) : 0;
+  const yellowDeduction = expectedYellowDeduction(position, history, minsProb);
 
   const mPts = modelXPts(
     position,
@@ -271,7 +294,11 @@ function predictFixture(
     csProb,
     lamAgainst,
     minsProb,
+    p60,
     defconPts,
+    bonusPts,
+    savesPts,
+    yellowDeduction,
   );
 
   const recent = history.slice(-5);
@@ -347,11 +374,11 @@ function buildTeamFinishingMap(
 export function scoreGameweekFacts(
   allFacts: PlayerGwFactRow[],
   fit: TeamPoissonFit,
-  idToSlug: Map<number, string>,
+  resolveTeamSlug: TeamSlugLookup,
   targetEvent: number,
   trainMaxGw: number,
   tacticalRoles?: Map<number, string>,
-): PlayerGameweekPrediction[] {
+): Omit<PlayerGameweekPrediction, 'fplCode'>[] {
   const enriched = enrichWithShares(allFacts);
   const historyByEl = new Map<number, PlayerHistory[]>();
   const fixturePreds: ReturnType<typeof predictFixture>[] = [];
@@ -377,7 +404,7 @@ export function scoreGameweekFacts(
         const teamXgPer90 = teamFinishingMap.get(teamKey);
         const tacticalRole = tacticalRoles?.get(row.element);
         fixturePreds.push(
-          predictFixture(row, fit, idToSlug, hist, tacticalRole, teamXgPer90),
+          predictFixture(row, fit, resolveTeamSlug, hist, tacticalRole, teamXgPer90),
         );
       }
     }
@@ -389,6 +416,10 @@ export function scoreGameweekFacts(
         minutes: row.minutes,
         starts: row.starts,
         defensiveContribution: row.defensiveContribution ?? 0,
+        bonus: row.bonus ?? 0,
+        yellowCards: row.yellowCards ?? 0,
+        saves: row.saves ?? 0,
+        cleanSheets: row.cleanSheets ?? 0,
       });
       historyByEl.set(row.element, list);
     }

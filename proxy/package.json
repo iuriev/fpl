@@ -20,7 +20,11 @@
     "pred:verify": "tsx --env-file=.env src/pred-verify.ts",
     "lineups:warmup": "tsx --env-file=.env src/lineups-warmup-cli.ts",
     "lineups:ingest-tm": "tsx scripts/ingest-transfermarkt-positions.ts",
-    "lineups:seed-positions": "npm run lineups:ingest-tm"
+    "lineups:seed-positions": "npm run lineups:ingest-tm",
+    "identity:audit": "tsx scripts/audit-fpl-identity.ts",
+    "identity:audit:pair": "tsx scripts/audit-fpl-identity.ts 2023-24 2024-25",
+    "identity:audit:live": "tsx scripts/audit-fpl-identity.ts 2025-26 --live",
+    "identity:audit:live-pair": "tsx scripts/audit-fpl-identity.ts 2024-25 2025-26 --live"
   },
   "dependencies": {
     "@hono/node-server": "^2.0.3",

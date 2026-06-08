@@ -22,7 +22,7 @@ vi.mock('@/api/queries', () => ({
 import { WatchedPlayerRow as WatchedPlayerRowLazy } from './WatchedPlayerRow';
 
 function renderRow(
-  playerId: number,
+  fplCode: number,
   onRemove = vi.fn(),
   currentGw: number | null = 36
 ) {
@@ -33,7 +33,7 @@ function renderRow(
         <MemoryRouter>
           <WatchedPlayerRowLazy
             rank={1}
-            playerId={playerId}
+            fplCode={fplCode}
             currentGw={currentGw}
             onRemove={onRemove}
           />
@@ -46,6 +46,7 @@ function renderRow(
 describe('WatchedPlayerRow', () => {
   beforeEach(() => {
     localStorage.removeItem('fpl-player-watchlist-v1');
+    localStorage.removeItem('fpl-player-watchlist-v2');
     mockUsePlayersLive.mockReturnValue({
       data: { gw: 36, players: fixtureTopPlayersGw.players },
       isLoading: false,
@@ -56,16 +57,18 @@ describe('WatchedPlayerRow', () => {
 
   it('renders player name when found in GW data', () => {
     const player = fixtureTopPlayersGw.players[0];
-    renderRow(player.id);
+    renderRow(player.fplCode);
     expect(screen.getByText(player.webName)).toBeInTheDocument();
   });
 
   it('shows skeleton while gameweek is not ready', () => {
+    const player = fixtureTopPlayersGw.players[0];
     mockUsePlayerPool.mockReturnValue({
       data: {
         players: [
           {
-            id: fixtureTopPlayersGw.players[0].id,
+            id: player.id,
+            code: player.fplCode,
             webName: 'Cached',
             position: 'FWD',
             teamCode: 13,
@@ -78,18 +81,20 @@ describe('WatchedPlayerRow', () => {
       },
       isLoading: false,
     });
-    renderRow(fixtureTopPlayersGw.players[0].id, vi.fn(), null);
+    renderRow(player.fplCode, vi.fn(), null);
     expect(screen.getByLabelText(/loading/i)).toHaveAttribute('aria-busy', 'true');
     expect(screen.queryByText('Cached')).not.toBeInTheDocument();
   });
 
   it('shows skeleton until live fetch completes even when pool is cached', () => {
+    const player = fixtureTopPlayersGw.players[0];
     mockUsePlayersLive.mockReturnValue({ data: undefined, isLoading: true, isFetched: false });
     mockUsePlayerPool.mockReturnValue({
       data: {
         players: [
           {
-            id: fixtureTopPlayersGw.players[0].id,
+            id: player.id,
+            code: player.fplCode,
             webName: 'Cached',
             position: 'FWD',
             teamCode: 13,
@@ -102,7 +107,7 @@ describe('WatchedPlayerRow', () => {
       },
       isLoading: false,
     });
-    renderRow(fixtureTopPlayersGw.players[0].id);
+    renderRow(player.fplCode);
     expect(screen.getByLabelText(/loading/i)).toHaveAttribute('aria-busy', 'true');
     expect(screen.queryByText('Cached')).not.toBeInTheDocument();
   });

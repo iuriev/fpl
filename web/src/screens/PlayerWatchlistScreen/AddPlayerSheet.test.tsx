@@ -15,6 +15,7 @@ const mockPool: PlayerPoolResponse = {
   players: [
     {
       id: 1,
+      code: 90001,
       webName: 'Haaland',
       firstName: 'Erling',
       lastName: 'Haaland',
@@ -35,6 +36,7 @@ const mockPool: PlayerPoolResponse = {
     },
     {
       id: 2,
+      code: 90002,
       webName: 'Salah',
       firstName: 'Mohamed',
       lastName: 'Salah',
@@ -83,7 +85,10 @@ function renderSheet(open = true) {
 import { AddPlayerSheet as AddPlayerSheetLazy } from './AddPlayerSheet';
 
 describe('AddPlayerSheet', () => {
-  beforeEach(() => localStorage.removeItem('fpl-player-watchlist-v1'));
+  beforeEach(() => {
+    localStorage.removeItem('fpl-player-watchlist-v1');
+    localStorage.removeItem('fpl-player-watchlist-v2');
+  });
 
   it('renders all players when no search query', () => {
     renderSheet();
@@ -113,6 +118,6 @@ describe('AddPlayerSheet', () => {
     const followBtns = screen.getAllByRole('button', { name: /follow/i });
     await userEvent.click(followBtns[0]);
     const ids = await repo.list();
-    expect(ids).toContain(1);
+    expect(ids).toContain(90001);
   });
 });

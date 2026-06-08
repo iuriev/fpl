@@ -1,5 +1,4 @@
-import { runMigrations } from './db/client';
-import { db } from './db/client';
+import { closeDb, db, runMigrations } from './db/client';
 import { defaultDataDir, ingestPlayerGwFacts, loadMergedGwFromDisk } from './prediction/ingest';
 import { runPredictionIngest } from './prediction/run-ingest';
 import { runScoreGameweek } from './prediction/score';
@@ -37,13 +36,20 @@ async function score() {
   console.log(`[pred:score] model_run_id=${runId} event=${event} season=${season}`);
 }
 
-if (cmd === 'ingest') {
-  await ingest();
-} else if (cmd === 'score') {
-  await score();
-} else {
-  console.error(
-    'Usage: pred-cli ingest [--season=2025-26] | pred-cli score --event=N [--season=2024-25]',
-  );
-  process.exit(1);
+try {
+  if (cmd === 'ingest') {
+    await ingest();
+  } else if (cmd === 'score') {
+    await score();
+  } else {
+    console.error(
+      'Usage: pred-cli ingest [--season=2025-26] | pred-cli score --event=N [--season=2024-25]',
+    );
+    process.exitCode = 1;
+  }
+} catch (err) {
+  console.error(err);
+  process.exitCode = 1;
+} finally {
+  await closeDb();
 }

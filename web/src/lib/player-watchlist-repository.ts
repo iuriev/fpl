@@ -4,21 +4,39 @@ export type PlayerWatchlistAddResult = 'ok' | 'duplicate' | 'limit';
 
 export interface PlayerWatchlistRepository {
   list(): Promise<number[]>;
-  add(playerId: number): Promise<PlayerWatchlistAddResult>;
-  remove(playerId: number): Promise<void>;
-  has(playerId: number): Promise<boolean>;
+  add(fplCode: number): Promise<PlayerWatchlistAddResult>;
+  remove(fplCode: number): Promise<void>;
+  has(fplCode: number): Promise<boolean>;
   getLimit(): number;
   invalidateCache(): void;
 }
 
-const STORAGE_KEY = 'fpl-player-watchlist-v1';
+const STORAGE_KEY = 'fpl-player-watchlist-v2';
+const LEGACY_STORAGE_KEY = 'fpl-player-watchlist-v1';
 const FREE_LIMIT = 2;
+
+function migrateLegacyStorage(): number[] {
+  try {
+    const raw = localStorage.getItem(LEGACY_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    localStorage.removeItem(LEGACY_STORAGE_KEY);
+    const codes = parsed.filter((x) => typeof x === 'number');
+    if (codes.length > 0) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(codes));
+    }
+    return codes;
+  } catch {
+    return [];
+  }
+}
 
 export class LocalStoragePlayerWatchlistRepository implements PlayerWatchlistRepository {
   private read(): number[] {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return [];
+      if (!raw) return migrateLegacyStorage();
       const parsed = JSON.parse(raw);
       return Array.isArray(parsed) ? parsed.filter((x) => typeof x === 'number') : [];
     } catch {
@@ -26,28 +44,28 @@ export class LocalStoragePlayerWatchlistRepository implements PlayerWatchlistRep
     }
   }
 
-  private write(ids: number[]): void {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
+  private write(codes: number[]): void {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(codes));
   }
 
   async list(): Promise<number[]> {
     return this.read();
   }
 
-  async add(playerId: number): Promise<PlayerWatchlistAddResult> {
-    const ids = this.read();
-    if (ids.includes(playerId)) return 'duplicate';
-    if (ids.length >= FREE_LIMIT) return 'limit';
-    this.write([...ids, playerId]);
+  async add(fplCode: number): Promise<PlayerWatchlistAddResult> {
+    const codes = this.read();
+    if (codes.includes(fplCode)) return 'duplicate';
+    if (codes.length >= FREE_LIMIT) return 'limit';
+    this.write([...codes, fplCode]);
     return 'ok';
   }
 
-  async remove(playerId: number): Promise<void> {
-    this.write(this.read().filter((id) => id !== playerId));
+  async remove(fplCode: number): Promise<void> {
+    this.write(this.read().filter((code) => code !== fplCode));
   }
 
-  async has(playerId: number): Promise<boolean> {
-    return this.read().includes(playerId);
+  async has(fplCode: number): Promise<boolean> {
+    return this.read().includes(fplCode);
   }
 
   getLimit(): number {
@@ -69,7 +87,7 @@ export class ApiPlayerWatchlistRepository implements PlayerWatchlistRepository {
       this._inflight = fetch('/api/me/player-watchlist', { credentials: 'include' })
         .then((res) => {
           if (!res.ok) throw new Error(`Player watchlist fetch failed: ${res.status}`);
-          return res.json().then((data: { playerIds: number[] }) => data.playerIds);
+          return res.json().then((data: { fplCodes: number[] }) => data.fplCodes);
         })
         .finally(() => {
           this._inflight = null;
@@ -78,13 +96,13 @@ export class ApiPlayerWatchlistRepository implements PlayerWatchlistRepository {
     return this._inflight;
   }
 
-  async add(playerId: number): Promise<PlayerWatchlistAddResult> {
+  async add(fplCode: number): Promise<PlayerWatchlistAddResult> {
     this.invalidateCache();
     const res = await fetch('/api/me/player-watchlist', {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ playerId }),
+      body: JSON.stringify({ fplCode }),
     });
     if (res.ok) {
       this.invalidateCache();
@@ -97,8 +115,8 @@ export class ApiPlayerWatchlistRepository implements PlayerWatchlistRepository {
     throw new Error(`Player watchlist add failed: ${res.status}`);
   }
 
-  async remove(playerId: number): Promise<void> {
-    const res = await fetch(`/api/me/player-watchlist/${playerId}`, {
+  async remove(fplCode: number): Promise<void> {
+    const res = await fetch(`/api/me/player-watchlist/${fplCode}`, {
       method: 'DELETE',
       credentials: 'include',
     });
@@ -106,9 +124,9 @@ export class ApiPlayerWatchlistRepository implements PlayerWatchlistRepository {
     this.invalidateCache();
   }
 
-  async has(playerId: number): Promise<boolean> {
-    const ids = await this.list();
-    return ids.includes(playerId);
+  async has(fplCode: number): Promise<boolean> {
+    const codes = await this.list();
+    return codes.includes(fplCode);
   }
 
   getLimit(): number {

@@ -64,6 +64,7 @@ export async function getPlayerProfile(
   const result: PlayerProfileResponse = {
     player: {
       id: element.id,
+      fplCode: element.code,
       webName: element.web_name,
       position,
       teamCode: element.team_code,

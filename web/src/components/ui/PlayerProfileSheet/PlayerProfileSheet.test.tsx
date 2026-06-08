@@ -19,6 +19,7 @@ const mockUsePlayerProfile = vi.mocked(queries.usePlayerProfile);
 const profileWithGw: PlayerProfileResponse = {
   player: {
     id: 100,
+    fplCode: 123456,
     webName: 'Saka',
     position: 'MID',
     teamCode: 3,
@@ -101,7 +102,7 @@ describe('PlayerProfileSheet', () => {
     const user = userEvent.setup();
     renderSheet({ onFollow });
     await user.click(screen.getByRole('button', { name: /follow/i }));
-    expect(onFollow).toHaveBeenCalledWith(100);
+    expect(onFollow).toHaveBeenCalledWith(123456);
   });
 
   it('shows lineup injury warning when lineupAlerts provided', () => {

@@ -28,7 +28,7 @@ function PlayerRow({ player, dimmed }: { player: SquadPlayer; dimmed?: boolean }
   const [expanded, setExpanded] = useState(false);
   const ptsClass = getPlayerPointsClass(player.points);
   const label = getStatLabel(player.stats);
-  const { following, toggle } = useFollowPlayer(player.id);
+  const { following, toggle } = useFollowPlayer(player.fplCode);
 
   return (
     <>

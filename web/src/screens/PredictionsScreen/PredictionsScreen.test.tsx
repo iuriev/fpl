@@ -136,6 +136,7 @@ const mockLineups: PredictedLineupsResponse = {
 const mockProfile: PlayerProfileResponse = {
   player: {
     id: 1,
+    fplCode: 90001,
     webName: 'Salah',
     position: 'MID',
     teamCode: 3,

@@ -52,6 +52,7 @@ export async function getTeamPlayers(teamCode: number): Promise<TeamPlayersRespo
     .filter((e) => e.team_code === teamCode)
     .map((e) => ({
       id: e.id,
+      fplCode: e.code,
       webName: e.web_name,
       position: POSITION_MAP[e.element_type] ?? 'GK',
       teamCode: e.team_code,

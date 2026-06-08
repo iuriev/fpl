@@ -50,6 +50,13 @@ docs/       # architecture overview + decision records (ADRs)
   choice. When a decision changes, the old ADR is marked `Superseded by ADR-XXXX` (never deleted)
   so the history of *why it changed* is preserved.
 
+## Database migrations
+
+Schema lives in `proxy/src/db/`. On every proxy boot, `runMigrations()` in `proxy/src/db/client.ts`
+applies any pending SQL migrations before the HTTP server starts (see ADR 0015). Re-running when
+nothing is pending is safe — Drizzle records applied migrations in `__drizzle_migrations` and skips
+them. Manual `npm run db:migrate -w proxy` is optional (same migrator, useful for CI or one-off ops).
+
 ## Caching
 
 FPL API responses are persisted in Postgres via `proxy/src/fpl-cache/db-cache.ts`. See
@@ -69,6 +76,15 @@ ADR 0018 for the full rationale and design.
 
 The in-memory `cache.ts` is retained only for computed, non-FPL results (player pool,
 fixtures).
+
+## FPL identity
+
+Player and team identity uses FPL `element.code` and `team.code` as canonical keys across
+seasons. Seasonal `element.id` / `team.id` are reserved for FPL API calls only. See
+[ADR 0020](decisions/0020-fpl-identity-model.md).
+
+Module: `proxy/src/fpl-identity/` — `FplIdentityMapper`, season registries, identity audits
+(`npm run audit:fpl-identity`), and `loadIdentityMapper` for the prediction pipeline.
 
 ## PRED-09 statistical predictions
 

@@ -6,19 +6,19 @@ import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import * as schema from '../db/schema';
 import { getOrFetchBootstrap } from '../fpl-cache/db-cache';
 import { deriveSeason } from '../fpl-cache/season';
+import { loadIdentityMapper, loadLiveIdentityMapper } from '../fpl-identity/load-mapper';
+import { softTeamSlugLookup } from '../fpl-identity/team-slug-lookup';
 import {
-  elementToFplCodeFromBootstrap,
   isSeasonComplete,
   loadCurrentSeasonFacts,
 } from './current-season';
 import { loadEplMatchesFromDisk, loadMergedGwFromDisk } from './ingest';
-import { attachFplCodes, loadElementToFplCode } from './player-code-map';
 import { scoreGameweekFacts } from './player-layer';
 import { fitTeamPoisson } from './team-poisson';
 import type { EplMatchRow, PlayerGwFactRow } from './types';
 
 async function loadTacticalRolesMap(
-  elementToCode: Map<number, number>,
+  elementToCode: ReadonlyMap<number, number>,
 ): Promise<Map<number, string>> {
   const path = join(new URL('.', import.meta.url).pathname, '..', 'data', 'player-tactical-roles.json');
   let raw: Record<string, { role: string }>;
@@ -47,7 +47,7 @@ const PRIOR_SEASON_FALLBACK_GW_THRESHOLD = 5;
 async function loadPriorSeasonCarryIn(
   currentFacts: PlayerGwFactRow[],
   targetEvent: number,
-  currentElementToCode: Map<number, number>,
+  currentElementToCode: ReadonlyMap<number, number>,
   dataDir?: string,
 ): Promise<PlayerGwFactRow[]> {
   const useAllPrior = targetEvent <= PRIOR_SEASON_FALLBACK_GW_THRESHOLD;
@@ -81,9 +81,9 @@ async function loadPriorSeasonCarryIn(
     } catch {
       continue;
     }
-    let priorElementToCode: Map<number, number>;
+    let priorElementToCode: ReadonlyMap<number, number>;
     try {
-      priorElementToCode = await loadElementToFplCode(priorSeason, dataDir);
+      priorElementToCode = (await loadIdentityMapper(priorSeason, dataDir)).elementToCodeMap();
     } catch {
       continue;
     }
@@ -106,7 +106,7 @@ export async function loadFactsWithPriorSeasons(
   dataDir?: string,
 ): Promise<PlayerGwFactRow[]> {
   const currentFacts = await loadMergedGwFromDisk(season, dataDir);
-  const currentElementToCode = await loadElementToFplCode(season, dataDir);
+  const currentElementToCode = (await loadIdentityMapper(season, dataDir)).elementToCodeMap();
   const priorFacts = await loadPriorSeasonCarryIn(currentFacts, targetEvent, currentElementToCode, dataDir);
   return [...priorFacts, ...currentFacts];
 }
@@ -149,8 +149,8 @@ export async function loadFactsForScoring(
     const complete = isSeasonComplete(bootstrap);
     console.log(`[pred:score] season=${season} current complete=${complete} — loading from element-summary cache`);
     const currentFacts = await loadCurrentSeasonFacts(db, season, targetEvent, bootstrap);
-    const elementToCode = elementToFplCodeFromBootstrap(bootstrap);
-    const priorFacts = await loadPriorSeasonCarryIn(currentFacts, targetEvent, elementToCode, dataDir);
+    const currentElementToCode = (await loadLiveIdentityMapper(season, bootstrap, dataDir)).elementToCodeMap();
+    const priorFacts = await loadPriorSeasonCarryIn(currentFacts, targetEvent, currentElementToCode, dataDir);
     return [...priorFacts, ...currentFacts];
   }
 
@@ -190,36 +190,36 @@ export async function runScoreGameweek(
   );
 
   const aliasRows = await db.select().from(schema.predTeamAlias);
-  const idToSlug = new Map(aliasRows.map((a) => [a.fplTeamId, a.slug]));
-  console.log(`${tag} team aliases=${aliasRows.length}`);
 
   const trainMaxGw = targetEvent - 1;
 
   const bootstrap = await getOrFetchBootstrap(db);
   const isCurrentSeason = deriveSeason(bootstrap.events) === season;
-  const elementToCode = isCurrentSeason
-    ? elementToFplCodeFromBootstrap(bootstrap)
-    : await loadElementToFplCode(season, dataDir);
-  console.log(`${tag} player code map size=${elementToCode.size} source=${isCurrentSeason ? 'bootstrap' : 'disk'}`);
+  const identity = isCurrentSeason
+    ? await loadLiveIdentityMapper(season, bootstrap, dataDir)
+    : await loadIdentityMapper(season, dataDir);
+  const resolveTeamSlug = softTeamSlugLookup(identity);
+  console.log(
+    `${tag} identity season=${identity.season} players=${identity.elementToCodeMap().size}` +
+    ` teams=${identity.teamIdToSlugMap().size} source=${isCurrentSeason ? 'bootstrap' : 'vaastav'}` +
+    ` db_aliases=${aliasRows.length}`,
+  );
 
-  const tacticalRoles = await loadTacticalRolesMap(elementToCode);
+  const tacticalRoles = await loadTacticalRolesMap(identity.elementToCodeMap());
   console.log(`${tag} tactical roles mapped=${tacticalRoles.size}`);
 
   const rawPredictions = scoreGameweekFacts(
     facts,
     fit,
-    idToSlug,
+    resolveTeamSlug,
     targetEvent,
     trainMaxGw,
     tacticalRoles,
   );
   console.log(`${tag} raw predictions=${rawPredictions.length}`);
 
-  const predictions = attachFplCodes(rawPredictions, elementToCode);
-  const skippedNoCode = rawPredictions.length - predictions.length;
-  console.log(
-    `${tag} predictions with_fpl_code=${predictions.length} skipped_no_code=${skippedNoCode}`,
-  );
+  const predictions = identity.attachFplCodes(rawPredictions);
+  console.log(`${tag} predictions with_fpl_code=${predictions.length}`);
 
   const [run] = await db
     .insert(schema.predModelRun)
@@ -230,7 +230,6 @@ export async function runScoreGameweek(
       params: { trainMaxGw, trainSeasons: TRAIN_SEASONS },
       metrics: {
         players: predictions.length,
-        skippedNoCode,
       },
     })
     .returning({ id: schema.predModelRun.id });

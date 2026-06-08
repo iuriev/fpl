@@ -23,12 +23,29 @@ vi.mock('./entry-service', () => ({
   getEntry: vi.fn(),
 }));
 
+vi.mock('./fpl-cache/db-cache', () => ({
+  getOrFetchBootstrap: vi.fn(),
+}));
+
+vi.mock('./player-watchlist-service', async (importOriginal) => {
+  const mod = await importOriginal<typeof import('./player-watchlist-service')>();
+  return {
+    ...mod,
+    loadWatchlistedFplCodes: vi.fn(),
+    ensurePlayerWatchlistSchema: vi.fn(),
+  };
+});
+
 import { auth } from './auth/auth';
 import { db } from './db/client';
 import * as entryService from './entry-service';
+import { getOrFetchBootstrap } from './fpl-cache/db-cache';
 import { me } from './me-routes';
+import * as playerWatchlistService from './player-watchlist-service';
 
 const mockDb = vi.mocked(db);
+const mockGetBootstrap = vi.mocked(getOrFetchBootstrap);
+const mockLoadWatchlistedFplCodes = vi.mocked(playerWatchlistService.loadWatchlistedFplCodes);
 
 const mockGetSession = vi.mocked(auth.api.getSession);
 const mockGetEntry = vi.mocked(entryService.getEntry);
@@ -48,6 +65,13 @@ const app = new Hono().route('/api/me', me);
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockGetBootstrap.mockResolvedValue({
+    elements: [
+      { id: 300, code: 90001 },
+      { id: 400, code: 90002 },
+    ],
+  } as never);
+  mockLoadWatchlistedFplCodes.mockResolvedValue(new Set());
 });
 
 describe('GET /api/me', () => {
@@ -425,20 +449,20 @@ describe('GET /api/me/player-watchlist', () => {
     expect(res.status).toBe(401);
   });
 
-  it('returns empty playerIds when no entries', async () => {
+  it('returns empty fplCodes when no entries', async () => {
     mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
-    makeSelectChain([]);
+    mockLoadWatchlistedFplCodes.mockResolvedValue(new Set());
     const res = await app.request('/api/me/player-watchlist');
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ playerIds: [] });
+    expect(await res.json()).toEqual({ fplCodes: [], playerIds: [] });
   });
 
-  it('returns playerIds when entries exist', async () => {
+  it('returns fplCodes when entries exist', async () => {
     mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
-    makeSelectChain([{ playerId: 300 }, { playerId: 400 }]);
+    mockLoadWatchlistedFplCodes.mockResolvedValue(new Set([90001, 90002]));
     const res = await app.request('/api/me/player-watchlist');
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ playerIds: [300, 400] });
+    expect(await res.json()).toEqual({ fplCodes: [90001, 90002], playerIds: [300, 400] });
   });
 });
 
@@ -448,17 +472,17 @@ describe('POST /api/me/player-watchlist', () => {
     const res = await app.request('/api/me/player-watchlist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ playerId: 300 }),
+      body: JSON.stringify({ fplCode: 90001 }),
     });
     expect(res.status).toBe(401);
   });
 
-  it('returns 400 for invalid playerId', async () => {
+  it('returns 400 for invalid fplCode', async () => {
     mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
     const res = await app.request('/api/me/player-watchlist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ playerId: 0 }),
+      body: JSON.stringify({ fplCode: 0 }),
     });
     expect(res.status).toBe(400);
   });
@@ -470,10 +494,23 @@ describe('POST /api/me/player-watchlist', () => {
     const res = await app.request('/api/me/player-watchlist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fplCode: 90001 }),
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ fplCode: 90001, playerId: 300 });
+  });
+
+  it('accepts legacy playerId and stores canonical fplCode', async () => {
+    mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
+    makeCountChain(0);
+    makeInsertChain(false);
+    const res = await app.request('/api/me/player-watchlist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ playerId: 300 }),
     });
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ playerId: 300 });
+    expect(await res.json()).toEqual({ fplCode: 90001, playerId: 300 });
   });
 
   it('returns 409 limit when at FREE_LIMIT', async () => {
@@ -482,7 +519,7 @@ describe('POST /api/me/player-watchlist', () => {
     const res = await app.request('/api/me/player-watchlist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ playerId: 300 }),
+      body: JSON.stringify({ fplCode: 90001 }),
     });
     expect(res.status).toBe(409);
     expect(await res.json()).toEqual({ error: 'limit' });
@@ -495,21 +532,21 @@ describe('POST /api/me/player-watchlist', () => {
     const res = await app.request('/api/me/player-watchlist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ playerId: 300 }),
+      body: JSON.stringify({ fplCode: 90001 }),
     });
     expect(res.status).toBe(409);
     expect(await res.json()).toEqual({ error: 'duplicate' });
   });
 });
 
-describe('DELETE /api/me/player-watchlist/:playerId', () => {
+describe('DELETE /api/me/player-watchlist/:fplCode', () => {
   it('returns 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
-    const res = await app.request('/api/me/player-watchlist/300', { method: 'DELETE' });
+    const res = await app.request('/api/me/player-watchlist/90001', { method: 'DELETE' });
     expect(res.status).toBe(401);
   });
 
-  it('returns 400 for invalid playerId', async () => {
+  it('returns 400 for invalid fplCode', async () => {
     mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
     const res = await app.request('/api/me/player-watchlist/abc', { method: 'DELETE' });
     expect(res.status).toBe(400);
@@ -518,7 +555,7 @@ describe('DELETE /api/me/player-watchlist/:playerId', () => {
   it('returns 204 on success', async () => {
     mockGetSession.mockResolvedValue({ user: mockUser, session: {} as never });
     makeDeleteChain();
-    const res = await app.request('/api/me/player-watchlist/300', { method: 'DELETE' });
+    const res = await app.request('/api/me/player-watchlist/90001', { method: 'DELETE' });
     expect(res.status).toBe(204);
   });
 

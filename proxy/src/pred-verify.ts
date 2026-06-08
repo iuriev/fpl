@@ -1,6 +1,6 @@
 import { count, desc, eq } from 'drizzle-orm';
 
-import { db } from './db/client';
+import { closeDb, db } from './db/client';
 import {
   predEplMatch,
   predModelRun,
@@ -35,7 +35,9 @@ async function main() {
   }
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+main()
+  .catch((err) => {
+    console.error(err);
+    process.exitCode = 1;
+  })
+  .finally(() => closeDb());

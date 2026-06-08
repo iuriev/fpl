@@ -37,6 +37,8 @@ it behaves. Avoid duplicating: link between them instead.
 | [0016](0016-auth-better-auth.md) | Use better-auth for authentication | Accepted |
 | [0017](0017-session-transport-cookie.md) | Session transport — HttpOnly cookie | Accepted |
 | [0018](0018-fpl-persistent-db-cache.md) | FPL persistent DB cache to minimise FPL API calls | Accepted |
+| [0019](0019-prediction-scoring-model-extension.md) | Prediction scoring model extension (PRED-11) | Accepted |
+| [0020](0020-fpl-identity-model.md) | FPL identity model — canonical player and team codes | Accepted |
 
 ## Template
 

@@ -48,6 +48,7 @@ export interface PlayerStats {
 
 export interface SquadPlayer {
   id: number;
+  fplCode: number;
   name: string;
   position: PlayerPosition;
   club: string;
@@ -138,6 +139,7 @@ export interface StatEntry {
 
 export interface TopPlayer {
   id: number;
+  fplCode: number;
   webName: string;
   position: PlayerPosition;
   teamCode: number;
@@ -291,6 +293,7 @@ export interface PlayerProfileStat {
 export interface PlayerProfileResponse {
   player: {
     id: number;
+    fplCode: number;
     webName: string;
     position: PlayerPosition;
     teamCode: number;
@@ -370,6 +373,7 @@ export interface InferredFormation {
 
 export interface PredictedLineupPlayer {
   id: number;
+  fplCode: number;
   webName: string;
   position: PlayerPosition;
   teamCode: number;

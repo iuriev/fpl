@@ -86,10 +86,10 @@ export const playerWatchlistEntry = pgTable(
     userId: text('user_id')
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
-    playerId: integer('player_id').notNull(),
+    fplCode: integer('fpl_code').notNull(),
     createdAt: timestamp('created_at').notNull().defaultNow(),
   },
-  (t) => [uniqueIndex('player_watchlist_entry_user_player_idx').on(t.userId, t.playerId)],
+  (t) => [uniqueIndex('player_watchlist_entry_user_fpl_code_idx').on(t.userId, t.fplCode)],
 );
 
 export const transferDraft = pgTable('transfer_draft', {
@@ -267,6 +267,10 @@ export const predPlayerGwFact = pgTable(
     expectedGoals: doublePrecision('expected_goals'),
     expectedAssists: doublePrecision('expected_assists'),
     defensiveContribution: smallint('defensive_contribution'),
+    bonus: smallint('bonus').default(0),
+    yellowCards: smallint('yellow_cards').default(0),
+    saves: smallint('saves').default(0),
+    cleanSheets: smallint('clean_sheets').default(0),
     ingestedAt: timestamp('ingested_at').notNull().defaultNow(),
   },
   (t) => [

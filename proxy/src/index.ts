@@ -2,7 +2,6 @@ import type { Server } from 'node:http';
 
 import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
-import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
@@ -11,7 +10,6 @@ import { auth } from './auth/auth';
 import { optionalUser } from './auth/middleware';
 import { closeDb, runMigrations } from './db/client';
 import { db } from './db/client';
-import { playerWatchlistEntry } from './db/schema';
 import * as entryService from './entry-service';
 import * as fixturesCalendarService from './fixtures-calendar-service';
 import * as fixturesService from './fixtures-service';
@@ -29,6 +27,10 @@ import { startLineupsWarmup } from './lineups-warmup';
 import { marketRoutes } from './market-routes';
 import { me } from './me-routes';
 import * as playerPoolService from './player-pool-service';
+import {
+  ensurePlayerWatchlistSchema,
+  loadWatchlistedFplCodes,
+} from './player-watchlist-service';
 import { predictedLineupsRoutes } from './predicted-lineups-routes';
 import { defaultDataDir } from './prediction/ingest';
 import { runScoreGameweek } from './prediction/score';
@@ -60,6 +62,7 @@ if (!process.env.BETTER_AUTH_SECRET) {
 }
 
 await runMigrations();
+await ensurePlayerWatchlistSchema();
 
 const isDev = process.env.NODE_ENV !== 'production';
 
@@ -178,21 +181,21 @@ app.get('/api/squad/:teamId/:gw', optionalUser, async (c) => {
     }
 
     const user = c.var.user;
-    const [result, watchlistedIds] = await Promise.all([
+    const [result, watchlistedCodes] = await Promise.all([
       squadService.getSquad(teamId, gw),
-      user
-        ? db
-            .select({ playerId: playerWatchlistEntry.playerId })
-            .from(playerWatchlistEntry)
-            .where(eq(playerWatchlistEntry.userId, user.id))
-            .then((rows) => new Set(rows.map((r) => r.playerId)))
-        : Promise.resolve(new Set<number>()),
+      user ? loadWatchlistedFplCodes(user.id) : Promise.resolve(new Set<number>()),
     ]);
 
     const withWatchlist = {
       ...result,
-      starters: result.starters.map((p) => ({ ...p, isWatchlisted: watchlistedIds.has(p.id) })),
-      bench: result.bench.map((p) => ({ ...p, isWatchlisted: watchlistedIds.has(p.id) })),
+      starters: result.starters.map((p) => ({
+        ...p,
+        isWatchlisted: watchlistedCodes.has(p.fplCode),
+      })),
+      bench: result.bench.map((p) => ({
+        ...p,
+        isWatchlisted: watchlistedCodes.has(p.fplCode),
+      })),
     };
 
     return c.json(withWatchlist);
@@ -238,19 +241,16 @@ app.get('/api/fixtures/upcoming', async (c) => {
 app.get('/api/player-pool', optionalUser, async (c) => {
   try {
     const user = c.var.user;
-    const [result, watchlistedIds] = await Promise.all([
+    const [result, watchlistedCodes] = await Promise.all([
       playerPoolService.getPlayerPool(),
-      user
-        ? db
-            .select({ playerId: playerWatchlistEntry.playerId })
-            .from(playerWatchlistEntry)
-            .where(eq(playerWatchlistEntry.userId, user.id))
-            .then((rows) => new Set(rows.map((r) => r.playerId)))
-        : Promise.resolve(new Set<number>()),
+      user ? loadWatchlistedFplCodes(user.id) : Promise.resolve(new Set<number>()),
     ]);
 
     return c.json({
-      players: result.players.map((p) => ({ ...p, isWatchlisted: watchlistedIds.has(p.id) })),
+      players: result.players.map((p) => ({
+        ...p,
+        isWatchlisted: watchlistedCodes.has(p.code),
+      })),
     });
   } catch (error) {
     console.error('Error fetching player pool:', error);

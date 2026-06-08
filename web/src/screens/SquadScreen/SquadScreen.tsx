@@ -453,7 +453,7 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
 SquadScreen.displayName = 'SquadScreen';
 
 function FollowableCard(props: React.ComponentProps<typeof PlayerCard>) {
-  const { following, toggle } = useFollowPlayer(props.player.id);
+  const { following, toggle } = useFollowPlayer(props.player.fplCode);
   const showFollow = !!props.playerInfo;
   return (
     <PlayerCard

@@ -316,7 +316,15 @@ export const PredictionsScreen: React.FC = () => {
     return poolData?.players.find((p) => p.id === profilePlayerId)?.webName;
   }, [profilePlayerId, selectedLineupPlayer, poolData?.players]);
 
-  const { following, toggle: toggleFollow } = useFollowPlayer(profilePlayerId ?? 0);
+  const profileFplCode = useMemo(() => {
+    if (profilePlayerId == null) return 0;
+    const poolPlayer = poolData?.players.find((p) => p.id === profilePlayerId);
+    if (poolPlayer) return poolPlayer.code;
+    if (selectedLineupPlayer) return selectedLineupPlayer.fplCode;
+    return 0;
+  }, [profilePlayerId, poolData?.players, selectedLineupPlayer]);
+
+  const { following, toggle: toggleFollow } = useFollowPlayer(profileFplCode);
 
   const activeMetric: PredictionMetric = activeTab === 'xa' ? 'xAssists' : 'xPts';
   const positionTabs = activeTab === 'xa' ? ASSIST_POSITION_TABS : POINTS_POSITION_TABS;
@@ -388,10 +396,10 @@ export const PredictionsScreen: React.FC = () => {
   const showXgMarketLoading =
     marketListLoading || (predictionsWarmupActive && xgMarketTeams.length === 0);
 
-  const marketDataReady = isPremium ? (marketData == null || marketData.ready) : (marketPreview == null || marketPreview.ready);
-
-  const showCsMarketEmpty = !showCsMarketLoading && marketDataReady && csMarketTeams.length === 0;
-  const showXgMarketEmpty = !showXgMarketLoading && marketDataReady && xgMarketTeams.length === 0;
+  const showCsMarketEmpty =
+    !showCsMarketLoading && csMarketTeams.length === 0 && !predictionsWarmupActive;
+  const showXgMarketEmpty =
+    !showXgMarketLoading && xgMarketTeams.length === 0 && !predictionsWarmupActive;
 
   const marketEmptyMessage =
     nextGw !== null

@@ -15,9 +15,13 @@ export async function closeDb(): Promise<void> {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-export async function runMigrations() {
+export async function runMigrations(): Promise<void> {
   const migrationClient = postgres(process.env.DATABASE_URL!, { max: 1, onnotice: () => {} });
   const migrationDb = drizzle(migrationClient);
-  await migrate(migrationDb, { migrationsFolder: join(__dirname, 'migrations') });
-  await migrationClient.end();
+  try {
+    await migrate(migrationDb, { migrationsFolder: join(__dirname, 'migrations') });
+    console.log('[db] Migrations up to date');
+  } finally {
+    await migrationClient.end();
+  }
 }

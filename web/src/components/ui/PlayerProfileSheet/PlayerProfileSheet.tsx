@@ -17,7 +17,7 @@ export interface PlayerProfileSheetProps {
   playerId: number | null;
   open: boolean;
   onClose: () => void;
-  onFollow?: (playerId: number) => void;
+  onFollow?: (fplCode: number) => void;
   isFollowing?: boolean;
   lineupAlerts?: PlayerProfileLineupAlerts;
   prediction?: PlayerGameweekPrediction;
@@ -29,6 +29,7 @@ export interface PlayerProfileSheetProps {
 
 const EMPTY_PROFILE_PLAYER: PlayerProfileResponse['player'] = {
   id: 0,
+  fplCode: 0,
   webName: '',
   position: 'MID',
   teamCode: 0,
@@ -50,7 +51,7 @@ function ProfileBody({
   predictionsContext = false,
 }: {
   data?: PlayerProfileResponse;
-  onFollow?: (playerId: number) => void;
+  onFollow?: (fplCode: number) => void;
   isFollowing?: boolean;
   lineupAlerts?: PlayerProfileLineupAlerts;
   prediction?: PlayerGameweekPrediction;
@@ -79,7 +80,7 @@ function ProfileBody({
             <button
               type="button"
               className={`${styles.followBtn} ${isFollowing ? styles.followBtnActive : ''}`}
-              onClick={() => onFollow(player.id)}
+              onClick={() => onFollow(player.fplCode)}
               aria-label={isFollowing ? copy.playerWatchlistUnfollow : copy.playerWatchlistFollow}
               aria-pressed={isFollowing}
             >

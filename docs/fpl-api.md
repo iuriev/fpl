@@ -16,7 +16,13 @@ Captured 2026-05 (season 2025/26). Verify against live data if something looks o
 - Player position (`element_type`): `1` = GK, `2` = DEF, `3` = MID, `4` = FWD (see `element_types`).
 - Player availability `status`: `a` available, `d` doubtful, `i` injured, `s` suspended,
   `u` unavailable, `n` not eligible. Detail in `news` and `chance_of_playing_this_round`.
-- Team identity: `team` (per-season team id) and `team_code` (stable code used for kit images).
+- **Player and team identity (`id` vs `code`)** — see ADR 0020. In FPL payloads:
+  - `elements[].id` / `teams[].id` — **seasonal** keys; change each season. Use only for FPL
+    API calls (`picks`, `element-summary`, live stats).
+  - `elements[].code` / `teams[].code` — **canonical** stable keys. Use for watchlist,
+    predictions, cross-season history, and all persisted user data. Exposed as `fplCode` /
+    `teamCode` in our API responses.
+  - `elements[].team` — seasonal team id; `elements[].team_code` — stable team code.
 
 ## Endpoints we use
 

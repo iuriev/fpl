@@ -5,6 +5,7 @@ import type {
   LeaderboardPlayer,
   LeaderboardSeasonResponse,
   PlayerStats,
+  SquadPlayer,
   SquadResponse,
   TeamOfTheWeekPlayer,
   TeamOfTheWeekResponse,
@@ -31,6 +32,17 @@ function mkStats(overrides: Partial<PlayerStats> = {}): PlayerStats {
     bonus: 0,
     total_points: 2,
     ...overrides,
+  };
+}
+
+function mkSquadPlayer(
+  player: Omit<SquadPlayer, 'stats' | 'fplCode'> & { stats?: Partial<PlayerStats> },
+): SquadPlayer {
+  const { stats: statsOverrides, ...rest } = player;
+  return {
+    ...rest,
+    fplCode: 90000 + rest.id,
+    stats: mkStats(statsOverrides),
   };
 }
 
@@ -74,7 +86,7 @@ export const fixtureSquad: SquadResponse = {
     freeTransfers: 1,
   },
   starters: [
-    {
+    mkSquadPlayer({
       id: 1,
       name: 'Flekken',
       position: 'GK',
@@ -86,9 +98,9 @@ export const fixtureSquad: SquadResponse = {
       isCaptain: false,
       isViceCaptain: false,
       status: 'a',
-      stats: mkStats({ clean_sheets: 1, saves: 5, total_points: 6 }),
-    },
-    {
+      stats: { clean_sheets: 1, saves: 5, total_points: 6 },
+    }),
+    mkSquadPlayer({
       id: 2,
       name: 'Alexander-Arnold',
       position: 'DEF',
@@ -100,9 +112,9 @@ export const fixtureSquad: SquadResponse = {
       isCaptain: false,
       isViceCaptain: false,
       status: 'a',
-      stats: mkStats({ assists: 1, clean_sheets: 1, bonus: 2, total_points: 8 }),
-    },
-    {
+      stats: { assists: 1, clean_sheets: 1, bonus: 2, total_points: 8 },
+    }),
+    mkSquadPlayer({
       id: 3,
       name: 'Pedro Porro',
       position: 'DEF',
@@ -115,9 +127,9 @@ export const fixtureSquad: SquadResponse = {
       isViceCaptain: false,
       status: 'i',
       news: 'Hamstring injury. Doubt for next match.',
-      stats: mkStats({ minutes: 45, goals_conceded: 2, total_points: 2 }),
-    },
-    {
+      stats: { minutes: 45, goals_conceded: 2, total_points: 2 },
+    }),
+    mkSquadPlayer({
       id: 4,
       name: 'Gabriel',
       position: 'DEF',
@@ -129,9 +141,9 @@ export const fixtureSquad: SquadResponse = {
       isCaptain: false,
       isViceCaptain: false,
       status: 'a',
-      stats: mkStats({ clean_sheets: 1, total_points: 6 }),
-    },
-    {
+      stats: { clean_sheets: 1, total_points: 6 },
+    }),
+    mkSquadPlayer({
       id: 5,
       name: 'Mykolenko',
       position: 'DEF',
@@ -145,9 +157,9 @@ export const fixtureSquad: SquadResponse = {
       status: 'd',
       chanceOfPlaying: 75,
       news: '75% chance to play.',
-      stats: mkStats({ goals_conceded: 2, total_points: 2 }),
-    },
-    {
+      stats: { goals_conceded: 2, total_points: 2 },
+    }),
+    mkSquadPlayer({
       id: 6,
       name: 'Salah',
       position: 'MID',
@@ -159,9 +171,9 @@ export const fixtureSquad: SquadResponse = {
       isCaptain: true,
       isViceCaptain: false,
       status: 'a',
-      stats: mkStats({ goals_scored: 1, assists: 1, bonus: 3, total_points: 14 }),
-    },
-    {
+      stats: { goals_scored: 1, assists: 1, bonus: 3, total_points: 14 },
+    }),
+    mkSquadPlayer({
       id: 7,
       name: 'Saka',
       position: 'MID',
@@ -173,9 +185,9 @@ export const fixtureSquad: SquadResponse = {
       isCaptain: false,
       isViceCaptain: true,
       status: 'a',
-      stats: mkStats({ assists: 1, bonus: 2, total_points: 8 }),
-    },
-    {
+      stats: { assists: 1, bonus: 2, total_points: 8 },
+    }),
+    mkSquadPlayer({
       id: 8,
       name: 'Palmer',
       position: 'MID',
@@ -187,9 +199,9 @@ export const fixtureSquad: SquadResponse = {
       isCaptain: false,
       isViceCaptain: false,
       status: 'a',
-      stats: mkStats({ goals_scored: 1, bonus: 1, total_points: 7 }),
-    },
-    {
+      stats: { goals_scored: 1, bonus: 1, total_points: 7 },
+    }),
+    mkSquadPlayer({
       id: 9,
       name: 'Andreas',
       position: 'MID',
@@ -201,9 +213,9 @@ export const fixtureSquad: SquadResponse = {
       isCaptain: false,
       isViceCaptain: false,
       status: 'a',
-      stats: mkStats({ clean_sheets: 1, bonus: 1, total_points: 5 }),
-    },
-    {
+      stats: { clean_sheets: 1, bonus: 1, total_points: 5 },
+    }),
+    mkSquadPlayer({
       id: 10,
       name: 'Isak',
       position: 'FWD',
@@ -215,9 +227,9 @@ export const fixtureSquad: SquadResponse = {
       isCaptain: false,
       isViceCaptain: false,
       status: 'a',
-      stats: mkStats({ bonus: 2, total_points: 4 }),
-    },
-    {
+      stats: { bonus: 2, total_points: 4 },
+    }),
+    mkSquadPlayer({
       id: 11,
       name: 'Mbeumo',
       position: 'FWD',
@@ -229,11 +241,11 @@ export const fixtureSquad: SquadResponse = {
       isCaptain: false,
       isViceCaptain: false,
       status: 'a',
-      stats: mkStats({ goals_scored: 1, total_points: 5 }),
-    },
+      stats: { goals_scored: 1, total_points: 5 },
+    }),
   ],
   bench: [
-    {
+    mkSquadPlayer({
       id: 12,
       name: 'Flaherty',
       position: 'GK',
@@ -245,9 +257,9 @@ export const fixtureSquad: SquadResponse = {
       isCaptain: false,
       isViceCaptain: false,
       status: 'a',
-      stats: mkStats({ goals_conceded: 1, saves: 3, total_points: 2 }),
-    },
-    {
+      stats: { goals_conceded: 1, saves: 3, total_points: 2 },
+    }),
+    mkSquadPlayer({
       id: 13,
       name: 'Wan-Bissaka',
       position: 'DEF',
@@ -259,9 +271,9 @@ export const fixtureSquad: SquadResponse = {
       isCaptain: false,
       isViceCaptain: false,
       status: 'a',
-      stats: mkStats({ minutes: 30, total_points: 1 }),
-    },
-    {
+      stats: { minutes: 30, total_points: 1 },
+    }),
+    mkSquadPlayer({
       id: 14,
       name: 'Mbete',
       position: 'MID',
@@ -273,9 +285,9 @@ export const fixtureSquad: SquadResponse = {
       isCaptain: false,
       isViceCaptain: false,
       status: 'a',
-      stats: mkStats({ minutes: 0, total_points: 0 }),
-    },
-    {
+      stats: { minutes: 0, total_points: 0 },
+    }),
+    mkSquadPlayer({
       id: 15,
       name: 'Vardy',
       position: 'FWD',
@@ -288,8 +300,8 @@ export const fixtureSquad: SquadResponse = {
       isViceCaptain: false,
       status: 's',
       news: 'Suspended for 1 match.',
-      stats: mkStats({ minutes: 0, total_points: 0 }),
-    },
+      stats: { minutes: 0, total_points: 0 },
+    }),
   ],
 };
 
@@ -322,9 +334,11 @@ function mkDtPlayer(
 const POSITIONS: TopPlayersPlayer['position'][] = ['GK', 'DEF', 'MID', 'FWD'];
 
 function mkTopPlayer(i: number): TopPlayersPlayer {
+  const id = i + 1;
   return {
-    id: i + 1,
-    webName: `Player${i + 1}`,
+    id,
+    fplCode: 90000 + id,
+    webName: `Player${id}`,
     position: POSITIONS[i % 4],
     teamCode: 3,
     teamShortName: 'ARS',
@@ -336,20 +350,20 @@ function mkTopPlayer(i: number): TopPlayersPlayer {
 export const fixtureTopPlayersGw: TopPlayersGwResponse = {
   gw: 36,
   players: [
-    { id: 1, webName: 'Haaland', position: 'FWD', teamCode: 43, teamShortName: 'MCI', points: 20, selectedByPercent: '62.5' },
-    { id: 2, webName: 'Salah', position: 'MID', teamCode: 14, teamShortName: 'LIV', points: 18, selectedByPercent: '50.1' },
-    { id: 3, webName: 'Saka', position: 'MID', teamCode: 3, teamShortName: 'ARS', points: 15, selectedByPercent: '30.4' },
-    { id: 4, webName: 'Raya', position: 'GK', teamCode: 3, teamShortName: 'ARS', points: 12, selectedByPercent: '14.2' },
-    { id: 5, webName: 'Saliba', position: 'DEF', teamCode: 3, teamShortName: 'ARS', points: 11, selectedByPercent: '22.8' },
+    { id: 1, fplCode: 90001, webName: 'Haaland', position: 'FWD', teamCode: 43, teamShortName: 'MCI', points: 20, selectedByPercent: '62.5' },
+    { id: 2, fplCode: 90002, webName: 'Salah', position: 'MID', teamCode: 14, teamShortName: 'LIV', points: 18, selectedByPercent: '50.1' },
+    { id: 3, fplCode: 90003, webName: 'Saka', position: 'MID', teamCode: 3, teamShortName: 'ARS', points: 15, selectedByPercent: '30.4' },
+    { id: 4, fplCode: 90004, webName: 'Raya', position: 'GK', teamCode: 3, teamShortName: 'ARS', points: 12, selectedByPercent: '14.2' },
+    { id: 5, fplCode: 90005, webName: 'Saliba', position: 'DEF', teamCode: 3, teamShortName: 'ARS', points: 11, selectedByPercent: '22.8' },
     ...Array.from({ length: 95 }, (_, i) => mkTopPlayer(i + 5)),
   ],
 };
 
 export const fixtureTopPlayersSeason: TopPlayersSeasonResponse = {
   players: [
-    { id: 1, webName: 'Salah', position: 'MID', teamCode: 14, teamShortName: 'LIV', points: 280, selectedByPercent: '50.1' },
-    { id: 2, webName: 'Haaland', position: 'FWD', teamCode: 43, teamShortName: 'MCI', points: 260, selectedByPercent: '62.5' },
-    { id: 3, webName: 'Saka', position: 'MID', teamCode: 3, teamShortName: 'ARS', points: 210, selectedByPercent: '30.4' },
+    { id: 1, fplCode: 90001, webName: 'Salah', position: 'MID', teamCode: 14, teamShortName: 'LIV', points: 280, selectedByPercent: '50.1' },
+    { id: 2, fplCode: 90002, webName: 'Haaland', position: 'FWD', teamCode: 43, teamShortName: 'MCI', points: 260, selectedByPercent: '62.5' },
+    { id: 3, fplCode: 90003, webName: 'Saka', position: 'MID', teamCode: 3, teamShortName: 'ARS', points: 210, selectedByPercent: '30.4' },
     ...Array.from({ length: 97 }, (_, i) => mkTopPlayer(i + 3)),
   ],
 };
@@ -367,10 +381,10 @@ export const fixtureTeamPlayers: TeamPlayersResponse = {
   teamName: 'Arsenal',
   teamShortName: 'ARS',
   players: [
-    { id: 1, webName: 'Saka', position: 'MID', teamCode: 3, teamShortName: 'ARS', points: 210, selectedByPercent: '30.4' },
-    { id: 2, webName: 'Saliba', position: 'DEF', teamCode: 3, teamShortName: 'ARS', points: 180, selectedByPercent: '22.8' },
-    { id: 3, webName: 'Raya', position: 'GK', teamCode: 3, teamShortName: 'ARS', points: 150, selectedByPercent: '14.2' },
-    { id: 4, webName: 'Havertz', position: 'MID', teamCode: 3, teamShortName: 'ARS', points: 120, selectedByPercent: '18.6' },
+    { id: 1, fplCode: 90001, webName: 'Saka', position: 'MID', teamCode: 3, teamShortName: 'ARS', points: 210, selectedByPercent: '30.4' },
+    { id: 2, fplCode: 90002, webName: 'Saliba', position: 'DEF', teamCode: 3, teamShortName: 'ARS', points: 180, selectedByPercent: '22.8' },
+    { id: 3, fplCode: 90003, webName: 'Raya', position: 'GK', teamCode: 3, teamShortName: 'ARS', points: 150, selectedByPercent: '14.2' },
+    { id: 4, fplCode: 90004, webName: 'Havertz', position: 'MID', teamCode: 3, teamShortName: 'ARS', points: 120, selectedByPercent: '18.6' },
   ],
 };
 

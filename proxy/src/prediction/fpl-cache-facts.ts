@@ -53,6 +53,10 @@ export async function loadCurrentSeasonFactsFromCache(
         expectedGoals: Number(h.expected_goals) || 0,
         expectedAssists: Number(h.expected_assists) || 0,
         defensiveContribution: h.defensive_contribution,
+        bonus: h.bonus,
+        yellowCards: h.yellow_cards,
+        saves: h.saves,
+        cleanSheets: h.clean_sheets,
         opponentTeam: h.opponent_team,
         wasHome: h.was_home,
       });

@@ -20,6 +20,7 @@ function toTopPlayersPlayer(p: PoolPlayer, gwMap: Map<number, TopPlayersPlayer>)
   const gw = gwMap.get(p.id);
   return {
     id: p.id,
+    fplCode: p.code,
     webName: p.webName,
     position: p.position,
     teamCode: p.teamCode,
@@ -37,7 +38,7 @@ function FollowableResult({
   rank: number;
   player: TopPlayersPlayer;
 }) {
-  const { following, toggle } = useFollowPlayer(player.id);
+  const { following, toggle } = useFollowPlayer(player.fplCode);
 
   return (
     <div className={styles.resultRow}>

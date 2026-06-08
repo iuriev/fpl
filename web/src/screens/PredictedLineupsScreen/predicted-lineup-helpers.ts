@@ -25,6 +25,7 @@ export function toSquadPlayer(
 ): SquadPlayer {
   return {
     id: player.id,
+    fplCode: player.fplCode,
     name: player.webName,
     position: player.position,
     club,
