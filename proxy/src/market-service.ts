@@ -87,6 +87,7 @@ export async function getMarketForEvent(event: number): Promise<MarketResponse> 
 
     teams.push({
       teamId,
+      teamCode: team.code,
       teamName: team.name,
       teamShortName: team.short_name,
       fixtures: fixturesSummary,

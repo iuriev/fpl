@@ -5,6 +5,7 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import * as queries from '@/api/queries';
+import { copy } from '@/lib/copy';
 import type { PlayerProfileResponse } from '@/types';
 
 import { PlayerProfileSheet } from './PlayerProfileSheet';
@@ -127,5 +128,62 @@ describe('PlayerProfileSheet', () => {
       'aria-pressed',
       'true'
     );
+  });
+
+  it('shows bench risk in summary variant before profile loads', () => {
+    mockUsePlayerProfile.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      isError: false,
+    } as ReturnType<typeof queries.usePlayerProfile>);
+
+    renderSheet({
+      profileVariant: 'summary',
+      lineupAlerts: { benchRisk: true },
+    });
+    expect(screen.getByText(copy.predictedLineupsBenchRisk)).toBeInTheDocument();
+  });
+
+  it('applies predictions context without past gameweek or prediction blurb', () => {
+    mockUsePlayerProfile.mockReturnValue({
+      data: profileWithGw,
+      isLoading: false,
+      isError: false,
+    } as ReturnType<typeof queries.usePlayerProfile>);
+
+    renderSheet({
+      predictionsContext: true,
+      prediction: {
+        fplCode: 1000,
+        playerId: 100,
+        event: 37,
+        xPts: 8.5,
+        xGoals: 0.4,
+        xAssists: 0.2,
+        csProb: null,
+        defconPts: 0,
+        confidence: 'low',
+        epNextAnchor: 8.5,
+        modelXPts: 8.2,
+      },
+    });
+    expect(screen.queryByText(/12 pts/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/xPts expected/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Upcoming Fixtures/i)).not.toBeInTheDocument();
+  });
+
+  it('hides past gameweek points and stat chips in summary variant', () => {
+    mockUsePlayerProfile.mockReturnValue({
+      data: profileWithGw,
+      isLoading: false,
+      isError: false,
+    } as ReturnType<typeof queries.usePlayerProfile>);
+
+    renderSheet({ profileVariant: 'summary', hidePastGameweek: true });
+    expect(screen.queryByText(/GW37/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/12 pts/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/1 goal/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Upcoming Fixtures/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/£9\.5m/)).toBeInTheDocument();
   });
 });

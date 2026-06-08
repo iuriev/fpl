@@ -11,6 +11,7 @@ vi.mock('./market-service', () => ({
     teams: [
       {
         teamId: 1,
+        teamCode: 3,
         teamName: 'Arsenal',
         teamShortName: 'ARS',
         fixtures: [{ opponentTeamId: 2, opponentShortName: 'MCI', isHome: true }],

@@ -1,13 +1,13 @@
 import React, { useMemo, useState } from 'react';
 
 import { useGameweeks, useMarket } from '@/api/queries';
+import { MarketTeamRow } from '@/components/ui/MarketTeamRow/MarketTeamRow';
 import { PremiumLockedOverlay } from '@/components/ui/PremiumLockedOverlay/PremiumLockedOverlay';
 import { PremiumSheet } from '@/components/ui/PremiumSheet/PremiumSheet';
 import { ScreenHeader } from '@/components/ui/ScreenHeader/ScreenHeader';
 import { copy, interpolate } from '@/lib/copy';
 import { useRequestPremiumUpsell } from '@/lib/premium-upsell/PremiumUpsellContext';
 import { usePremiumStatus } from '@/lib/use-premium-status';
-import type { TeamMarketDto } from '@/types';
 
 import styles from './MarketScreen.module.css';
 
@@ -15,64 +15,16 @@ type MarketTab = 'cs' | 'xg';
 
 const FREE_VISIBLE = 5;
 
-function FixtureChip({ shortName, isHome }: { shortName: string; isHome: boolean }) {
-  return (
-    <span className={`${styles.chip} ${isHome ? styles.chipHome : styles.chipAway}`}>
-      {shortName} ({isHome ? 'H' : 'A'})
-    </span>
-  );
-}
-
-function TeamRow({
-  team,
-  rank,
-  tab,
-  maxValue,
-}: {
-  team: TeamMarketDto;
-  rank: number;
-  tab: MarketTab;
-  maxValue: number;
-}) {
-  const value = tab === 'cs' ? team.csProb : team.xG;
-  const displayValue =
-    tab === 'cs' ? `${(value * 100).toFixed(0)}%` : value.toFixed(2);
-  const barWidth = maxValue > 0 ? (value / maxValue) * 100 : 0;
-
-  return (
-    <div className={styles.row}>
-      <span className={styles.rank}>{rank}</span>
-      <div className={styles.teamInfo}>
-        <span className={styles.teamName}>{team.teamShortName}</span>
-        <div className={styles.chips}>
-          {team.fixtures.map((f) => (
-            <FixtureChip
-              key={f.opponentTeamId}
-              shortName={f.opponentShortName}
-              isHome={f.isHome}
-            />
-          ))}
-        </div>
-      </div>
-      <div className={styles.valueCol}>
-        <span className={styles.value}>{displayValue}</span>
-        <div className={styles.barTrack}>
-          <div className={styles.barFill} style={{ width: `${barWidth}%` }} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function MarketSkeleton() {
   return (
     <div aria-label={copy.loadingPlaceholder} aria-busy="true">
       {Array.from({ length: 8 }).map((_, i) => (
         <div key={i} className={styles.skeletonRow}>
           <div className={`${styles.skeletonCell} ${styles.skeletonRank}`} />
+          <div className={`${styles.skeletonCell} ${styles.skeletonBadge}`} />
           <div className={styles.skeletonInfo}>
             <div className={`${styles.skeletonCell} ${styles.skeletonName}`} />
-            <div className={`${styles.skeletonCell} ${styles.skeletonChip}`} />
+            <div className={`${styles.skeletonCell} ${styles.skeletonFixture}`} />
           </div>
           <div className={`${styles.skeletonCell} ${styles.skeletonValue}`} />
         </div>
@@ -153,7 +105,7 @@ export const MarketScreen: React.FC = () => {
         {!isLoading && sorted.length > 0 && isPremium && (
           <>
             {sorted.map((team, i) => (
-              <TeamRow key={team.teamId} team={team} rank={i + 1} tab={activeTab} maxValue={maxValue} />
+              <MarketTeamRow key={team.teamId} team={team} rank={i + 1} tab={activeTab} maxValue={maxValue} />
             ))}
             <p className={styles.disclaimer}>{copy.marketDisclaimer}</p>
           </>
@@ -162,12 +114,12 @@ export const MarketScreen: React.FC = () => {
         {!isLoading && sorted.length > 0 && !isPremium && (
           <>
             {freeRows.map((team, i) => (
-              <TeamRow key={team.teamId} team={team} rank={i + 1} tab={activeTab} maxValue={maxValue} />
+              <MarketTeamRow key={team.teamId} team={team} rank={i + 1} tab={activeTab} maxValue={maxValue} />
             ))}
             {lockedRows.length > 0 && (
               <div className={styles.lockedSection}>
                 {lockedRows.map((team, i) => (
-                  <TeamRow
+                  <MarketTeamRow
                     key={team.teamId}
                     team={team}
                     rank={FREE_VISIBLE + i + 1}

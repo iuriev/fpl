@@ -276,6 +276,7 @@ export const copy = {
   predictionsLineupsPremiumFreeLabel: 'No lineup data',
   predictionsLineupsPremiumPremiumLabel: 'All 20 team XIs',
   predictionsLineupsUnlockLabel: 'Unlock predicted lineups',
+  marketVsOpponent: 'vs {opponent}',
 
   // Predicted Points screen (PRED-02)
   predictedPointsNavLink: 'Predicted Points',

@@ -52,89 +52,6 @@
   position: relative;
 }
 
-/* Team row */
-.row {
-  display: flex;
-  align-items: center;
-  gap: var(--fpl-space-sm);
-  padding: var(--fpl-space-sm) var(--fpl-space-base);
-  border-bottom: 1px solid var(--fpl-bg-hair);
-}
-
-.rank {
-  width: 1.5rem;
-  flex-shrink: 0;
-  font: var(--fpl-fw-semibold) var(--fpl-fs-micro) / 1 var(--fpl-font-display);
-  color: var(--fpl-muted);
-  text-align: center;
-}
-
-.teamInfo {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  min-width: 0;
-}
-
-.teamName {
-  font: var(--fpl-fw-semibold) var(--fpl-fs-body-s) / 1 var(--fpl-font-display);
-  color: var(--fpl-text);
-}
-
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-}
-
-.chip {
-  display: inline-block;
-  padding: 0.125rem 0.375rem;
-  border-radius: var(--fpl-radius-sm);
-  font: var(--fpl-fw-semibold) var(--fpl-fs-micro) / 1 var(--fpl-font-display);
-  letter-spacing: var(--fpl-tr-head-s);
-}
-
-.chipHome {
-  background: var(--fpl-fdr-2-bg, rgba(0, 180, 90, 0.15));
-  color: var(--fpl-fdr-2-text, #00b45a);
-}
-
-.chipAway {
-  background: var(--fpl-fdr-4-bg, rgba(255, 100, 60, 0.15));
-  color: var(--fpl-fdr-4-text, #ff643c);
-}
-
-.valueCol {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.25rem;
-  flex-shrink: 0;
-  width: 5rem;
-}
-
-.value {
-  font: var(--fpl-fw-semibold) var(--fpl-fs-body-s) / 1 var(--fpl-font-display);
-  color: var(--fpl-text);
-}
-
-.barTrack {
-  width: 100%;
-  height: 0.25rem;
-  background: var(--fpl-bg-soft);
-  border-radius: var(--fpl-radius-sm);
-  overflow: hidden;
-}
-
-.barFill {
-  height: 100%;
-  background: var(--fpl-accent);
-  border-radius: var(--fpl-radius-sm);
-  transition: width 250ms ease;
-}
-
 .empty {
   padding: var(--fpl-space-xl3);
   text-align: center;
@@ -171,6 +88,12 @@
   flex-shrink: 0;
 }
 
+.skeletonBadge {
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+}
+
 .skeletonInfo {
   flex: 1;
   display: flex;
@@ -183,14 +106,14 @@
   height: 0.75rem;
 }
 
-.skeletonChip {
-  width: 4.5rem;
+.skeletonFixture {
+  width: 4rem;
   height: 0.625rem;
 }
 
 .skeletonValue {
-  width: 3rem;
-  height: 0.875rem;
+  width: 3.5rem;
+  height: 1.25rem;
   flex-shrink: 0;
 }
 

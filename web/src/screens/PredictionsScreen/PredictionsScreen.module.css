@@ -163,40 +163,12 @@
 }
 
 /* ── Lineups tab ── */
-.teamScroller {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--fpl-space-sm);
-  flex-shrink: 0;
-  padding: var(--fpl-space-md) var(--fpl-space-xl3);
-}
-
-.teamChip {
-  flex-shrink: 0;
-  background: var(--fpl-bg-raised);
-  border: 1px solid var(--fpl-bg-hair);
-  border-radius: var(--fpl-r-pill);
-  padding: var(--fpl-space-sm) var(--fpl-space-md);
-  font: var(--fpl-fw-semibold) var(--fpl-fs-body-s) var(--fpl-font-display);
-  color: var(--fpl-muted);
-  cursor: pointer;
-  transition:
-    color 120ms,
-    border-color 120ms,
-    background 120ms;
-}
-
-.teamChipActive {
-  color: var(--fpl-accent);
-  border-color: var(--fpl-accent);
-  background: color-mix(in srgb, var(--fpl-accent) 12%, transparent);
-}
 
 .lineupMeta {
   padding: 0 var(--fpl-space-xl3) var(--fpl-space-md);
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: var(--fpl-space-xs);
 }
 
 .formation {
@@ -207,36 +179,6 @@
 .fixture {
   font: var(--fpl-fw-regular) var(--fpl-fs-body-s) var(--fpl-font-display);
   color: var(--fpl-muted);
-}
-
-.lineupMetaLeft {
-  display: flex;
-  flex-direction: column;
-  gap: var(--fpl-space-xs);
-}
-
-.gwPickerBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--fpl-space-xs);
-  background: none;
-  border: none;
-  padding: 0;
-  font: var(--fpl-fw-semibold) var(--fpl-fs-body-s) / 1 var(--fpl-font-display);
-  color: var(--fpl-muted);
-  letter-spacing: var(--fpl-tr-head-s);
-  cursor: pointer;
-  transition: color 120ms;
-}
-
-.gwPickerBtn:hover {
-  color: var(--fpl-text);
-}
-
-.gwPickerChevron {
-  width: 0.75rem;
-  height: 0.75rem;
-  flex-shrink: 0;
 }
 
 .lineupContent {
@@ -281,129 +223,11 @@
   cursor: pointer;
 }
 
-.gwList {
-  display: flex;
-  flex-direction: column;
-  padding: var(--fpl-space-xs) 0 var(--fpl-space-xl4);
-}
-
-.gwOption {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: var(--fpl-space-base) var(--fpl-space-xl3);
-  background: none;
-  border: none;
-  border-bottom: 1px solid var(--fpl-bg-hair);
-  color: var(--fpl-text);
-  font: var(--fpl-fw-regular) var(--fpl-fs-body) var(--fpl-font-display);
-  cursor: pointer;
-  text-align: left;
-  transition: background 100ms;
-  min-height: 3rem;
-}
-
-.gwOption:last-child {
-  border-bottom: none;
-}
-
-.gwOption:active {
-  background: color-mix(in srgb, var(--fpl-text) 5%, transparent);
-}
-
-.gwOptionSelected {
-  color: var(--fpl-accent);
-  font-weight: var(--fpl-fw-semibold);
-}
-
 /* ── Market tabs (CS% / xG) ── */
 .marketListWrap {
   flex: 1;
   overflow-y: auto;
   padding-bottom: var(--fpl-space-xl3);
-}
-
-.marketRow {
-  display: flex;
-  align-items: center;
-  gap: var(--fpl-space-sm);
-  padding: var(--fpl-space-sm) var(--fpl-space-base);
-  border-bottom: 1px solid var(--fpl-bg-hair);
-}
-
-.marketRank {
-  width: 1.5rem;
-  flex-shrink: 0;
-  font: var(--fpl-fw-semibold) var(--fpl-fs-micro) / 1 var(--fpl-font-display);
-  color: var(--fpl-muted);
-  text-align: center;
-}
-
-.marketTeamInfo {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  min-width: 0;
-}
-
-.marketTeamName {
-  font: var(--fpl-fw-semibold) var(--fpl-fs-body-s) / 1 var(--fpl-font-display);
-  color: var(--fpl-text);
-}
-
-.marketChips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-}
-
-.marketChip {
-  display: inline-block;
-  padding: 0.125rem 0.375rem;
-  border-radius: var(--fpl-radius-sm);
-  font: var(--fpl-fw-semibold) var(--fpl-fs-micro) / 1 var(--fpl-font-display);
-  letter-spacing: var(--fpl-tr-head-s);
-}
-
-.marketChipHome {
-  background: var(--fpl-fdr-2-bg, rgba(0, 180, 90, 0.15));
-  color: var(--fpl-fdr-2-text, #00b45a);
-}
-
-.marketChipAway {
-  background: var(--fpl-fdr-4-bg, rgba(255, 100, 60, 0.15));
-  color: var(--fpl-fdr-4-text, #ff643c);
-}
-
-.marketValueCol {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.25rem;
-  flex-shrink: 0;
-  width: 5rem;
-}
-
-.marketValue {
-  font: var(--fpl-fw-semibold) var(--fpl-fs-body-s) / 1 var(--fpl-font-display);
-  color: var(--fpl-text);
-}
-
-.barTrack {
-  width: 100%;
-  height: 0.25rem;
-  background: var(--fpl-bg-soft);
-  border-radius: var(--fpl-radius-sm);
-  overflow: hidden;
-}
-
-.barFill {
-  height: 100%;
-  background: var(--fpl-accent);
-  border-radius: var(--fpl-radius-sm);
-  transition: width 250ms ease;
 }
 
 /* Market skeleton */
@@ -413,6 +237,19 @@
   gap: var(--fpl-space-sm);
   padding: var(--fpl-space-sm) var(--fpl-space-base);
   border-bottom: 1px solid var(--fpl-bg-hair);
+}
+
+.marketSkeletonRank {
+  width: 1.5rem;
+  height: 0.75rem;
+  flex-shrink: 0;
+}
+
+.marketSkeletonBadge {
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  border-radius: var(--fpl-radius-sm);
 }
 
 .marketSkeletonInfo {
@@ -427,14 +264,14 @@
   height: 0.75rem;
 }
 
-.marketSkeletonChip {
-  width: 4.5rem;
+.marketSkeletonFixture {
+  width: 4rem;
   height: 0.625rem;
 }
 
 .marketSkeletonValue {
-  width: 3rem;
-  height: 0.875rem;
+  width: 3.5rem;
+  height: 1.25rem;
   flex-shrink: 0;
 }
 

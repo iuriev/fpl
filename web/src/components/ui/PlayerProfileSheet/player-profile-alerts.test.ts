@@ -27,6 +27,11 @@ describe('buildAvailabilityAlerts', () => {
     expect(lines.some((l) => l.text.includes('50%'))).toBe(true);
   });
 
+  it('shows bench risk when flagged in lineup context', () => {
+    const lines = buildAvailabilityAlerts(basePlayer, { benchRisk: true });
+    expect(lines.some((l) => l.text === copy.predictedLineupsBenchRisk)).toBe(true);
+  });
+
   it('shows FPL status when no lineup context', () => {
     const lines = buildAvailabilityAlerts(
       { ...basePlayer, status: 'd', news: 'Knock - 75% chance' },

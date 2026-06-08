@@ -2,12 +2,13 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { useGameweeks, useMarket, usePlayerPool, usePredictedLineups, usePredictions } from '@/api/queries';
-import { BottomSheet } from '@/components/ui/BottomSheet/BottomSheet';
+import { MarketTeamRow } from '@/components/ui/MarketTeamRow/MarketTeamRow';
 import { PlayerProfileSheet } from '@/components/ui/PlayerProfileSheet/PlayerProfileSheet';
 import { PredictedPointsRow } from '@/components/ui/PredictedPointsRow/PredictedPointsRow';
 import { PremiumLockedOverlay } from '@/components/ui/PremiumLockedOverlay/PremiumLockedOverlay';
 import { PremiumSheet } from '@/components/ui/PremiumSheet/PremiumSheet';
 import { ScreenHeader } from '@/components/ui/ScreenHeader/ScreenHeader';
+import { TeamPickerGrid } from '@/components/ui/TeamPickerGrid/TeamPickerGrid';
 import { copy, interpolate } from '@/lib/copy';
 import {
   buildPredictedPointsRows,
@@ -17,8 +18,7 @@ import { useRequestPremiumUpsell } from '@/lib/premium-upsell/PremiumUpsellConte
 import { useFollowPlayer } from '@/lib/use-follow-player';
 import { usePremiumStatus } from '@/lib/use-premium-status';
 import { PredictedLineupPitch } from '@/screens/PredictedLineupsScreen/PredictedLineupPitch';
-import type { PlayerPosition, TeamMarketDto } from '@/types';
-import { MAX_GAMEWEEK } from '@/types';
+import type { PlayerPosition } from '@/types';
 
 import styles from './PredictionsScreen.module.css';
 
@@ -99,58 +99,16 @@ function PointsSkeleton() {
 
 // ── Market sub-components ─────────────────────────────────
 
-function FixtureChip({ shortName, isHome }: { shortName: string; isHome: boolean }) {
-  return (
-    <span className={`${styles.marketChip} ${isHome ? styles.marketChipHome : styles.marketChipAway}`}>
-      {shortName} ({isHome ? 'H' : 'A'})
-    </span>
-  );
-}
-
-function MarketTeamRow({
-  team,
-  rank,
-  tab,
-  maxValue,
-}: {
-  team: TeamMarketDto;
-  rank: number;
-  tab: 'cs' | 'xg';
-  maxValue: number;
-}) {
-  const value = tab === 'cs' ? team.csProb : team.xG;
-  const displayValue = tab === 'cs' ? `${(value * 100).toFixed(0)}%` : value.toFixed(2);
-  const barWidth = maxValue > 0 ? (value / maxValue) * 100 : 0;
-  return (
-    <div className={styles.marketRow}>
-      <span className={styles.marketRank}>{rank}</span>
-      <div className={styles.marketTeamInfo}>
-        <span className={styles.marketTeamName}>{team.teamShortName}</span>
-        <div className={styles.marketChips}>
-          {team.fixtures.map((f) => (
-            <FixtureChip key={f.opponentTeamId} shortName={f.opponentShortName} isHome={f.isHome} />
-          ))}
-        </div>
-      </div>
-      <div className={styles.marketValueCol}>
-        <span className={styles.marketValue}>{displayValue}</span>
-        <div className={styles.barTrack}>
-          <div className={styles.barFill} style={{ width: `${barWidth}%` }} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function MarketSkeleton() {
   return (
     <div aria-label={copy.loadingPlaceholder} aria-busy="true">
       {Array.from({ length: 8 }).map((_, i) => (
         <div key={i} className={styles.marketSkeletonRow}>
-          <div className={`${styles.skeletonCell} ${styles.marketSkeletonName}`} />
+          <div className={`${styles.skeletonCell} ${styles.marketSkeletonRank}`} />
+          <div className={`${styles.skeletonCell} ${styles.marketSkeletonBadge}`} />
           <div className={styles.marketSkeletonInfo}>
             <div className={`${styles.skeletonCell} ${styles.marketSkeletonName}`} />
-            <div className={`${styles.skeletonCell} ${styles.marketSkeletonChip}`} />
+            <div className={`${styles.skeletonCell} ${styles.marketSkeletonFixture}`} />
           </div>
           <div className={`${styles.skeletonCell} ${styles.marketSkeletonValue}`} />
         </div>
@@ -191,39 +149,8 @@ export const PredictionsScreen: React.FC = () => {
 
   // ── Lineups state & queries ────────────────────────────
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
-  const [gwPickerOpen, setGwPickerOpen] = useState(false);
 
-  const defaultGw = gameweeksData?.next ?? gameweeksData?.current ?? null;
-  const selectableGws = useMemo(() => {
-    const current = gameweeksData?.current;
-    const next = gameweeksData?.next ?? gameweeksData?.current;
-    if (current == null || next == null) return [];
-    const low = Math.min(current, next);
-    const high = Math.max(current, next);
-    return Array.from({ length: high - low + 1 }, (_, i) => low + i);
-  }, [gameweeksData]);
-
-  const gwParam = searchParams.get('gw');
-  const selectedGw = useMemo(() => {
-    if (gwParam) {
-      const n = Number(gwParam);
-      if (Number.isInteger(n) && n >= 1 && n <= MAX_GAMEWEEK) {
-        if (selectableGws.length === 0 || selectableGws.includes(n)) return n;
-      }
-    }
-    return defaultGw;
-  }, [gwParam, defaultGw, selectableGws]);
-
-  const selectGw = (gw: number) => {
-    setSearchParams((prev) => {
-      const p = new URLSearchParams(prev);
-      p.set('gw', String(gw));
-      return p;
-    });
-    setGwPickerOpen(false);
-  };
-
-  const lineupsQuery = usePredictedLineups(selectedGw, isPremium);
+  const lineupsQuery = usePredictedLineups(nextGw, isPremium);
 
   const teams = useMemo(() => lineupsQuery.data?.teams ?? [], [lineupsQuery.data]);
   const defaultTeamId = useMemo(() => {
@@ -242,10 +169,6 @@ export const PredictionsScreen: React.FC = () => {
         { opponent: activeTeam.nextFixture.opponentShortName }
       )
     : null;
-
-  const gwLabel = selectedGw !== null
-    ? interpolate(copy.predictionsGwLabel, { n: selectedGw })
-    : '';
 
   // ── Market queries (shared for CS% + xG) ──────────────
   const { data: marketData, isLoading: marketLoading } = useMarket(nextGw);
@@ -273,9 +196,15 @@ export const PredictionsScreen: React.FC = () => {
   const [premiumOpen, setPremiumOpen] = useState(false);
   const [profilePlayerId, setProfilePlayerId] = useState<number | null>(null);
 
-  const selectedLineupPlayer = profilePlayerId != null
-    ? activeTeam?.players.find((p) => p.id === profilePlayerId)
-    : undefined;
+  const selectedLineupPlayer = useMemo(() => {
+    if (profilePlayerId == null) return undefined;
+    for (const team of teams) {
+      const player = team.players.find((p) => p.id === profilePlayerId);
+      if (player) return player;
+    }
+    return undefined;
+  }, [profilePlayerId, teams]);
+
   const profileLineupAlerts = selectedLineupPlayer != null
     ? {
         injuryWarning: selectedLineupPlayer.injuryWarning,
@@ -284,9 +213,11 @@ export const PredictionsScreen: React.FC = () => {
       }
     : undefined;
 
-  const profilePrediction = predictionsData?.ready === true
-    ? predictionsData.players.find((p) => p.playerId === profilePlayerId)
-    : undefined;
+  const profilePlayerName = useMemo(() => {
+    if (profilePlayerId == null) return undefined;
+    if (selectedLineupPlayer) return selectedLineupPlayer.webName;
+    return poolData?.players.find((p) => p.id === profilePlayerId)?.webName;
+  }, [profilePlayerId, selectedLineupPlayer, poolData?.players]);
 
   const { following, toggle: toggleFollow } = useFollowPlayer(profilePlayerId ?? 0);
 
@@ -411,42 +342,19 @@ export const PredictionsScreen: React.FC = () => {
 
           {isPremium && (
             <>
-              <div className={styles.teamScroller} role="tablist" aria-label={copy.predictionsTabLineups}>
-                {teams.map((team) => (
-                  <button
-                    key={team.teamId}
-                    type="button"
-                    role="tab"
-                    aria-selected={team.teamId === resolvedTeamId}
-                    className={`${styles.teamChip} ${team.teamId === resolvedTeamId ? styles.teamChipActive : ''}`}
-                    onClick={() => setSelectedTeamId(team.teamId)}
-                  >
-                    {team.shortName}
-                  </button>
-                ))}
-              </div>
+              <TeamPickerGrid
+                teams={teams}
+                selectedTeamId={resolvedTeamId}
+                onSelectTeam={setSelectedTeamId}
+                ariaLabel={copy.predictionsTabLineups}
+              />
 
               {activeTeam && (
                 <div className={styles.lineupMeta}>
-                  <div className={styles.lineupMetaLeft}>
-                    <span className={styles.formation}>
-                      {copy.predictedLineupsFormationLabel}: {activeTeam.formation.label}
-                    </span>
-                    {fixtureLabel && <span className={styles.fixture}>{fixtureLabel}</span>}
-                  </div>
-                  {gwLabel && (
-                    <button
-                      type="button"
-                      className={styles.gwPickerBtn}
-                      onClick={() => setGwPickerOpen(true)}
-                      aria-label={gwLabel}
-                    >
-                      {gwLabel}
-                      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" className={styles.gwPickerChevron}>
-                        <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </button>
-                  )}
+                  <span className={styles.formation}>
+                    {copy.predictedLineupsFormationLabel}: {activeTeam.formation.label}
+                  </span>
+                  {fixtureLabel && <span className={styles.fixture}>{fixtureLabel}</span>}
                 </div>
               )}
 
@@ -475,28 +383,6 @@ export const PredictionsScreen: React.FC = () => {
                       />
                 )}
               </div>
-
-              <BottomSheet
-                open={gwPickerOpen}
-                onClose={() => setGwPickerOpen(false)}
-                title={copy.predictedLineupsSelectGameweek}
-              >
-                {gwPickerOpen && (
-                  <div className={styles.gwList}>
-                    {selectableGws.map((id) => (
-                      <button
-                        key={id}
-                        type="button"
-                        className={`${styles.gwOption} ${id === selectedGw ? styles.gwOptionSelected : ''}`}
-                        aria-pressed={id === selectedGw}
-                        onClick={() => selectGw(id)}
-                      >
-                        {interpolate(copy.predictionsGwLabel, { n: id })}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </BottomSheet>
             </>
           )}
         </>
@@ -546,8 +432,9 @@ export const PredictionsScreen: React.FC = () => {
         onClose={() => setProfilePlayerId(null)}
         onFollow={() => toggleFollow()}
         isFollowing={following}
-        prediction={activeTab === 'points' ? profilePrediction : undefined}
-        lineupAlerts={activeTab === 'lineups' ? profileLineupAlerts : undefined}
+        predictionsContext
+        lineupAlerts={profileLineupAlerts}
+        lineupPlayerName={profilePlayerName}
       />
     </div>
   );

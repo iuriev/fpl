@@ -40,6 +40,7 @@ function makeTeam(id: number, csProb: number, xG: number) {
     'LEI', 'LIV', 'MCI', 'MUN', 'NEW', 'NFO', 'SOU', 'TOT', 'WHU', 'WOL'];
   return {
     teamId: id,
+    teamCode: id * 10,
     teamName: `Team ${id}`,
     teamShortName: shorts[(id - 1) % 20],
     fixtures: [{ opponentTeamId: 99, opponentShortName: 'OPP', isHome: id % 2 === 0 }],

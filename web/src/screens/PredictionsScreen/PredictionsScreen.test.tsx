@@ -16,6 +16,7 @@ vi.mock('@/api/queries', async (importOriginal) => {
     usePredictions: vi.fn(),
     usePredictedLineups: vi.fn(),
     useMarket: vi.fn(),
+    usePlayerProfile: vi.fn(),
   };
 });
 
@@ -32,7 +33,7 @@ vi.mock('@/lib/use-follow-player', () => ({
 }));
 
 import { usePremiumStatus } from '@/lib/use-premium-status';
-import type { PredictedLineupsResponse, TeamMarketDto } from '@/types';
+import type { PlayerProfileResponse, PredictedLineupsResponse, TeamMarketDto } from '@/types';
 
 import { PredictionsScreen } from './PredictionsScreen';
 
@@ -77,6 +78,7 @@ function makeTeam(id: number, csProb: number, xG: number): TeamMarketDto {
     'BHA', 'CRY', 'EVE', 'FUL', 'IPS', 'LEI', 'NFO', 'SOU', 'WHU', 'WOL'];
   return {
     teamId: id,
+    teamCode: id * 10,
     teamName: `Team ${id}`,
     teamShortName: shorts[(id - 1) % 20],
     fixtures: [{ opponentTeamId: 99, opponentShortName: 'OPP', isHome: id % 2 === 0 }],
@@ -111,10 +113,33 @@ const mockLineups: PredictedLineupsResponse = {
   ],
 };
 
+const mockProfile: PlayerProfileResponse = {
+  player: {
+    id: 1,
+    webName: 'Salah',
+    position: 'MID',
+    teamCode: 3,
+    teamShortName: 'LIV',
+    nowCost: 130,
+    selectedByPercent: '50',
+    status: 'a',
+    news: '',
+  },
+  gw: 37,
+  gwPoints: 8,
+  gwStats: [{ identifier: 'minutes', value: 90 }],
+  nextFixtures: [{ gw: 38, opponent: 'MCI', home: false, difficulty: 5 }],
+};
+
 // ── Render helper ─────────────────────────────────────────
 
 function renderScreen(isPremium = false, initialEntries = ['/predictions']) {
   mockUsePremiumStatus.mockReturnValue(isPremium);
+  mockQueries.usePlayerProfile.mockReturnValue({
+    data: mockProfile,
+    isLoading: false,
+    isError: false,
+  } as unknown as ReturnType<typeof queries.usePlayerProfile>);
   mockQueries.useGameweeks.mockReturnValue({
     data: { current: 36, next: 37, gameweeks: [] },
   } as unknown as ReturnType<typeof queries.useGameweeks>);
@@ -201,6 +226,16 @@ describe('PredictionsScreen', () => {
       renderScreen(false);
       await user.click(screen.getByText(copy.predictedPointsUnlockLabel));
       expect(screen.getByText(copy.predictedPointsPremiumTitle)).toBeInTheDocument();
+    });
+
+    it('uses predictions player profile on Points tab without past gameweek stats', async () => {
+      const user = userEvent.setup();
+      renderScreen(false);
+      await user.click(screen.getByRole('button', { name: /Salah/i }));
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByText(/£13\.0m/)).toBeInTheDocument();
+      expect(screen.queryByText(/8 pts/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Upcoming Fixtures/i)).not.toBeInTheDocument();
     });
   });
 

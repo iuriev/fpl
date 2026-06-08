@@ -1,0 +1,41 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(2.75rem, 1fr));
+  gap: var(--fpl-space-sm);
+  flex-shrink: 0;
+  padding: var(--fpl-space-md) var(--fpl-space-xl3);
+}
+
+.chip {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--fpl-space-xs);
+  background: var(--fpl-bg-raised);
+  border: 2px solid var(--fpl-bg-hair);
+  border-radius: var(--fpl-radius-md);
+  cursor: pointer;
+  transition:
+    border-color 120ms,
+    background 120ms,
+    box-shadow 120ms;
+}
+
+.chip:hover {
+  border-color: color-mix(in srgb, var(--fpl-accent) 45%, var(--fpl-bg-hair));
+}
+
+.chipActive {
+  border-color: var(--fpl-accent);
+  background: color-mix(in srgb, var(--fpl-accent) 12%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--fpl-accent) 35%, transparent);
+}
+
+.badgeWrap {
+  width: 1.75rem;
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

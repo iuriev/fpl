@@ -67,35 +67,6 @@
   font-weight: var(--fpl-fw-semibold);
 }
 
-.teamScroller {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--fpl-space-sm);
-  flex-shrink: 0;
-  padding: var(--fpl-space-md) var(--fpl-space-xl3);
-}
-
-.teamChip {
-  flex-shrink: 0;
-  background: var(--fpl-bg-raised);
-  border: 1px solid var(--fpl-bg-hair);
-  border-radius: var(--fpl-r-pill);
-  padding: var(--fpl-space-sm) var(--fpl-space-md);
-  font: var(--fpl-fw-semibold) var(--fpl-fs-body-s) var(--fpl-font-display);
-  color: var(--fpl-muted);
-  cursor: pointer;
-  transition:
-    color 120ms,
-    border-color 120ms,
-    background 120ms;
-}
-
-.teamChipActive {
-  color: var(--fpl-accent);
-  border-color: var(--fpl-accent);
-  background: color-mix(in srgb, var(--fpl-accent) 12%, transparent);
-}
-
 .meta {
   padding: 0 var(--fpl-space-xl3) var(--fpl-space-md);
   display: flex;

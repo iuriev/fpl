@@ -6,6 +6,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet/BottomSheet';
 import { PremiumLockedOverlay } from '@/components/ui/PremiumLockedOverlay/PremiumLockedOverlay';
 import { PremiumSheet } from '@/components/ui/PremiumSheet/PremiumSheet';
 import { ScreenHeader } from '@/components/ui/ScreenHeader/ScreenHeader';
+import { TeamPickerGrid } from '@/components/ui/TeamPickerGrid/TeamPickerGrid';
 import { copy, interpolate } from '@/lib/copy';
 import { useRequestPremiumUpsell } from '@/lib/premium-upsell/PremiumUpsellContext';
 import { usePremiumStatus } from '@/lib/use-premium-status';
@@ -138,20 +139,12 @@ export const PredictedLineupsScreen: React.FC = () => {
 
       {isPremium && (
         <>
-          <div className={styles.teamScroller} role="tablist" aria-label={copy.predictedLineupsTitle}>
-            {teams.map((team) => (
-              <button
-                key={team.teamId}
-                type="button"
-                role="tab"
-                aria-selected={team.teamId === resolvedTeamId}
-                className={`${styles.teamChip} ${team.teamId === resolvedTeamId ? styles.teamChipActive : ''}`}
-                onClick={() => setSelectedTeamId(team.teamId)}
-              >
-                {team.shortName}
-              </button>
-            ))}
-          </div>
+          <TeamPickerGrid
+            teams={teams}
+            selectedTeamId={resolvedTeamId}
+            onSelectTeam={setSelectedTeamId}
+            ariaLabel={copy.predictedLineupsTitle}
+          />
 
           {activeTeam && (
             <div className={styles.meta}>

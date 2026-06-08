@@ -76,6 +76,7 @@ export interface TeamFixtureSummary {
 
 export interface TeamMarketDto {
   teamId: number;
+  teamCode: number;
   teamName: string;
   teamShortName: string;
   fixtures: TeamFixtureSummary[];
