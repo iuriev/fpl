@@ -213,6 +213,49 @@ blended  = weight × xgPer90 + (1 − weight) × prior
 
 If the player has no history, the prior is used directly.
 
+### Set-piece role boost for xG
+
+Players tagged as direct free-kick or corner takers receive a boost applied to the
+**prior only**:
+
+```
+SETPIECE_XG_BOOST = {
+  freekick_direct: 1.5,
+  corner:          1.05,
+  corner_r:        1.05,
+  corner_l:        1.05,
+  freekick_cross:  1.05,
+}
+
+effectivePriorXg = rolePrior × max(SETPIECE_XG_BOOST[role] for role in setpieceRoles, default 1)
+```
+
+The boost fades naturally as observed history accumulates (same blend weight as above).
+
+---
+
+## Set-piece roles
+
+`player-tactical-roles.json` carries an optional `setpiece` array per player entry:
+
+```json
+{ "role": "rw", "lane": "R", "secondary": [], "setpiece": ["corner_r", "freekick_cross"] }
+```
+
+Values are a subset of `SetpieceRole`:
+
+| Tag | Meaning |
+|-----|---------|
+| `corner` | Takes corners (foot unspecified) |
+| `corner_r` | Takes corners with right foot |
+| `corner_l` | Takes corners with left foot |
+| `freekick_direct` | Takes direct free kicks (shooting) |
+| `freekick_cross` | Takes indirect/crossing free kicks |
+
+Scraped from Transfermarkt player profile pages during TM ingest phase 2. Only players
+in attacking roles (`lw`, `rw`, `am`, `rb`, `lb`, `st`) are scraped.
+If no set-piece tags are found on the profile page, no `setpiece` field is written.
+
 ---
 
 ## Team xA share (shareXa) — xA only

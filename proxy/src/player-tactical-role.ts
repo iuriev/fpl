@@ -24,6 +24,7 @@ export interface PlayerTacticalProfile {
   role: TacticalRole;
   lane: PlayerLane;
   secondary?: TacticalRole[];
+  setpiece?: string[];
 }
 
 const registry = rolesData as Record<string, PlayerTacticalProfile>;

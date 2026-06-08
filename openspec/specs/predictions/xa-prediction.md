@@ -75,17 +75,42 @@ Fallback prior by FPL position (when tactical role is unknown):
 Tactical roles come from `player-tactical-roles.json` (Transfermarkt offline ingest).
 See `lineup-prediction.md` for the ingest process.
 
+### Set-piece role boost
+
+Players tagged as regular set-piece takers in `player-tactical-roles.json` receive a
+multiplicative boost applied to the **prior only** (not the rolling observed rate):
+
+```
+SETPIECE_XA_BOOST = {
+  corner:          1.5,
+  corner_r:        1.5,
+  corner_l:        1.5,
+  freekick_cross:  1.4,
+  freekick_direct: 1.1,
+}
+
+effectivePrior = prior × max(SETPIECE_XA_BOOST[role] for role in setpieceRoles, default 1)
+```
+
+If the player has multiple set-piece roles, the maximum boost is taken.
+The boost applies only to the prior component; once a player has accumulated enough
+history (540 min), the blend shifts entirely to observed data and the boost fades out.
+
+Set-piece roles (`corner`, `corner_r`, `corner_l`, `freekick_direct`, `freekick_cross`) are
+scraped from Transfermarkt player profile pages during the TM ingest phase 2 and stored as
+the optional `setpiece` array in `player-tactical-roles.json`.
+
 ### Blend
 
 ```
 XA_RATE_FULL_WEIGHT_MINS = 540
 
 weight = min(totalMins / 540, 1)
-blendedXaPer90 = weight × rollingRate + (1 − weight) × prior
+blendedXaPer90 = weight × rollingRate + (1 − weight) × effectivePrior
 ```
 
 A player needs 540 minutes of history (≈ 6 full matches) to reach full weight on observed data.
-Below that, the prior dominates proportionally.
+Below that, the prior (with set-piece boost if applicable) dominates proportionally.
 
 ---
 

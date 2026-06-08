@@ -83,6 +83,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   const [isDirty, setIsDirty] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [showTour, setShowTour] = useState(false);
+  const [isAiLoading, setIsAiLoading] = useState(false);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const draftSourceRef = useRef<'saved' | 'fresh'>('fresh');
   const chipInitializedRef = useRef(false);
@@ -378,6 +379,26 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
     void draftRepo.save(draft).then(() => setIsDirty(false));
   };
 
+  const handleAiFreeHit = useCallback(async () => {
+    if (nextGw === null) return;
+    setIsAiLoading(true);
+    try {
+      const res = await fetch(`/api/squad/${teamId}/free-hit-suggest?gw=${nextGw}`);
+      if (!res.ok) throw new Error('request failed');
+      const data = (await res.json()) as { swaps: Array<{ outId: number; inId: number }>; totalXPts: number };
+      if (data.swaps.length === 0) {
+        setToast(interpolate(copy.aiFreehitNoGain, { gw: String(nextGw) }));
+      } else {
+        setPlanChip('freehit');
+        updateDraft((d) => ({ ...d, chip: 'freehit', swaps: data.swaps }));
+      }
+    } catch {
+      setToast(copy.aiFreehitError);
+    } finally {
+      setIsAiLoading(false);
+    }
+  }, [teamId, nextGw, updateDraft]);
+
   const handleChipToggle = (chip: PlanChip) => {
     setPlanChip((prev) => {
       const next = prev === chip ? 'none' : chip;
@@ -478,9 +499,12 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
             onOpenTransfers={() => setIsTransfersOpen(true)}
             onReset={handleReset}
             onSave={handleSave}
+            onAiFreeHit={() => { void handleAiFreeHit(); }}
             hasSwaps={(draft?.swaps.length ?? 0) > 0}
             hasChanges={(draft?.swaps.length ?? 0) > 0 || (draft?.subs.length ?? 0) > 0 || planChip !== initialChip}
             isDirty={isDirty}
+            isAiLoading={isAiLoading}
+            freehitAvailable={squadData?.chipStatuses.freehit.status === 'available'}
           />
         </>
       )}

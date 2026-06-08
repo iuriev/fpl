@@ -4,13 +4,19 @@
   z-index: 20;
   flex-shrink: 0;
   display: flex;
-  gap: var(--fpl-space-sm);
+  flex-direction: column;
+  gap: var(--fpl-space-xs);
   padding: var(--fpl-space-xs) var(--fpl-space-md);
   background: var(--fpl-bg-deep);
   border-top: 1px solid var(--fpl-bg-hair);
 }
 
-.bar > * {
+.row {
+  display: flex;
+  gap: var(--fpl-space-sm);
+}
+
+.row > * {
   flex: 1;
   height: var(--fpl-size-btn-h) !important;
   font-size: var(--fpl-fs-body-xs) !important;

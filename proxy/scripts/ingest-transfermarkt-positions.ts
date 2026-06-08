@@ -8,6 +8,10 @@ import {
   matchFplPlayersToTm,
 } from '../src/tactical-positions/match-fpl-player.js';
 import {
+  fetchSetpieceRoles,
+  type SetpieceRole,
+} from '../src/tactical-positions/scrape-transfermarkt-setpiece.js';
+import {
   fetchTransfermarktSquad,
   sleep,
   type TmSquadPlayer,
@@ -74,8 +78,11 @@ async function main(): Promise<void> {
   };
 
   const teamShort = new Map(bootstrap.teams.map((t) => [t.id, t.short_name]));
-  const profiles: Record<string, { role: TacticalRole; lane: 'L' | 'C' | 'R'; secondary: TacticalRole[] }> =
-    {};
+  const profiles: Record<
+    string,
+    { role: TacticalRole; lane: 'L' | 'C' | 'R'; secondary: TacticalRole[]; setpiece?: SetpieceRole[] }
+  > = {};
+  const fplCodeToTmId = new Map<number, string>();
   const matchReport: Array<Record<string, unknown>> = [];
   const unmapped: Array<Record<string, unknown>> = [];
   const tmById = new Map<string, TmSquadPlayer>();
@@ -136,6 +143,7 @@ async function main(): Promise<void> {
         lane: mapped.lane,
         secondary: mapped.secondary,
       };
+      fplCodeToTmId.set(m.fplCode, m.tmId);
       matchReport.push({
         team: short,
         fplCode: m.fplCode,
@@ -202,6 +210,32 @@ async function main(): Promise<void> {
       });
     }
   }
+
+  // Phase 2: Scrape set-piece roles from TM player profile pages (attacking roles only)
+  const SETPIECE_ROLES_TARGET: TacticalRole[] = ['lw', 'rw', 'am', 'rb', 'lb', 'st'];
+  const setpieceCandidates = Object.entries(profiles)
+    .filter(([, p]) => SETPIECE_ROLES_TARGET.includes(p.role))
+    .map(([code]) => Number(code))
+    .filter((code) => fplCodeToTmId.has(code));
+
+  console.log(`\n[phase2] Scraping set-piece roles for ${setpieceCandidates.length} attacking players…`);
+  let setpieceHits = 0;
+  for (let i = 0; i < setpieceCandidates.length; i++) {
+    const code = setpieceCandidates[i];
+    const tmId = fplCodeToTmId.get(code)!;
+    try {
+      const roles = await fetchSetpieceRoles(tmId);
+      if (roles.length > 0) {
+        profiles[String(code)].setpiece = roles;
+        setpieceHits++;
+        console.log(`  [${i + 1}/${setpieceCandidates.length}] code=${code} tmId=${tmId} → ${roles.join(', ')}`);
+      }
+    } catch (err) {
+      console.warn(`  [${i + 1}/${setpieceCandidates.length}] code=${code} tmId=${tmId} ERROR: ${String(err)}`);
+    }
+    if (i < setpieceCandidates.length - 1) await sleep(DELAY_MS);
+  }
+  console.log(`[phase2] Set-piece roles found for ${setpieceHits}/${setpieceCandidates.length} players`);
 
   const lanesPath = join(repoRoot, 'src/data/player-lanes.json');
   const lanes: Record<string, 'L' | 'C' | 'R'> = {};

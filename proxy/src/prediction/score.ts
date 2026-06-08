@@ -40,6 +40,31 @@ async function loadTacticalRolesMap(
   return result;
 }
 
+async function loadSetpieceRolesMap(
+  elementToCode: ReadonlyMap<number, number>,
+): Promise<Map<number, string[]>> {
+  const path = join(new URL('.', import.meta.url).pathname, '..', 'data', 'player-tactical-roles.json');
+  let raw: Record<string, { setpiece?: string[] }>;
+  try {
+    const text = await readFile(path, 'utf8');
+    raw = JSON.parse(text) as Record<string, { setpiece?: string[] }>;
+  } catch {
+    return new Map();
+  }
+  const codeToSetpiece = new Map<number, string[]>();
+  for (const [codeStr, entry] of Object.entries(raw)) {
+    if (entry.setpiece && entry.setpiece.length > 0) {
+      codeToSetpiece.set(Number(codeStr), entry.setpiece);
+    }
+  }
+  const result = new Map<number, string[]>();
+  for (const [element, code] of elementToCode) {
+    const roles = codeToSetpiece.get(code);
+    if (roles) result.set(element, roles);
+  }
+  return result;
+}
+
 const TRAIN_SEASONS = ['2022-23', '2023-24'];
 
 const PRIOR_SEASON_FALLBACK_GW_THRESHOLD = 5;
@@ -208,6 +233,9 @@ export async function runScoreGameweek(
   const tacticalRoles = await loadTacticalRolesMap(identity.elementToCodeMap());
   console.log(`${tag} tactical roles mapped=${tacticalRoles.size}`);
 
+  const setpieceRolesMap = await loadSetpieceRolesMap(identity.elementToCodeMap());
+  console.log(`${tag} setpiece roles mapped=${setpieceRolesMap.size}`);
+
   const rawPredictions = scoreGameweekFacts(
     facts,
     fit,
@@ -215,6 +243,7 @@ export async function runScoreGameweek(
     targetEvent,
     trainMaxGw,
     tacticalRoles,
+    setpieceRolesMap,
   );
   console.log(`${tag} raw predictions=${rawPredictions.length}`);
 

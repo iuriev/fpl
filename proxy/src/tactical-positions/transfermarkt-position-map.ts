@@ -1,5 +1,6 @@
 import type { PlayerLane } from '../player-lane-registry';
 import type { TacticalRole } from '../player-tactical-role';
+export type { SetpieceRole } from './scrape-transfermarkt-setpiece';
 
 export interface TacticalProfileDraft {
   role: TacticalRole;

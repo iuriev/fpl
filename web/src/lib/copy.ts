@@ -667,6 +667,11 @@ export const copy = {
   marketCalculatingState: 'Calculating market predictions for GW {n}…',
   marketDisclaimer:
     'CS% and xG are model estimates based on Poisson ratings. For research purposes only.',
+  aiFreehitButton: 'AI Free Hit',
+  aiWildcardButton: 'AI Wildcard',
+  aiFreehitPlayed: 'Free Hit already played this season',
+  aiFreehitError: 'Could not load suggestion — try again',
+  aiFreehitNoGain: 'Your squad is already near-optimal for GW {gw}',
 };
 
 /**

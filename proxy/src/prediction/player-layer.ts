@@ -67,6 +67,22 @@ const XA_PRIOR_BY_POSITION: Record<string, number> = {
 // League-average xG/90 for a striker (used as baseline for teamFinishingMultiplier)
 const LEAGUE_AVG_STRIKER_XG_PER90 = 0.28;
 
+// Set-piece role boosts applied to the prior component only (multipliers)
+const SETPIECE_XA_BOOST: Record<string, number> = {
+  corner: 1.5,
+  corner_r: 1.5,
+  corner_l: 1.5,
+  freekick_cross: 1.4,
+  freekick_direct: 1.1,
+};
+const SETPIECE_XG_BOOST: Record<string, number> = {
+  freekick_direct: 1.5,
+  corner: 1.05,
+  corner_r: 1.05,
+  corner_l: 1.05,
+  freekick_cross: 1.05,
+};
+
 interface PlayerHistory {
   expectedGoals: number;
   expectedAssists: number;
@@ -82,12 +98,24 @@ interface PlayerHistory {
 const XA_RATE_WINDOW = 12;
 const XA_RATE_FULL_WEIGHT_MINS = 540;
 
-function defaultXgPer90(position: string, tacticalRole?: string): number {
-  if (tacticalRole) {
-    const rolePrior = XG_PRIOR_BY_ROLE[tacticalRole];
-    if (rolePrior !== undefined) return rolePrior;
+function maxSetpieceBoost(boostTable: Record<string, number>, setpieceRoles?: string[]): number {
+  if (!setpieceRoles || setpieceRoles.length === 0) return 1;
+  let max = 1;
+  for (const role of setpieceRoles) {
+    const boost = boostTable[role];
+    if (boost !== undefined && boost > max) max = boost;
   }
-  return XG_PRIOR_BY_POSITION[position] ?? 0.01;
+  return max;
+}
+
+function defaultXgPer90(position: string, tacticalRole?: string, setpieceRoles?: string[]): number {
+  let prior: number;
+  if (tacticalRole) {
+    prior = XG_PRIOR_BY_ROLE[tacticalRole] ?? XG_PRIOR_BY_POSITION[position] ?? 0.01;
+  } else {
+    prior = XG_PRIOR_BY_POSITION[position] ?? 0.01;
+  }
+  return prior * maxSetpieceBoost(SETPIECE_XG_BOOST, setpieceRoles);
 }
 
 function rollingXgPer90(history: PlayerHistory[]): { rate: number; minutes: number } {
@@ -106,20 +134,23 @@ function blendedXgPer90(
   position: string,
   history: PlayerHistory[],
   tacticalRole?: string,
+  setpieceRoles?: string[],
 ): number {
-  const prior = defaultXgPer90(position, tacticalRole);
+  const prior = defaultXgPer90(position, tacticalRole, setpieceRoles);
   const { rate, minutes } = rollingXgPer90(history);
   if (minutes <= 0) return prior;
   const weight = Math.min(minutes / XA_RATE_FULL_WEIGHT_MINS, 1);
   return weight * rate + (1 - weight) * prior;
 }
 
-function defaultXaPer90(position: string, tacticalRole?: string): number {
+function defaultXaPer90(position: string, tacticalRole?: string, setpieceRoles?: string[]): number {
+  let prior: number;
   if (tacticalRole) {
-    const rolePrior = XA_PRIOR_BY_ROLE[tacticalRole];
-    if (rolePrior !== undefined) return rolePrior;
+    prior = XA_PRIOR_BY_ROLE[tacticalRole] ?? XA_PRIOR_BY_POSITION[position] ?? 0.01;
+  } else {
+    prior = XA_PRIOR_BY_POSITION[position] ?? 0.01;
   }
-  return XA_PRIOR_BY_POSITION[position] ?? 0.01;
+  return prior * maxSetpieceBoost(SETPIECE_XA_BOOST, setpieceRoles);
 }
 
 function rollingXaPer90(history: PlayerHistory[]): { rate: number; minutes: number } {
@@ -138,8 +169,9 @@ function blendedXaPer90(
   position: string,
   history: PlayerHistory[],
   tacticalRole?: string,
+  setpieceRoles?: string[],
 ): number {
-  const prior = defaultXaPer90(position, tacticalRole);
+  const prior = defaultXaPer90(position, tacticalRole, setpieceRoles);
   const { rate, minutes } = rollingXaPer90(history);
   if (minutes <= 0) return prior;
   const weight = Math.min(minutes / XA_RATE_FULL_WEIGHT_MINS, 1);
@@ -173,8 +205,9 @@ function predictXAssists(
   minsProb: number,
   tacticalRole?: string,
   teamXgPer90?: number,
+  setpieceRoles?: string[],
 ): number {
-  const xaPer90 = blendedXaPer90(position, history, tacticalRole);
+  const xaPer90 = blendedXaPer90(position, history, tacticalRole, setpieceRoles);
   const expectedMins = minsProb * 90;
   return (
     xaPer90 *
@@ -205,6 +238,7 @@ function predictFixture(
   history: PlayerHistory[],
   tacticalRole?: string,
   teamXgPer90?: number,
+  setpieceRoles?: string[],
 ): Omit<PlayerGameweekPrediction, 'event' | 'fplCode'> & { round: number; fixture: number } {
   const position = row.position as PlayerPosition;
   const teamSlug =
@@ -232,7 +266,7 @@ function predictFixture(
   const minsProb = minutesProb(history);
   const p60 = prob60Plus(history);
 
-  const xgPer90 = blendedXgPer90(position, history, tacticalRole);
+  const xgPer90 = blendedXgPer90(position, history, tacticalRole, setpieceRoles);
   const xGoals = xgPer90 * fixtureAttackMultiplier(lamFor, fit) * minsProb;
 
   const xAssists = predictXAssists(
@@ -243,6 +277,7 @@ function predictFixture(
     minsProb,
     tacticalRole,
     teamXgPer90,
+    setpieceRoles,
   );
 
   const defconHit = rollingDefconHitRate(
@@ -361,6 +396,7 @@ export function scoreGameweekFacts(
   targetEvent: number,
   trainMaxGw: number,
   tacticalRoles?: Map<number, string>,
+  setpieceRolesMap?: Map<number, string[]>,
 ): Omit<PlayerGameweekPrediction, 'fplCode'>[] {
   const historyByEl = new Map<number, PlayerHistory[]>();
   const fixturePreds: ReturnType<typeof predictFixture>[] = [];
@@ -385,8 +421,9 @@ export function scoreGameweekFacts(
         const teamKey = teamKeyForRow(row);
         const teamXgPer90 = teamFinishingMap.get(teamKey);
         const tacticalRole = tacticalRoles?.get(row.element);
+        const setpieceRoles = setpieceRolesMap?.get(row.element);
         fixturePreds.push(
-          predictFixture(row, fit, resolveTeamSlug, hist, tacticalRole, teamXgPer90),
+          predictFixture(row, fit, resolveTeamSlug, hist, tacticalRole, teamXgPer90, setpieceRoles),
         );
       }
     }

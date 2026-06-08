@@ -14,9 +14,10 @@ import * as entryService from './entry-service';
 import * as fixturesCalendarService from './fixtures-calendar-service';
 import * as fixturesService from './fixtures-service';
 import { flaggedError } from './flagged-log';
-import { getOrFetchBootstrap } from './fpl-cache/db-cache';
+import { getOrFetchBootstrap, getOrFetchSquad } from './fpl-cache/db-cache';
 import { prefetchMissingGwData } from './fpl-cache/prefetch';
 import { deriveSeason } from './fpl-cache/season';
+import { optimizeFreeHit } from './free-hit-optimizer';
 import * as gameweeksService from './gameweeks-service';
 import * as historyService from './history-service';
 import * as leaderboardService from './leaderboard-service';
@@ -35,6 +36,7 @@ import { predictedLineupsRoutes } from './predicted-lineups-routes';
 import { defaultDataDir } from './prediction/ingest';
 import { runScoreGameweek } from './prediction/score';
 import { predictionRoutes } from './prediction-routes';
+import * as predictionService from './prediction-service';
 import { startPredictionsWarmup } from './predictions-warmup';
 import { priceRoutes } from './price-routes';
 import { resolveNextGw } from './resolve-next-gw';
@@ -212,6 +214,85 @@ app.get('/api/squad/:teamId/:gw', optionalUser, async (c) => {
     }
     console.error('Error fetching squad:', error);
     return c.json({ error: 'Unable to fetch squad' }, { status: 500 });
+  }
+});
+
+// GET /api/squad/:teamId/free-hit-suggest?gw=N
+app.get('/api/squad/:teamId/free-hit-suggest', optionalUser, async (c) => {
+  const teamId = parseInt(c.req.param('teamId'), 10);
+  const gwParam = c.req.query('gw');
+
+  if (isNaN(teamId) || teamId <= 0) {
+    return c.json({ error: 'Invalid team ID' }, { status: 400 });
+  }
+
+  try {
+    const bootstrap = await getOrFetchBootstrap(db);
+    const season = deriveSeason(bootstrap.events);
+
+    let targetGw: number;
+    if (gwParam !== undefined) {
+      targetGw = parseInt(gwParam, 10);
+      if (isNaN(targetGw) || targetGw < 1 || targetGw > MAX_GAMEWEEK) {
+        return c.json({ error: 'Invalid gw param' }, { status: 400 });
+      }
+    } else {
+      targetGw = resolveNextGw(bootstrap);
+    }
+
+    // Resolve current GW for fetching the squad picks
+    let currentGw = bootstrap.events.find((e) => e.is_current)?.id;
+    if (!currentGw) {
+      const finished = bootstrap.events.filter((e) => e.finished);
+      currentGw = finished.length > 0 ? finished[finished.length - 1].id : 1;
+    }
+
+    const picks = await getOrFetchSquad(db, season, teamId, currentGw, bootstrap.events);
+
+    const totalBudget =
+      picks.picks.reduce((sum, p) => sum + p.selling_price, 0) +
+      picks.entry_history.bank;
+    const currentSquadIds = picks.picks.map((p) => p.element);
+
+    const predictions = await predictionService.getPredictionsForEvent(targetGw);
+    if (!predictions.ready || predictions.players.length === 0) {
+      return c.json(
+        { error: `No prediction data available for GW ${targetGw}` },
+        { status: 404 },
+      );
+    }
+
+    // Build xPts lookup: fplCode -> xPts
+    const xPtsMap = new Map(predictions.players.map((p) => [p.fplCode, p.xPts]));
+
+    // Build player pool: map bootstrap elements using fplCode to get xPts
+    const ELEMENT_TYPE_TO_POS: Record<number, 'GK' | 'DEF' | 'MID' | 'FWD'> = {
+      1: 'GK',
+      2: 'DEF',
+      3: 'MID',
+      4: 'FWD',
+    };
+
+    const optimizerPlayers = bootstrap.elements
+      .filter((el) => el.status !== 'u')
+      .map((el) => ({
+        id: el.id,
+        position: ELEMENT_TYPE_TO_POS[el.element_type] ?? ('GK' as const),
+        teamId: el.team,
+        nowCost: el.now_cost,
+        xPts: xPtsMap.get(el.code) ?? 0,
+      }))
+      .filter((p) => p.xPts > 0);
+
+    const result = optimizeFreeHit(totalBudget, optimizerPlayers, currentSquadIds, targetGw);
+    return c.json(result);
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    if (msg.includes('No picks available')) {
+      return c.json({ error: 'Could not load squad for budget calculation' }, { status: 404 });
+    }
+    console.error('Error in free-hit-suggest:', error);
+    return c.json({ error: 'Unable to generate free hit suggestion' }, { status: 500 });
   }
 });
 

@@ -105,6 +105,8 @@ export interface FPLPicks {
   picks: Array<{
     element: number;
     position: number;
+    selling_price: number;
+    purchase_price: number;
     is_captain: boolean;
     is_vice_captain: boolean;
   }>;
