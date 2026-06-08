@@ -469,20 +469,18 @@ Write original copy (do not copy fpl.team text); use https://fpl.team/about/ as 
 
 | ID | Task | Effort | Why |
 |----|------|--------|-----|
-| ~~STAT-01~~ | ~~DEFCON / BPS leaderboard screen~~ | S | ✅ Done — `/leaderboard` GW + Season tabs; `GET /api/leaderboard/gw/:gw` and `/api/leaderboard/season`. |
+| ~~STAT-01~~ | ~~DEFCON / BPS leaderboard screen~~ | S | ✅ Done — merged into `/top-players` as DEFCON + BPS tabs (GW + Season); `/leaderboard` route deleted. |
 | ANA-08 | Captain Picks Analyzer | M | Helps users see if their captaincy decisions are paying off. |
 | ANA-09 | Transfer Analyzer | M | Net transfer points history — was each transfer worth it? |
 ### Feature details
 
 #### STAT-01: DEFCON / BPS leaderboard [SHIPPED]
-Shipped on `/leaderboard`: GW and Season tabs, DEFCON + BPS columns, player info sheet; proxy
-`leaderboard-service` backed by live FPL fixture stats.
+Merged into `/top-players` as dedicated DEFCON and BPS tabs (GW + Season sub-toggle); `/leaderboard`
+route deleted. Proxy `leaderboard-service` backed by live FPL fixture stats.
 
 Two-sided ranking of players by in-match performance:
-- **DEFCON** (worst performers): `{Player} {scored}/{possible}` e.g. Mount 13/12 — Red badges, sorted worst first
-- **BPS** (best performers): `{Player} {bps}({game count})` e.g. Dorgu 50(3) — Green badges, sorted best first
-
-Can be integrated into the player info popup or as a standalone screen.
+- **DEFCON** (worst performers): sorted worst-BPS first; neutral BPS badge
+- **BPS** (best performers): sorted best-BPS first; green BPS badge
 
 
 ---
@@ -635,7 +633,7 @@ For reference — features that are live in the codebase:
 - **Team of the Week Screen** — best XI for a GW
 - **My Stats screen** — league rankings and per-GW history (tabbed on `/stats`)
 - **Leagues Stats Screen** — mini-league standings
-- **Top Players Screen** — top performers for a GW
+- **Top Players Screen** — top performers for a GW; 5 tabs: Points (list + TOTW pitch toggle), DEFCON, BPS, By Team, Season (Points · DEFCON · BPS sub-toggle)
 - **Transfer Planner** — pick players to transfer in/out, budget tracking, squad validation; saved draft syncs to account via `/api/me/transfer-draft` (PLAN-00)
 - **Transfer screen polish** — captain badge right, team abbrev + FDR chip under PlayerCard, outfield picker, position filter tabs, Sort button (UX-01 SwapsStrip scroll, UX-02 next 3 fixtures column, UX-03 %, pts, xPts columns); UX-04 player info popup (fixtures + price); DES-04 FDR colour tokens; VIS-01 goals/assists badges + ownership pill on all card sizes
 - **Cloudflare migration (INFRA-01)** — OpenSpec change `openspec/changes/infra-01-cloudflare-migration`; moves SPA to Cloudflare Pages and proxy to Cloudflare Workers; Supabase unchanged. Replaces Fly.io deployment.
@@ -644,7 +642,7 @@ For reference — features that are live in the codebase:
 - **League participants browser (ANA-12)** — click a league in Stats to browse all participants and view their squads; OpenSpec change 2026-06-02-ana-12-league-participants-browser.
 - **Price changes & predictions (ANA-03, PRED-06)** — `/price-changes` screen: Actual (GW/season risers/fallers) + Tonight predictions; All FPL free, My squad premium; player profile sheet; OpenSpec `ana-03-pred-06-price-changes`.
 - **Predicted lineups (PRED-08)** — `/predicted-lineups`; premium-only predicted XI for all 20 PL teams (table + pitch, formation label, bench-risk); OpenSpec `archive/2026-06-04-pred-08-predicted-lineups`.
-- **DEFCON / BPS leaderboard (STAT-01)** — `/leaderboard` screen with GW and Season tabs; DEFCON worst-first, BPS best-first; `GET /api/leaderboard/gw/:gw` and `/api/leaderboard/season`.
+- **DEFCON / BPS leaderboard (STAT-01)** — merged into `/top-players` as DEFCON + BPS tabs; `/leaderboard` route deleted; `GET /api/leaderboard/gw/:gw` and `/api/leaderboard/season` retained.
 - **Fix bugs** — BUG-01 (position limits), BUG-02 (transfer arrows)
 - **Proxy/BFF** — services for squad, entry, gameweeks, history, leagues, dream-team, fixtures, player pool, top players, team
 

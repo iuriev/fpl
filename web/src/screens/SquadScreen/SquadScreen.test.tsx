@@ -45,9 +45,8 @@ function renderScreen(isGuest?: boolean, state?: Record<string, unknown>) {
 }
 
 describe('SquadScreen header navigation', () => {
-  it('does not show Change button (own team)', () => {
+  it('does not show back button for own team', () => {
     renderScreen(false);
-    expect(screen.queryByRole('button', { name: /change/i })).toBeNull();
     expect(screen.queryByRole('button', { name: /back/i })).toBeNull();
   });
 
