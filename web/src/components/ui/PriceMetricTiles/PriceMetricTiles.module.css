@@ -79,3 +79,15 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
+
+.tileXpts_bps {
+  color: var(--fpl-positive, #4ade80);
+  background: var(--fpl-positive-bg, rgba(74, 222, 128, 0.12));
+  border-color: color-mix(in srgb, var(--fpl-positive, #4ade80) 45%, transparent);
+}
+
+.tileXpts_defcon {
+  color: var(--fpl-sub-target);
+  background: rgba(34, 211, 238, 0.12);
+  border-color: color-mix(in srgb, var(--fpl-sub-target) 45%, transparent);
+}

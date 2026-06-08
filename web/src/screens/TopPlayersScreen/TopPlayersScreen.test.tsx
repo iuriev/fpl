@@ -126,25 +126,31 @@ describe('TopPlayersScreen', () => {
     expect(screen.queryByText('Player100')).not.toBeInTheDocument();
   });
 
-  it('renders prev/next gameweek nav buttons on Points tab', () => {
+  it('renders gameweek picker in header on Points tab', () => {
     renderScreen();
-    expect(screen.getByRole('button', { name: /previous gameweek/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /next gameweek/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /GW 36/i })).toBeInTheDocument();
   });
 
-  it('shows the selected GW label', () => {
+  it('shows the selected GW label in header', () => {
     renderScreen('/top-players?gw=36');
-    expect(screen.getByText('GW 36')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'GW 36' })).toBeInTheDocument();
   });
 
-  it('next button is disabled when on the latest finished GW', () => {
+  it('opens gameweek picker bottom sheet from header', async () => {
+    const user = userEvent.setup();
     renderScreen('/top-players?gw=36');
-    expect(screen.getByRole('button', { name: /next gameweek/i })).toBeDisabled();
+    await user.click(screen.getByRole('button', { name: 'GW 36' }));
+    expect(screen.getByRole('dialog', { name: /select gameweek/i })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'GW 35' })).toBeInTheDocument();
   });
 
-  it('prev button is disabled when on GW 1', () => {
-    renderScreen('/top-players?gw=1');
-    expect(screen.getByRole('button', { name: /previous gameweek/i })).toBeDisabled();
+  it('updates GW when a different gameweek is selected', async () => {
+    const user = userEvent.setup();
+    renderScreen('/top-players?gw=36');
+    await user.click(screen.getByRole('button', { name: 'GW 36' }));
+    await user.click(screen.getByRole('option', { name: 'GW 35' }));
+    expect(screen.getByRole('button', { name: 'GW 35' })).toBeInTheDocument();
+    expect(mockQueries.useTopPlayersGw).toHaveBeenLastCalledWith(35);
   });
 
   it('renders a menu button', () => {
@@ -186,11 +192,11 @@ describe('TopPlayersScreen — DEFCON tab', () => {
     expect(screen.getByText('Trippier')).toBeInTheDocument();
   });
 
-  it('renders GW nav on DEFCON tab', async () => {
+  it('renders GW picker in header on DEFCON tab', async () => {
     renderScreen();
     const user = userEvent.setup();
     await user.click(screen.getByRole('tab', { name: 'DEFCON' }));
-    expect(screen.getByRole('button', { name: /previous gameweek/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /GW 36/i })).toBeInTheDocument();
   });
 
   it('renders BPS badge labels in DEFCON list', async () => {
@@ -213,11 +219,11 @@ describe('TopPlayersScreen — BPS tab', () => {
     expect(screen.getByText('Salah')).toBeInTheDocument();
   });
 
-  it('renders GW nav on BPS tab', async () => {
+  it('renders GW picker in header on BPS tab', async () => {
     renderScreen();
     const user = userEvent.setup();
     await user.click(screen.getByRole('tab', { name: 'BPS' }));
-    expect(screen.getByRole('button', { name: /previous gameweek/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /GW 36/i })).toBeInTheDocument();
   });
 });
 
@@ -265,11 +271,11 @@ describe('TopPlayersScreen — By Team tab', () => {
     expect(screen.getByText('1')).toBeInTheDocument();
   });
 
-  it('hides GW navigator on By Team tab', async () => {
+  it('hides GW picker on By Team tab', async () => {
     renderScreen();
     const user = userEvent.setup();
     await user.click(screen.getByRole('tab', { name: 'By Team' }));
-    expect(screen.queryByRole('button', { name: /previous gameweek/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^GW \d+$/ })).not.toBeInTheDocument();
   });
 });
 
@@ -298,11 +304,11 @@ describe('TopPlayersScreen — Season tab', () => {
     expect(screen.getByText('Haaland')).toBeInTheDocument();
   });
 
-  it('hides GW nav on Season tab', async () => {
+  it('hides GW picker on Season tab', async () => {
     renderScreen();
     const user = userEvent.setup();
     await user.click(screen.getByRole('tab', { name: 'Season' }));
-    expect(screen.queryByRole('button', { name: /previous gameweek/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^GW \d+$/ })).not.toBeInTheDocument();
   });
 
   it('switches to DEFCON season view', async () => {

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { useWatchlistRepository } from './watchlist-repository';
 
-export function useFollowTeam(teamId: number, enabled = true) {
+export function useFollowTeam(teamId: number, enabled = true, onLimit?: () => void) {
   const repo = useWatchlistRepository();
   const [following, setFollowing] = useState(false);
   const [limitReached, setLimitReached] = useState(false);
@@ -19,14 +19,15 @@ export function useFollowTeam(teamId: number, enabled = true) {
       setLimitReached(false);
     } else {
       const result = await repo.add(teamId);
-      if (result === 'ok') {
+      if (result === 'ok' || result === 'duplicate') {
         setFollowing(true);
         setLimitReached(false);
       } else if (result === 'limit') {
         setLimitReached(true);
+        onLimit?.();
       }
     }
-  }, [following, repo, teamId]);
+  }, [following, onLimit, repo, teamId]);
 
   return { following, limitReached, toggle };
 }

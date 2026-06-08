@@ -47,6 +47,7 @@ export const ManagerRow: React.FC<ManagerRowProps> = ({
 
   const isLoading = squadLoading || historyLoading || transfersLoading;
   const hasEntryData = Boolean(entryData.managerName);
+  const showLoader = isLoading || !hasEntryData;
 
   const handleRowClick = () => {
     if (isOwnTeam) {
@@ -121,7 +122,15 @@ export const ManagerRow: React.FC<ManagerRowProps> = ({
         </div>
       </div>
 
-      {!isLoading && (
+      {showLoader ? (
+        <div
+          className={styles.loadingBody}
+          aria-busy="true"
+          aria-label={copy.loadingPlaceholder}
+        >
+          <span className={styles.spinner} aria-hidden="true" />
+        </div>
+      ) : (
         <>
           <div className={styles.statsGrid}>
             <div className={styles.statItem}>

@@ -155,11 +155,11 @@ describe('ApiWatchlistRepository', () => {
     expect(fetch).toHaveBeenCalledTimes(1);
   });
 
-  it('list() returns cached result on repeated calls', async () => {
+  it('list() refetches on sequential calls', async () => {
     mockFetch(200, { managers: [m100] });
     await repo.list();
     await repo.list();
-    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledTimes(2);
   });
 
   it('cache is invalidated after add()', async () => {
@@ -169,6 +169,27 @@ describe('ApiWatchlistRepository', () => {
       .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ managers: [m100] }) } as Response);
     await repo.list();
     await repo.add(100);
+    const managers = await repo.list();
+    expect(fetch).toHaveBeenCalledTimes(3);
+    expect(managers).toEqual([m100]);
+  });
+
+  it('add() invalidates an in-flight list() so the next list() refetches', async () => {
+    let resolveList: (value: Response) => void = () => {};
+    const listPromise = new Promise<Response>((resolve) => {
+      resolveList = resolve;
+    });
+
+    vi.mocked(fetch)
+      .mockReturnValueOnce(listPromise)
+      .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ teamId: 100 }) } as Response)
+      .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ managers: [m100] }) } as Response);
+
+    const firstList = repo.list();
+    await repo.add(100);
+    resolveList({ ok: true, status: 200, json: () => Promise.resolve({ managers: [] }) } as Response);
+    await firstList;
+
     const managers = await repo.list();
     expect(fetch).toHaveBeenCalledTimes(3);
     expect(managers).toEqual([m100]);

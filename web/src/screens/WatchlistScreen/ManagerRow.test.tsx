@@ -81,6 +81,16 @@ describe('ManagerRow', () => {
   });
 
 
+  it('shows in-card loader while squad data is loading', () => {
+    vi.mocked(queries.useSquad).mockImplementationOnce(() => ({ data: undefined, isLoading: true }) as never);
+    vi.mocked(queries.useHistory).mockImplementationOnce(() => ({ data: undefined, isLoading: true }) as never);
+    vi.mocked(queries.useTransfers).mockImplementationOnce(() => ({ data: undefined, isLoading: true }) as never);
+
+    const { container } = renderRow();
+    expect(container.querySelector('[aria-busy="true"][aria-label="Loading..."]')).toBeTruthy();
+    expect(container.querySelector('[class*="spinner"]')).toBeTruthy();
+  });
+
   it('unfollow button is disabled while loading', () => {
     vi.mocked(queries.useSquad).mockImplementationOnce(() => ({ data: undefined, isLoading: true }) as never);
     vi.mocked(queries.useHistory).mockImplementationOnce(() => ({ data: undefined, isLoading: true }) as never);

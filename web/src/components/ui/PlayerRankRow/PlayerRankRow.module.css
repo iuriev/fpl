@@ -1,9 +1,9 @@
 .row {
   display: flex;
   align-items: center;
-  gap: var(--fpl-space-md);
-  padding: var(--fpl-space-sm) var(--fpl-space-xl3);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  gap: var(--fpl-space-sm);
+  padding: var(--fpl-space-sm) var(--fpl-space-xl);
+  border-bottom: 1px solid var(--fpl-border);
 }
 
 .row:last-child {
@@ -11,10 +11,10 @@
 }
 
 .rank {
-  width: 1.5rem;
+  width: 1.25rem;
   flex-shrink: 0;
-  font: var(--fpl-fw-bold) var(--fpl-fs-body-s) / 1 var(--fpl-font-display);
-  color: var(--fpl-muted-soft);
+  font-size: var(--fpl-fs-body-s);
+  color: var(--fpl-muted);
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
@@ -28,7 +28,8 @@
 }
 
 .name {
-  font: var(--fpl-fw-semibold) var(--fpl-fs-body) / 1.2 var(--fpl-font-display);
+  font-size: var(--fpl-fs-body-s);
+  font-weight: var(--fpl-fw-semibold);
   color: var(--fpl-text);
   white-space: nowrap;
   overflow: hidden;
@@ -38,20 +39,21 @@
 .meta {
   display: flex;
   align-items: center;
-  gap: var(--fpl-space-xs);
+  gap: 0.25rem;
 }
 
 .club {
-  font: var(--fpl-fw-regular) var(--fpl-fs-body-xs) / 1 var(--fpl-font-display);
+  font-size: var(--fpl-fs-caption);
   color: var(--fpl-muted);
 }
 
 .points {
   flex-shrink: 0;
-  font: var(--fpl-fw-bold) var(--fpl-fs-body-m) / 1 var(--fpl-font-display);
+  font-size: var(--fpl-fs-body);
+  font-weight: var(--fpl-fw-bold);
+  line-height: 1;
   color: var(--fpl-accent);
   font-variant-numeric: tabular-nums;
-  min-width: 2rem;
   text-align: right;
 }
 
@@ -105,6 +107,13 @@
   margin-top: 0.25rem;
 }
 
+.followSlot {
+  min-width: 2.5rem;
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 .followBtn {
   width: 1.75rem;
   height: 1.75rem;
@@ -118,7 +127,6 @@
   cursor: pointer;
   flex-shrink: 0;
   transition: color 0.15s, background 0.15s;
-  align-self: center;
 }
 
 .followBtnActive {

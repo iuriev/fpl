@@ -33,53 +33,104 @@
 .skeleton {
   display: flex;
   align-items: center;
-  gap: var(--fpl-space-md);
-  padding: var(--fpl-space-sm) var(--fpl-space-xl3);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  gap: var(--fpl-space-sm);
+  padding: var(--fpl-space-sm) var(--fpl-space-xl);
+  border-bottom: 1px solid var(--fpl-border);
+}
+
+.skeleton:last-child {
+  border-bottom: none;
 }
 
 .skeletonRank {
-  width: 1.5rem;
+  width: 1.25rem;
   flex-shrink: 0;
   font-size: var(--fpl-fs-body-s);
   color: var(--fpl-muted-soft);
   text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.skeletonCell {
+  border-radius: var(--fpl-radius-xs);
+  background: var(--fpl-bg-hair);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.14) 50%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  background-size: 200% 100%;
+  animation: fplShimmer 1.6s ease-in-out infinite;
 }
 
 .skeletonJersey {
-  width: 2.25rem;
-  height: 2.25rem;
+  width: var(--fpl-size-jersey-m);
+  height: var(--fpl-size-jersey-m);
   border-radius: var(--fpl-radius-sm);
-  background: var(--fpl-bg-hair);
   flex-shrink: 0;
 }
 
 .skeletonInfo {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.125rem;
 }
 
 .skeletonName {
   height: 0.875rem;
-  width: 7rem;
-  border-radius: var(--fpl-radius-sm);
-  background: var(--fpl-bg-hair);
+  width: 60%;
+  max-width: 8rem;
 }
 
-.skeletonMeta {
-  height: 0.625rem;
-  width: 4rem;
+.skeletonMetaRow {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.skeletonBadge {
+  width: 1.75rem;
+  height: 0.75rem;
   border-radius: var(--fpl-radius-sm);
-  background: var(--fpl-bg-hair);
+}
+
+.skeletonClub {
+  width: 1.75rem;
+  height: 0.625rem;
+}
+
+.skeletonChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--fpl-space-xs);
+  margin-top: 0.125rem;
+}
+
+.skeletonChip {
+  width: 4.5rem;
+  height: 1.125rem;
+  border-radius: 0.25rem;
+}
+
+.skeletonOwnership {
+  width: 5rem;
+  height: 0.625rem;
+  margin-top: 0.125rem;
 }
 
 .skeletonPoints {
-  width: 2rem;
+  width: 1.5rem;
   height: 1rem;
-  border-radius: var(--fpl-radius-sm);
-  background: var(--fpl-bg-hair);
+  flex-shrink: 0;
+}
+
+.skeletonFollow {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--fpl-radius-pill);
   flex-shrink: 0;
 }
 
@@ -103,4 +154,10 @@
   flex: 1;
   font-size: var(--fpl-fs-body-s);
   color: var(--fpl-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeletonCell {
+    animation: none;
+  }
 }

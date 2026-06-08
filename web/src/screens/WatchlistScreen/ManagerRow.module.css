@@ -296,6 +296,30 @@
   color: var(--fpl-muted);
 }
 
+/* ── Loading ── */
+
+.loadingBody {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 0.75rem;
+  border-top: 1px solid var(--fpl-bg-hair);
+  min-height: 5.5rem;
+}
+
+.spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid var(--fpl-bg-hair);
+  border-top-color: var(--fpl-accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /* ── Skeletons ── */
 
 .skeletonScore {

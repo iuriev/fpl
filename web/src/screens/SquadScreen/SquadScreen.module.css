@@ -191,6 +191,14 @@
   color: #fff;
 }
 
+.followLimit {
+  margin: 0;
+  padding: 0 var(--fpl-space-xl3) var(--fpl-space-xs);
+  font-size: var(--fpl-fs-label);
+  color: var(--fpl-negative, #ef4444);
+  text-align: center;
+}
+
 .gwNav {
   display: flex;
   align-items: center;
@@ -252,10 +260,6 @@
   transition: opacity 180ms ease;
 }
 
-.summaryWrap_fetching {
-  opacity: 0.72;
-}
-
 .summaryPlaceholder {
   flex-shrink: 0;
   height: 2.75rem;
@@ -282,11 +286,6 @@
 .pitchBench {
   display: flex;
   flex-direction: column;
-}
-
-.squadContent_fetching {
-  opacity: 0.72;
-  pointer-events: none;
 }
 
 .pitchWrap {

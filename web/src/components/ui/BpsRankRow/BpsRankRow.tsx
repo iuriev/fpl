@@ -2,6 +2,8 @@ import React from 'react';
 
 import { Jersey } from '@/components/ui/Jersey/Jersey';
 import { PositionBadge } from '@/components/ui/PositionBadge/PositionBadge';
+import { PriceMetricTiles } from '@/components/ui/PriceMetricTiles/PriceMetricTiles';
+import { copy } from '@/lib/copy';
 import type { LeaderboardPlayer } from '@/types';
 
 import styles from './BpsRankRow.module.css';
@@ -13,9 +15,6 @@ export interface BpsRankRowProps {
 }
 
 export const BpsRankRow: React.FC<BpsRankRowProps> = ({ rank, player, variant }) => {
-  const price = `£${(player.nowCost / 10).toFixed(1)}m`;
-  const badgeClass = variant === 'bps' ? styles.badge_bps : styles.badge_defcon;
-
   return (
     <div className={styles.row}>
       <span className={styles.rank}>{rank}</span>
@@ -27,11 +26,14 @@ export const BpsRankRow: React.FC<BpsRankRowProps> = ({ rank, player, variant })
           <span className={styles.club}>{player.teamShortName}</span>
         </span>
       </div>
-      <span className={styles.price}>{price}</span>
-      <div className={`${styles.badge} ${badgeClass}`}>
-        <span className={styles.badgeValue}>{player.value}</span>
-        <span className={styles.badgeLabel}>BPS</span>
-      </div>
+      <PriceMetricTiles
+        nowCost={player.nowCost}
+        expectedPoints={String(player.value)}
+        expectedPointsLabel={
+          variant === 'bps' ? copy.topPlayersTabBps : copy.topPlayersTabDefcon
+        }
+        metricTone={variant}
+      />
     </div>
   );
 };

@@ -266,7 +266,17 @@
   color: #a5f3fc;
 }
 
+.metaRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  width: 100%;
+}
+
 .ownershipPill {
+  flex: 1;
+  min-width: 0;
   font-size: var(--fpl-fs-nano);
   font-weight: var(--fpl-fw-bold);
   padding: 0.125rem 0.25rem;
@@ -276,7 +286,6 @@
   line-height: 1;
   pointer-events: none;
   text-align: center;
-  width: 100%;
 }
 
 
@@ -417,6 +426,11 @@
   color: #ffffff;
   box-shadow: 0 2px 6px rgba(34, 211, 238, 0.5);
   -webkit-tap-highlight-color: transparent;
+}
+
+.subBtn_hidden {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .followBtn {

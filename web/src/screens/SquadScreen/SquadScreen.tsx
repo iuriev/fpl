@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { ApiError } from '@/api/client';
@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button/Button';
 import { ListView, ListViewSkeleton } from '@/components/ui/ListView/ListView';
 import { Pitch } from '@/components/ui/Pitch/Pitch';
 import { PlayerCard } from '@/components/ui/PlayerCard/PlayerCard';
+import { PremiumSheet } from '@/components/ui/PremiumSheet/PremiumSheet';
 import { SummaryStrip } from '@/components/ui/SummaryStrip/SummaryStrip';
 import type { NavLinksMode } from '@/components/ui/TeamInfoPanel/TeamInfoPanel';
 import { TeamNavDrawer } from '@/components/ui/TeamNavDrawer/TeamNavDrawer';
@@ -15,6 +16,7 @@ import { copy, interpolate } from '@/lib/copy';
 import { useMyTeam } from '@/lib/my-team/MyTeamContext';
 import { useFollowPlayer } from '@/lib/use-follow-player';
 import { useFollowTeam } from '@/lib/use-follow-team';
+import { useWatchlistRepository } from '@/lib/watchlist-repository';
 import type { PlayerPosition, SquadPlayer } from '@/types';
 import { MAX_GAMEWEEK } from '@/types';
 
@@ -57,7 +59,14 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
   const backLabel = locationState?.backLabel ?? copy.squadGuestBack;
 
   const navLinksMode: NavLinksMode = isDemoMode ? 'demo' : isGuestMode ? 'hidden' : 'full';
-  const { following: followingTeam, limitReached: followLimitReached, toggle: toggleFollowTeam } = useFollowTeam(teamId, isGuestMode);
+  const watchlistRepo = useWatchlistRepository();
+  const [followPremiumOpen, setFollowPremiumOpen] = useState(false);
+  const handleFollowLimit = useCallback(() => setFollowPremiumOpen(true), []);
+  const {
+    following: followingTeam,
+    limitReached: followLimitReached,
+    toggle: toggleFollowTeam,
+  } = useFollowTeam(teamId, isGuestMode, handleFollowLimit);
 
   const { data: gameweeksData } = useGameweeks();
   const { data: entry, isError: entryIsError } = useEntry(teamId);
@@ -221,6 +230,12 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
             )}
           </div>
 
+          {isGuestMode && followLimitReached && (
+            <p className={styles.followLimit} role="alert">
+              {interpolate(copy.watchlistFollowLimitToast, { max: watchlistRepo.getLimit() })}
+            </p>
+          )}
+
           <div className={styles.gwNav}>
             <button
               className={styles.navBtn}
@@ -263,16 +278,33 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
           </div>
         </header>
 
-        {squad && (
-          <div
-            className={`${styles.summaryWrap} ${isGwTransition ? styles.summaryWrap_fetching : ''}`}
-          >
+        {squad && !isGwTransition && (
+          <div className={styles.summaryWrap}>
             <SummaryStrip summary={squad.summary} activeChip={squad.activeChip} />
           </div>
         )}
-        {isLoading && <div className={styles.summaryPlaceholder} aria-hidden="true" />}
+        {(isLoading || isGwTransition) && (
+          <div className={styles.summaryPlaceholder} aria-hidden="true" />
+        )}
 
         {isLoading && (view === 'list' ? <ListViewSkeleton /> : <SquadSkeleton />)}
+
+        {isGwTransition &&
+          squad &&
+          squad.starters.length > 0 &&
+          (view === 'list' ? (
+            <div className={styles.squadContent} aria-busy="true" aria-label={copy.loadingPlaceholder}>
+              <ListViewSkeleton />
+            </div>
+          ) : (
+            positionGroups && (
+              <SquadPitchSkeleton
+                starterCounts={POSITION_ORDER.map((pos) => positionGroups[pos].length)}
+                benchCount={squad.bench.length}
+                ariaLabel={copy.loadingPlaceholder}
+              />
+            )
+          ))}
 
         {entryIsError && (
           <div className={styles.stateCenter}>
@@ -309,20 +341,15 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
         )}
 
         {squad &&
+          !isGwTransition &&
           squad.starters.length > 0 &&
           (view === 'list' ? (
-            <div
-              className={`${styles.squadContent} ${isGwTransition ? styles.squadContent_fetching : ''}`}
-              aria-busy={isGwTransition}
-            >
+            <div className={styles.squadContent}>
               <ListView starters={squad.starters} bench={squad.bench} />
             </div>
           ) : (
             positionGroups && (
-              <div
-                className={`${styles.pitchBench} ${isGwTransition ? styles.squadContent_fetching : ''}`}
-                aria-busy={isGwTransition}
-              >
+              <div className={styles.pitchBench}>
                 <div className={styles.pitchWrap}>
                   <Pitch className={styles.pitchFill}>
                     <div className={styles.pitchRows}>
@@ -390,6 +417,17 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
             )
           ))}
       </div>
+
+      {isGuestMode && (
+        <PremiumSheet
+          open={followPremiumOpen}
+          onClose={() => setFollowPremiumOpen(false)}
+          title={copy.premiumWatchlistTitle}
+          description={copy.premiumWatchlistDescription}
+          freeLabel={copy.premiumWatchlistFreeLabel}
+          premiumLabel={copy.premiumWatchlistPremiumLabel}
+        />
+      )}
     </div>
   );
 };
@@ -409,13 +447,31 @@ function FollowableCard(props: React.ComponentProps<typeof PlayerCard>) {
 }
 
 function SquadSkeleton() {
+  return <SquadPitchSkeleton ariaLabel={copy.loadingPlaceholder} />;
+}
+
+interface SquadPitchSkeletonProps {
+  starterCounts?: number[];
+  benchCount?: number;
+  ariaLabel?: string;
+}
+
+function SquadPitchSkeleton({
+  starterCounts = [2, 4, 4, 1],
+  benchCount = 4,
+  ariaLabel,
+}: SquadPitchSkeletonProps) {
   return (
-    <div className={styles.pitchBench} aria-label={copy.loadingPlaceholder} aria-busy="true">
+    <div
+      className={styles.pitchBench}
+      aria-label={ariaLabel}
+      aria-busy={ariaLabel ? 'true' : undefined}
+    >
       <div className={styles.pitchWrap}>
         <Pitch className={styles.pitchFill}>
           <div className={styles.skeletonVeil} />
           <div className={styles.pitchRows}>
-            {[2, 4, 4, 1].map((count, rowIdx) => (
+            {starterCounts.map((count, rowIdx) => (
               <div key={rowIdx} className={styles.playerRow}>
                 {Array.from({ length: count }).map((_, i) => (
                   <PlayerSkeleton key={i} size="large" />
@@ -427,12 +483,12 @@ function SquadSkeleton() {
       </div>
       <div className={styles.bench}>
         <div className={styles.benchLabels}>
-          {Array.from({ length: 4 }).map((_, i) => (
+          {Array.from({ length: benchCount }).map((_, i) => (
             <div key={i} className={styles.skeletonLabel} />
           ))}
         </div>
         <div className={styles.benchRow}>
-          {Array.from({ length: 4 }).map((_, i) => (
+          {Array.from({ length: benchCount }).map((_, i) => (
             <PlayerSkeleton key={i} size="medium" />
           ))}
         </div>

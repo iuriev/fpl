@@ -23,9 +23,14 @@ export const WatchedPlayerRow: React.FC<WatchedPlayerRowProps> = ({
   const liveQuery = usePlayersLive(currentGw, [playerId]);
   const poolQuery = usePlayerPool();
 
+  const liveReady = currentGw !== null && liveQuery.isFetched;
+
   const player = useMemo((): TopPlayersPlayer | null => {
+    if (!liveReady) return null;
+
     const livePlayer = liveQuery.data?.players.find((p) => p.id === playerId);
     if (livePlayer) return livePlayer;
+
     const poolPlayer = poolQuery.data?.players.find((p) => p.id === playerId);
     if (poolPlayer) {
       return {
@@ -39,22 +44,10 @@ export const WatchedPlayerRow: React.FC<WatchedPlayerRowProps> = ({
       };
     }
     return null;
-  }, [liveQuery.data, poolQuery.data, playerId, currentGw]);
+  }, [liveReady, liveQuery.data, poolQuery.data, playerId, currentGw]);
 
-  const isLoading = liveQuery.isLoading || poolQuery.isLoading;
-
-  if (isLoading && !player) {
-    return (
-      <div className={styles.skeleton} aria-busy="true">
-        <span className={styles.skeletonRank}>{rank}</span>
-        <div className={styles.skeletonJersey} />
-        <div className={styles.skeletonInfo}>
-          <div className={styles.skeletonName} />
-          <div className={styles.skeletonMeta} />
-        </div>
-        <div className={styles.skeletonPoints} />
-      </div>
-    );
+  if (currentGw === null || !liveReady) {
+    return <WatchedPlayerRowSkeleton rank={rank} />;
   }
 
   if (!player) {
@@ -75,5 +68,32 @@ export const WatchedPlayerRow: React.FC<WatchedPlayerRowProps> = ({
 
   return <PlayerRankRow rank={rank} player={player} onFollow={onRemove} isFollowing={true} />;
 };
+
+function WatchedPlayerRowSkeleton({ rank }: { rank: number }) {
+  return (
+    <div
+      className={styles.skeleton}
+      aria-busy="true"
+      aria-label={copy.loadingPlaceholder}
+    >
+      <span className={styles.skeletonRank}>{rank}</span>
+      <div className={`${styles.skeletonCell} ${styles.skeletonJersey}`} />
+      <div className={styles.skeletonInfo}>
+        <div className={`${styles.skeletonCell} ${styles.skeletonName}`} />
+        <div className={styles.skeletonMetaRow}>
+          <div className={`${styles.skeletonCell} ${styles.skeletonBadge}`} />
+          <div className={`${styles.skeletonCell} ${styles.skeletonClub}`} />
+        </div>
+        <div className={styles.skeletonChips}>
+          <div className={`${styles.skeletonCell} ${styles.skeletonChip}`} />
+          <div className={`${styles.skeletonCell} ${styles.skeletonChip}`} />
+        </div>
+        <div className={`${styles.skeletonCell} ${styles.skeletonOwnership}`} />
+      </div>
+      <div className={`${styles.skeletonCell} ${styles.skeletonPoints}`} />
+      <div className={`${styles.skeletonCell} ${styles.skeletonFollow}`} />
+    </div>
+  );
+}
 
 WatchedPlayerRow.displayName = 'WatchedPlayerRow';

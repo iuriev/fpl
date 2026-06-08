@@ -1,8 +1,8 @@
 .row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
+  gap: var(--fpl-space-sm);
+  padding: var(--fpl-space-sm) var(--fpl-space-xl);
   border-bottom: 1px solid var(--fpl-border);
 }
 
@@ -42,57 +42,3 @@
   color: var(--fpl-muted);
 }
 
-.price {
-  font-size: var(--fpl-fs-body-s);
-  color: var(--fpl-text-soft);
-  flex-shrink: 0;
-}
-
-.badge {
-  flex-shrink: 0;
-  min-width: 2.5rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0.25rem 0.375rem;
-  border-radius: var(--fpl-radius-s);
-  gap: 0.0625rem;
-}
-
-.badgeValue {
-  font-size: var(--fpl-fs-body);
-  font-weight: var(--fpl-fw-bold);
-  line-height: 1;
-}
-
-.badgeLabel {
-  font-size: 0.5rem;
-  font-weight: var(--fpl-fw-semibold);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  opacity: 0.8;
-}
-
-.badge_defcon {
-  background: var(--fpl-surface-2);
-}
-
-.badge_defcon .badgeValue {
-  color: var(--fpl-text-soft);
-}
-
-.badge_defcon .badgeLabel {
-  color: var(--fpl-muted);
-}
-
-.badge_bps {
-  background: var(--fpl-positive-bg, rgba(74, 222, 128, 0.12));
-}
-
-.badge_bps .badgeValue {
-  color: var(--fpl-positive, #4ade80);
-}
-
-.badge_bps .badgeLabel {
-  color: var(--fpl-positive, #4ade80);
-}

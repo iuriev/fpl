@@ -11,6 +11,7 @@ export interface PriceMetricTilesProps {
   secondaryVariant?: 'likely' | 'very_likely';
   expectedPoints?: string;
   expectedPointsLabel?: string;
+  metricTone?: 'accent' | 'bps' | 'defcon';
 }
 
 export const PriceMetricTiles: React.FC<PriceMetricTilesProps> = ({
@@ -20,15 +21,22 @@ export const PriceMetricTiles: React.FC<PriceMetricTilesProps> = ({
   secondaryVariant = 'likely',
   expectedPoints,
   expectedPointsLabel,
+  metricTone = 'accent',
 }) => {
   const rising = changeAmount != null && changeAmount > 0;
   const falling = changeAmount != null && changeAmount < 0;
+  const metricToneClass =
+    metricTone === 'bps'
+      ? styles.tileXpts_bps
+      : metricTone === 'defcon'
+        ? styles.tileXpts_defcon
+        : '';
 
   return (
     <div className={styles.group} aria-hidden="true">
       <span className={styles.tilePrice}>{formatPriceTenths(nowCost)}</span>
       {expectedPoints != null && (
-        <span className={styles.tileXpts}>
+        <span className={`${styles.tileXpts} ${metricToneClass}`}>
           <span className={styles.tileXptsValue}>{expectedPoints}</span>
           {expectedPointsLabel && (
             <span className={styles.tileXptsLabel}>{expectedPointsLabel}</span>

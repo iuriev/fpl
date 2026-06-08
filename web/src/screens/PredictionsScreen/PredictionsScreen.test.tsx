@@ -193,29 +193,38 @@ describe('PredictionsScreen', () => {
       expect(screen.getByRole('tab', { name: copy.predictionsTabXG })).toBeInTheDocument();
     });
 
-    it('defaults to Points tab', () => {
+    it('defaults to Lineups tab', () => {
       renderScreen();
-      expect(screen.getByRole('tab', { name: copy.predictionsTabPoints })).toHaveAttribute('aria-selected', 'true');
+      expect(screen.getByRole('tab', { name: copy.predictionsTabLineups })).toHaveAttribute('aria-selected', 'true');
     });
   });
 
   describe('Points tab', () => {
-    it('shows position sub-tabs', () => {
+    it('shows position sub-tabs with FWD first and selected by default', async () => {
+      const user = userEvent.setup();
       renderScreen();
-      expect(screen.getByRole('tab', { name: 'MID' })).toBeInTheDocument();
-      expect(screen.getByRole('tab', { name: 'GK' })).toBeInTheDocument();
+      await user.click(screen.getByRole('tab', { name: copy.predictionsTabPoints }));
+      const posTabs = screen.getAllByRole('tab', { name: /^(FWD|MID|DEF|GK)$/ });
+      expect(posTabs.map((t) => t.textContent)).toEqual(['FWD', 'MID', 'DEF', 'GK']);
+      expect(screen.getByRole('tab', { name: 'FWD' })).toHaveAttribute('aria-selected', 'true');
     });
 
-    it('shows top 3 players free and a lock overlay for free user', () => {
+    it('shows top 3 players free and a lock overlay for free user', async () => {
+      const user = userEvent.setup();
       renderScreen(false);
+      await user.click(screen.getByRole('tab', { name: copy.predictionsTabPoints }));
+      await user.click(screen.getByRole('tab', { name: 'MID' }));
       expect(screen.getByText('Salah')).toBeInTheDocument();
       expect(screen.getByText('Saka')).toBeInTheDocument();
       expect(screen.getByText('De Bruyne')).toBeInTheDocument();
       expect(screen.getByText(copy.predictedPointsUnlockLabel)).toBeInTheDocument();
     });
 
-    it('shows all players without lock for premium user', () => {
+    it('shows all players without lock for premium user', async () => {
+      const user = userEvent.setup();
       renderScreen(true);
+      await user.click(screen.getByRole('tab', { name: copy.predictionsTabPoints }));
+      await user.click(screen.getByRole('tab', { name: 'MID' }));
       expect(screen.getByText('Salah')).toBeInTheDocument();
       expect(screen.getByText('Fernandes')).toBeInTheDocument();
       expect(screen.queryByText(copy.predictedPointsUnlockLabel)).not.toBeInTheDocument();
@@ -224,6 +233,8 @@ describe('PredictionsScreen', () => {
     it('opens PremiumSheet when Points unlock CTA is clicked', async () => {
       const user = userEvent.setup();
       renderScreen(false);
+      await user.click(screen.getByRole('tab', { name: copy.predictionsTabPoints }));
+      await user.click(screen.getByRole('tab', { name: 'MID' }));
       await user.click(screen.getByText(copy.predictedPointsUnlockLabel));
       expect(screen.getByText(copy.predictedPointsPremiumTitle)).toBeInTheDocument();
     });
@@ -231,6 +242,8 @@ describe('PredictionsScreen', () => {
     it('uses predictions player profile on Points tab without past gameweek stats', async () => {
       const user = userEvent.setup();
       renderScreen(false);
+      await user.click(screen.getByRole('tab', { name: copy.predictionsTabPoints }));
+      await user.click(screen.getByRole('tab', { name: 'MID' }));
       await user.click(screen.getByRole('button', { name: /Salah/i }));
       expect(screen.getByRole('dialog')).toBeInTheDocument();
       expect(screen.getByText(/£13\.0m/)).toBeInTheDocument();
@@ -240,24 +253,19 @@ describe('PredictionsScreen', () => {
   });
 
   describe('Lineups tab', () => {
-    it('shows premium lock overlay for free user', async () => {
-      const user = userEvent.setup();
+    it('shows premium lock overlay for free user', () => {
       renderScreen(false);
-      await user.click(screen.getByRole('tab', { name: copy.predictionsTabLineups }));
       expect(screen.getByText(copy.predictionsLineupsUnlockLabel)).toBeInTheDocument();
     });
 
-    it('shows team chips and pitch for premium user', async () => {
-      const user = userEvent.setup();
+    it('shows team chips and pitch for premium user', () => {
       renderScreen(true);
-      await user.click(screen.getByRole('tab', { name: copy.predictionsTabLineups }));
       expect(screen.getByRole('tab', { name: 'ARS' })).toBeInTheDocument();
     });
 
     it('opens PremiumSheet when Lineups unlock CTA is clicked', async () => {
       const user = userEvent.setup();
       renderScreen(false);
-      await user.click(screen.getByRole('tab', { name: copy.predictionsTabLineups }));
       await user.click(screen.getByText(copy.predictionsLineupsUnlockLabel));
       expect(screen.getByText(copy.predictionsLineupsPremiumTitle)).toBeInTheDocument();
     });

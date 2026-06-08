@@ -10,37 +10,101 @@ import {
 } from '@/lib/player-watchlist-repository';
 import { ToastProvider } from '@/lib/toast';
 
+const mockUsePlayersLive = vi.fn();
+const mockUsePlayerPool = vi.fn();
+
 vi.mock('@/api/queries', () => ({
   useGameweeks: () => ({ data: fixtureGameweeks }),
-  usePlayersLive: (_gw: number, ids: number[]) => ({
-    data: { gw: 36, players: fixtureTopPlayersGw.players.filter((p) => ids.includes(p.id)) },
-    isLoading: false,
-  }),
-  usePlayerPool: () => ({ data: { players: [] }, isLoading: false }),
+  usePlayersLive: (...args: unknown[]) => mockUsePlayersLive(...args),
+  usePlayerPool: () => mockUsePlayerPool(),
 }));
 
-function renderRow(playerId: number, onRemove = vi.fn()) {
+import { WatchedPlayerRow as WatchedPlayerRowLazy } from './WatchedPlayerRow';
+
+function renderRow(
+  playerId: number,
+  onRemove = vi.fn(),
+  currentGw: number | null = 36
+) {
   const repo = new LocalStoragePlayerWatchlistRepository();
   return render(
     <PlayerWatchlistRepositoryContext.Provider value={repo}>
       <ToastProvider>
         <MemoryRouter>
-          <WatchedPlayerRowLazy rank={1} playerId={playerId} currentGw={36} onRemove={onRemove} />
+          <WatchedPlayerRowLazy
+            rank={1}
+            playerId={playerId}
+            currentGw={currentGw}
+            onRemove={onRemove}
+          />
         </MemoryRouter>
       </ToastProvider>
     </PlayerWatchlistRepositoryContext.Provider>
   );
 }
 
-import { WatchedPlayerRow as WatchedPlayerRowLazy } from './WatchedPlayerRow';
-
 describe('WatchedPlayerRow', () => {
-  beforeEach(() => localStorage.removeItem('fpl-player-watchlist-v1'));
+  beforeEach(() => {
+    localStorage.removeItem('fpl-player-watchlist-v1');
+    mockUsePlayersLive.mockReturnValue({
+      data: { gw: 36, players: fixtureTopPlayersGw.players },
+      isLoading: false,
+      isFetched: true,
+    });
+    mockUsePlayerPool.mockReturnValue({ data: { players: [] }, isLoading: false });
+  });
 
   it('renders player name when found in GW data', () => {
     const player = fixtureTopPlayersGw.players[0];
     renderRow(player.id);
     expect(screen.getByText(player.webName)).toBeInTheDocument();
+  });
+
+  it('shows skeleton while gameweek is not ready', () => {
+    mockUsePlayerPool.mockReturnValue({
+      data: {
+        players: [
+          {
+            id: fixtureTopPlayersGw.players[0].id,
+            webName: 'Cached',
+            position: 'FWD',
+            teamCode: 13,
+            teamShortName: 'MCI',
+            eventPoints: 0,
+            totalPoints: 100,
+            selectedByPercent: '10',
+          },
+        ],
+      },
+      isLoading: false,
+    });
+    renderRow(fixtureTopPlayersGw.players[0].id, vi.fn(), null);
+    expect(screen.getByLabelText(/loading/i)).toHaveAttribute('aria-busy', 'true');
+    expect(screen.queryByText('Cached')).not.toBeInTheDocument();
+  });
+
+  it('shows skeleton until live fetch completes even when pool is cached', () => {
+    mockUsePlayersLive.mockReturnValue({ data: undefined, isLoading: true, isFetched: false });
+    mockUsePlayerPool.mockReturnValue({
+      data: {
+        players: [
+          {
+            id: fixtureTopPlayersGw.players[0].id,
+            webName: 'Cached',
+            position: 'FWD',
+            teamCode: 13,
+            teamShortName: 'MCI',
+            eventPoints: 0,
+            totalPoints: 100,
+            selectedByPercent: '10',
+          },
+        ],
+      },
+      isLoading: false,
+    });
+    renderRow(fixtureTopPlayersGw.players[0].id);
+    expect(screen.getByLabelText(/loading/i)).toHaveAttribute('aria-busy', 'true');
+    expect(screen.queryByText('Cached')).not.toBeInTheDocument();
   });
 
   it('shows unknown state when player not in any data', () => {

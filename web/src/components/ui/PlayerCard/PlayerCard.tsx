@@ -28,9 +28,12 @@ export interface PlayerCardProps {
   footBadge?: React.ReactNode;
   hideAvailabilityBadge?: boolean;
   onSubClick?: () => void;
+  reserveSubSlot?: boolean;
   playerInfo?: PlayerInfo;
   hideCaptaincy?: boolean;
   subTourAttr?: string;
+  ownershipTourAttr?: string;
+  fixtureTourAttr?: string;
   onFollow?: (playerId: number) => void;
   isFollowing?: boolean;
 }
@@ -69,9 +72,12 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   footBadge,
   hideAvailabilityBadge = false,
   onSubClick,
+  reserveSubSlot = false,
   playerInfo,
   hideCaptaincy = false,
   subTourAttr,
+  ownershipTourAttr,
+  fixtureTourAttr,
   onFollow,
   isFollowing = false,
 }) => {
@@ -236,33 +242,29 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
         )}
         {showPointsPill && <span className={styles.points}>{player.points}</span>}
       </div>
-      {playerInfo && (
-        <span className={styles.ownershipPill} data-tour="step-4">
-          {playerInfo.ownership}%{playerInfo.expectedPoints ? ` / ${playerInfo.expectedPoints}` : ''}
-        </span>
-      )}
-
-      {(nextFixture || onSubClick) && (
-        <div className={styles.fixtureRow}>
-          {!hideClub && <span className={styles.teamAbbrev}>{player.club}</span>}
-          {nextFixture && (
-            <FdrChip
-              opponent={nextFixture.opponent}
-              home={nextFixture.home}
-              difficulty={nextFixture.difficulty}
-              data-tour="step-5"
-            />
+      {(playerInfo || onSubClick || reserveSubSlot) && (
+        <div className={styles.metaRow}>
+          {playerInfo && (
+            <span className={styles.ownershipPill} data-tour={ownershipTourAttr}>
+              {playerInfo.ownership}%
+              {playerInfo.expectedPoints ? ` / ${playerInfo.expectedPoints}` : ''}
+            </span>
           )}
-          {onSubClick && (
+          {(onSubClick || reserveSubSlot) && (
             <span
-              className={styles.subBtn}
-              onClick={(e) => {
-                e.stopPropagation();
-                onSubClick();
-              }}
-              role="button"
-              aria-label="Substitute"
-              data-tour={subTourAttr}
+              className={`${styles.subBtn} ${!onSubClick ? styles.subBtn_hidden : ''}`}
+              onClick={
+                onSubClick
+                  ? (e) => {
+                      e.stopPropagation();
+                      onSubClick();
+                    }
+                  : undefined
+              }
+              role={onSubClick ? 'button' : undefined}
+              aria-label={onSubClick ? 'Substitute' : undefined}
+              aria-hidden={!onSubClick}
+              data-tour={onSubClick ? subTourAttr : undefined}
             >
               <svg width="8" height="10" viewBox="0 0 10 12" fill="none" aria-hidden="true">
                 <path d="M5 1L1 5H9L5 1Z" fill="currentColor" />
@@ -270,6 +272,17 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
               </svg>
             </span>
           )}
+        </div>
+      )}
+
+      {nextFixture && (
+        <div className={styles.fixtureRow} data-tour={fixtureTourAttr}>
+          {!hideClub && <span className={styles.teamAbbrev}>{player.club}</span>}
+          <FdrChip
+            opponent={nextFixture.opponent}
+            home={nextFixture.home}
+            difficulty={nextFixture.difficulty}
+          />
         </div>
       )}
 

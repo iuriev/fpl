@@ -57,14 +57,16 @@ export const PlayerRankRow: React.FC<PlayerRankRowProps> = ({
       </div>
       <span className={styles.points}>{player.points}</span>
       {onFollow && (
-        <button
-          className={`${styles.followBtn} ${isFollowing ? styles.followBtnActive : ''}`}
-          onClick={(e) => { e.stopPropagation(); onFollow(player.id); }}
-          aria-label={isFollowing ? copy.playerWatchlistUnfollow : copy.playerWatchlistFollow}
-          aria-pressed={isFollowing}
-        >
-          {isFollowing ? '★' : '☆'}
-        </button>
+        <div className={styles.followSlot}>
+          <button
+            className={`${styles.followBtn} ${isFollowing ? styles.followBtnActive : ''}`}
+            onClick={(e) => { e.stopPropagation(); onFollow(player.id); }}
+            aria-label={isFollowing ? copy.playerWatchlistUnfollow : copy.playerWatchlistFollow}
+            aria-pressed={isFollowing}
+          >
+            {isFollowing ? '★' : '☆'}
+          </button>
+        </div>
       )}
     </div>
   );

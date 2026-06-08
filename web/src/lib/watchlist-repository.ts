@@ -20,6 +20,7 @@ export interface WatchlistRepository {
   remove(teamId: number): Promise<void>;
   has(teamId: number): Promise<boolean>;
   getLimit(): number;
+  invalidateCache(): void;
 }
 
 const STORAGE_KEY = 'fpl-watchlist-v1';
@@ -64,29 +65,43 @@ export class LocalStorageWatchlistRepository implements WatchlistRepository {
   getLimit(): number {
     return FREE_LIMIT;
   }
+
+  invalidateCache(): void {}
 }
 
 export class ApiWatchlistRepository implements WatchlistRepository {
-  private _cache: Promise<WatchedManager[]> | null = null;
+  private _inflight: Promise<WatchedManager[]> | null = null;
+
+  invalidateCache(): void {
+    this._inflight = null;
+  }
 
   async list(): Promise<WatchedManager[]> {
-    if (!this._cache) {
-      this._cache = fetch('/api/me/managers-watchlist', { credentials: 'include' }).then((res) => {
-        if (!res.ok) { this._cache = null; throw new Error(`Watchlist fetch failed: ${res.status}`); }
-        return res.json().then((data: { managers: WatchedManager[] }) => data.managers);
-      });
+    if (!this._inflight) {
+      this._inflight = fetch('/api/me/managers-watchlist', { credentials: 'include' })
+        .then((res) => {
+          if (!res.ok) throw new Error(`Watchlist fetch failed: ${res.status}`);
+          return res.json().then((data: { managers: WatchedManager[] }) => data.managers);
+        })
+        .finally(() => {
+          this._inflight = null;
+        });
     }
-    return this._cache;
+    return this._inflight;
   }
 
   async add(teamId: number): Promise<AddResult> {
+    this.invalidateCache();
     const res = await fetch('/api/me/managers-watchlist', {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ teamId }),
     });
-    if (res.ok) { this._cache = null; return 'ok'; }
+    if (res.ok) {
+      this.invalidateCache();
+      return 'ok';
+    }
     if (res.status === 409) {
       const body = (await res.json()) as { error: string };
       return body.error === 'duplicate' ? 'duplicate' : 'limit';
@@ -100,7 +115,7 @@ export class ApiWatchlistRepository implements WatchlistRepository {
       credentials: 'include',
     });
     if (!res.ok && res.status !== 204) throw new Error(`Watchlist remove failed: ${res.status}`);
-    this._cache = null;
+    this.invalidateCache();
   }
 
   async has(teamId: number): Promise<boolean> {

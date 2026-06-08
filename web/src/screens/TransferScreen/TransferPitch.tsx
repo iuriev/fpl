@@ -29,6 +29,16 @@ function groupByPosition(players: SquadPlayer[]): Record<PlayerPosition, SquadPl
   return groups;
 }
 
+function pickTourAnchorId(
+  starters: SquadPlayer[],
+  poolLookup?: Map<number, PoolPlayer>,
+): number | null {
+  const fwd = starters.find((p) => p.position === 'FWD' && poolLookup?.get(p.id));
+  if (fwd) return fwd.id;
+  const withPool = starters.find((p) => poolLookup?.get(p.id));
+  return withPool?.id ?? starters[0]?.id ?? null;
+}
+
 export const TransferPitch: React.FC<TransferPitchProps> = ({
   starters,
   bench,
@@ -43,6 +53,7 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
   onSubCancel,
 }) => {
   const positionGroups = groupByPosition(starters);
+  const tourAnchorId = pickTourAnchorId(starters, poolLookup);
 
   const subModeActive = selectedSubId !== null;
 
@@ -108,7 +119,10 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
           hideCaptaincy
           nextFixture={poolLookup?.get(player.id)?.nextFixtures[0]}
           playerInfo={buildPlayerInfo(player)}
+          ownershipTourAttr={player.id === tourAnchorId ? 'step-4' : undefined}
+          fixtureTourAttr={player.id === tourAnchorId ? 'step-5' : undefined}
           subTourAttr={tourAttr}
+          reserveSubSlot={!!onSubIconClick}
           onSubClick={
             !subModeActive && onSubIconClick ? () => onSubIconClick(player.id) : undefined
           }

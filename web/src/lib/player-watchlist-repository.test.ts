@@ -157,11 +157,11 @@ describe('ApiPlayerWatchlistRepository', () => {
     expect(fetch).toHaveBeenCalledTimes(1);
   });
 
-  it('list() returns cached result on repeated calls', async () => {
+  it('list() refetches on sequential calls', async () => {
     mockFetch(200, { playerIds: [300] });
     await repo.list();
     await repo.list();
-    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledTimes(2);
   });
 
   it('cache is invalidated after add()', async () => {

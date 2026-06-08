@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import { useGameweeks } from '@/api/queries';
 import { PremiumSheet } from '@/components/ui/PremiumSheet/PremiumSheet';
@@ -14,6 +15,7 @@ import styles from './WatchlistScreen.module.css';
 
 export const WatchlistScreen: React.FC = () => {
   const { myTeamId } = useMyTeam();
+  const location = useLocation();
   const repo = useWatchlistRepository();
   const { data: gameweeksData } = useGameweeks();
 
@@ -21,13 +23,15 @@ export const WatchlistScreen: React.FC = () => {
   const [premiumOpen, setPremiumOpen] = useState(false);
 
   const refreshList = useCallback(async () => {
+    repo.invalidateCache();
     const managers = await repo.list();
     setWatchedManagers(managers);
   }, [repo]);
 
   useEffect(() => {
+    repo.invalidateCache();
     repo.list().then(setWatchedManagers).catch(() => setWatchedManagers([]));
-  }, [repo]);
+  }, [repo, location.key]);
 
   const handleRemove = useCallback(async (teamId: number) => {
     await repo.remove(teamId);
@@ -65,9 +69,11 @@ export const WatchlistScreen: React.FC = () => {
             <p className={styles.emptyHeading}>{copy.watchlistEmptyHeading}</p>
             <p className={styles.emptySubtext}>{copy.watchlistEmptySubtext}</p>
           </div>
+        ) : currentGw === null ? (
+          <div className={styles.cardList} aria-busy="true" />
         ) : (
           <div className={styles.cardList}>
-            {currentGw !== null && watchedManagers.map((manager) => (
+            {watchedManagers.map((manager) => (
               <ManagerRow
                 key={manager.teamId}
                 teamId={manager.teamId}

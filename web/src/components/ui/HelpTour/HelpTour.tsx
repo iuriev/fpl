@@ -11,12 +11,33 @@ export interface HelpTourProps {
   onStepChange?: (index: number) => void;
 }
 
+const pitchStep = (step: Step): Step => ({
+  ...step,
+  skipScroll: true,
+  placement: 'top',
+});
+
 const STEPS: Step[] = [
   { title: copy.tourStep1Title, content: copy.tourStep1Text, target: '[data-tour="step-1"]', skipBeacon: true },
   { title: copy.tourStep2Title, content: copy.tourStep2Text, target: '[data-tour="step-2"]', skipBeacon: true },
-  { title: copy.tourStep4Title, content: copy.tourStep4Text, target: '[data-tour="step-4"]', skipBeacon: true },
-  { title: copy.tourStep5Title, content: copy.tourStep5Text, target: '[data-tour="step-5"]', skipBeacon: true },
-  { title: copy.tourStep6Title, content: copy.tourStep6Text, target: '[data-tour="step-6"]', skipBeacon: true },
+  pitchStep({
+    title: copy.tourStep4Title,
+    content: copy.tourStep4Text,
+    target: '[data-tour="step-4"]',
+    skipBeacon: true,
+  }),
+  pitchStep({
+    title: copy.tourStep5Title,
+    content: copy.tourStep5Text,
+    target: '[data-tour="step-5"]',
+    skipBeacon: true,
+  }),
+  pitchStep({
+    title: copy.tourStep6Title,
+    content: copy.tourStep6Text,
+    target: '[data-tour="step-6"]',
+    skipBeacon: true,
+  }),
   { title: copy.tourStep9Title, content: copy.tourStep9Text, target: '[data-tour="step-9"]', skipBeacon: true },
 ];
 
@@ -168,6 +189,8 @@ export const HelpTour: React.FC<HelpTourProps> = ({ open, onClose, onStepChange 
     } else if (type === EVENTS.STEP_AFTER) {
       if (action === ACTIONS.NEXT) setStepIndex(index + 1);
       else if (action === ACTIONS.PREV) setStepIndex(index - 1);
+    } else if (type === EVENTS.TARGET_NOT_FOUND) {
+      if (index < STEPS.length - 1) setStepIndex(index + 1);
     } else if (type === EVENTS.TOUR_END) {
       onClose();
     }

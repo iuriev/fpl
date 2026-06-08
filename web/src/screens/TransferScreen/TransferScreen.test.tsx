@@ -93,7 +93,7 @@ const POOL_PLAYERS: PoolPlayer[] = SQUAD_DATA.starters.concat(SQUAD_DATA.bench).
   selectedByPercent: '10',
   expectedPoints: '5.0',
   form: '5.0',
-  nextFixtures: [],
+  nextFixtures: [{ opponent: 'TOT', home: true, difficulty: 3 }],
 }));
 
 const EXTRA_PLAYER: PoolPlayer = {
@@ -357,9 +357,11 @@ describe('TransferScreen help tour', () => {
     await user.click(nextBtn);
 
     expect(await screen.findByText('Player Stats')).toBeInTheDocument();
+    expect(document.querySelectorAll('[data-tour="step-4"]')).toHaveLength(1);
     await user.click(nextBtn);
 
     expect(await screen.findByText('Fixture Difficulty')).toBeInTheDocument();
+    expect(document.querySelectorAll('[data-tour="step-5"]')).toHaveLength(1);
     await user.click(nextBtn);
 
     expect(await screen.findByText('Substitutions')).toBeInTheDocument();
@@ -419,6 +421,9 @@ describe('TransferScreen Reset button', () => {
     const edersonCard = screen.getByRole('button', { name: /Ederson/i });
     const subIcon = within(edersonCard).getByLabelText('Substitute');
     await user.click(subIcon);
+
+    expect(within(edersonCard).queryByLabelText('Substitute')).not.toBeInTheDocument();
+    expect(within(edersonCard).getByText('10% / 5.0').parentElement?.childElementCount).toBe(2);
 
     // Hart is a starter
     const hartCard = screen.getByRole('button', { name: /Hart/i });

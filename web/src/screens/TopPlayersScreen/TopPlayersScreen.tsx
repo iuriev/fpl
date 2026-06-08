@@ -21,7 +21,7 @@ import { PlayerCard } from '@/components/ui/PlayerCard/PlayerCard';
 import { PlayerRankRow } from '@/components/ui/PlayerRankRow/PlayerRankRow';
 import { ScreenHeader } from '@/components/ui/ScreenHeader/ScreenHeader';
 import { type ViewMode, ViewToggle } from '@/components/ui/ViewToggle/ViewToggle';
-import { copy } from '@/lib/copy';
+import { copy, interpolate } from '@/lib/copy';
 import { useFollowPlayer } from '@/lib/use-follow-player';
 import type {
   LeaderboardPlayer,
@@ -41,7 +41,7 @@ type SeasonView = 'points' | 'defcon' | 'bps';
 const PAGE_SIZE = 20;
 const EMPTY_TOP: TopPlayersPlayer[] = [];
 const EMPTY_LB: LeaderboardPlayer[] = [];
-const POSITION_ORDER: PlayerPosition[] = ['GK', 'DEF', 'MID', 'FWD'];
+const POSITION_ORDER: PlayerPosition[] = ['FWD', 'MID', 'DEF', 'GK'];
 
 function withTransition(update: () => void): void {
   if (!document.startViewTransition) {
@@ -196,27 +196,19 @@ export const TopPlayersScreen: React.FC = () => {
 
   const selectedTeamName = teams.find((t) => t.code === selectedTeamCode)?.name ?? '';
   const [teamPickerOpen, setTeamPickerOpen] = useState(false);
+  const [gwPickerOpen, setGwPickerOpen] = useState(false);
 
   const showGwNav = activeTab === 'points' || activeTab === 'defcon' || activeTab === 'bps';
 
-  const canGoPrev =
-    selectedGw !== null && selectedGw > 1 && finishedGws.some((gw) => gw.id === selectedGw - 1);
-  const canGoNext =
-    selectedGw !== null &&
-    latestFinishedGw !== null &&
-    selectedGw < latestFinishedGw &&
-    finishedGws.some((gw) => gw.id === selectedGw + 1);
-
-  const navigateGw = (delta: number) => {
-    if (selectedGw === null) return;
-    const next = selectedGw + delta;
+  const selectGw = (gw: number) => {
     withTransition(() =>
       setSearchParams((prev) => {
         const p = new URLSearchParams(prev);
-        p.set('gw', String(next));
+        p.set('gw', String(gw));
         return p;
       })
     );
+    setGwPickerOpen(false);
   };
 
   const setTab = (tab: Tab) => {
@@ -274,7 +266,8 @@ export const TopPlayersScreen: React.FC = () => {
   const seasonBps = useProgressiveList(seasonBpsPlayers);
   const seasonPoints = useProgressiveList(seasonPlayers);
 
-  const gwLabel = selectedGw !== null ? `GW ${selectedGw}` : '';
+  const gwLabel =
+    selectedGw !== null ? interpolate(copy.topPlayersGwLabel, { n: selectedGw }) : '';
 
   const isLoading =
     activeTab === 'points'
@@ -320,7 +313,37 @@ export const TopPlayersScreen: React.FC = () => {
 
   return (
     <div className={`${styles.screen} ${showPitch ? styles.screenTotw : ''}`}>
-      <ScreenHeader title={copy.topPlayersTitle} />
+      <ScreenHeader
+        title={copy.topPlayersTitle}
+        right={
+          showGwNav && gwLabel ? (
+            <button
+              type="button"
+              className={styles.gwPickerBtn}
+              onClick={() => setGwPickerOpen(true)}
+              aria-label={gwLabel}
+              aria-haspopup="listbox"
+              aria-expanded={gwPickerOpen}
+            >
+              {gwLabel}
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                aria-hidden="true"
+                className={styles.gwPickerChevron}
+              >
+                <path
+                  d="M4 6l4 4 4-4"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          ) : undefined
+        }
+      />
 
       <div className={styles.tabs} role="tablist" aria-label={copy.topPlayersTitle}>
         <button
@@ -364,44 +387,6 @@ export const TopPlayersScreen: React.FC = () => {
           {copy.topPlayersTabSeason}
         </button>
       </div>
-
-      {showGwNav && (
-        <div className={styles.gwNav}>
-          <button
-            className={styles.navBtn}
-            onClick={() => navigateGw(-1)}
-            disabled={!canGoPrev}
-            aria-label="Previous gameweek"
-          >
-            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path
-                d="M10 4l-4 4 4 4"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-          <span className={styles.gwLabel}>{gwLabel}</span>
-          <button
-            className={styles.navBtn}
-            onClick={() => navigateGw(1)}
-            disabled={!canGoNext}
-            aria-label="Next gameweek"
-          >
-            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" className={styles.chevronRight}>
-              <path
-                d="M10 4l-4 4 4 4"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-        </div>
-      )}
 
       {activeTab === 'points' && (
         <div className={styles.viewToggleWrap}>
@@ -720,6 +705,29 @@ export const TopPlayersScreen: React.FC = () => {
           )}
         </div>
       )}
+
+      <BottomSheet
+        open={gwPickerOpen}
+        onClose={() => setGwPickerOpen(false)}
+        title={copy.topPlayersSelectGameweek}
+      >
+        {gwPickerOpen && (
+          <div className={styles.gwList} role="listbox" aria-label={copy.topPlayersSelectGameweek}>
+            {[...finishedGws].reverse().map((gw) => (
+              <button
+                key={gw.id}
+                type="button"
+                className={`${styles.gwOption} ${gw.id === selectedGw ? styles.gwOptionSelected : ''}`}
+                role="option"
+                aria-selected={gw.id === selectedGw}
+                onClick={() => selectGw(gw.id)}
+              >
+                {interpolate(copy.topPlayersGwLabel, { n: gw.id })}
+              </button>
+            ))}
+          </div>
+        )}
+      </BottomSheet>
     </div>
   );
 };
@@ -767,7 +775,7 @@ function PitchSkeletonContent() {
     <>
       <div className={styles.pitchSkeletonVeil} />
       <div className={styles.pitchRows}>
-        {[1, 3, 4, 3].map((count, rowIdx) => (
+        {[3, 4, 3, 1].map((count, rowIdx) => (
           <div key={rowIdx} className={styles.playerRow}>
             {Array.from({ length: count }).map((_, i) => (
               <div key={i} className={styles.pitchSkeletonPlayer}>

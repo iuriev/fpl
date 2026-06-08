@@ -28,13 +28,13 @@ type MainTab = 'points' | 'lineups' | 'cs' | 'xg';
 type PositionTab = PlayerPosition;
 
 const MAIN_TABS: { slug: MainTab; label: string }[] = [
-  { slug: 'points', label: copy.predictionsTabPoints },
   { slug: 'lineups', label: copy.predictionsTabLineups },
+  { slug: 'points', label: copy.predictionsTabPoints },
   { slug: 'cs', label: copy.predictionsTabCS },
   { slug: 'xg', label: copy.predictionsTabXG },
 ];
 
-const POSITION_TABS: PositionTab[] = ['GK', 'DEF', 'MID', 'FWD'];
+const POSITION_TABS: PositionTab[] = ['FWD', 'MID', 'DEF', 'GK'];
 const FREE_TOTAL = 10;
 const FREE_VISIBLE = 3;
 const PREMIUM_PAGE_SIZE = 20;
@@ -126,9 +126,9 @@ export const PredictionsScreen: React.FC = () => {
 
   // ── Tab state ──────────────────────────────────────────
   const tabParam = searchParams.get('tab');
-  const activeTab: MainTab = (['points', 'lineups', 'cs', 'xg'] as MainTab[]).includes(tabParam as MainTab)
+  const activeTab: MainTab = (['lineups', 'points', 'cs', 'xg'] as MainTab[]).includes(tabParam as MainTab)
     ? (tabParam as MainTab)
-    : 'points';
+    : 'lineups';
 
   const setTab = (tab: MainTab) => {
     setSearchParams((prev) => {
@@ -143,7 +143,7 @@ export const PredictionsScreen: React.FC = () => {
   const nextGw = gameweeksData?.next ?? gameweeksData?.current ?? null;
 
   // ── Points state & queries ─────────────────────────────
-  const [posTab, setPosTab] = useState<PositionTab>('MID');
+  const [posTab, setPosTab] = useState<PositionTab>('FWD');
   const { data: poolData, isLoading: poolLoading } = usePlayerPool();
   const { data: predictionsData, isLoading: predictionsLoading } = usePredictions(nextGw);
 

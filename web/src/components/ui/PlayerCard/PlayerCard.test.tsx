@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import type { FixtureInfo, SquadPlayer } from '@/types';
 
@@ -186,6 +186,33 @@ describe('PlayerCard info popup', () => {
     render(<PlayerCard player={makePlayer()} playerInfo={makePlayerInfo({ expectedPoints: '8.1' })} />);
     await user.click(screen.getByRole('button', { name: /player info/i }));
     expect(screen.getByText(/8.1 XP/)).toBeInTheDocument();
+  });
+
+  it('renders substitute control beside ownership pill', () => {
+    render(
+      <PlayerCard
+        player={makePlayer()}
+        playerInfo={makePlayerInfo()}
+        onSubClick={vi.fn()}
+      />
+    );
+    const ownership = screen.getByText('44.5% / 4.5');
+    const subBtn = screen.getByRole('button', { name: 'Substitute' });
+    expect(ownership.parentElement).toBe(subBtn.parentElement);
+  });
+
+  it('keeps substitute slot reserved when reserveSubSlot is true without onSubClick', () => {
+    const { container } = render(
+      <PlayerCard
+        player={makePlayer()}
+        playerInfo={makePlayerInfo()}
+        reserveSubSlot
+      />
+    );
+    expect(screen.queryByRole('button', { name: 'Substitute' })).not.toBeInTheDocument();
+    const ownership = screen.getByText('44.5% / 4.5');
+    expect(ownership.parentElement?.childElementCount).toBe(2);
+    expect(container.querySelector('[aria-hidden="true"] svg')).toBeTruthy();
   });
 
   it('does not render expected points when missing', async () => {

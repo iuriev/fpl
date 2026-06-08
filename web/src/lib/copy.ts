@@ -331,6 +331,8 @@ export const copy = {
   topPlayersTabTeam: 'By Team',
   topPlayersTeamSelectLabel: 'Select team',
   topPlayersTeamLoadError: "Couldn't load team players",
+  topPlayersGwLabel: 'GW {n}',
+  topPlayersSelectGameweek: 'Select gameweek',
 
   // Transfer planner screen
   transfersBack: 'Squad',
