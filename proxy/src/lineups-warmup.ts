@@ -6,7 +6,7 @@ import { getOrFetchBootstrap } from './fpl-cache/db-cache';
 import { deriveSeason } from './fpl-cache/season';
 import {
   countFreshSummaries,
-  getFreshElementSummaryRow,
+  getBulkFreshElementSummaries,
   getOrFetchElementSummary,
 } from './fpl-element-summary-cache';
 import { getOrFetchAllFixtures } from './fpl-fixtures-cache';
@@ -134,6 +134,8 @@ async function warmElementIds(
     return;
   }
 
+  const cachedMap = await getBulkFreshElementSummaries(db, season, ids);
+
   let done = 0;
   let fetches = 0;
   let lastLogAt = Date.now();
@@ -150,7 +152,7 @@ async function warmElementIds(
     );
   };
 
-  logWarmup(`${label}: warming ${ids.length} players…`);
+  logWarmup(`${label}: warming ${ids.length} players… (${cachedMap.size} in DB, ${ids.length - cachedMap.size} need FPL fetch)`);
   maybeLogProgress(true);
 
   for (const elementId of ids) {
@@ -158,8 +160,7 @@ async function warmElementIds(
       logWarmup(`${label}: stopped early (shutdown)`);
       return;
     }
-    const fresh = await getFreshElementSummaryRow(db, season, elementId);
-    if (!fresh) {
+    if (!cachedMap.has(elementId)) {
       logWarmup(
         `${label} FPL fetch element-summary/${elementId} (${done + 1}/${ids.length}, call #${fetches + 1})`
       );
