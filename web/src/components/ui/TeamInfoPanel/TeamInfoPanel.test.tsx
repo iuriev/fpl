@@ -125,9 +125,9 @@ describe('TeamInfoPanel — navLinksMode', () => {
 });
 
 describe('TeamInfoPanel — settings link', () => {
-  it('shows Settings nav link in full mode', () => {
+  it('does not show Settings nav link in full mode', () => {
     renderPanelWithUser();
-    expect(screen.getByRole('link', { name: /settings/i }).getAttribute('href')).toBe('/settings');
+    expect(screen.queryByRole('link', { name: /settings/i })).toBeNull();
   });
 
   it('does not show account profile in the side panel', () => {

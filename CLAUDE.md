@@ -75,6 +75,11 @@ The project is built spec-first; application code comes last. Read these before 
   note something, add it to `docs/backlog.md` immediately. The backlog is the single capture
   point for everything not yet in an OpenSpec change. To promote an idea to active work: run
   `/opsx:propose` to turn it into an OpenSpec change proposal, then implement from there.
+- **Prediction model spec.** Whenever any formula, constant, or algorithm in
+  `proxy/src/prediction/` is added or changed, invoke the `prediction-spec-consistency`
+  skill — it contains the code→spec mapping table and consistency checklist. The spec files
+  in `openspec/specs/predictions/` are the single source of truth for how predictions work.
+  A code change without a matching spec update is incomplete.
 - **DB schema documentation.** Whenever `proxy/src/db/schema.ts` is created or modified,
   update `docs/db-schema.md` in the same change: keep the per-table Markdown column table and
   the Mermaid ER diagram in sync with the Drizzle schema. This is the non-developer-friendly

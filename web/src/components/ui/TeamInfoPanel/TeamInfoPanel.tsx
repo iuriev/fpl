@@ -34,7 +34,6 @@ const NAV_LINKS: { to: string; label: () => string; featured?: boolean; end?: bo
   { to: '/predictions', label: () => copy.predictionsNavLink },
   { to: '/price-changes', label: () => copy.priceChangesNavLink },
   { to: '/fixtures', label: () => copy.fixturesCalendarNavLink },
-  { to: '/settings', label: () => copy.settingsNavLink },
 ];
 
 export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({
@@ -125,33 +124,19 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({
 
       {navLinksMode === 'demo' && (
         <div className={styles.navLinks}>
-          {navLinks.map(({ to, label, featured, end }) =>
-            to === '/settings' ? (
-              <NavLink
-                key={to}
-                to={to}
-                end={end}
-                onClick={onClose}
-                className={({ isActive }) =>
-                  [styles.navLink, isActive ? styles.navLinkActive : ''].filter(Boolean).join(' ')
-                }
-              >
-                {label()}
-              </NavLink>
-            ) : (
-              <button
-                key={to}
-                type="button"
-                className={`${styles.navLink} ${styles.navLinkDemo}${featured ? ` ${styles.navLinkFeatured}` : ''}`}
-                onClick={() => {
-                  openDemoGate();
-                  onClose?.();
-                }}
-              >
-                {label()}
-              </button>
-            )
-          )}
+          {navLinks.map(({ to, label, featured }) => (
+            <button
+              key={to}
+              type="button"
+              className={`${styles.navLink} ${styles.navLinkDemo}${featured ? ` ${styles.navLinkFeatured}` : ''}`}
+              onClick={() => {
+                openDemoGate();
+                onClose?.();
+              }}
+            >
+              {label()}
+            </button>
+          ))}
         </div>
       )}
 
