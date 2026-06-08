@@ -1,6 +1,7 @@
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
 import * as schema from './db/schema';
+import { lineupsWarmupFlagLog } from './flagged-log';
 import { getOrFetchBootstrap } from './fpl-cache/db-cache';
 import { deriveSeason } from './fpl-cache/season';
 import {
@@ -84,7 +85,7 @@ const PROGRESS_LOG_EVERY = 10;
 const HEARTBEAT_MS = 20_000;
 
 function logWarmup(message: string): void {
-  console.log(`[lineups:warmup] ${message}`);
+  lineupsWarmupFlagLog.log(message);
 }
 
 export function formatLineupsWarmupStatus(
@@ -269,7 +270,7 @@ export async function runLineupsWarmup(db: Db): Promise<void> {
   } catch (err) {
     status.phase = 'error';
     status.lastError = err instanceof Error ? err.message : String(err);
-    console.error('[lineups:warmup] error:', err);
+    lineupsWarmupFlagLog.error('error:', err);
   } finally {
     running = false;
   }

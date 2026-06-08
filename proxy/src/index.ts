@@ -15,6 +15,7 @@ import { playerWatchlistEntry } from './db/schema';
 import * as entryService from './entry-service';
 import * as fixturesCalendarService from './fixtures-calendar-service';
 import * as fixturesService from './fixtures-service';
+import { flaggedError } from './flagged-log';
 import { getOrFetchBootstrap } from './fpl-cache/db-cache';
 import { prefetchMissingGwData } from './fpl-cache/prefetch';
 import { deriveSeason } from './fpl-cache/season';
@@ -486,7 +487,11 @@ httpServer = serve({ fetch: app.fetch, port }, () => {
       startPredictionsWarmup(db);
     } catch (err) {
       setStartupSeedDone();
-      console.error('[proxy] startup background tasks error:', err);
+      flaggedError(
+        ['LINEUPS_SEED_ON_START', 'LINEUPS_WARMUP_ENABLED', 'PREDICTIONS_WARMUP_ENABLED'],
+        'startup background tasks error:',
+        err,
+      );
     }
   })();
 });

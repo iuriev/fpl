@@ -36,7 +36,7 @@ export const GameweekReviewScreen: React.FC<GameweekReviewScreenProps> = ({ team
   const prevGw = reviewGw !== null && reviewGw > 1 ? reviewGw - 1 : null;
 
   const { data: currentSquad } = useSquad(teamId, reviewGw);
-  const { data: previousSquad } = useSquad(teamId, prevGw);
+  const { data: previousSquad } = useSquad(teamId, currentSquad ? prevGw : null);
 
   const historyGw = useMemo(
     () => historyData?.gameweeks.find((g) => g.gw === reviewGw) ?? null,

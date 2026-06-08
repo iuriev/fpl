@@ -1,6 +1,7 @@
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
 import * as schema from './db/schema';
+import { predictionsWarmupFlagLog } from './flagged-log';
 import { getOrFetchBootstrap } from './fpl-cache/db-cache';
 import { deriveSeason } from './fpl-cache/season';
 import { defaultDataDir } from './prediction/ingest';
@@ -40,7 +41,7 @@ export function getPredictionsWarmupStatus(): PredictionsWarmupStatus {
 }
 
 function logWarmup(message: string): void {
-  console.log(`[predictions:warmup] ${message}`);
+  predictionsWarmupFlagLog.log(message);
 }
 
 export async function runPredictionsWarmup(db: Db): Promise<void> {
@@ -67,7 +68,7 @@ export async function runPredictionsWarmup(db: Db): Promise<void> {
     status.targetEvent = targetEvent;
 
     logWarmup(`ingest starting for season=${season} targetEvent=${targetEvent}`);
-    await runPredictionIngest(db, defaultDataDir());
+    await runPredictionIngest(db, defaultDataDir(), undefined, ['PREDICTIONS_WARMUP_ENABLED']);
     if (isShuttingDown()) return;
 
     status.phase = 'score';
@@ -81,7 +82,7 @@ export async function runPredictionsWarmup(db: Db): Promise<void> {
     status.phase = 'error';
     status.ready = false;
     status.lastError = err instanceof Error ? err.message : String(err);
-    console.error('[predictions:warmup] error:', err);
+    predictionsWarmupFlagLog.error('error:', err);
   } finally {
     running = false;
   }

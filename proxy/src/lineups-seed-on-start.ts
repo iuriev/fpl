@@ -2,6 +2,8 @@ import { spawn } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { seedFlagLog } from './flagged-log';
+
 const scriptsDir = join(dirname(fileURLToPath(import.meta.url)), '../scripts');
 
 export function isLineupsSeedOnStartEnabled(): boolean {
@@ -33,10 +35,10 @@ function runTransfermarktIngest(): Promise<void> {
 export async function maybeRunLineupsSeedOnStart(): Promise<void> {
   if (!isLineupsSeedOnStartEnabled()) return;
 
-  console.log(
-    '[lineups:seed] LINEUPS_SEED_ON_START=true — Transfermarkt ingest (slow; ~4s per club)'
+  seedFlagLog.log(
+    'LINEUPS_SEED_ON_START=true — Transfermarkt ingest (slow; ~4s per club)',
   );
   const started = Date.now();
   await runTransfermarktIngest();
-  console.log(`[lineups:seed] position registry refreshed in ${Date.now() - started}ms`);
+  seedFlagLog.log(`position registry refreshed in ${Date.now() - started}ms`);
 }

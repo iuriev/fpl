@@ -388,8 +388,10 @@ export const PredictionsScreen: React.FC = () => {
   const showXgMarketLoading =
     marketListLoading || (predictionsWarmupActive && xgMarketTeams.length === 0);
 
-  const showCsMarketEmpty = !showCsMarketLoading && csMarketTeams.length === 0;
-  const showXgMarketEmpty = !showXgMarketLoading && xgMarketTeams.length === 0;
+  const marketDataReady = isPremium ? (marketData == null || marketData.ready) : (marketPreview == null || marketPreview.ready);
+
+  const showCsMarketEmpty = !showCsMarketLoading && marketDataReady && csMarketTeams.length === 0;
+  const showXgMarketEmpty = !showXgMarketLoading && marketDataReady && xgMarketTeams.length === 0;
 
   const marketEmptyMessage =
     nextGw !== null
