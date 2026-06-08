@@ -5,6 +5,8 @@ import { useSearchParams } from 'react-router-dom';
 import { ApiError } from '@/api/client';
 import {
   useGameweeks,
+  useLeaderboardGw,
+  useLeaderboardSeason,
   useTeamOfTheWeek,
   useTeamPlayers,
   useTeams,
@@ -12,14 +14,17 @@ import {
   useTopPlayersSeason,
 } from '@/api/queries';
 import { BottomSheet } from '@/components/ui/BottomSheet/BottomSheet';
+import { BpsRankRow } from '@/components/ui/BpsRankRow/BpsRankRow';
 import { Button } from '@/components/ui/Button/Button';
 import { Pitch } from '@/components/ui/Pitch/Pitch';
 import { PlayerCard } from '@/components/ui/PlayerCard/PlayerCard';
 import { PlayerRankRow } from '@/components/ui/PlayerRankRow/PlayerRankRow';
 import { ScreenHeader } from '@/components/ui/ScreenHeader/ScreenHeader';
+import { type ViewMode, ViewToggle } from '@/components/ui/ViewToggle/ViewToggle';
 import { copy } from '@/lib/copy';
 import { useFollowPlayer } from '@/lib/use-follow-player';
 import type {
+  LeaderboardPlayer,
   PlayerPosition,
   PlayerStatus,
   SquadPlayer,
@@ -30,10 +35,12 @@ import { MAX_GAMEWEEK } from '@/types';
 
 import styles from './TopPlayersScreen.module.css';
 
-type Tab = 'gw' | 'season' | 'team' | 'totw';
+type Tab = 'points' | 'defcon' | 'bps' | 'team' | 'season';
+type SeasonView = 'points' | 'defcon' | 'bps';
 
 const PAGE_SIZE = 20;
-const EMPTY: TopPlayersPlayer[] = [];
+const EMPTY_TOP: TopPlayersPlayer[] = [];
+const EMPTY_LB: LeaderboardPlayer[] = [];
 const POSITION_ORDER: PlayerPosition[] = ['GK', 'DEF', 'MID', 'FWD'];
 
 function withTransition(update: () => void): void {
@@ -44,7 +51,7 @@ function withTransition(update: () => void): void {
   document.startViewTransition(() => flushSync(update));
 }
 
-function useProgressiveList(items: TopPlayersPlayer[]) {
+function useProgressiveList<T>(items: T[]) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -138,13 +145,19 @@ export const TopPlayersScreen: React.FC = () => {
 
   const tabParam = searchParams.get('tab');
   const activeTab: Tab =
-    tabParam === 'season'
-      ? 'season'
-      : tabParam === 'team'
-        ? 'team'
-        : tabParam === 'totw'
-          ? 'totw'
-          : 'gw';
+    tabParam === 'defcon'
+      ? 'defcon'
+      : tabParam === 'bps'
+        ? 'bps'
+        : tabParam === 'team'
+          ? 'team'
+          : tabParam === 'season'
+            ? 'season'
+            : 'points';
+
+  const seasonViewParam = searchParams.get('seasonView');
+  const activeSeasonView: SeasonView =
+    seasonViewParam === 'defcon' ? 'defcon' : seasonViewParam === 'bps' ? 'bps' : 'points';
 
   const gwParam = searchParams.get('gw');
   const selectedGw = useMemo(() => {
@@ -159,6 +172,14 @@ export const TopPlayersScreen: React.FC = () => {
     () => finishedGws.some((gw) => gw.id === selectedGw),
     [finishedGws, selectedGw]
   );
+
+  // View mode (List / Pitch) for Points tab — local state, not persisted in URL
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const prevTab = useRef<Tab>(activeTab);
+  if (prevTab.current !== activeTab) {
+    prevTab.current = activeTab;
+    if (activeTab !== 'points') setViewMode('list');
+  }
 
   // Teams query — loaded when "By Team" tab is active
   const { data: teamsData } = useTeams();
@@ -176,7 +197,7 @@ export const TopPlayersScreen: React.FC = () => {
   const selectedTeamName = teams.find((t) => t.code === selectedTeamCode)?.name ?? '';
   const [teamPickerOpen, setTeamPickerOpen] = useState(false);
 
-  const showGwNav = activeTab === 'gw' || activeTab === 'totw';
+  const showGwNav = activeTab === 'points' || activeTab === 'defcon' || activeTab === 'bps';
 
   const canGoPrev =
     selectedGw !== null && selectedGw > 1 && finishedGws.some((gw) => gw.id === selectedGw - 1);
@@ -206,6 +227,14 @@ export const TopPlayersScreen: React.FC = () => {
     });
   };
 
+  const setSeasonView = (view: SeasonView) => {
+    setSearchParams((prev) => {
+      const p = new URLSearchParams(prev);
+      p.set('seasonView', view);
+      return p;
+    });
+  };
+
   const handleTeamChange = (code: number) => {
     setSearchParams((prev) => {
       const p = new URLSearchParams(prev);
@@ -214,44 +243,59 @@ export const TopPlayersScreen: React.FC = () => {
     });
   };
 
-  const gwQuery = useTopPlayersGw(activeTab === 'gw' && selectedGwFinished ? selectedGw : null);
+  // Queries
+  const gwQuery = useTopPlayersGw(activeTab === 'points' && selectedGwFinished ? selectedGw : null);
   const seasonQuery = useTopPlayersSeason();
   const teamPlayersQuery = useTeamPlayers(activeTab === 'team' ? selectedTeamCode : null);
   const totwQuery = useTeamOfTheWeek(
-    activeTab === 'totw' && selectedGwFinished ? selectedGw : null
+    activeTab === 'points' && viewMode === 'pitch' && selectedGwFinished ? selectedGw : null
   );
+  const leaderboardGwQuery = useLeaderboardGw(
+    (activeTab === 'defcon' || activeTab === 'bps') && selectedGwFinished ? selectedGw : null
+  );
+  const leaderboardSeasonQuery = useLeaderboardSeason();
 
-  const gwPlayers = gwQuery.data?.players ?? EMPTY;
-  const seasonPlayers = seasonQuery.data?.players ?? EMPTY;
-  const teamPlayers = teamPlayersQuery.data?.players ?? EMPTY;
+  const gwPlayers = gwQuery.data?.players ?? EMPTY_TOP;
+  const seasonPlayers = seasonQuery.data?.players ?? EMPTY_TOP;
+  const teamPlayers = teamPlayersQuery.data?.players ?? EMPTY_TOP;
+
+  const defconPlayers = leaderboardGwQuery.data?.defcon ?? EMPTY_LB;
+  const bpsPlayers = leaderboardGwQuery.data?.bps ?? EMPTY_LB;
+  const seasonDefconPlayers = leaderboardSeasonQuery.data?.defcon ?? EMPTY_LB;
+  const seasonBpsPlayers = leaderboardSeasonQuery.data?.bps ?? EMPTY_LB;
 
   const activePlayers =
-    activeTab === 'gw' ? gwPlayers : activeTab === 'season' ? seasonPlayers : teamPlayers;
+    activeTab === 'points' ? gwPlayers : activeTab === 'team' ? teamPlayers : EMPTY_TOP;
 
   const { visible, sentinelRef, hasMore } = useProgressiveList(activePlayers);
+  const defcon = useProgressiveList(defconPlayers);
+  const bps = useProgressiveList(bpsPlayers);
+  const seasonDefcon = useProgressiveList(seasonDefconPlayers);
+  const seasonBps = useProgressiveList(seasonBpsPlayers);
+  const seasonPoints = useProgressiveList(seasonPlayers);
 
   const gwLabel = selectedGw !== null ? `GW ${selectedGw}` : '';
 
   const isLoading =
-    activeTab === 'gw'
+    activeTab === 'points'
       ? gwQuery.isLoading
-      : activeTab === 'season'
-        ? seasonQuery.isLoading
-        : teamPlayersQuery.isLoading;
+      : activeTab === 'team'
+        ? teamPlayersQuery.isLoading
+        : false;
 
   const isError =
-    activeTab === 'gw'
+    activeTab === 'points'
       ? gwQuery.isError
-      : activeTab === 'season'
-        ? seasonQuery.isError
-        : teamPlayersQuery.isError;
+      : activeTab === 'team'
+        ? teamPlayersQuery.isError
+        : false;
 
   const refetch =
-    activeTab === 'gw'
+    activeTab === 'points'
       ? gwQuery.refetch
-      : activeTab === 'season'
-        ? seasonQuery.refetch
-        : teamPlayersQuery.refetch;
+      : activeTab === 'team'
+        ? teamPlayersQuery.refetch
+        : gwQuery.refetch;
 
   // TOTW state
   const isTotwGwTransition =
@@ -261,7 +305,13 @@ export const TopPlayersScreen: React.FC = () => {
   const isTotwIs400 =
     totwQuery.isError && totwQuery.error instanceof ApiError && totwQuery.error.status === 400;
   const isTotwRealError = totwQuery.isError && !isTotwIs400;
-  const showPitch = activeTab === 'totw' && selectedGwFinished && !isTotwRealError && !isTotwNotAvailable && !isTotwIs400;
+  const showPitch =
+    activeTab === 'points' &&
+    viewMode === 'pitch' &&
+    selectedGwFinished &&
+    !isTotwRealError &&
+    !isTotwNotAvailable &&
+    !isTotwIs400;
 
   const totwPositionGroups = useMemo(() => {
     if (!totwQuery.data) return null;
@@ -269,25 +319,33 @@ export const TopPlayersScreen: React.FC = () => {
   }, [totwQuery.data]);
 
   return (
-    <div className={`${styles.screen} ${activeTab === 'totw' ? styles.screenTotw : ''}`}>
+    <div className={`${styles.screen} ${showPitch ? styles.screenTotw : ''}`}>
       <ScreenHeader title={copy.topPlayersTitle} />
 
       <div className={styles.tabs} role="tablist" aria-label={copy.topPlayersTitle}>
         <button
           role="tab"
-          aria-selected={activeTab === 'gw'}
-          className={`${styles.tab} ${activeTab === 'gw' ? styles.tabActive : ''}`}
-          onClick={() => setTab('gw')}
+          aria-selected={activeTab === 'points'}
+          className={`${styles.tab} ${activeTab === 'points' ? styles.tabActive : ''}`}
+          onClick={() => setTab('points')}
         >
-          {copy.topPlayersTabGw}
+          {copy.topPlayersTabPoints}
         </button>
         <button
           role="tab"
-          aria-selected={activeTab === 'season'}
-          className={`${styles.tab} ${activeTab === 'season' ? styles.tabActive : ''}`}
-          onClick={() => setTab('season')}
+          aria-selected={activeTab === 'defcon'}
+          className={`${styles.tab} ${activeTab === 'defcon' ? styles.tabActive : ''}`}
+          onClick={() => setTab('defcon')}
         >
-          {copy.topPlayersTabSeason}
+          {copy.topPlayersTabDefcon}
+        </button>
+        <button
+          role="tab"
+          aria-selected={activeTab === 'bps'}
+          className={`${styles.tab} ${activeTab === 'bps' ? styles.tabActive : ''}`}
+          onClick={() => setTab('bps')}
+        >
+          {copy.topPlayersTabBps}
         </button>
         <button
           role="tab"
@@ -299,11 +357,11 @@ export const TopPlayersScreen: React.FC = () => {
         </button>
         <button
           role="tab"
-          aria-selected={activeTab === 'totw'}
-          className={`${styles.tab} ${activeTab === 'totw' ? styles.tabActive : ''}`}
-          onClick={() => setTab('totw')}
+          aria-selected={activeTab === 'season'}
+          className={`${styles.tab} ${activeTab === 'season' ? styles.tabActive : ''}`}
+          onClick={() => setTab('season')}
         >
-          {copy.topPlayersTabTotw}
+          {copy.topPlayersTabSeason}
         </button>
       </div>
 
@@ -342,6 +400,12 @@ export const TopPlayersScreen: React.FC = () => {
               />
             </svg>
           </button>
+        </div>
+      )}
+
+      {activeTab === 'points' && (
+        <div className={styles.viewToggleWrap}>
+          <ViewToggle value={viewMode} onChange={setViewMode} />
         </div>
       )}
 
@@ -413,15 +477,14 @@ export const TopPlayersScreen: React.FC = () => {
         </>
       )}
 
-      {activeTab !== 'totw' && (
+      {/* Points tab — List view */}
+      {activeTab === 'points' && viewMode === 'list' && (
         <div className={styles.body}>
           {isLoading && <PlayerListSkeleton />}
 
           {isError && (
             <div className={styles.stateCenter}>
-              <p className={styles.stateText}>
-                {activeTab === 'team' ? copy.topPlayersTeamLoadError : copy.topPlayersLoadError}
-              </p>
+              <p className={styles.stateText}>{copy.topPlayersLoadError}</p>
               <Button variant="secondary" onClick={() => refetch()}>
                 {copy.topPlayersRetry}
               </Button>
@@ -439,7 +502,8 @@ export const TopPlayersScreen: React.FC = () => {
         </div>
       )}
 
-      {activeTab === 'totw' && isTotwRealError && (
+      {/* Points tab — Pitch view (TOTW) */}
+      {activeTab === 'points' && viewMode === 'pitch' && isTotwRealError && (
         <div className={styles.stateCenter}>
           <p className={styles.stateText}>{copy.teamOfTheWeekLoadError}</p>
           <Button variant="secondary" onClick={() => totwQuery.refetch()}>
@@ -448,7 +512,7 @@ export const TopPlayersScreen: React.FC = () => {
         </div>
       )}
 
-      {activeTab === 'totw' && (isTotwNotAvailable || isTotwIs400) && (
+      {activeTab === 'points' && viewMode === 'pitch' && (isTotwNotAvailable || isTotwIs400) && (
         <div className={styles.stateCenter}>
           <p className={styles.stateText}>{copy.teamOfTheWeekNotAvailable}</p>
         </div>
@@ -478,6 +542,182 @@ export const TopPlayersScreen: React.FC = () => {
               )
             )}
           </Pitch>
+        </div>
+      )}
+
+      {/* By Team tab */}
+      {activeTab === 'team' && (
+        <div className={styles.body}>
+          {teamPlayersQuery.isLoading && <PlayerListSkeleton />}
+
+          {teamPlayersQuery.isError && (
+            <div className={styles.stateCenter}>
+              <p className={styles.stateText}>{copy.topPlayersTeamLoadError}</p>
+              <Button variant="secondary" onClick={() => teamPlayersQuery.refetch()}>
+                {copy.topPlayersRetry}
+              </Button>
+            </div>
+          )}
+
+          {!teamPlayersQuery.isLoading && !teamPlayersQuery.isError && teamPlayers.length > 0 && (
+            <div className={styles.list}>
+              {visible.map((player, i) => (
+                <FollowableRankRow key={player.id} rank={i + 1} player={player} />
+              ))}
+              {hasMore && <div ref={sentinelRef} className={styles.sentinel} aria-hidden="true" />}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* DEFCON tab */}
+      {activeTab === 'defcon' && (
+        <div className={styles.body}>
+          {leaderboardGwQuery.isLoading && <PlayerListSkeleton />}
+          {leaderboardGwQuery.isError && (
+            <div className={styles.stateCenter}>
+              <p className={styles.stateText}>{copy.topPlayersLoadError}</p>
+              <Button variant="secondary" onClick={() => leaderboardGwQuery.refetch()}>
+                {copy.topPlayersRetry}
+              </Button>
+            </div>
+          )}
+          {!leaderboardGwQuery.isLoading && !leaderboardGwQuery.isError && (
+            <div className={styles.list}>
+              {defcon.visible.map((player, i) => (
+                <BpsRankRow key={player.id} rank={i + 1} player={player} variant="defcon" />
+              ))}
+              {defcon.hasMore && (
+                <div ref={defcon.sentinelRef} className={styles.sentinel} aria-hidden="true" />
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* BPS tab */}
+      {activeTab === 'bps' && (
+        <div className={styles.body}>
+          {leaderboardGwQuery.isLoading && <PlayerListSkeleton />}
+          {leaderboardGwQuery.isError && (
+            <div className={styles.stateCenter}>
+              <p className={styles.stateText}>{copy.topPlayersLoadError}</p>
+              <Button variant="secondary" onClick={() => leaderboardGwQuery.refetch()}>
+                {copy.topPlayersRetry}
+              </Button>
+            </div>
+          )}
+          {!leaderboardGwQuery.isLoading && !leaderboardGwQuery.isError && (
+            <div className={styles.list}>
+              {bps.visible.map((player, i) => (
+                <BpsRankRow key={player.id} rank={i + 1} player={player} variant="bps" />
+              ))}
+              {bps.hasMore && (
+                <div ref={bps.sentinelRef} className={styles.sentinel} aria-hidden="true" />
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Season tab */}
+      {activeTab === 'season' && (
+        <div className={styles.body}>
+          <div className={styles.seasonSubToggle} role="group" aria-label="Season view">
+            <button
+              className={`${styles.seasonPill} ${activeSeasonView === 'points' ? styles.seasonPillActive : ''}`}
+              aria-pressed={activeSeasonView === 'points'}
+              onClick={() => setSeasonView('points')}
+            >
+              {copy.topPlayersSeasonSubPoints}
+            </button>
+            <button
+              className={`${styles.seasonPill} ${activeSeasonView === 'defcon' ? styles.seasonPillActive : ''}`}
+              aria-pressed={activeSeasonView === 'defcon'}
+              onClick={() => setSeasonView('defcon')}
+            >
+              {copy.topPlayersSeasonSubDefcon}
+            </button>
+            <button
+              className={`${styles.seasonPill} ${activeSeasonView === 'bps' ? styles.seasonPillActive : ''}`}
+              aria-pressed={activeSeasonView === 'bps'}
+              onClick={() => setSeasonView('bps')}
+            >
+              {copy.topPlayersSeasonSubBps}
+            </button>
+          </div>
+
+          {activeSeasonView === 'points' && (
+            <>
+              {seasonQuery.isLoading && <PlayerListSkeleton />}
+              {seasonQuery.isError && (
+                <div className={styles.stateCenter}>
+                  <p className={styles.stateText}>{copy.topPlayersLoadError}</p>
+                  <Button variant="secondary" onClick={() => seasonQuery.refetch()}>
+                    {copy.topPlayersRetry}
+                  </Button>
+                </div>
+              )}
+              {!seasonQuery.isLoading && !seasonQuery.isError && seasonPoints.visible.length > 0 && (
+                <div className={styles.list}>
+                  {seasonPoints.visible.map((player, i) => (
+                    <FollowableRankRow key={player.id} rank={i + 1} player={player} />
+                  ))}
+                  {seasonPoints.hasMore && (
+                    <div ref={seasonPoints.sentinelRef} className={styles.sentinel} aria-hidden="true" />
+                  )}
+                </div>
+              )}
+            </>
+          )}
+
+          {activeSeasonView === 'defcon' && (
+            <>
+              {leaderboardSeasonQuery.isLoading && <PlayerListSkeleton />}
+              {leaderboardSeasonQuery.isError && (
+                <div className={styles.stateCenter}>
+                  <p className={styles.stateText}>{copy.topPlayersLoadError}</p>
+                  <Button variant="secondary" onClick={() => leaderboardSeasonQuery.refetch()}>
+                    {copy.topPlayersRetry}
+                  </Button>
+                </div>
+              )}
+              {!leaderboardSeasonQuery.isLoading && !leaderboardSeasonQuery.isError && (
+                <div className={styles.list}>
+                  {seasonDefcon.visible.map((player, i) => (
+                    <BpsRankRow key={player.id} rank={i + 1} player={player} variant="defcon" />
+                  ))}
+                  {seasonDefcon.hasMore && (
+                    <div ref={seasonDefcon.sentinelRef} className={styles.sentinel} aria-hidden="true" />
+                  )}
+                </div>
+              )}
+            </>
+          )}
+
+          {activeSeasonView === 'bps' && (
+            <>
+              {leaderboardSeasonQuery.isLoading && <PlayerListSkeleton />}
+              {leaderboardSeasonQuery.isError && (
+                <div className={styles.stateCenter}>
+                  <p className={styles.stateText}>{copy.topPlayersLoadError}</p>
+                  <Button variant="secondary" onClick={() => leaderboardSeasonQuery.refetch()}>
+                    {copy.topPlayersRetry}
+                  </Button>
+                </div>
+              )}
+              {!leaderboardSeasonQuery.isLoading && !leaderboardSeasonQuery.isError && (
+                <div className={styles.list}>
+                  {seasonBps.visible.map((player, i) => (
+                    <BpsRankRow key={player.id} rank={i + 1} player={player} variant="bps" />
+                  ))}
+                  {seasonBps.hasMore && (
+                    <div ref={seasonBps.sentinelRef} className={styles.sentinel} aria-hidden="true" />
+                  )}
+                </div>
+              )}
+            </>
+          )}
         </div>
       )}
     </div>

@@ -411,3 +411,39 @@
     opacity: 1;
   }
 }
+
+/* View toggle wrap (Points tab) */
+.viewToggleWrap {
+  display: flex;
+  justify-content: center;
+  padding: 0.375rem var(--fpl-space-base);
+  border-bottom: 1px solid var(--fpl-border);
+  flex-shrink: 0;
+}
+
+/* Season sub-toggle */
+.seasonSubToggle {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--fpl-border);
+  flex-shrink: 0;
+}
+
+.seasonPill {
+  font-size: var(--fpl-fs-body-s);
+  font-weight: var(--fpl-fw-semibold);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--fpl-radius-pill);
+  background: var(--fpl-surface-2);
+  color: var(--fpl-muted);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 120ms, color 120ms;
+}
+
+.seasonPillActive {
+  background: var(--fpl-accent-subtle, rgba(0, 212, 184, 0.12));
+  color: var(--fpl-accent);
+  border-color: var(--fpl-accent-border, rgba(0, 212, 184, 0.3));
+}
