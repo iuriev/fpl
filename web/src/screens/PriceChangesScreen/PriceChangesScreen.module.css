@@ -90,3 +90,26 @@
   text-align: center;
   margin: 0;
 }
+
+/* ── Empty state ── */
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--fpl-space-sm);
+  padding: var(--fpl-space-xl3) var(--fpl-space-lg);
+}
+
+.emptyHeading {
+  font: var(--fpl-fw-medium) var(--fpl-fs-body) var(--fpl-font-display);
+  color: var(--fpl-text);
+  margin: 0;
+}
+
+.emptySubtext {
+  font: var(--fpl-fw-regular) var(--fpl-fs-body-s) var(--fpl-font-display);
+  color: var(--fpl-muted);
+  margin: 0;
+}

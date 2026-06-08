@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-import { usePriceChanges, usePricePredictions } from '@/api/queries';
+import { useGameweeks, usePriceChanges, usePricePredictions } from '@/api/queries';
 import { FilterChipBar } from '@/components/ui/FilterChipBar/FilterChipBar';
 import { PlayerProfileSheet } from '@/components/ui/PlayerProfileSheet/PlayerProfileSheet';
 import { PremiumLockedOverlay } from '@/components/ui/PremiumLockedOverlay/PremiumLockedOverlay';
@@ -17,6 +17,7 @@ import type {
   PriceChangePeriod,
   PricePredictionDirection,
 } from '@/types';
+import { MAX_GAMEWEEK } from '@/types';
 
 import styles from './PriceChangesScreen.module.css';
 
@@ -45,6 +46,18 @@ export const PriceChangesScreen: React.FC = () => {
   const [premiumOpen, setPremiumOpen] = useState(false);
   const [profilePlayerId, setProfilePlayerId] = useState<number | null>(null);
 
+  const { data: gameweeksData } = useGameweeks();
+  const periodInitialized = useRef(false);
+
+  useEffect(() => {
+    if (!periodInitialized.current && gameweeksData) {
+      periodInitialized.current = true;
+      if (gameweeksData.current >= MAX_GAMEWEEK) {
+        setPeriod('season');
+      }
+    }
+  }, [gameweeksData]);
+
   const squadScope = scope === 'squad';
 
   const changesQuery = usePriceChanges(
@@ -66,10 +79,29 @@ export const PriceChangesScreen: React.FC = () => {
 
   const { follow, unfollow, isFollowing } = useFollowPlayer();
 
-  const emptyMessage = useMemo(() => {
-    if (squadScope) return copy.priceChangesEmptySquad;
-    if (mode === 'tonight') return copy.priceChangesEmptyTonight;
-    return period === 'gw' ? copy.priceChangesEmptyGw : copy.priceChangesEmptySeason;
+  const emptyContent = useMemo((): { heading: string; subtext: string } => {
+    if (squadScope) {
+      return {
+        heading: copy.priceChangesEmptySquadHeading,
+        subtext: copy.priceChangesEmptySquadSubtext,
+      };
+    }
+    if (mode === 'tonight') {
+      return {
+        heading: copy.priceChangesEmptyTonightHeading,
+        subtext: copy.priceChangesEmptyTonightSubtext,
+      };
+    }
+    if (period === 'season') {
+      return {
+        heading: copy.priceChangesEmptySeasonHeading,
+        subtext: copy.priceChangesEmptySeasonSubtext,
+      };
+    }
+    return {
+      heading: copy.priceChangesEmptyGwHeading,
+      subtext: copy.priceChangesEmptyGwSubtext,
+    };
   }, [mode, period, squadScope]);
 
   const players = mode === 'actual' ? changesQuery.data?.players : predictionsQuery.data?.players;
@@ -209,7 +241,10 @@ export const PriceChangesScreen: React.FC = () => {
         {(!squadScope || isPremium) && !activeQuery.isLoading && !activeQuery.isError && (
           <>
             {players && players.length === 0 && (
-              <p className={styles.message}>{emptyMessage}</p>
+              <div className={styles.emptyState}>
+                <p className={styles.emptyHeading}>{emptyContent.heading}</p>
+                <p className={styles.emptySubtext}>{emptyContent.subtext}</p>
+              </div>
             )}
             {mode === 'actual' &&
               changesQuery.data?.players.map((player, i) => (
