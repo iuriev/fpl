@@ -30,9 +30,12 @@ import { marketRoutes } from './market-routes';
 import { me } from './me-routes';
 import * as playerPoolService from './player-pool-service';
 import { predictedLineupsRoutes } from './predicted-lineups-routes';
+import { defaultDataDir } from './prediction/ingest';
+import { runScoreGameweek } from './prediction/score';
 import { predictionRoutes } from './prediction-routes';
 import { startPredictionsWarmup } from './predictions-warmup';
 import { priceRoutes } from './price-routes';
+import { resolveNextGw } from './resolve-next-gw';
 import { requestShutdown } from './shutdown';
 import * as squadService from './squad-service';
 import {
@@ -483,8 +486,14 @@ httpServer = serve({ fetch: app.fetch, port }, () => {
       prefetchMissingGwData(db, season, bootstrap.events).catch((err) =>
         console.error('[prefetch] error:', err),
       );
-      startLineupsWarmup(db);
       startPredictionsWarmup(db);
+      startLineupsWarmup(db, async () => {
+        const bs = await getOrFetchBootstrap(db);
+        const targetEvent = resolveNextGw(bs);
+        const currentSeason = deriveSeason(bs.events);
+        console.log(`[lineups:warmup] triggering rescore event=${targetEvent} season=${currentSeason} with fresh element-summary data`);
+        await runScoreGameweek(db, currentSeason, targetEvent, defaultDataDir());
+      });
     } catch (err) {
       setStartupSeedDone();
       flaggedError(

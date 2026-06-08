@@ -47,6 +47,8 @@ function starterSummary(fixtureId: number): FPLElementSummary {
         bonus: 0,
         bps: 0,
         defensive_contribution: 0,
+        expected_goals: 0,
+        expected_assists: 0,
       },
     ],
   };

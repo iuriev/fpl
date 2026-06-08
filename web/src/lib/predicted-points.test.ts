@@ -114,6 +114,74 @@ describe('buildPredictedPointsRows', () => {
     expect(rows[0].player.id).toBe(2);
     expect(rows[0].prediction).toBeUndefined();
   });
+  it('excludes players without prediction when metric is xAssists', () => {
+    const players = [makePlayer(1, 10001, '9.0'), makePlayer(2, 10002, '5.0')];
+    const predictions: PredictionsResponse = {
+      event: 34,
+      modelRunId: 'run',
+      ready: true,
+      players: [
+        {
+          fplCode: 10001,
+          playerId: 1,
+          event: 34,
+          xPts: 4.0,
+          xGoals: 0.1,
+          xAssists: 0.5,
+          csProb: null,
+          defconPts: 0,
+          confidence: 'medium',
+          epNextAnchor: 9,
+          modelXPts: 3,
+        },
+      ],
+    };
+    const rows = buildPredictedPointsRows(players, predictions, 'xAssists');
+    expect(rows).toHaveLength(1);
+    expect(rows[0].player.id).toBe(1);
+    expect(rows[0].displayValue).toBe(0.5);
+  });
+
+  it('excludes players with xAssists = 0 when metric is xAssists', () => {
+    const players = [makePlayer(1, 10001, '9.0'), makePlayer(2, 10002, '5.0')];
+    const predictions: PredictionsResponse = {
+      event: 34,
+      modelRunId: 'run',
+      ready: true,
+      players: [
+        {
+          fplCode: 10001,
+          playerId: 1,
+          event: 34,
+          xPts: 4.0,
+          xGoals: 0.1,
+          xAssists: 0.5,
+          csProb: null,
+          defconPts: 0,
+          confidence: 'medium',
+          epNextAnchor: 9,
+          modelXPts: 3,
+        },
+        {
+          fplCode: 10002,
+          playerId: 2,
+          event: 34,
+          xPts: 2.0,
+          xGoals: 0.0,
+          xAssists: 0.0,
+          csProb: null,
+          defconPts: 0,
+          confidence: 'low',
+          epNextAnchor: 5,
+          modelXPts: 2,
+        },
+      ],
+    };
+    const rows = buildPredictedPointsRows(players, predictions, 'xAssists');
+    expect(rows).toHaveLength(1);
+    expect(rows[0].player.id).toBe(1);
+  });
+
   it('sorts by xAssists when metric is xAssists', () => {
     const players = [makePlayer(1, 10001, '9.0'), makePlayer(2, 10002, '5.0')];
     const predictions: PredictionsResponse = {

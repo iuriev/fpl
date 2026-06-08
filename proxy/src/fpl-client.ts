@@ -301,6 +301,8 @@ export interface FPLElementSummary {
     bonus: number;
     bps: number;
     defensive_contribution: number;
+    expected_goals: string | number;
+    expected_assists: string | number;
   }>;
 }
 

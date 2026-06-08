@@ -54,9 +54,14 @@ describe('getPlayerProfile', () => {
     vi.mocked(elementSummaryCache.getOrFetchElementSummary).mockResolvedValue({
       history: [
         {
+          fixture: 1,
           round: 37,
+          opponent_team: 2,
+          was_home: true,
+          kickoff_time: '2026-05-20T19:00:00Z',
           total_points: 8,
           minutes: 90,
+          starts: 1,
           goals_scored: 1,
           assists: 0,
           clean_sheets: 0,
@@ -70,6 +75,8 @@ describe('getPlayerProfile', () => {
           bonus: 2,
           bps: 30,
           defensive_contribution: 0,
+          expected_goals: 0,
+          expected_assists: 0,
         },
       ],
     });

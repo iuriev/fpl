@@ -174,7 +174,7 @@ async function warmElementIds(
   logWarmup(`${label}: finished — ${fetches} FPL calls, ${ids.length - fetches} already cached`);
 }
 
-export async function runLineupsWarmup(db: Db): Promise<void> {
+export async function runLineupsWarmup(db: Db, onComplete?: () => Promise<void>): Promise<void> {
   if (!isWarmupEnabled()) {
     status.phase = 'done';
     status.ready = true;
@@ -267,6 +267,14 @@ export async function runLineupsWarmup(db: Db): Promise<void> {
     status.phase = 'done';
     status.ready = true;
     logWarmup(`phase=done — warmup complete (${formatLineupsWarmupStatus()})`);
+
+    if (onComplete) {
+      try {
+        await onComplete();
+      } catch (err) {
+        lineupsWarmupFlagLog.error('onComplete error:', err);
+      }
+    }
   } catch (err) {
     status.phase = 'error';
     status.lastError = err instanceof Error ? err.message : String(err);
@@ -276,7 +284,7 @@ export async function runLineupsWarmup(db: Db): Promise<void> {
   }
 }
 
-export function startLineupsWarmup(db: Db): void {
+export function startLineupsWarmup(db: Db, onComplete?: () => Promise<void>): void {
   if (!isWarmupEnabled()) {
     status.phase = 'done';
     status.ready = true;
@@ -284,5 +292,5 @@ export function startLineupsWarmup(db: Db): void {
     return;
   }
   logWarmup('scheduling background warmup after bootstrap is available');
-  void runLineupsWarmup(db);
+  void runLineupsWarmup(db, onComplete);
 }

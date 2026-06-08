@@ -42,17 +42,19 @@ export function buildPredictedPointsRows(
   );
 
   return players
-    .map((player) => {
+    .flatMap((player) => {
       const prediction = byCode.get(player.code);
+      if (prediction == null && metric === 'xAssists') return [];
       const raw =
         prediction != null ? metricValue(prediction, metric) : parseFloat(player.expectedPoints);
       const displayValue = Number.isFinite(raw) ? raw : 0;
-      return {
+      if (metric === 'xAssists' && displayValue <= 0) return [];
+      return [{
         player,
         displayValue,
         displayLabel: metricLabel(metric),
         prediction,
-      };
+      }];
     })
     .sort((a, b) => b.displayValue - a.displayValue);
 }
