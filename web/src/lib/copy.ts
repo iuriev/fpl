@@ -262,6 +262,21 @@ export const copy = {
   priceChangesFilterFWD: 'FWD',
   priceChangesUnlockSquad: 'Unlock my squad view',
 
+  // Predictions with AI screen
+  predictionsNavLink: 'Predictions with AI',
+  predictionsTitle: 'Predictions with AI',
+  predictionsGwLabel: 'GW {n}',
+  predictionsTabPoints: 'Points',
+  predictionsTabLineups: 'Lineups',
+  predictionsTabCS: 'CS%',
+  predictionsTabXG: 'xG',
+  predictionsLineupsPremiumTitle: 'See predicted lineups',
+  predictionsLineupsPremiumDescription:
+    'Subscribe to unlock predicted starting XIs for all 20 Premier League teams.',
+  predictionsLineupsPremiumFreeLabel: 'No lineup data',
+  predictionsLineupsPremiumPremiumLabel: 'All 20 team XIs',
+  predictionsLineupsUnlockLabel: 'Unlock predicted lineups',
+
   // Predicted Points screen (PRED-02)
   predictedPointsNavLink: 'Predicted Points',
   predictedPointsTitle: 'Predicted Points',

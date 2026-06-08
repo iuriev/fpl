@@ -13,7 +13,7 @@ import styles from './PredictedPointsRow.module.css';
 export interface PredictedPointsRowProps {
   rank: number;
   row: PredictedPointsRowData;
-  onSelect: (playerId: number) => void;
+  onSelect?: (playerId: number) => void;
 }
 
 export const PredictedPointsRow: React.FC<PredictedPointsRowProps> = ({
@@ -22,12 +22,12 @@ export const PredictedPointsRow: React.FC<PredictedPointsRowProps> = ({
   onSelect,
 }) => {
   const { player, xPts, prediction } = row;
+  const Tag = onSelect ? 'button' : 'div';
 
   return (
-    <button
-      type="button"
+    <Tag
+      {...(onSelect ? { type: 'button' as const, onClick: () => onSelect(player.id) } : {})}
       className={styles.row}
-      onClick={() => onSelect(player.id)}
       aria-label={`${player.webName}, ${formatPriceTenths(player.nowCost)}, ${xPts.toFixed(1)} ${copy.predictedPointsXptsLabel}`}
     >
       <span className={styles.rank}>{rank}</span>
@@ -45,7 +45,7 @@ export const PredictedPointsRow: React.FC<PredictedPointsRowProps> = ({
         expectedPoints={xPts.toFixed(1)}
         expectedPointsLabel={copy.predictedPointsXptsLabel}
       />
-    </button>
+    </Tag>
   );
 };
 

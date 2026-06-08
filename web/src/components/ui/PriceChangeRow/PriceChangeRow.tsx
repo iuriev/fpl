@@ -12,17 +12,17 @@ import styles from './PriceChangeRow.module.css';
 export interface PriceChangeRowProps {
   rank: number;
   player: PriceChangePlayer;
-  onSelect: (playerId: number) => void;
+  onSelect?: (playerId: number) => void;
 }
 
 export const PriceChangeRow: React.FC<PriceChangeRowProps> = ({ rank, player, onSelect }) => {
   const rising = player.changeAmount > 0;
+  const Tag = onSelect ? 'button' : 'div';
 
   return (
-    <button
-      type="button"
+    <Tag
+      {...(onSelect ? { type: 'button' as const, onClick: () => onSelect(player.id) } : {})}
       className={styles.row}
-      onClick={() => onSelect(player.id)}
       aria-label={`${player.webName}, ${formatPriceTenths(player.nowCost)}, ${formatChangeTenths(player.changeAmount)}`}
     >
       <span className={styles.rank}>{rank}</span>
@@ -44,7 +44,7 @@ export const PriceChangeRow: React.FC<PriceChangeRowProps> = ({ rank, player, on
         </span>
       </div>
       <PriceMetricTiles nowCost={player.nowCost} changeAmount={player.changeAmount} />
-    </button>
+    </Tag>
   );
 };
 

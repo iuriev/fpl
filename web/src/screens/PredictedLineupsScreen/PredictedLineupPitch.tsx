@@ -12,7 +12,7 @@ export interface PredictedLineupPitchProps {
   players: PredictedLineupPlayer[];
   teamShortName: string;
   teamId: number;
-  onSelect: (id: number) => void;
+  onSelect?: (id: number) => void;
 }
 
 export const PredictedLineupPitch: React.FC<PredictedLineupPitchProps> = ({
@@ -29,24 +29,38 @@ export const PredictedLineupPitch: React.FC<PredictedLineupPitchProps> = ({
         <div className={styles.pitchRows}>
           {POSITION_ORDER.map((pos) => (
             <div key={pos} className={styles.playerRow}>
-              {groups[pos].map((player) => (
-                <button
-                  key={player.id}
-                  type="button"
-                  className={styles.pitchCardBtn}
-                  onClick={() => onSelect(player.id)}
-                >
-                  <PlayerCard
-                    player={toSquadPlayer(player, teamShortName, teamId)}
-                    size="large"
-                    hideClub
-                    hideAvailabilityBadge
-                    hidePoints
-                    showXMinsPill
-                    showLineupPlayRisk={hasLineupPlayRisk(player)}
-                  />
-                </button>
-              ))}
+              {groups[pos].map((player) =>
+                onSelect ? (
+                  <button
+                    key={player.id}
+                    type="button"
+                    className={styles.pitchCardBtn}
+                    onClick={() => onSelect(player.id)}
+                  >
+                    <PlayerCard
+                      player={toSquadPlayer(player, teamShortName, teamId)}
+                      size="large"
+                      hideClub
+                      hideAvailabilityBadge
+                      hidePoints
+                      showXMinsPill
+                      showLineupPlayRisk={hasLineupPlayRisk(player)}
+                    />
+                  </button>
+                ) : (
+                  <div key={player.id} className={styles.pitchCardBtn}>
+                    <PlayerCard
+                      player={toSquadPlayer(player, teamShortName, teamId)}
+                      size="large"
+                      hideClub
+                      hideAvailabilityBadge
+                      hidePoints
+                      showXMinsPill
+                      showLineupPlayRisk={hasLineupPlayRisk(player)}
+                    />
+                  </div>
+                )
+              )}
             </div>
           ))}
         </div>

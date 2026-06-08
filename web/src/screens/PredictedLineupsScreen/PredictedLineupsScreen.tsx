@@ -3,13 +3,11 @@ import { useSearchParams } from 'react-router-dom';
 
 import { useGameweeks, usePredictedLineups } from '@/api/queries';
 import { BottomSheet } from '@/components/ui/BottomSheet/BottomSheet';
-import { PlayerProfileSheet } from '@/components/ui/PlayerProfileSheet/PlayerProfileSheet';
 import { PremiumLockedOverlay } from '@/components/ui/PremiumLockedOverlay/PremiumLockedOverlay';
 import { PremiumSheet } from '@/components/ui/PremiumSheet/PremiumSheet';
 import { ScreenHeader } from '@/components/ui/ScreenHeader/ScreenHeader';
 import { copy, interpolate } from '@/lib/copy';
 import { useRequestPremiumUpsell } from '@/lib/premium-upsell/PremiumUpsellContext';
-import { useFollowPlayer } from '@/lib/use-follow-player';
 import { usePremiumStatus } from '@/lib/use-premium-status';
 import { MAX_GAMEWEEK } from '@/types';
 
@@ -26,7 +24,6 @@ export const PredictedLineupsScreen: React.FC = () => {
   const [view, setView] = useState<ViewMode>('pitch');
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
   const [premiumOpen, setPremiumOpen] = useState(false);
-  const [profilePlayerId, setProfilePlayerId] = useState<number | null>(null);
   const [gwPickerOpen, setGwPickerOpen] = useState(false);
 
   const { data: gameweeksData } = useGameweeks();
@@ -86,22 +83,6 @@ export const PredictedLineupsScreen: React.FC = () => {
   const resolvedTeamId = selectedTeamId ?? defaultTeamId;
 
   const activeTeam = teams.find((t) => t.teamId === resolvedTeamId) ?? teams[0];
-
-  const selectedLineupPlayer =
-    profilePlayerId != null
-      ? activeTeam?.players.find((p) => p.id === profilePlayerId)
-      : undefined;
-
-  const profileLineupAlerts =
-    selectedLineupPlayer != null
-      ? {
-          injuryWarning: selectedLineupPlayer.injuryWarning,
-          benchRisk: selectedLineupPlayer.benchRisk,
-          chanceOfPlaying: selectedLineupPlayer.chanceOfPlaying,
-        }
-      : undefined;
-
-  const { following, toggle: toggleFollow } = useFollowPlayer(profilePlayerId ?? 0);
 
   const fixtureLabel =
     activeTeam?.nextFixture != null
@@ -227,14 +208,12 @@ export const PredictedLineupsScreen: React.FC = () => {
                 ) : view === 'table' ? (
                   <PredictedLineupTable
                     players={activeTeam.players}
-                    onSelect={setProfilePlayerId}
                   />
                 ) : (
                   <PredictedLineupPitch
                     players={activeTeam.players}
                     teamShortName={activeTeam.shortName}
                     teamId={activeTeam.teamId}
-                    onSelect={setProfilePlayerId}
                   />
                 )}
               </>
@@ -274,14 +253,6 @@ export const PredictedLineupsScreen: React.FC = () => {
         )}
       </BottomSheet>
 
-      <PlayerProfileSheet
-        playerId={profilePlayerId}
-        open={profilePlayerId != null}
-        onClose={() => setProfilePlayerId(null)}
-        onFollow={() => toggleFollow()}
-        isFollowing={following}
-        lineupAlerts={profileLineupAlerts}
-      />
     </div>
   );
 };

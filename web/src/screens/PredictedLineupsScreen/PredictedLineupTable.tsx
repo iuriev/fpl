@@ -8,7 +8,7 @@ import styles from './PredictedLineupsScreen.module.css';
 
 export interface PredictedLineupTableProps {
   players: PredictedLineupPlayer[];
-  onSelect: (id: number) => void;
+  onSelect?: (id: number) => void;
 }
 
 export const PredictedLineupTable: React.FC<PredictedLineupTableProps> = ({
@@ -35,16 +35,25 @@ export const PredictedLineupTable: React.FC<PredictedLineupTableProps> = ({
         {sorted.map((player) => (
           <tr key={player.id}>
             <td>
-              <button
-                type="button"
-                className={`${styles.tableRowBtn} ${player.benchRisk || player.injuryWarning ? styles.tableRowBenchRisk : ''}`}
-                onClick={() => onSelect(player.id)}
-              >
-                <span className={styles.tableName}>{player.webName}</span>
-                {player.benchRisk && (
-                  <span className={styles.benchRiskBadge}>{copy.predictedLineupsBenchRisk}</span>
-                )}
-              </button>
+              {onSelect ? (
+                <button
+                  type="button"
+                  className={`${styles.tableRowBtn} ${player.benchRisk || player.injuryWarning ? styles.tableRowBenchRisk : ''}`}
+                  onClick={() => onSelect(player.id)}
+                >
+                  <span className={styles.tableName}>{player.webName}</span>
+                  {player.benchRisk && (
+                    <span className={styles.benchRiskBadge}>{copy.predictedLineupsBenchRisk}</span>
+                  )}
+                </button>
+              ) : (
+                <span className={`${styles.tableRowBtn} ${player.benchRisk || player.injuryWarning ? styles.tableRowBenchRisk : ''}`}>
+                  <span className={styles.tableName}>{player.webName}</span>
+                  {player.benchRisk && (
+                    <span className={styles.benchRiskBadge}>{copy.predictedLineupsBenchRisk}</span>
+                  )}
+                </span>
+              )}
             </td>
             <td className={styles.tableNum}>{displayPredictedXMins(player.xMins)}</td>
           </tr>

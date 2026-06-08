@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useGameweeks, usePlayerPool, usePredictions } from '@/api/queries';
-import { PlayerProfileSheet } from '@/components/ui/PlayerProfileSheet/PlayerProfileSheet';
 import { PredictedPointsRow } from '@/components/ui/PredictedPointsRow/PredictedPointsRow';
 import { PremiumLockedOverlay } from '@/components/ui/PremiumLockedOverlay/PremiumLockedOverlay';
 import { PremiumSheet } from '@/components/ui/PremiumSheet/PremiumSheet';
@@ -12,7 +11,6 @@ import {
   type PredictedPointsRowData,
 } from '@/lib/predicted-points';
 import { useRequestPremiumUpsell } from '@/lib/premium-upsell/PremiumUpsellContext';
-import { useFollowPlayer } from '@/lib/use-follow-player';
 import { usePremiumStatus } from '@/lib/use-premium-status';
 import type { PlayerPosition } from '@/types';
 
@@ -29,13 +27,7 @@ function listItemsKey(items: PredictedPointsRowData[]): string {
   return items.map((r) => `${r.player.id}:${r.xPts}`).join(',');
 }
 
-function PremiumPredictedList({
-  rows,
-  onSelect,
-}: {
-  rows: PredictedPointsRowData[];
-  onSelect: (playerId: number) => void;
-}) {
+function PremiumPredictedList({ rows }: { rows: PredictedPointsRowData[] }) {
   const [visibleCount, setVisibleCount] = useState(PREMIUM_PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -61,7 +53,7 @@ function PremiumPredictedList({
   return (
     <>
       {visible.map((row, i) => (
-        <PredictedPointsRow key={row.player.id} rank={i + 1} row={row} onSelect={onSelect} />
+        <PredictedPointsRow key={row.player.id} rank={i + 1} row={row} />
       ))}
       {hasMore && <div ref={sentinelRef} className={styles.sentinel} aria-hidden="true" />}
     </>
@@ -73,11 +65,9 @@ export const PredictedPointsScreen: React.FC = () => {
   const requestUpsell = useRequestPremiumUpsell();
   const [activeTab, setActiveTab] = useState<PositionTab>('MID');
   const [premiumOpen, setPremiumOpen] = useState(false);
-  const [profilePlayerId, setProfilePlayerId] = useState<number | null>(null);
 
   const { data: poolData, isLoading: poolLoading } = usePlayerPool();
   const { data: gameweeksData, isLoading: gameweeksLoading } = useGameweeks();
-  const { following, toggle: toggleFollow } = useFollowPlayer(profilePlayerId ?? 0);
 
   const nextGw = gameweeksData?.next ?? gameweeksData?.current ?? null;
   const { data: predictionsData, isLoading: predictionsLoading } = usePredictions(nextGw);
@@ -106,10 +96,6 @@ export const PredictedPointsScreen: React.FC = () => {
   const modelReady = predictionsData?.ready === true;
   const showFplFallback =
     !predictionsLoading && nextGw != null && predictionsData != null && !modelReady;
-  const profilePrediction =
-    predictionsData?.ready === true
-      ? predictionsData.players.find((p) => p.playerId === profilePlayerId)
-      : undefined;
 
   return (
     <div className={styles.screen}>
@@ -149,7 +135,6 @@ export const PredictedPointsScreen: React.FC = () => {
           <PremiumPredictedList
             key={listKey}
             rows={sortedForTab}
-            onSelect={setProfilePlayerId}
           />
         )}
 
@@ -160,7 +145,6 @@ export const PredictedPointsScreen: React.FC = () => {
                 key={row.player.id}
                 rank={i + 1}
                 row={row}
-                onSelect={setProfilePlayerId}
               />
             ))}
             {freeLocked.length > 0 && (
@@ -170,7 +154,6 @@ export const PredictedPointsScreen: React.FC = () => {
                     key={row.player.id}
                     rank={FREE_VISIBLE + i + 1}
                     row={row}
-                    onSelect={() => {}}
                   />
                 ))}
                 <PremiumLockedOverlay
@@ -196,14 +179,6 @@ export const PredictedPointsScreen: React.FC = () => {
         premiumLabel={copy.predictedPointsPremiumPremiumLabel}
       />
 
-      <PlayerProfileSheet
-        playerId={profilePlayerId}
-        open={profilePlayerId != null}
-        onClose={() => setProfilePlayerId(null)}
-        onFollow={() => toggleFollow()}
-        isFollowing={following}
-        prediction={profilePrediction}
-      />
     </div>
   );
 };

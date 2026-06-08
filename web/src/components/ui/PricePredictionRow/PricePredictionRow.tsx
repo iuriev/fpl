@@ -12,7 +12,7 @@ import styles from './PricePredictionRow.module.css';
 export interface PricePredictionRowProps {
   rank: number;
   player: PricePredictionPlayer;
-  onSelect: (playerId: number) => void;
+  onSelect?: (playerId: number) => void;
 }
 
 function likelihoodLabel(likelihood: PricePredictionPlayer['likelihood']): string {
@@ -26,12 +26,12 @@ export const PricePredictionRow: React.FC<PricePredictionRowProps> = ({
   onSelect,
 }) => {
   const rising = player.netTransfersEvent > 0;
+  const Tag = onSelect ? 'button' : 'div';
 
   return (
-    <button
-      type="button"
+    <Tag
+      {...(onSelect ? { type: 'button' as const, onClick: () => onSelect(player.id) } : {})}
       className={styles.row}
-      onClick={() => onSelect(player.id)}
       aria-label={`${player.webName}, ${likelihoodLabel(player.likelihood)}`}
     >
       <span className={styles.rank}>{rank}</span>
@@ -59,7 +59,7 @@ export const PricePredictionRow: React.FC<PricePredictionRowProps> = ({
         secondaryLabel={likelihoodLabel(player.likelihood)}
         secondaryVariant={player.likelihood === 'very_likely' ? 'very_likely' : 'likely'}
       />
-    </button>
+    </Tag>
   );
 };
 

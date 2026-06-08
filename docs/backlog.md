@@ -196,12 +196,6 @@ Research what similar services do (fpl.team, fplukraine.com, etc.) and design ac
 Shipped on `/price-changes` (Actual tab): GW and Season risers/fallers, position filter, top 50.
 Combined with PRED-06 in OpenSpec `archive/2026-06-03-ana-03-pred-06-price-changes`.
 
-#### ANA-06: Captain Poll
-Community vote for the best captain pick each gameweek.
-Poll format: "Who is the best GW{N} captain?" with top candidate options showing their fixture
-e.g. `Haaland (MCI) vs AVL (H)`, `M.Salah (LIV) vs BRE (H)`.
-Drives daily engagement before the deadline.
-
 #### ANA-08: Captain Picks Analyzer
 Show the user's historical captain pick record:
 total captain points earned, success rate per pick, best/worst calls.
@@ -283,7 +277,6 @@ Useful for long-term planning — build a shortlist without committing a transfe
 | ~~PRED-05~~ | ~~Clean sheet probability & xG/xA market screen (per-team stats)~~ | M | ✅ Done — `/market`; CS% and xG panels, DGW aggregation, free top-5 + upsell; OpenSpec `archive/2026-06-07-pred-05-cs-xg-market-screen`. |
 | PRED-07 | Predicted goals & assists screen | M | Complement to PRED-05; popular FPL decision-making tool. Depends on PRED-09 production API. |
 | ~~PRED-08~~ | ~~Predicted lineups for all 20 PL teams~~ | L | ✅ Done — `/predicted-lineups`; premium-only; FPL formation inference + `player-lanes.json` (OpenSpec `archive/2026-06-04-pred-08-predicted-lineups`). |
-| PRED-10 | Textual prediction analytics in player profile sheet | S | Show a short natural-language explanation of why a player is expected to score that many xPts — form, fixture, ownership, threat. Phase 1 uses ep_next + FDR heuristics; Phase 2 enriched by PRED-09 production API. |
 | ~~PRED-02~~ | ~~Predicted points list screen (free: top 3, locked: rest)~~ | M | ✅ Done — `/predicted-points`; GK/DEF/MID/FWD tabs sorted by `ep_next`; free top-3 + blur+upsell; premium progressive load. Upgrade to PRED-09 xPts once production API is live. |
 
 | MON-01 | Premium subscription flow (paywall, pricing page) | L | Unlocks revenue. Pricing research: OpenSpec `2026-06-04-mon-01-pricing-market-research`; investor PDFs in `docs/investor/pdf/`. |
@@ -301,29 +294,6 @@ On screen load (data ready), call `requestUpsell('predictions')` from `PremiumUp
 - Subtitle: "Click on a player to view their profile and compare predictions."
 - Free rows: `[club badge] [player photo] {Name} {price}m {pos}/{team}/{ownership%}` → `xPts {value}` large right-aligned
 - Locked rows: blurred photo + name, "🔒 Become a seasoned veteran to see all players", blurred xPts
-
-#### PRED-10: Textual prediction analytics in player profile sheet
-
-When a user opens a player's profile from the Predicted Points screen (or any screen), show a short
-natural-language blurb below the xPts value explaining the reasoning behind the estimate.
-
-**Examples:**
-- "Haaland has an easy home fixture (FDR 2), averaged 7.4 pts over the last 5 GWs, and is 99% likely to start."
-- "Salah faces a tough away trip (FDR 4) but has scored in 3 of his last 4 and has the highest threat rating in the squad."
-- "Raya is expected to keep a clean sheet (CS% 42%) against Wolves at home — their attack ranks 18th in xG this season."
-
-**Signals to surface (in priority order):**
-1. Fixture difficulty (FDR 1–5, home/away)
-2. Recent form (last 5 GW pts average, goal/assist involvement)
-3. Minutes confidence (chance_of_playing, injury status)
-4. Season-level rank in threat / creativity / influence (ICT)
-
-**Phase 1 (before PRED-09):** heuristic sentences from FPL API fields only (ep_next, ict_index,
-threat, creativity, form, chance_of_playing, FDR). No model needed.
-
-**Phase 2 (after PRED-09):** enrich with model-derived xGoals, xAssists, CS%, defconPts.
-
-Depends on: PRED-09 for phase 2.
 
 #### PRED-05: Clean sheet probability & xG/xA market screen
 Per-team market screen inspired by fplukraine.com:
@@ -444,7 +414,6 @@ Reference: fpl.team Transfer Solver.
 | ID | Task | Effort | Why |
 |----|------|--------|-----|
 | ~~FIX-02~~ | ~~Full-season Fixtures Calendar (FDR heatmap, DGW/BGW, Recovery views)~~ | L | ✅ Done — `/fixtures` screen; 5 tabs (Official/Overall/Defensive/Attacking/Rest Days); DGW/BGW detection; 12h cache. OpenSpec `2026-06-04-fix-02-fixtures-calendar`. |
-| ANA-06 | Captain Poll (community vote each GW) | M | Social feature; drives pre-deadline engagement and return visits. |
 | APP-01 | About page | S | Builds trust. Needed before wider launch. |
 
 ### Feature details

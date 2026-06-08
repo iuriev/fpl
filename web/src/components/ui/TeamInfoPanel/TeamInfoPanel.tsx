@@ -33,9 +33,7 @@ const NAV_LINKS: { to: string; label: () => string; featured?: boolean; end?: bo
   { to: '/watchlist', label: () => copy.watchlistNavLink },
   { to: '/player-watchlist', label: () => copy.playerWatchlistNavLink },
   { to: '/top-players', label: () => copy.topPlayersNavLink },
-  { to: '/predicted-points', label: () => copy.predictedPointsNavLink },
-  { to: '/predicted-lineups', label: () => copy.predictedLineupsNavLink },
-  { to: '/market', label: () => copy.marketNavLink },
+  { to: '/predictions', label: () => copy.predictionsNavLink },
   { to: '/price-changes', label: () => copy.priceChangesNavLink },
   { to: '/fixtures', label: () => copy.fixturesCalendarNavLink },
 ];

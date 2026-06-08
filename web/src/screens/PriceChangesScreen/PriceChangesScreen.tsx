@@ -2,14 +2,12 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useGameweeks, usePriceChanges, usePricePredictions } from '@/api/queries';
 import { FilterChipBar } from '@/components/ui/FilterChipBar/FilterChipBar';
-import { PlayerProfileSheet } from '@/components/ui/PlayerProfileSheet/PlayerProfileSheet';
 import { PremiumLockedOverlay } from '@/components/ui/PremiumLockedOverlay/PremiumLockedOverlay';
 import { PremiumSheet } from '@/components/ui/PremiumSheet/PremiumSheet';
 import { PriceChangeRow } from '@/components/ui/PriceChangeRow/PriceChangeRow';
 import { PricePredictionRow } from '@/components/ui/PricePredictionRow/PricePredictionRow';
 import { ScreenHeader } from '@/components/ui/ScreenHeader/ScreenHeader';
 import { copy } from '@/lib/copy';
-import { useFollowPlayer } from '@/lib/use-follow-player';
 import { useSubscriptionTier } from '@/lib/use-subscription-tier';
 import type {
   PositionFilter,
@@ -44,7 +42,6 @@ export const PriceChangesScreen: React.FC = () => {
     useState<PricePredictionDirection>('rise');
   const [position, setPosition] = useState<PositionFilter>('all');
   const [premiumOpen, setPremiumOpen] = useState(false);
-  const [profilePlayerId, setProfilePlayerId] = useState<number | null>(null);
 
   const { data: gameweeksData } = useGameweeks();
   const periodInitialized = useRef(false);
@@ -77,8 +74,6 @@ export const PriceChangesScreen: React.FC = () => {
 
   const activeQuery = mode === 'actual' ? changesQuery : predictionsQuery;
 
-  const { follow, unfollow, isFollowing } = useFollowPlayer();
-
   const emptyContent = useMemo((): { heading: string; subtext: string } => {
     if (squadScope) {
       return {
@@ -105,14 +100,6 @@ export const PriceChangesScreen: React.FC = () => {
   }, [mode, period, squadScope]);
 
   const players = mode === 'actual' ? changesQuery.data?.players : predictionsQuery.data?.players;
-
-  const handleFollow = (playerId: number) => {
-    if (isFollowing(playerId)) {
-      unfollow(playerId);
-    } else {
-      follow(playerId);
-    }
-  };
 
   return (
     <div className={styles.screen}>
@@ -252,7 +239,6 @@ export const PriceChangesScreen: React.FC = () => {
                   key={player.id}
                   rank={i + 1}
                   player={player}
-                  onSelect={setProfilePlayerId}
                 />
               ))}
             {mode === 'tonight' &&
@@ -261,7 +247,6 @@ export const PriceChangesScreen: React.FC = () => {
                   key={player.id}
                   rank={i + 1}
                   player={player}
-                  onSelect={setProfilePlayerId}
                 />
               ))}
           </>
@@ -281,13 +266,6 @@ export const PriceChangesScreen: React.FC = () => {
         premiumLabel={copy.priceChangesPremiumPremiumLabel}
       />
 
-      <PlayerProfileSheet
-        playerId={profilePlayerId}
-        open={profilePlayerId != null}
-        onClose={() => setProfilePlayerId(null)}
-        onFollow={handleFollow}
-        isFollowing={profilePlayerId != null ? isFollowing(profilePlayerId) : false}
-      />
     </div>
   );
 };

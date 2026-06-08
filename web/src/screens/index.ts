@@ -11,6 +11,7 @@ export { MyStatsScreen } from './MyStatsScreen/MyStatsScreen';
 export { PlayerWatchlistScreen } from './PlayerWatchlistScreen/PlayerWatchlistScreen';
 export { PredictedLineupsScreen } from './PredictedLineupsScreen/PredictedLineupsScreen';
 export { PredictedPointsScreen } from './PredictedPointsScreen/PredictedPointsScreen';
+export { PredictionsScreen } from './PredictionsScreen/PredictionsScreen';
 export { PriceChangesScreen } from './PriceChangesScreen/PriceChangesScreen';
 export { ResetPasswordScreen } from './ResetPasswordScreen/ResetPasswordScreen';
 export { SignInScreen } from './SignInScreen/SignInScreen';

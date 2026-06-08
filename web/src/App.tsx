@@ -26,11 +26,9 @@ import {
   ForgotPasswordScreen,
   GameweekReviewScreen,
   LeagueStandingsScreen,
-  MarketScreen,
   MyStatsScreen,
   PlayerWatchlistScreen,
-  PredictedLineupsScreen,
-  PredictedPointsScreen,
+  PredictionsScreen,
   PriceChangesScreen,
   ResetPasswordScreen,
   SignInScreen,
@@ -109,27 +107,14 @@ function AppContent() {
           </AuthAndTeamProtectedRoute>
         }
       />
+      <Route path="/predicted-points" element={<Navigate to="/predictions?tab=points" replace />} />
+      <Route path="/predicted-lineups" element={<Navigate to="/predictions?tab=lineups" replace />} />
+      <Route path="/market" element={<Navigate to="/predictions?tab=cs" replace />} />
       <Route
-        path="/predicted-points"
+        path="/predictions"
         element={
           <AuthAndTeamProtectedRoute>
-            <PredictedPointsScreen />
-          </AuthAndTeamProtectedRoute>
-        }
-      />
-      <Route
-        path="/predicted-lineups"
-        element={
-          <AuthAndTeamProtectedRoute>
-            <PredictedLineupsScreen />
-          </AuthAndTeamProtectedRoute>
-        }
-      />
-      <Route
-        path="/market"
-        element={
-          <AuthAndTeamProtectedRoute>
-            <MarketScreen />
+            <PredictionsScreen />
           </AuthAndTeamProtectedRoute>
         }
       />
