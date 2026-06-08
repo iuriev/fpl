@@ -283,9 +283,15 @@ export const copy = {
   predictionsGwLabel: 'GW {n}',
   predictionsTabPoints: 'FPL points',
   predictionsTabLineups: 'Lineups',
+  predictionsTabXG: 'xG',
   predictionsTabXA: 'xA',
   predictionsTabCS: 'Team CS%',
   predictionsTabTeamXG: 'Team xG',
+  predictedGoalsXgLabel: 'xG',
+  predictedGoalsEmptyPosition: 'No goal predictions available for this position.',
+  predictedGoalsDisclaimer:
+    'Expected goals this gameweek — approximate statistical estimates, not official FPL data.',
+  predictedGoalsModelPending: 'Goal predictions are not ready for this gameweek yet.',
   predictedAssistsXaLabel: 'xA',
   predictedAssistsEmptyPosition: 'No assist predictions available for this position.',
   predictedAssistsDisclaimer:

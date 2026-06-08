@@ -510,12 +510,15 @@ export type PredictionsPreviewByPosition = Record<
 
 export type AssistsPreviewByPosition = Record<'FWD' | 'MID' | 'DEF', PlayerGameweekPrediction[]>;
 
+export type GoalsPreviewByPosition = Record<'FWD' | 'MID' | 'DEF', PlayerGameweekPrediction[]>;
+
 export interface PredictionsPreviewResponse {
   event: number;
   modelRunId: string | null;
   ready: boolean;
   byXPts: PredictionsPreviewByPosition;
   byXAssists: AssistsPreviewByPosition;
+  byXGoals: GoalsPreviewByPosition;
 }
 
 export type LineupsWarmupPhase =

@@ -36,19 +36,21 @@ import type { PlayerPosition, TeamMarketDto } from '@/types';
 
 import styles from './PredictionsScreen.module.css';
 
-type MainTab = 'points' | 'lineups' | 'xa' | 'cs' | 'xg';
+type MainTab = 'points' | 'lineups' | 'xg' | 'xa' | 'cs' | 'team-xg';
 type PositionTab = PlayerPosition;
 
 const MAIN_TABS: { slug: MainTab; label: string }[] = [
   { slug: 'lineups', label: copy.predictionsTabLineups },
   { slug: 'points', label: copy.predictionsTabPoints },
+  { slug: 'xg', label: copy.predictionsTabXG },
   { slug: 'xa', label: copy.predictionsTabXA },
   { slug: 'cs', label: copy.predictionsTabCS },
-  { slug: 'xg', label: copy.predictionsTabTeamXG },
+  { slug: 'team-xg', label: copy.predictionsTabTeamXG },
 ];
 
 const POINTS_POSITION_TABS: PositionTab[] = ['FWD', 'MID', 'DEF', 'GK'];
 const ASSIST_POSITION_TABS: PositionTab[] = ['FWD', 'MID', 'DEF'];
+const GOALS_POSITION_TABS: PositionTab[] = ['FWD', 'MID', 'DEF'];
 const FREE_VISIBLE = 2;
 const FREE_TEASER = 8;
 const PREMIUM_PAGE_SIZE = 20;
@@ -197,7 +199,7 @@ export const PredictionsScreen: React.FC = () => {
 
   const tabParam = searchParams.get('tab');
   const activeTab: MainTab = (
-    ['lineups', 'points', 'xa', 'cs', 'xg'] as MainTab[]
+    ['lineups', 'points', 'xg', 'xa', 'cs', 'team-xg'] as MainTab[]
   ).includes(tabParam as MainTab)
     ? (tabParam as MainTab)
     : 'lineups';
@@ -287,7 +289,7 @@ export const PredictionsScreen: React.FC = () => {
   const [profilePlayerId, setProfilePlayerId] = useState<number | null>(null);
 
   useEffect(() => {
-    if (activeTab === 'xa' && posTab === 'GK') {
+    if ((activeTab === 'xa' || activeTab === 'xg') && posTab === 'GK') {
       setPosTab('FWD');
     }
   }, [activeTab, posTab]);
@@ -326,8 +328,14 @@ export const PredictionsScreen: React.FC = () => {
 
   const { following, toggle: toggleFollow } = useFollowPlayer(profileFplCode);
 
-  const activeMetric: PredictionMetric = activeTab === 'xa' ? 'xAssists' : 'xPts';
-  const positionTabs = activeTab === 'xa' ? ASSIST_POSITION_TABS : POINTS_POSITION_TABS;
+  const activeMetric: PredictionMetric =
+    activeTab === 'xa' ? 'xAssists' : activeTab === 'xg' ? 'xGoals' : 'xPts';
+  const positionTabs =
+    activeTab === 'xa'
+      ? ASSIST_POSITION_TABS
+      : activeTab === 'xg'
+        ? GOALS_POSITION_TABS
+        : POINTS_POSITION_TABS;
 
   const playerRows = useMemo(() => {
     const players = poolData?.players ?? [];
@@ -339,6 +347,10 @@ export const PredictionsScreen: React.FC = () => {
 
     if (activeTab === 'xa') {
       return buildPreviewPlayerRows(filtered, predictionsPreview, posTab, 'xAssists');
+    }
+
+    if (activeTab === 'xg') {
+      return buildPreviewPlayerRows(filtered, predictionsPreview, posTab, 'xGoals');
     }
 
     if (predictionsPreview?.ready) {
@@ -359,7 +371,7 @@ export const PredictionsScreen: React.FC = () => {
   const playerListLoading = poolLoading || (isPremium ? predictionsLoading : previewLoading);
   const modelReady = isPremium
     ? predictionsData?.ready === true
-    : activeTab === 'xa'
+    : activeTab === 'xa' || activeTab === 'xg'
       ? predictionsPreview?.ready === true
       : predictionsPreview?.ready === true || predictionsData?.ready === true;
 
@@ -378,11 +390,26 @@ export const PredictionsScreen: React.FC = () => {
     predictionsPreview != null &&
     !predictionsPreview.ready;
 
+  const showGoalsPending =
+    !isPremium &&
+    activeTab === 'xg' &&
+    !previewLoading &&
+    predictionsPreview != null &&
+    !predictionsPreview.ready;
+
   const emptyCopy =
-    activeTab === 'xa' ? copy.predictedAssistsEmptyPosition : copy.predictedPointsEmptyPosition;
+    activeTab === 'xa'
+      ? copy.predictedAssistsEmptyPosition
+      : activeTab === 'xg'
+        ? copy.predictedGoalsEmptyPosition
+        : copy.predictedPointsEmptyPosition;
 
   const disclaimerCopy =
-    activeTab === 'xa' ? copy.predictedAssistsDisclaimer : copy.predictedPointsDisclaimer;
+    activeTab === 'xa'
+      ? copy.predictedAssistsDisclaimer
+      : activeTab === 'xg'
+        ? copy.predictedGoalsDisclaimer
+        : copy.predictedPointsDisclaimer;
 
   const nextGwLabel = nextGw !== null ? interpolate(copy.predictionsGwLabel, { n: nextGw }) : '';
 
@@ -434,7 +461,7 @@ export const PredictionsScreen: React.FC = () => {
         ))}
       </div>
 
-      {(activeTab === 'points' || activeTab === 'xa') && (
+      {(activeTab === 'points' || activeTab === 'xg' || activeTab === 'xa') && (
         <>
           <div className={styles.posTabs} role="tablist" aria-label="Position">
             {positionTabs.map((pos) => (
@@ -453,6 +480,10 @@ export const PredictionsScreen: React.FC = () => {
 
           {showFplFallback && (
             <p className={styles.fallbackNotice}>{copy.predictedPointsFplFallback}</p>
+          )}
+
+          {showGoalsPending && (
+            <p className={styles.fallbackNotice}>{copy.predictedGoalsModelPending}</p>
           )}
 
           {showAssistsPending && (
@@ -584,7 +615,7 @@ export const PredictionsScreen: React.FC = () => {
         </div>
       )}
 
-      {activeTab === 'xg' && (
+      {activeTab === 'team-xg' && (
         <div className={styles.marketListWrap}>
           {showXgMarketLoading && <MarketSkeleton />}
           {showXgMarketLoading && predictionsWarmupActive && (
@@ -616,10 +647,11 @@ export const PredictionsScreen: React.FC = () => {
       )}
 
       {(activeTab === 'points' ||
+        activeTab === 'xg' ||
         activeTab === 'xa' ||
         activeTab === 'lineups' ||
         activeTab === 'cs' ||
-        activeTab === 'xg') && (
+        activeTab === 'team-xg') && (
         <PremiumSheet
           open={premiumOpen}
           onClose={() => setPremiumOpen(false)}

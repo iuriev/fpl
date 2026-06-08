@@ -6,7 +6,7 @@ import type {
   PredictionsResponse,
 } from '@/types';
 
-export type PredictionMetric = 'xPts' | 'xAssists';
+export type PredictionMetric = 'xPts' | 'xAssists' | 'xGoals';
 
 export type PredictedPointsRowData = {
   player: PoolPlayer;
@@ -25,11 +25,15 @@ export function formatPredictionDecimal(value: number): string {
 }
 
 function metricValue(prediction: PlayerGameweekPrediction, metric: PredictionMetric): number {
-  return metric === 'xPts' ? prediction.xPts : prediction.xAssists;
+  if (metric === 'xPts') return prediction.xPts;
+  if (metric === 'xAssists') return prediction.xAssists;
+  return prediction.xGoals;
 }
 
 function metricLabel(metric: PredictionMetric): string {
-  return metric === 'xPts' ? 'xPts' : 'xA';
+  if (metric === 'xPts') return 'xPts';
+  if (metric === 'xAssists') return 'xA';
+  return 'xG';
 }
 
 export function buildPredictedPointsRows(
@@ -44,11 +48,11 @@ export function buildPredictedPointsRows(
   return players
     .flatMap((player) => {
       const prediction = byCode.get(player.code);
-      if (prediction == null && metric === 'xAssists') return [];
+      if (prediction == null && (metric === 'xAssists' || metric === 'xGoals')) return [];
       const raw =
         prediction != null ? metricValue(prediction, metric) : parseFloat(player.expectedPoints);
       const displayValue = Number.isFinite(raw) ? raw : 0;
-      if (metric === 'xAssists' && displayValue <= 0) return [];
+      if ((metric === 'xAssists' || metric === 'xGoals') && displayValue <= 0) return [];
       return [{
         player,
         displayValue,
@@ -69,7 +73,11 @@ export function buildPreviewPlayerRows(
 
   const poolByCode = new Map(players.map((p) => [p.code, p]));
   const bucket =
-    metric === 'xPts' ? preview.byXPts[position] : preview.byXAssists[position as 'FWD' | 'MID' | 'DEF'];
+    metric === 'xPts'
+      ? preview.byXPts[position]
+      : metric === 'xAssists'
+        ? preview.byXAssists[position as 'FWD' | 'MID' | 'DEF']
+        : preview.byXGoals[position as 'FWD' | 'MID' | 'DEF'];
 
   if (!bucket) return [];
 

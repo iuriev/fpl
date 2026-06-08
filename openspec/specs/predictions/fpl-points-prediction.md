@@ -7,7 +7,7 @@ Sub-models consumed (all values must come from these specs — never recomputed 
 - `team-xg-prediction.md` → `λ_for`, `λ_against`
 - `team-cleansheet-prediction.md` → `csProb`
 - `xa-prediction.md` → `xAssists`
-- `shared.md` → `minsProb`, `prob60Plus`, `confidence`, `shareXg`
+- `shared.md` → `minsProb`, `prob60Plus`, `confidence`, `blendedXgPer90`
 
 ---
 
@@ -33,11 +33,21 @@ from `team-cleansheet-prediction.md`.
 ## Step 1 — Player xG
 
 ```
-xGoals = λ_for × shareXg × minsProb
+xGoals = blendedXgPer90 × fixtureAttackMultiplier × minsProb
+
+fixtureAttackMultiplier = λ_for / exp(μ)   // league-average baseline = exp(μ)
+                        = 1                 // when λ_for is unknown (slug unresolved)
 ```
 
-`shareXg` is the player's rolling 5-match share of team xG (see `shared.md`).
-`λ_for` comes from `team-xg-prediction.md` — never recomputed here.
+`blendedXgPer90` is the player's rolling xG/90 blended with a role/position prior (see `shared.md`).
+`λ_for` and `μ` come from `team-xg-prediction.md` — never recomputed here.
+
+**Why not `λ_for × shareXg`?**
+The previous formula multiplied the Poisson goals-based `λ_for` by `shareXg` derived from
+Opta-scale FPL xG data. These operate on different scales (Opta xG > actual goals), producing
+systematically deflated values (max ~0.5 for top strikers instead of ~0.7–1.0+).
+The new formula uses the player's direct xG/90 rate from FPL history as the baseline,
+and the Poisson model only for the per-fixture opponent difficulty adjustment.
 
 ---
 

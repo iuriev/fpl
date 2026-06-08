@@ -22,6 +22,7 @@ vi.mock('./prediction-service', () => ({
     ready: true,
     byXPts: { FWD: [], MID: [], DEF: [], GK: [] },
     byXAssists: { FWD: [], MID: [], DEF: [] },
+    byXGoals: { FWD: [], MID: [], DEF: [] },
   })),
 }));
 

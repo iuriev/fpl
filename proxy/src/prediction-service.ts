@@ -11,6 +11,7 @@ import {
 } from './prediction/preview-limits';
 import type {
   AssistsPreviewByPosition,
+  GoalsPreviewByPosition,
   PredictionsPreviewByPosition,
   PredictionsPreviewResponse,
   PredictionsResponse,
@@ -89,11 +90,15 @@ function emptyByXAssists(): AssistsPreviewByPosition {
   return { FWD: [], MID: [], DEF: [] };
 }
 
+function emptyByXGoals(): GoalsPreviewByPosition {
+  return { FWD: [], MID: [], DEF: [] };
+}
+
 function topByPosition(
   players: MappedPlayer[],
   positions: PlayerPosition[],
-  metric: 'xPts' | 'xAssists',
-): PredictionsPreviewByPosition | AssistsPreviewByPosition {
+  metric: 'xPts' | 'xAssists' | 'xGoals',
+): PredictionsPreviewByPosition | AssistsPreviewByPosition | GoalsPreviewByPosition {
   const out: Record<string, MappedPlayer[]> = {};
   for (const pos of positions) {
     out[pos] = players
@@ -128,6 +133,7 @@ export async function getPredictionsPreviewForEvent(
       ready: false,
       byXPts: emptyByXPts(),
       byXAssists: emptyByXAssists(),
+      byXGoals: emptyByXGoals(),
     };
   }
 
@@ -145,5 +151,10 @@ export async function getPredictionsPreviewForEvent(
       ASSIST_PREVIEW_POSITIONS,
       'xAssists',
     ) as AssistsPreviewByPosition,
+    byXGoals: topByPosition(
+      loaded.players,
+      ASSIST_PREVIEW_POSITIONS,
+      'xGoals',
+    ) as GoalsPreviewByPosition,
   };
 }

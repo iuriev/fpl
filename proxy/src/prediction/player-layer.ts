@@ -21,6 +21,28 @@ import { expectedYellowDeduction } from './yellow-card';
 
 export type { TeamSlugLookup } from '../fpl-identity/team-slug-lookup';
 
+// xG priors by tactical role (xG/90 for an average player in that role)
+const XG_PRIOR_BY_ROLE: Record<string, number> = {
+  st: 0.30,   // Striker
+  rw: 0.15,   // Right Winger
+  lw: 0.15,   // Left Winger
+  am: 0.12,   // Attacking MID / CAM
+  cm: 0.08,   // Central MID
+  dm: 0.04,   // Defensive MID
+  rb: 0.04,   // Attacking fullback
+  lb: 0.04,
+  cb: 0.02,   // Centre-back
+  gk: 0.01,
+};
+
+// Fallback xG prior by FPL position when tactical role is unknown
+const XG_PRIOR_BY_POSITION: Record<string, number> = {
+  FWD: 0.28,
+  MID: 0.10,
+  DEF: 0.03,
+  GK: 0.01,
+};
+
 const XA_PRIOR_BY_ROLE: Record<string, number> = {
   am: 0.32,   // Attacking MID / CAM
   rw: 0.28,   // Right Winger
@@ -57,18 +79,39 @@ interface PlayerHistory {
   cleanSheets: number;
 }
 
-interface EnrichedFact extends PlayerGwFactRow {
-  shareXg: number;
-  shareXa: number;
-}
-
 const XA_RATE_WINDOW = 12;
 const XA_RATE_FULL_WEIGHT_MINS = 540;
 
-function defaultShare(position: string): { xg: number; xa: number } {
-  if (position === 'FWD') return { xg: 0.12, xa: 0.06 };
-  if (position === 'MID') return { xg: 0.08, xa: 0.1 };
-  return { xg: 0.04, xa: 0.05 };
+function defaultXgPer90(position: string, tacticalRole?: string): number {
+  if (tacticalRole) {
+    const rolePrior = XG_PRIOR_BY_ROLE[tacticalRole];
+    if (rolePrior !== undefined) return rolePrior;
+  }
+  return XG_PRIOR_BY_POSITION[position] ?? 0.01;
+}
+
+function rollingXgPer90(history: PlayerHistory[]): { rate: number; minutes: number } {
+  const recent = history.slice(-XA_RATE_WINDOW);
+  let totalXg = 0;
+  let totalMins = 0;
+  for (const h of recent) {
+    totalXg += h.expectedGoals;
+    totalMins += h.minutes;
+  }
+  if (totalMins <= 0) return { rate: 0, minutes: 0 };
+  return { rate: (totalXg / totalMins) * 90, minutes: totalMins };
+}
+
+function blendedXgPer90(
+  position: string,
+  history: PlayerHistory[],
+  tacticalRole?: string,
+): number {
+  const prior = defaultXgPer90(position, tacticalRole);
+  const { rate, minutes } = rollingXgPer90(history);
+  if (minutes <= 0) return prior;
+  const weight = Math.min(minutes / XA_RATE_FULL_WEIGHT_MINS, 1);
+  return weight * rate + (1 - weight) * prior;
 }
 
 function defaultXaPer90(position: string, tacticalRole?: string): number {
@@ -103,10 +146,11 @@ function blendedXaPer90(
   return weight * rate + (1 - weight) * prior;
 }
 
+// Fixture attack multiplier: λ_for / league_baseline.
+// Returns 1 when λ_for is unknown (no slug match) → league-average fixture.
 function fixtureAttackMultiplier(lamFor: number, fit: TeamPoissonFit): number {
   const baseline = Math.exp(fit.mu);
   if (baseline <= 0 || lamFor <= 0) return 1;
-  // Linear multiplier: stronger attack → proportionally more assist opportunities
   return lamFor / baseline;
 }
 
@@ -140,74 +184,6 @@ function predictXAssists(
   );
 }
 
-function teamKeyForRow(row: PlayerGwFactRow): string {
-  return row.teamName ?? String(row.teamId ?? '');
-}
-
-function teamMatchTotalsKey(row: PlayerGwFactRow): string {
-  return `${row.season}|${row.round}|${teamKeyForRow(row)}`;
-}
-
-function buildTeamMatchTotals(
-  rows: PlayerGwFactRow[],
-): Map<string, { teamXg: number; teamXa: number }> {
-  const totals = new Map<string, { teamXg: number; teamXa: number }>();
-  for (const row of rows) {
-    const key = teamMatchTotalsKey(row);
-    const cur = totals.get(key) ?? { teamXg: 0, teamXa: 0 };
-    cur.teamXg += row.expectedGoals;
-    cur.teamXa += row.expectedAssists;
-    totals.set(key, cur);
-  }
-  return totals;
-}
-
-function enrichWithShares(rows: PlayerGwFactRow[]): EnrichedFact[] {
-  const teamTotals = buildTeamMatchTotals(rows);
-  const byPlayer = new Map<number, PlayerGwFactRow[]>();
-  for (const r of rows) {
-    const list = byPlayer.get(r.element) ?? [];
-    list.push(r);
-    byPlayer.set(r.element, list);
-  }
-
-  const out: EnrichedFact[] = [];
-  for (const [, playerRows] of byPlayer) {
-    const sorted = [...playerRows].sort(
-      (a, b) => a.round - b.round || a.fixture - b.fixture,
-    );
-    const hist: { xg: number; xa: number; teamXg: number; teamXa: number }[] = [];
-    for (const row of sorted) {
-      const matchTotals = teamTotals.get(teamMatchTotalsKey(row));
-      const teamXg = matchTotals?.teamXg || 1e-6;
-      const teamXa = matchTotals?.teamXa || 1e-6;
-      let shareXg: number;
-      let shareXa: number;
-      if (hist.length > 0) {
-        const recent = hist.slice(-5);
-        const pXg = recent.reduce((s, h) => s + h.xg, 0);
-        const tXg = recent.reduce((s, h) => s + h.teamXg, 0) || 1e-6;
-        const pXa = recent.reduce((s, h) => s + h.xa, 0);
-        const tXa = recent.reduce((s, h) => s + h.teamXa, 0) || 1e-6;
-        shareXg = Math.min(1, pXg / tXg);
-        shareXa = Math.min(1, pXa / tXa);
-      } else {
-        const d = defaultShare(row.position);
-        shareXg = d.xg;
-        shareXa = d.xa;
-      }
-      hist.push({
-        xg: row.expectedGoals,
-        xa: row.expectedAssists,
-        teamXg,
-        teamXa,
-      });
-      out.push({ ...row, shareXg, shareXa });
-    }
-  }
-  return out;
-}
-
 function minutesProb(history: PlayerHistory[]): number {
   if (history.length === 0) return 0.5;
   const recent = history.slice(-5);
@@ -223,7 +199,7 @@ function prob60Plus(history: PlayerHistory[]): number {
 }
 
 function predictFixture(
-  row: EnrichedFact,
+  row: PlayerGwFactRow,
   fit: TeamPoissonFit,
   resolveTeamSlug: TeamSlugLookup,
   history: PlayerHistory[],
@@ -255,7 +231,10 @@ function predictFixture(
 
   const minsProb = minutesProb(history);
   const p60 = prob60Plus(history);
-  const xGoals = lamFor * row.shareXg * minsProb;
+
+  const xgPer90 = blendedXgPer90(position, history, tacticalRole);
+  const xGoals = xgPer90 * fixtureAttackMultiplier(lamFor, fit) * minsProb;
+
   const xAssists = predictXAssists(
     position,
     lamFor,
@@ -339,6 +318,10 @@ function combineCs(probs: (number | null)[]): number | null {
   return 1 - p;
 }
 
+function teamKeyForRow(row: PlayerGwFactRow): string {
+  return row.teamName ?? String(row.teamId ?? '');
+}
+
 // Build a map of teamKey → average xG/90 of top-2 attackers (proxy for finishing quality)
 function buildTeamFinishingMap(
   facts: PlayerGwFactRow[],
@@ -379,12 +362,11 @@ export function scoreGameweekFacts(
   trainMaxGw: number,
   tacticalRoles?: Map<number, string>,
 ): Omit<PlayerGameweekPrediction, 'fplCode'>[] {
-  const enriched = enrichWithShares(allFacts);
   const historyByEl = new Map<number, PlayerHistory[]>();
   const fixturePreds: ReturnType<typeof predictFixture>[] = [];
   const teamFinishingMap = buildTeamFinishingMap(allFacts, targetEvent);
 
-  const rounds = [...new Set(enriched.map((r) => r.round))].sort((a, b) => a - b);
+  const rounds = [...new Set(allFacts.map((r) => r.round))].sort((a, b) => a - b);
   const uniquePlayers = new Set(allFacts.map((r) => r.element)).size;
   console.log(
     `[pred:score:layer] target_event=${targetEvent} train_max_gw=${trainMaxGw}` +
@@ -392,7 +374,7 @@ export function scoreGameweekFacts(
   );
 
   for (const round of rounds) {
-    const gwRows = enriched.filter((r) => r.round === round);
+    const gwRows = allFacts.filter((r) => r.round === round);
     if (round === targetEvent && round > trainMaxGw) {
       console.log(
         `[pred:score:layer] scoring target round=${round} fixture_rows=${gwRows.length}` +

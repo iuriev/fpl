@@ -172,22 +172,51 @@ startRate   = count(recent5.starts > 0) / max(recent5.length, 1)
 
 ---
 
-## Team xG share (shareXg)
+## Player xG/90 rate (blendedXgPer90)
 
-Used by `fpl-points-prediction.md` to allocate team-level xG to individual players.
+Used by `fpl-points-prediction.md` to compute player-level xGoals.
 
-For each GW row, `shareXg` is the player's rolling 5-match share of their team's xG:
+Rolling window of last 12 GW rows:
 
 ```
-recent5 = last 5 (player xG, team xG) pairs before this row
-shareXg = sum(player xG in recent5) / sum(team xG in recent5)
-shareXg = min(shareXg, 1)
+recentN = last 12 GW rows in player history
+xgPer90 = sum(recentN.expectedGoals) / sum(recentN.minutes) × 90
 ```
 
-If no history exists, position defaults apply:
+Blended with a positional/role prior:
 
-| Position | Default shareXg | Default shareXa |
-|----------|----------------|----------------|
-| FWD | 0.12 | 0.06 |
-| MID | 0.08 | 0.10 |
-| DEF / GK | 0.04 | 0.05 |
+```
+weight   = min(totalMins / 540, 1)   // full weight after 6 × 90 min
+blended  = weight × xgPer90 + (1 − weight) × prior
+```
+
+**xG priors by tactical role (xG/90):**
+
+| Role | Prior |
+|------|-------|
+| `st` | 0.30 |
+| `rw` / `lw` | 0.15 |
+| `am` | 0.12 |
+| `cm` | 0.08 |
+| `dm` / `rb` / `lb` | 0.04 |
+| `cb` | 0.02 |
+| `gk` | 0.01 |
+
+**Fallback by FPL position when tactical role is unknown:**
+
+| Position | Prior xG/90 |
+|----------|------------|
+| FWD | 0.28 |
+| MID | 0.10 |
+| DEF | 0.03 |
+| GK | 0.01 |
+
+If the player has no history, the prior is used directly.
+
+---
+
+## Team xA share (shareXa) — xA only
+
+`shareXa` (rolling 5-match share of team xA) was previously used for `xGoals` but is now
+**only used internally during data enrichment**. It is **not** part of the `xGoals` formula
+as of the player xG/90 rate redesign. The xA calculation uses `blendedXaPer90` instead.

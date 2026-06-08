@@ -251,6 +251,7 @@ describe('buildPreviewPlayerRows', () => {
         ],
         DEF: [],
       },
+      byXGoals: { FWD: [], MID: [], DEF: [] },
     };
     const rows = buildPreviewPlayerRows(players, preview, 'MID', 'xAssists');
     expect(rows).toHaveLength(1);
