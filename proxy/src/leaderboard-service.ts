@@ -56,6 +56,7 @@ export async function getLeaderboardGw(gw: number): Promise<LeaderboardGwRespons
         position: (POSITION_MAP[element.element_type] ?? 'GK') as PlayerPosition,
         teamCode: element.team_code,
         teamShortName: team?.short_name ?? 'UNK',
+        nowCost: element.now_cost,
         bps: live.stats.bonus,
         defcon: sumDefcon(live.explain),
       },
@@ -128,6 +129,7 @@ export async function getLeaderboardSeason(): Promise<LeaderboardSeasonResponse>
         position: (POSITION_MAP[element.element_type] ?? 'GK') as PlayerPosition,
         teamCode: element.team_code,
         teamShortName: team?.short_name ?? 'UNK',
+        nowCost: element.now_cost,
         value,
         ...(avg !== undefined ? { avg } : {}),
       });

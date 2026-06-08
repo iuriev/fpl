@@ -56,6 +56,7 @@ describe('getLeaderboardGw', () => {
     expect(result.gw).toBe(1);
     expect(result.bps[0].id).toBe(20);
     expect(result.bps[0].value).toBe(50);
+    expect(result.bps[0].nowCost).toBe(145);
     expect(result.bps[1].id).toBe(10);
     expect(result.bps[2].id).toBe(30);
   });
@@ -73,6 +74,7 @@ describe('getLeaderboardGw', () => {
 
     expect(result.defcon[0].id).toBe(30);
     expect(result.defcon[0].value).toBe(8);
+    expect(result.defcon[0].nowCost).toBe(60);
     expect(result.defcon[1].id).toBe(10);
     expect(result.defcon[1].value).toBe(5);
   });
@@ -184,12 +186,14 @@ describe('getLeaderboardSeason', () => {
 
     expect(result.bps[0].id).toBe(20);
     expect(result.bps[0].value).toBe(45);
+    expect(result.bps[0].nowCost).toBe(145);
     expect(result.bps[1].id).toBe(10);
     expect(result.bps[1].value).toBe(30);
 
     expect(result.defcon[0].id).toBe(10);
     expect(result.defcon[0].value).toBe(13);
     expect(result.defcon[0].avg).toBe(6.5);
+    expect(result.defcon[0].nowCost).toBe(55);
     expect(result.defcon).toHaveLength(1);
   });
 
