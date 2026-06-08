@@ -7,6 +7,7 @@ import {
   StartupReadinessContext,
   StartupReadinessContextValue,
 } from './StartupReadinessContext';
+import { shouldPollStartupHealth } from './warmup-status';
 
 const POLL_MS = 30_000;
 
@@ -21,7 +22,8 @@ export function StartupReadinessProvider({ children }: { children: React.ReactNo
     queryKey: ['health'],
     queryFn: () => api.getHealth(),
     enabled: !skipGate,
-    refetchInterval: (query) => (query.state.data?.ready ? false : POLL_MS),
+    refetchInterval: (query) =>
+      shouldPollStartupHealth(query.state.data) ? POLL_MS : false,
     retry: true,
   });
 

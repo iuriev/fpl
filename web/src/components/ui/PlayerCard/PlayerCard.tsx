@@ -6,6 +6,7 @@ import type { FixtureInfo, PlayerStatus, SquadPlayer, StatEntry } from '@/types'
 
 import { FdrChip } from '../FdrChip/FdrChip';
 import { Jersey } from '../Jersey/Jersey';
+import { TotwBadge } from '../TotwBadge/TotwBadge';
 import styles from './PlayerCard.module.css';
 
 export interface PlayerInfo {
@@ -31,6 +32,7 @@ export interface PlayerCardProps {
   reserveSubSlot?: boolean;
   playerInfo?: PlayerInfo;
   hideCaptaincy?: boolean;
+  showTotwBadge?: boolean;
   subTourAttr?: string;
   ownershipTourAttr?: string;
   fixtureTourAttr?: string;
@@ -75,6 +77,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   reserveSubSlot = false,
   playerInfo,
   hideCaptaincy = false,
+  showTotwBadge = false,
   subTourAttr,
   ownershipTourAttr,
   fixtureTourAttr,
@@ -171,6 +174,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
         {(footBadge ||
           badge ||
           showLineupPlayRisk ||
+          showTotwBadge ||
           (!hideCaptaincy && (player.isCaptain || player.isViceCaptain))) && (
           <div className={styles.badgeRow}>
             <div className={styles.badgeRow_left}>
@@ -183,8 +187,6 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
                   {badge.char}
                 </span>
               )}
-            </div>
-            <div className={styles.badgeRow_right}>
               {showLineupPlayRisk && (
                 <span className={styles.lineupRiskIcon} aria-label={copy.predictedLineupsPlayRiskAria}>
                   <svg viewBox="0 0 12 12" fill="none" aria-hidden="true">
@@ -204,6 +206,9 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
                   </svg>
                 </span>
               )}
+              {showTotwBadge && <TotwBadge />}
+            </div>
+            <div className={styles.badgeRow_right}>
               {!hideCaptaincy && (player.isCaptain || player.isViceCaptain) && (
                 <span
                   className={`${styles.capBadge}${player.isViceCaptain ? ` ${styles.capBadge_vice}` : ''}`}

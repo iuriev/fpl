@@ -31,6 +31,7 @@ import {
   PredictionsScreen,
   PriceChangesScreen,
   ResetPasswordScreen,
+  SettingsScreen,
   SignInScreen,
   SignUpScreen,
   SquadScreen,
@@ -83,6 +84,14 @@ function AppContent() {
       <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
       <Route path="/reset-password" element={<ResetPasswordScreen />} />
       <Route path="/entry" element={<EntryScreen />} />
+      <Route
+        path="/settings"
+        element={
+          <AuthAndTeamProtectedRoute>
+            <SettingsScreen />
+          </AuthAndTeamProtectedRoute>
+        }
+      />
       <Route
         path="/stats"
         element={

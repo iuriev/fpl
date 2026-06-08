@@ -5,7 +5,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as queries from '@/api/queries';
-import { copy } from '@/lib/copy';
+import { copy, interpolate } from '@/lib/copy';
 
 vi.mock('@/api/queries', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/api/queries')>();
@@ -14,8 +14,10 @@ vi.mock('@/api/queries', async (importOriginal) => {
     useGameweeks: vi.fn(),
     usePlayerPool: vi.fn(),
     usePredictions: vi.fn(),
+    usePredictionsPreview: vi.fn(),
     usePredictedLineups: vi.fn(),
     useMarket: vi.fn(),
+    useMarketPreview: vi.fn(),
     usePlayerProfile: vi.fn(),
   };
 });
@@ -30,6 +32,24 @@ vi.mock('@/lib/premium-upsell/PremiumUpsellContext', () => ({
 
 vi.mock('@/lib/use-follow-player', () => ({
   useFollowPlayer: vi.fn(() => ({ following: false, toggle: vi.fn() })),
+}));
+
+vi.mock('@/lib/startup-readiness/StartupReadinessContext', () => ({
+  useStartupReadiness: vi.fn(() => ({
+    ready: true,
+    checking: false,
+    health: {
+      status: 'ok',
+      ready: true,
+      seed: { phase: 'skipped' },
+      lineupsWarmup: { phase: 'done', ready: true, hotDone: 0, hotTotal: 0, coldDone: 0, coldTotal: 0, lastError: null, startedAt: null },
+      predictionsWarmup: { phase: 'done', ready: true, targetEvent: 37, lastError: null, startedAt: null },
+    },
+  })),
+}));
+
+vi.mock('@/lib/startup-readiness/use-predictions-warmup-refetch', () => ({
+  usePredictionsWarmupRefetch: vi.fn(),
 }));
 
 import { usePremiumStatus } from '@/lib/use-premium-status';
@@ -133,7 +153,11 @@ const mockProfile: PlayerProfileResponse = {
 
 // ── Render helper ─────────────────────────────────────────
 
-function renderScreen(isPremium = false, initialEntries = ['/predictions']) {
+function renderScreen(
+  isPremium = false,
+  initialEntries = ['/predictions'],
+  options?: { marketPreviewReady?: boolean },
+) {
   mockUsePremiumStatus.mockReturnValue(isPremium);
   mockQueries.usePlayerProfile.mockReturnValue({
     data: mockProfile,
@@ -151,6 +175,79 @@ function renderScreen(isPremium = false, initialEntries = ['/predictions']) {
     data: { event: 37, modelRunId: null, ready: false, players: [] },
     isLoading: false,
   } as unknown as ReturnType<typeof queries.usePredictions>);
+  mockQueries.usePredictionsPreview.mockReturnValue({
+    data: {
+      event: 37,
+      modelRunId: 'run-1',
+      ready: true,
+      byXPts: {
+        FWD: [],
+        MID: [
+          {
+            fplCode: 1000,
+            playerId: 1,
+            event: 37,
+            xPts: 8.5,
+            xGoals: 0.4,
+            xAssists: 0.3,
+            csProb: null,
+            defconPts: 0,
+            confidence: 'high',
+            epNextAnchor: 8.5,
+            modelXPts: 8.5,
+          },
+          {
+            fplCode: 2000,
+            playerId: 2,
+            event: 37,
+            xPts: 7.1,
+            xGoals: 0.3,
+            xAssists: 0.2,
+            csProb: null,
+            defconPts: 0,
+            confidence: 'medium',
+            epNextAnchor: 7.1,
+            modelXPts: 7.1,
+          },
+        ],
+        DEF: [],
+        GK: [],
+      },
+      byXAssists: {
+        FWD: [],
+        MID: [
+          {
+            fplCode: 4000,
+            playerId: 4,
+            event: 37,
+            xPts: 6.2,
+            xGoals: 0.2,
+            xAssists: 0.41,
+            csProb: null,
+            defconPts: 0,
+            confidence: 'medium',
+            epNextAnchor: 6.2,
+            modelXPts: 6.2,
+          },
+          {
+            fplCode: 1000,
+            playerId: 1,
+            event: 37,
+            xPts: 8.5,
+            xGoals: 0.4,
+            xAssists: 0.3,
+            csProb: null,
+            defconPts: 0,
+            confidence: 'high',
+            epNextAnchor: 8.5,
+            modelXPts: 8.5,
+          },
+        ],
+        DEF: [],
+      },
+    },
+    isLoading: false,
+  } as unknown as ReturnType<typeof queries.usePredictionsPreview>);
   mockQueries.usePredictedLineups.mockReturnValue({
     data: mockLineups,
     isLoading: false,
@@ -166,6 +263,19 @@ function renderScreen(isPremium = false, initialEntries = ['/predictions']) {
     },
     isLoading: false,
   } as unknown as ReturnType<typeof queries.useMarket>);
+  const marketPreviewReady = options?.marketPreviewReady ?? true;
+  mockQueries.useMarketPreview.mockReturnValue({
+    data: marketPreviewReady
+      ? {
+          event: 37,
+          modelRunId: 'run-1',
+          ready: true,
+          topCs: [makeTeam(1, 0.8, 1.2), makeTeam(2, 0.76, 1.1)],
+          topXg: [makeTeam(3, 0.2, 2.0), makeTeam(4, 0.18, 1.9)],
+        }
+      : { event: 37, modelRunId: null, ready: false, topCs: [], topXg: [] },
+    isLoading: false,
+  } as unknown as ReturnType<typeof queries.useMarketPreview>);
 
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
@@ -185,12 +295,13 @@ describe('PredictionsScreen', () => {
   });
 
   describe('tab bar', () => {
-    it('renders all four tabs', () => {
+    it('renders all five tabs', () => {
       renderScreen();
       expect(screen.getByRole('tab', { name: copy.predictionsTabPoints })).toBeInTheDocument();
       expect(screen.getByRole('tab', { name: copy.predictionsTabLineups })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: copy.predictionsTabXA })).toBeInTheDocument();
       expect(screen.getByRole('tab', { name: copy.predictionsTabCS })).toBeInTheDocument();
-      expect(screen.getByRole('tab', { name: copy.predictionsTabXG })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: copy.predictionsTabTeamXG })).toBeInTheDocument();
     });
 
     it('defaults to Lineups tab', () => {
@@ -209,14 +320,14 @@ describe('PredictionsScreen', () => {
       expect(screen.getByRole('tab', { name: 'FWD' })).toHaveAttribute('aria-selected', 'true');
     });
 
-    it('shows top 3 players free and a lock overlay for free user', async () => {
+    it('shows top 2 players free and a lock overlay for free user', async () => {
       const user = userEvent.setup();
       renderScreen(false);
       await user.click(screen.getByRole('tab', { name: copy.predictionsTabPoints }));
       await user.click(screen.getByRole('tab', { name: 'MID' }));
       expect(screen.getByText('Salah')).toBeInTheDocument();
       expect(screen.getByText('Saka')).toBeInTheDocument();
-      expect(screen.getByText('De Bruyne')).toBeInTheDocument();
+      expect(screen.queryByText('De Bruyne')).not.toBeInTheDocument();
       expect(screen.getByText(copy.predictedPointsUnlockLabel)).toBeInTheDocument();
     });
 
@@ -271,14 +382,34 @@ describe('PredictionsScreen', () => {
     });
   });
 
+  describe('xA tab', () => {
+    it('shows FWD MID DEF position tabs without GK', async () => {
+      const user = userEvent.setup();
+      renderScreen(false);
+      await user.click(screen.getByRole('tab', { name: copy.predictionsTabXA }));
+      const posTabs = screen.getAllByRole('tab', { name: /^(FWD|MID|DEF)$/ });
+      expect(posTabs.map((t) => t.textContent)).toEqual(['FWD', 'MID', 'DEF']);
+      expect(screen.queryByRole('tab', { name: 'GK' })).not.toBeInTheDocument();
+    });
+
+    it('shows top 2 assist rows and lock overlay for free user', async () => {
+      const user = userEvent.setup();
+      renderScreen(false);
+      await user.click(screen.getByRole('tab', { name: copy.predictionsTabXA }));
+      await user.click(screen.getByRole('tab', { name: 'MID' }));
+      expect(screen.getByText('Fernandes')).toBeInTheDocument();
+      expect(screen.getByText('Salah')).toBeInTheDocument();
+      expect(screen.getByText(copy.predictedPointsUnlockLabel)).toBeInTheDocument();
+    });
+  });
+
   describe('CS% tab', () => {
-    it('shows all teams without any lock for free user', async () => {
+    it('shows top 2 teams and lock overlay for free user', async () => {
       const user = userEvent.setup();
       renderScreen(false);
       await user.click(screen.getByRole('tab', { name: copy.predictionsTabCS }));
-      const rows = screen.getAllByText(/\d+%/);
-      expect(rows.length).toBe(20);
-      expect(screen.queryByText(/unlock/i)).not.toBeInTheDocument();
+      expect(screen.getAllByText(/\d+%/).length).toBe(2);
+      expect(screen.getByText(copy.predictedPointsUnlockLabel)).toBeInTheDocument();
     });
 
     it('shows sorted CS% values descending', async () => {
@@ -290,16 +421,33 @@ describe('PredictionsScreen', () => {
       const second = parseInt(rows[1].textContent!);
       expect(first).toBeGreaterThanOrEqual(second);
     });
+
+    it('shows empty message when market preview is not ready', async () => {
+      const user = userEvent.setup();
+      renderScreen(false, ['/predictions'], { marketPreviewReady: false });
+      await user.click(screen.getByRole('tab', { name: copy.predictionsTabCS }));
+      expect(
+        screen.getByText(interpolate(copy.marketEmptyState, { n: 37 })),
+      ).toBeInTheDocument();
+    });
   });
 
-  describe('xG tab', () => {
-    it('shows all teams without any lock for free user', async () => {
+  describe('Team xG tab', () => {
+    it('shows top 2 teams and lock overlay for free user', async () => {
       const user = userEvent.setup();
       renderScreen(false);
-      await user.click(screen.getByRole('tab', { name: copy.predictionsTabXG }));
-      const rows = screen.getAllByText(/^\d+\.\d{2}$/);
-      expect(rows.length).toBe(20);
-      expect(screen.queryByText(/unlock/i)).not.toBeInTheDocument();
+      await user.click(screen.getByRole('tab', { name: copy.predictionsTabTeamXG }));
+      expect(screen.getAllByText(/^\d+\.\d{2}$/).length).toBe(2);
+      expect(screen.getByText(copy.predictedPointsUnlockLabel)).toBeInTheDocument();
+    });
+
+    it('shows empty message when market preview is not ready', async () => {
+      const user = userEvent.setup();
+      renderScreen(false, ['/predictions'], { marketPreviewReady: false });
+      await user.click(screen.getByRole('tab', { name: copy.predictionsTabTeamXG }));
+      expect(
+        screen.getByText(interpolate(copy.marketEmptyState, { n: 37 })),
+      ).toBeInTheDocument();
     });
   });
 

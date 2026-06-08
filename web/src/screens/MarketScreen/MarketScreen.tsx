@@ -7,6 +7,9 @@ import { PremiumSheet } from '@/components/ui/PremiumSheet/PremiumSheet';
 import { ScreenHeader } from '@/components/ui/ScreenHeader/ScreenHeader';
 import { copy, interpolate } from '@/lib/copy';
 import { useRequestPremiumUpsell } from '@/lib/premium-upsell/PremiumUpsellContext';
+import { useStartupReadiness } from '@/lib/startup-readiness/StartupReadinessContext';
+import { usePredictionsWarmupRefetch } from '@/lib/startup-readiness/use-predictions-warmup-refetch';
+import { isPredictionsWarmupActive } from '@/lib/startup-readiness/warmup-status';
 import { usePremiumStatus } from '@/lib/use-premium-status';
 
 import styles from './MarketScreen.module.css';
@@ -39,9 +42,13 @@ export const MarketScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<MarketTab>('cs');
   const [premiumOpen, setPremiumOpen] = useState(false);
 
+  const { health } = useStartupReadiness();
+  const predictionsWarmupActive = isPredictionsWarmupActive(health);
   const { data: gameweeksData } = useGameweeks();
   const nextGw = gameweeksData?.next ?? gameweeksData?.current ?? null;
   const { data: marketData, isLoading } = useMarket(nextGw);
+
+  usePredictionsWarmupRefetch(nextGw);
 
   const sorted = useMemo(() => {
     const teams = marketData?.teams ?? [];
@@ -58,7 +65,13 @@ export const MarketScreen: React.FC = () => {
   }, [sorted, activeTab]);
 
   const gwLabel = nextGw !== null ? interpolate(copy.marketGwLabel, { n: nextGw }) : '';
-  const isEmpty = !isLoading && marketData != null && !marketData.ready;
+  const showLoading = isLoading || (predictionsWarmupActive && sorted.length === 0);
+  const isEmpty =
+    !showLoading && (marketData == null || !marketData.ready) && sorted.length === 0;
+  const calculatingMessage =
+    nextGw !== null
+      ? interpolate(copy.marketCalculatingState, { n: nextGw })
+      : copy.marketCalculatingState.replace(' GW {n}', '');
 
   const freeRows = sorted.slice(0, FREE_VISIBLE);
   const lockedRows = sorted.slice(FREE_VISIBLE);
@@ -92,7 +105,11 @@ export const MarketScreen: React.FC = () => {
       </div>
 
       <div className={styles.listWrap}>
-        {isLoading && <MarketSkeleton />}
+        {showLoading && <MarketSkeleton />}
+
+        {showLoading && predictionsWarmupActive && (
+          <p className={styles.calculating}>{calculatingMessage}</p>
+        )}
 
         {isEmpty && (
           <p className={styles.empty}>
@@ -102,7 +119,7 @@ export const MarketScreen: React.FC = () => {
           </p>
         )}
 
-        {!isLoading && sorted.length > 0 && isPremium && (
+        {!showLoading && sorted.length > 0 && isPremium && (
           <>
             {sorted.map((team, i) => (
               <MarketTeamRow key={team.teamId} team={team} rank={i + 1} tab={activeTab} maxValue={maxValue} />
@@ -111,7 +128,7 @@ export const MarketScreen: React.FC = () => {
           </>
         )}
 
-        {!isLoading && sorted.length > 0 && !isPremium && (
+        {!showLoading && sorted.length > 0 && !isPremium && (
           <>
             {freeRows.map((team, i) => (
               <MarketTeamRow key={team.teamId} team={team} rank={i + 1} tab={activeTab} maxValue={maxValue} />

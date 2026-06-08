@@ -9,12 +9,20 @@ export interface DrawerProps {
   onClose: () => void;
   ariaLabel: string;
   header?: React.ReactNode;
+  headerActions?: React.ReactNode;
   children: React.ReactNode;
 }
 
 const SWIPE_THRESHOLD_PX = 80;
 
-export const Drawer: React.FC<DrawerProps> = ({ open, onClose, ariaLabel, header, children }) => {
+export const Drawer: React.FC<DrawerProps> = ({
+  open,
+  onClose,
+  ariaLabel,
+  header,
+  headerActions,
+  children,
+}) => {
   const panelRef = useRef<HTMLDivElement>(null);
   const startXRef = useRef<number>(0);
   const draggingRef = useRef(false);
@@ -82,7 +90,8 @@ export const Drawer: React.FC<DrawerProps> = ({ open, onClose, ariaLabel, header
       >
         <div className={styles.drawerHeader}>
           <div className={styles.drawerHeaderContent}>{header}</div>
-          <button className={styles.closeBtn} onClick={onClose} aria-label={copy.closeButton}>
+          {headerActions}
+          <button className={styles.iconBtn} onClick={onClose} aria-label={copy.closeButton}>
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path
                 d="M4 4l8 8M12 4l-8 8"

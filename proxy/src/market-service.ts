@@ -4,9 +4,15 @@ import { db } from './db/client';
 import { predModelRun, predPlayerGw } from './db/schema';
 import { getOrFetchBootstrap } from './fpl-cache/db-cache';
 import * as fplClient from './fpl-client';
-import type { MarketResponse, TeamMarketDto } from './prediction/types';
+import { PREVIEW_TEAM_LIMIT } from './prediction/preview-limits';
+import type { MarketPreviewResponse, MarketResponse, TeamMarketDto } from './prediction/types';
 
-export async function getMarketForEvent(event: number): Promise<MarketResponse> {
+async function loadMarketTeams(event: number): Promise<{
+  event: number;
+  modelRunId: string | null;
+  ready: boolean;
+  teams: TeamMarketDto[];
+}> {
   const [run] = await db
     .select()
     .from(predModelRun)
@@ -35,7 +41,6 @@ export async function getMarketForEvent(event: number): Promise<MarketResponse> 
   const teamById = new Map(bootstrap.teams.map((t) => [t.id, t]));
   const codeToElement = new Map(bootstrap.elements.map((el) => [el.code, el]));
 
-  // Build per-team aggregates from player predictions
   const teamXGoals = new Map<number, number>();
   const teamCsProbs = new Map<number, number[]>();
 
@@ -46,9 +51,7 @@ export async function getMarketForEvent(event: number): Promise<MarketResponse> 
 
     teamXGoals.set(teamId, (teamXGoals.get(teamId) ?? 0) + row.xGoals);
 
-    // csProb is only set for GK/DEF and equals csTeam * minsProb
-    // Use the GK's csProb as the best proxy for team CS probability
-    const position = el.element_type; // 1=GK, 2=DEF, 3=MID, 4=FWD
+    const position = el.element_type;
     if ((position === 1 || position === 2) && row.csProb !== null) {
       const bucket = teamCsProbs.get(teamId) ?? [];
       bucket.push(row.csProb);
@@ -56,7 +59,6 @@ export async function getMarketForEvent(event: number): Promise<MarketResponse> 
     }
   }
 
-  // Build fixture map: teamId -> [{opponentId, isHome}]
   const teamFixtures = new Map<number, Array<{ opponentTeamId: number; isHome: boolean }>>();
   for (const fix of fixtures) {
     const home = teamFixtures.get(fix.team_h) ?? [];
@@ -75,7 +77,6 @@ export async function getMarketForEvent(event: number): Promise<MarketResponse> 
     if (!team) continue;
 
     const csProbs = teamCsProbs.get(teamId) ?? [];
-    // Take max csProb among GK/DEF — best represents the team's actual clean sheet chance
     const csProb = csProbs.length > 0 ? Math.max(...csProbs) : 0;
 
     const fixList = teamFixtures.get(teamId) ?? [];
@@ -98,4 +99,42 @@ export async function getMarketForEvent(event: number): Promise<MarketResponse> 
   }
 
   return { event, modelRunId: run.id, ready: teams.length > 0, teams };
+}
+
+export async function getMarketForEvent(event: number): Promise<MarketResponse> {
+  const loaded = await loadMarketTeams(event);
+  return {
+    event: loaded.event,
+    modelRunId: loaded.modelRunId,
+    ready: loaded.ready,
+    teams: loaded.teams,
+  };
+}
+
+export async function getMarketPreviewForEvent(event: number): Promise<MarketPreviewResponse> {
+  const loaded = await loadMarketTeams(event);
+  if (!loaded.ready) {
+    return {
+      event: loaded.event,
+      modelRunId: loaded.modelRunId,
+      ready: false,
+      topCs: [],
+      topXg: [],
+    };
+  }
+
+  const topCs = [...loaded.teams]
+    .sort((a, b) => b.csProb - a.csProb)
+    .slice(0, PREVIEW_TEAM_LIMIT);
+  const topXg = [...loaded.teams]
+    .sort((a, b) => b.xG - a.xG)
+    .slice(0, PREVIEW_TEAM_LIMIT);
+
+  return {
+    event: loaded.event,
+    modelRunId: loaded.modelRunId,
+    ready: true,
+    topCs,
+    topXg,
+  };
 }

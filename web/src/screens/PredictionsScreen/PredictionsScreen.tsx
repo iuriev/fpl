@@ -1,9 +1,19 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { useGameweeks, useMarket, usePlayerPool, usePredictedLineups, usePredictions } from '@/api/queries';
+import {
+  useGameweeks,
+  useMarket,
+  useMarketPreview,
+  usePlayerPool,
+  usePredictedLineups,
+  usePredictions,
+  usePredictionsPreview,
+} from '@/api/queries';
+import { MarketTeamPlaceholderRow } from '@/components/ui/MarketTeamPlaceholderRow/MarketTeamPlaceholderRow';
 import { MarketTeamRow } from '@/components/ui/MarketTeamRow/MarketTeamRow';
 import { PlayerProfileSheet } from '@/components/ui/PlayerProfileSheet/PlayerProfileSheet';
+import { PredictedPlayerPlaceholderRow } from '@/components/ui/PredictedPlayerPlaceholderRow/PredictedPlayerPlaceholderRow';
 import { PredictedPointsRow } from '@/components/ui/PredictedPointsRow/PredictedPointsRow';
 import { PremiumLockedOverlay } from '@/components/ui/PremiumLockedOverlay/PremiumLockedOverlay';
 import { PremiumSheet } from '@/components/ui/PremiumSheet/PremiumSheet';
@@ -12,34 +22,36 @@ import { TeamPickerGrid } from '@/components/ui/TeamPickerGrid/TeamPickerGrid';
 import { copy, interpolate } from '@/lib/copy';
 import {
   buildPredictedPointsRows,
+  buildPreviewPlayerRows,
   type PredictedPointsRowData,
+  type PredictionMetric,
 } from '@/lib/predicted-points';
-import { useRequestPremiumUpsell } from '@/lib/premium-upsell/PremiumUpsellContext';
+import { useStartupReadiness } from '@/lib/startup-readiness/StartupReadinessContext';
+import { usePredictionsWarmupRefetch } from '@/lib/startup-readiness/use-predictions-warmup-refetch';
+import { isPredictionsWarmupActive } from '@/lib/startup-readiness/warmup-status';
 import { useFollowPlayer } from '@/lib/use-follow-player';
 import { usePremiumStatus } from '@/lib/use-premium-status';
 import { PredictedLineupPitch } from '@/screens/PredictedLineupsScreen/PredictedLineupPitch';
-import type { PlayerPosition } from '@/types';
+import type { PlayerPosition, TeamMarketDto } from '@/types';
 
 import styles from './PredictionsScreen.module.css';
 
-// ── Types ─────────────────────────────────────────────────
-
-type MainTab = 'points' | 'lineups' | 'cs' | 'xg';
+type MainTab = 'points' | 'lineups' | 'xa' | 'cs' | 'xg';
 type PositionTab = PlayerPosition;
 
 const MAIN_TABS: { slug: MainTab; label: string }[] = [
   { slug: 'lineups', label: copy.predictionsTabLineups },
   { slug: 'points', label: copy.predictionsTabPoints },
+  { slug: 'xa', label: copy.predictionsTabXA },
   { slug: 'cs', label: copy.predictionsTabCS },
-  { slug: 'xg', label: copy.predictionsTabXG },
+  { slug: 'xg', label: copy.predictionsTabTeamXG },
 ];
 
-const POSITION_TABS: PositionTab[] = ['FWD', 'MID', 'DEF', 'GK'];
-const FREE_TOTAL = 10;
-const FREE_VISIBLE = 3;
+const POINTS_POSITION_TABS: PositionTab[] = ['FWD', 'MID', 'DEF', 'GK'];
+const ASSIST_POSITION_TABS: PositionTab[] = ['FWD', 'MID', 'DEF'];
+const FREE_VISIBLE = 2;
+const FREE_TEASER = 8;
 const PREMIUM_PAGE_SIZE = 20;
-
-// ── Points sub-components ─────────────────────────────────
 
 function PremiumPointsList({
   rows,
@@ -60,7 +72,7 @@ function PremiumPointsList({
           setVisibleCount((c) => Math.min(c + PREMIUM_PAGE_SIZE, rows.length));
         }
       },
-      { threshold: 0 }
+      { threshold: 0 },
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
@@ -74,6 +86,34 @@ function PremiumPointsList({
       ))}
       {visibleCount < rows.length && (
         <div ref={sentinelRef} className={styles.sentinel} aria-hidden="true" />
+      )}
+    </>
+  );
+}
+
+function FreePlayerList({
+  rows,
+  onSelect,
+  onUnlock,
+}: {
+  rows: PredictedPointsRowData[];
+  onSelect: (id: number) => void;
+  onUnlock: () => void;
+}) {
+  if (rows.length === 0) return null;
+
+  return (
+    <>
+      {rows.slice(0, FREE_VISIBLE).map((row, i) => (
+        <PredictedPointsRow key={row.player.id} rank={i + 1} row={row} onSelect={onSelect} />
+      ))}
+      {FREE_TEASER > 0 && (
+        <div className={styles.lockedSection}>
+          {Array.from({ length: FREE_TEASER }).map((_, i) => (
+            <PredictedPlayerPlaceholderRow key={i} rank={FREE_VISIBLE + i + 1} />
+          ))}
+          <PremiumLockedOverlay onUnlock={onUnlock} label={copy.predictedPointsUnlockLabel} />
+        </div>
       )}
     </>
   );
@@ -97,8 +137,6 @@ function PointsSkeleton() {
   );
 }
 
-// ── Market sub-components ─────────────────────────────────
-
 function MarketSkeleton() {
   return (
     <div aria-label={copy.loadingPlaceholder} aria-busy="true">
@@ -117,16 +155,50 @@ function MarketSkeleton() {
   );
 }
 
-// ── Main component ────────────────────────────────────────
+function FreeMarketList({
+  teams,
+  tab,
+  maxValue,
+  onUnlock,
+}: {
+  teams: TeamMarketDto[];
+  tab: 'cs' | 'xg';
+  maxValue: number;
+  onUnlock: () => void;
+}) {
+  if (teams.length === 0) return null;
+
+  return (
+    <>
+      {teams.slice(0, FREE_VISIBLE).map((team, i) => (
+        <MarketTeamRow
+          key={team.teamId}
+          team={team}
+          rank={i + 1}
+          tab={tab}
+          maxValue={maxValue}
+        />
+      ))}
+      <div className={styles.lockedSection}>
+        {Array.from({ length: FREE_TEASER }).map((_, i) => (
+          <MarketTeamPlaceholderRow key={i} rank={FREE_VISIBLE + i + 1} />
+        ))}
+        <PremiumLockedOverlay onUnlock={onUnlock} label={copy.predictedPointsUnlockLabel} />
+      </div>
+    </>
+  );
+}
 
 export const PredictionsScreen: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const isPremium = usePremiumStatus();
-  const requestUpsell = useRequestPremiumUpsell();
+  const { health } = useStartupReadiness();
+  const predictionsWarmupActive = isPredictionsWarmupActive(health);
 
-  // ── Tab state ──────────────────────────────────────────
   const tabParam = searchParams.get('tab');
-  const activeTab: MainTab = (['lineups', 'points', 'cs', 'xg'] as MainTab[]).includes(tabParam as MainTab)
+  const activeTab: MainTab = (
+    ['lineups', 'points', 'xa', 'cs', 'xg'] as MainTab[]
+  ).includes(tabParam as MainTab)
     ? (tabParam as MainTab)
     : 'lineups';
 
@@ -138,19 +210,30 @@ export const PredictionsScreen: React.FC = () => {
     });
   };
 
-  // ── Shared queries ─────────────────────────────────────
   const { data: gameweeksData } = useGameweeks();
   const nextGw = gameweeksData?.next ?? gameweeksData?.current ?? null;
 
-  // ── Points state & queries ─────────────────────────────
   const [posTab, setPosTab] = useState<PositionTab>('FWD');
   const { data: poolData, isLoading: poolLoading } = usePlayerPool();
-  const { data: predictionsData, isLoading: predictionsLoading } = usePredictions(nextGw);
+  const { data: predictionsData, isLoading: predictionsLoading } = usePredictions(
+    nextGw,
+    isPremium,
+  );
+  const { data: predictionsPreview, isLoading: previewLoading } = usePredictionsPreview(
+    nextGw,
+    !isPremium,
+  );
 
-  // ── Lineups state & queries ────────────────────────────
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
-
   const lineupsQuery = usePredictedLineups(nextGw, isPremium);
+
+  const { data: marketData, isLoading: marketLoading } = useMarket(nextGw, isPremium);
+  const { data: marketPreview, isLoading: marketPreviewLoading } = useMarketPreview(
+    nextGw,
+    !isPremium,
+  );
+
+  usePredictionsWarmupRefetch(nextGw);
 
   const teams = useMemo(() => lineupsQuery.data?.teams ?? [], [lineupsQuery.data]);
   const defaultTeamId = useMemo(() => {
@@ -161,17 +244,15 @@ export const PredictionsScreen: React.FC = () => {
   const resolvedTeamId = selectedTeamId ?? defaultTeamId;
   const activeTeam = teams.find((t) => t.teamId === resolvedTeamId) ?? teams[0];
 
-  const fixtureLabel = activeTeam?.nextFixture != null
-    ? interpolate(
-        activeTeam.nextFixture.isHome
-          ? copy.predictedLineupsVsHome
-          : copy.predictedLineupsVsAway,
-        { opponent: activeTeam.nextFixture.opponentShortName }
-      )
-    : null;
-
-  // ── Market queries (shared for CS% + xG) ──────────────
-  const { data: marketData, isLoading: marketLoading } = useMarket(nextGw);
+  const fixtureLabel =
+    activeTeam?.nextFixture != null
+      ? interpolate(
+          activeTeam.nextFixture.isHome
+            ? copy.predictedLineupsVsHome
+            : copy.predictedLineupsVsAway,
+          { opponent: activeTeam.nextFixture.opponentShortName },
+        )
+      : null;
 
   const csSorted = useMemo(() => {
     const list = marketData?.teams ?? [];
@@ -185,16 +266,31 @@ export const PredictionsScreen: React.FC = () => {
 
   const csMax = useMemo(
     () => (csSorted.length === 0 ? 1 : Math.max(...csSorted.map((t) => t.csProb))),
-    [csSorted]
+    [csSorted],
   );
   const xgMax = useMemo(
     () => (xgSorted.length === 0 ? 1 : Math.max(...xgSorted.map((t) => t.xG))),
-    [xgSorted]
+    [xgSorted],
   );
 
-  // ── Shared modal state ─────────────────────────────────
+  const previewCsMax = useMemo(() => {
+    const list = marketPreview?.topCs ?? [];
+    return list.length === 0 ? 1 : Math.max(...list.map((t) => t.csProb));
+  }, [marketPreview]);
+
+  const previewXgMax = useMemo(() => {
+    const list = marketPreview?.topXg ?? [];
+    return list.length === 0 ? 1 : Math.max(...list.map((t) => t.xG));
+  }, [marketPreview]);
+
   const [premiumOpen, setPremiumOpen] = useState(false);
   const [profilePlayerId, setProfilePlayerId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (activeTab === 'xa' && posTab === 'GK') {
+      setPosTab('FWD');
+    }
+  }, [activeTab, posTab]);
 
   const selectedLineupPlayer = useMemo(() => {
     if (profilePlayerId == null) return undefined;
@@ -205,13 +301,14 @@ export const PredictionsScreen: React.FC = () => {
     return undefined;
   }, [profilePlayerId, teams]);
 
-  const profileLineupAlerts = selectedLineupPlayer != null
-    ? {
-        injuryWarning: selectedLineupPlayer.injuryWarning,
-        benchRisk: selectedLineupPlayer.benchRisk,
-        chanceOfPlaying: selectedLineupPlayer.chanceOfPlaying,
-      }
-    : undefined;
+  const profileLineupAlerts =
+    selectedLineupPlayer != null
+      ? {
+          injuryWarning: selectedLineupPlayer.injuryWarning,
+          benchRisk: selectedLineupPlayer.benchRisk,
+          chanceOfPlaying: selectedLineupPlayer.chanceOfPlaying,
+        }
+      : undefined;
 
   const profilePlayerName = useMemo(() => {
     if (profilePlayerId == null) return undefined;
@@ -221,25 +318,89 @@ export const PredictionsScreen: React.FC = () => {
 
   const { following, toggle: toggleFollow } = useFollowPlayer(profilePlayerId ?? 0);
 
-  useEffect(() => {
-    if (!isPremium) requestUpsell('predictions');
-  }, [isPremium, requestUpsell]);
+  const activeMetric: PredictionMetric = activeTab === 'xa' ? 'xAssists' : 'xPts';
+  const positionTabs = activeTab === 'xa' ? ASSIST_POSITION_TABS : POINTS_POSITION_TABS;
 
-  // ── Points tab data ────────────────────────────────────
-  const pointsRows = useMemo(() => {
+  const playerRows = useMemo(() => {
     const players = poolData?.players ?? [];
     const filtered = players.filter((p) => p.position === posTab);
-    return buildPredictedPointsRows(filtered, predictionsData);
-  }, [poolData, posTab, predictionsData]);
 
-  const pointsLoading = poolLoading || predictionsLoading;
-  const modelReady = predictionsData?.ready === true;
+    if (isPremium) {
+      return buildPredictedPointsRows(filtered, predictionsData, activeMetric);
+    }
+
+    if (activeTab === 'xa') {
+      return buildPreviewPlayerRows(filtered, predictionsPreview, posTab, 'xAssists');
+    }
+
+    if (predictionsPreview?.ready) {
+      return buildPreviewPlayerRows(filtered, predictionsPreview, posTab, 'xPts');
+    }
+
+    return buildPredictedPointsRows(filtered, undefined, 'xPts');
+  }, [
+    poolData,
+    posTab,
+    predictionsData,
+    predictionsPreview,
+    isPremium,
+    activeTab,
+    activeMetric,
+  ]);
+
+  const playerListLoading = poolLoading || (isPremium ? predictionsLoading : previewLoading);
+  const modelReady = isPremium
+    ? predictionsData?.ready === true
+    : activeTab === 'xa'
+      ? predictionsPreview?.ready === true
+      : predictionsPreview?.ready === true || predictionsData?.ready === true;
+
   const showFplFallback =
-    !predictionsLoading && nextGw != null && predictionsData != null && !modelReady;
+    !isPremium &&
+    activeTab === 'points' &&
+    !previewLoading &&
+    nextGw != null &&
+    predictionsPreview != null &&
+    !predictionsPreview.ready;
+
+  const showAssistsPending =
+    !isPremium &&
+    activeTab === 'xa' &&
+    !previewLoading &&
+    predictionsPreview != null &&
+    !predictionsPreview.ready;
+
+  const emptyCopy =
+    activeTab === 'xa' ? copy.predictedAssistsEmptyPosition : copy.predictedPointsEmptyPosition;
+
+  const disclaimerCopy =
+    activeTab === 'xa' ? copy.predictedAssistsDisclaimer : copy.predictedPointsDisclaimer;
 
   const nextGwLabel = nextGw !== null ? interpolate(copy.predictionsGwLabel, { n: nextGw }) : '';
 
-  // ── Render ─────────────────────────────────────────────
+  const marketListLoading = isPremium ? marketLoading : marketPreviewLoading;
+
+  const csMarketTeams = isPremium ? csSorted : (marketPreview?.topCs ?? []);
+  const xgMarketTeams = isPremium ? xgSorted : (marketPreview?.topXg ?? []);
+
+  const showCsMarketLoading =
+    marketListLoading || (predictionsWarmupActive && csMarketTeams.length === 0);
+  const showXgMarketLoading =
+    marketListLoading || (predictionsWarmupActive && xgMarketTeams.length === 0);
+
+  const showCsMarketEmpty = !showCsMarketLoading && csMarketTeams.length === 0;
+  const showXgMarketEmpty = !showXgMarketLoading && xgMarketTeams.length === 0;
+
+  const marketEmptyMessage =
+    nextGw !== null
+      ? interpolate(copy.marketEmptyState, { n: nextGw })
+      : copy.marketEmptyState.replace(' GW {n}', '');
+
+  const marketCalculatingMessage =
+    nextGw !== null
+      ? interpolate(copy.marketCalculatingState, { n: nextGw })
+      : copy.marketCalculatingState.replace(' GW {n}', '');
+
   return (
     <div className={styles.screen}>
       <ScreenHeader
@@ -248,7 +409,6 @@ export const PredictionsScreen: React.FC = () => {
         right={nextGwLabel ? <span className={styles.gwLabel}>{nextGwLabel}</span> : undefined}
       />
 
-      {/* Main tab bar */}
       <div className={styles.tabs} role="tablist" aria-label={copy.predictionsTitle}>
         {MAIN_TABS.map(({ slug, label }) => (
           <button
@@ -264,11 +424,10 @@ export const PredictionsScreen: React.FC = () => {
         ))}
       </div>
 
-      {/* ── Points tab ── */}
-      {activeTab === 'points' && (
+      {(activeTab === 'points' || activeTab === 'xa') && (
         <>
           <div className={styles.posTabs} role="tablist" aria-label="Position">
-            {POSITION_TABS.map((pos) => (
+            {positionTabs.map((pos) => (
               <button
                 key={pos}
                 type="button"
@@ -286,49 +445,36 @@ export const PredictionsScreen: React.FC = () => {
             <p className={styles.fallbackNotice}>{copy.predictedPointsFplFallback}</p>
           )}
 
+          {showAssistsPending && (
+            <p className={styles.fallbackNotice}>{copy.predictedAssistsModelPending}</p>
+          )}
+
           <div className={styles.listWrap}>
-            {pointsLoading && <PointsSkeleton />}
+            {playerListLoading && <PointsSkeleton />}
 
-            {!pointsLoading && pointsRows.length === 0 && (
-              <p className={styles.empty}>{copy.predictedPointsEmptyPosition}</p>
+            {!playerListLoading && playerRows.length === 0 && (
+              <p className={styles.empty}>{emptyCopy}</p>
             )}
 
-            {!pointsLoading && pointsRows.length > 0 && isPremium && (
-              <PremiumPointsList rows={pointsRows} onSelect={setProfilePlayerId} />
+            {!playerListLoading && playerRows.length > 0 && isPremium && (
+              <PremiumPointsList rows={playerRows} onSelect={setProfilePlayerId} />
             )}
 
-            {!pointsLoading && pointsRows.length > 0 && !isPremium && (
-              <>
-                {pointsRows.slice(0, FREE_VISIBLE).map((row, i) => (
-                  <PredictedPointsRow key={row.player.id} rank={i + 1} row={row} onSelect={setProfilePlayerId} />
-                ))}
-                {pointsRows.slice(FREE_VISIBLE, FREE_TOTAL).length > 0 && (
-                  <div className={styles.lockedSection}>
-                    {pointsRows.slice(FREE_VISIBLE, FREE_TOTAL).map((row, i) => (
-                      <PredictedPointsRow
-                        key={row.player.id}
-                        rank={FREE_VISIBLE + i + 1}
-                        row={row}
-                        onSelect={() => {}}
-                      />
-                    ))}
-                    <PremiumLockedOverlay
-                      onUnlock={() => setPremiumOpen(true)}
-                      label={copy.predictedPointsUnlockLabel}
-                    />
-                  </div>
-                )}
-              </>
+            {!playerListLoading && playerRows.length > 0 && !isPremium && (
+              <FreePlayerList
+                rows={playerRows}
+                onSelect={setProfilePlayerId}
+                onUnlock={() => setPremiumOpen(true)}
+              />
             )}
 
-            {!pointsLoading && pointsRows.length > 0 && modelReady && (
-              <p className={styles.disclaimer}>{copy.predictedPointsDisclaimer}</p>
+            {!playerListLoading && playerRows.length > 0 && modelReady && (
+              <p className={styles.disclaimer}>{disclaimerCopy}</p>
             )}
           </div>
         </>
       )}
 
-      {/* ── Lineups tab ── */}
       {activeTab === 'lineups' && (
         <>
           {!isPremium && (
@@ -360,69 +506,133 @@ export const PredictionsScreen: React.FC = () => {
 
               <div className={styles.lineupContent}>
                 {lineupsQuery.isLoading && (
-                  <div className={styles.skeletonBar} aria-busy="true" aria-label={copy.loadingPlaceholder} />
+                  <div
+                    className={styles.skeletonBar}
+                    aria-busy="true"
+                    aria-label={copy.loadingPlaceholder}
+                  />
                 )}
 
                 {lineupsQuery.isError && (
                   <div>
                     <p className={styles.lineupError}>{copy.predictedLineupsLoadError}</p>
-                    <button type="button" className={styles.retryBtn} onClick={() => lineupsQuery.refetch()}>
+                    <button
+                      type="button"
+                      className={styles.retryBtn}
+                      onClick={() => lineupsQuery.refetch()}
+                    >
                       {copy.predictedLineupsRetry}
                     </button>
                   </div>
                 )}
 
-                {activeTeam && !lineupsQuery.isLoading && !lineupsQuery.isError && (
-                  activeTeam.players.length === 0
-                    ? <p className={styles.lineupEmpty}>{copy.predictedLineupsEmptyTeam}</p>
-                    : <PredictedLineupPitch
-                        players={activeTeam.players}
-                        teamShortName={activeTeam.shortName}
-                        teamId={activeTeam.teamId}
-                        onSelect={setProfilePlayerId}
-                      />
-                )}
+                {activeTeam && !lineupsQuery.isLoading && !lineupsQuery.isError &&
+                  (activeTeam.players.length === 0 ? (
+                    <p className={styles.lineupEmpty}>{copy.predictedLineupsEmptyTeam}</p>
+                  ) : (
+                    <PredictedLineupPitch
+                      players={activeTeam.players}
+                      teamShortName={activeTeam.shortName}
+                      teamId={activeTeam.teamId}
+                      onSelect={setProfilePlayerId}
+                    />
+                  ))}
               </div>
             </>
           )}
         </>
       )}
 
-      {/* ── CS% tab ── */}
       {activeTab === 'cs' && (
         <div className={styles.marketListWrap}>
-          {marketLoading && <MarketSkeleton />}
-          {!marketLoading && csSorted.map((team, i) => (
-            <MarketTeamRow key={team.teamId} team={team} rank={i + 1} tab="cs" maxValue={csMax} />
-          ))}
-          {!marketLoading && csSorted.length > 0 && (
+          {showCsMarketLoading && <MarketSkeleton />}
+          {showCsMarketLoading && predictionsWarmupActive && (
+            <p className={styles.calculating}>{marketCalculatingMessage}</p>
+          )}
+          {showCsMarketEmpty && <p className={styles.empty}>{marketEmptyMessage}</p>}
+          {!showCsMarketLoading && isPremium &&
+            csSorted.map((team, i) => (
+              <MarketTeamRow
+                key={team.teamId}
+                team={team}
+                rank={i + 1}
+                tab="cs"
+                maxValue={csMax}
+              />
+            ))}
+          {!showCsMarketLoading && !isPremium && (
+            <FreeMarketList
+              teams={marketPreview?.topCs ?? []}
+              tab="cs"
+              maxValue={previewCsMax}
+              onUnlock={() => setPremiumOpen(true)}
+            />
+          )}
+          {!showCsMarketLoading && isPremium && csSorted.length > 0 && (
             <p className={styles.disclaimer}>{copy.marketDisclaimer}</p>
           )}
         </div>
       )}
 
-      {/* ── xG tab ── */}
       {activeTab === 'xg' && (
         <div className={styles.marketListWrap}>
-          {marketLoading && <MarketSkeleton />}
-          {!marketLoading && xgSorted.map((team, i) => (
-            <MarketTeamRow key={team.teamId} team={team} rank={i + 1} tab="xg" maxValue={xgMax} />
-          ))}
-          {!marketLoading && xgSorted.length > 0 && (
+          {showXgMarketLoading && <MarketSkeleton />}
+          {showXgMarketLoading && predictionsWarmupActive && (
+            <p className={styles.calculating}>{marketCalculatingMessage}</p>
+          )}
+          {showXgMarketEmpty && <p className={styles.empty}>{marketEmptyMessage}</p>}
+          {!showXgMarketLoading && isPremium &&
+            xgSorted.map((team, i) => (
+              <MarketTeamRow
+                key={team.teamId}
+                team={team}
+                rank={i + 1}
+                tab="xg"
+                maxValue={xgMax}
+              />
+            ))}
+          {!showXgMarketLoading && !isPremium && (
+            <FreeMarketList
+              teams={marketPreview?.topXg ?? []}
+              tab="xg"
+              maxValue={previewXgMax}
+              onUnlock={() => setPremiumOpen(true)}
+            />
+          )}
+          {!showXgMarketLoading && isPremium && xgSorted.length > 0 && (
             <p className={styles.disclaimer}>{copy.marketDisclaimer}</p>
           )}
         </div>
       )}
 
-      {/* ── Shared modals ── */}
-      {(activeTab === 'points' || activeTab === 'lineups') && (
+      {(activeTab === 'points' ||
+        activeTab === 'xa' ||
+        activeTab === 'lineups' ||
+        activeTab === 'cs' ||
+        activeTab === 'xg') && (
         <PremiumSheet
           open={premiumOpen}
           onClose={() => setPremiumOpen(false)}
-          title={activeTab === 'lineups' ? copy.predictionsLineupsPremiumTitle : copy.predictedPointsPremiumTitle}
-          description={activeTab === 'lineups' ? copy.predictionsLineupsPremiumDescription : copy.predictedPointsPremiumDescription}
-          freeLabel={activeTab === 'lineups' ? copy.predictionsLineupsPremiumFreeLabel : copy.predictedPointsPremiumFreeLabel}
-          premiumLabel={activeTab === 'lineups' ? copy.predictionsLineupsPremiumPremiumLabel : copy.predictedPointsPremiumPremiumLabel}
+          title={
+            activeTab === 'lineups'
+              ? copy.predictionsLineupsPremiumTitle
+              : copy.predictedPointsPremiumTitle
+          }
+          description={
+            activeTab === 'lineups'
+              ? copy.predictionsLineupsPremiumDescription
+              : copy.predictedPointsPremiumDescription
+          }
+          freeLabel={
+            activeTab === 'lineups'
+              ? copy.predictionsLineupsPremiumFreeLabel
+              : copy.predictedPointsPremiumFreeLabel
+          }
+          premiumLabel={
+            activeTab === 'lineups'
+              ? copy.predictionsLineupsPremiumPremiumLabel
+              : copy.predictedPointsPremiumPremiumLabel
+          }
         />
       )}
 

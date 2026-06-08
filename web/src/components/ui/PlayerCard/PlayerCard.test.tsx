@@ -242,3 +242,15 @@ describe('PlayerCard captaincy', () => {
     expect(screen.queryByLabelText('Captain')).not.toBeInTheDocument();
   });
 });
+
+describe('PlayerCard Team of the Week badge', () => {
+  it('renders TOTW badge when showTotwBadge is true', () => {
+    render(<PlayerCard player={makePlayer()} showTotwBadge />);
+    expect(screen.getByLabelText('Team of the Week')).toBeInTheDocument();
+  });
+
+  it('does not render TOTW badge by default', () => {
+    render(<PlayerCard player={makePlayer()} />);
+    expect(screen.queryByLabelText('Team of the Week')).not.toBeInTheDocument();
+  });
+});

@@ -106,4 +106,63 @@ describe('scoreGameweekFacts', () => {
     expect(defender!.xAssists).toBeLessThan(0.2);
     expect(forward!.xGoals).toBeGreaterThan(defender!.xGoals);
   });
+
+  it('ranks creative mids above poacher forwards on xAssists but not necessarily on xGoals', () => {
+    const trainRounds = [1, 2, 3, 4, 5];
+    const facts: PlayerGwFactRow[] = [];
+
+    for (const round of trainRounds) {
+      facts.push(
+        fact({
+          round,
+          element: 20,
+          position: 'FWD',
+          expectedGoals: 0.65,
+          expectedAssists: 0.04,
+        }),
+        fact({
+          round,
+          element: 21,
+          position: 'MID',
+          expectedGoals: 0.08,
+          expectedAssists: 0.42,
+        }),
+      );
+    }
+
+    facts.push(
+      fact({
+        round: 6,
+        element: 20,
+        position: 'FWD',
+        expectedGoals: 0,
+        expectedAssists: 0,
+        xp: 6,
+      }),
+      fact({
+        round: 6,
+        element: 21,
+        position: 'MID',
+        expectedGoals: 0,
+        expectedAssists: 0,
+        xp: 5,
+      }),
+    );
+
+    const fit = fitTeamPoisson(SAMPLE_MATCHES);
+    const idToSlug = new Map([
+      [1, 'arsenal'],
+      [2, 'wolves'],
+    ]);
+
+    const preds = scoreGameweekFacts(facts, fit, idToSlug, 6, 5);
+    const forward = preds.find((p) => p.seasonElementId === 20);
+    const playmaker = preds.find((p) => p.seasonElementId === 21);
+
+    expect(forward).toBeDefined();
+    expect(playmaker).toBeDefined();
+    expect(forward!.xGoals).toBeGreaterThan(playmaker!.xGoals);
+    expect(playmaker!.xAssists).toBeGreaterThan(forward!.xAssists);
+    expect(playmaker!.xPts).not.toBeCloseTo(playmaker!.xAssists, 1);
+  });
 });

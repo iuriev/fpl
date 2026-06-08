@@ -52,6 +52,14 @@
   position: relative;
 }
 
+.calculating {
+  padding: 0 var(--fpl-space-xl3) var(--fpl-space-base);
+  text-align: center;
+  font: var(--fpl-fw-regular) var(--fpl-fs-body-s) var(--fpl-font-display);
+  color: var(--fpl-muted);
+  margin: 0;
+}
+
 .empty {
   padding: var(--fpl-space-xl3);
   text-align: center;

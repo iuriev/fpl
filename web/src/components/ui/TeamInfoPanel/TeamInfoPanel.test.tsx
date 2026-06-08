@@ -1,15 +1,12 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import * as authClientModule from '@/auth/auth-client';
 import { AuthContext, type AuthContextValue } from '@/auth/AuthContext';
 import { fixtureEntry } from '@/fixtures';
 import * as readDonationUrlModule from '@/lib/donation/readDonationUrl';
 
 import { TeamInfoPanel, TeamInfoPanelSkeleton } from './TeamInfoPanel';
-
-vi.mock('@/auth/auth-client');
 
 const nullAuthCtx: AuthContextValue = { user: null, loading: false, refetch: vi.fn() };
 
@@ -127,49 +124,16 @@ describe('TeamInfoPanel — navLinksMode', () => {
   });
 });
 
-describe('TeamInfoPanel — user block', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('shows user name and email in full mode', () => {
+describe('TeamInfoPanel — settings link', () => {
+  it('shows Settings nav link in full mode', () => {
     renderPanelWithUser();
-    expect(screen.getByText('Ivan Iuriev')).toBeInTheDocument();
-    expect(screen.getByText('ivan.iuriev@gmail.com')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /settings/i }).getAttribute('href')).toBe('/settings');
   });
 
-  it('shows Sign out button in full mode', () => {
+  it('does not show account profile in the side panel', () => {
     renderPanelWithUser();
-    expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument();
-  });
-
-it('does not show user block in demo mode', () => {
-    renderPanelWithUser({}, 'demo');
-    expect(screen.queryByRole('button', { name: /sign out/i })).toBeNull();
-  });
-
-  it('does not show user block in hidden mode', () => {
-    renderPanelWithUser({}, 'hidden');
-    expect(screen.queryByRole('button', { name: /sign out/i })).toBeNull();
-  });
-
-  it('does not show user block when user is null', () => {
-    renderPanelWithUser({}, 'full', null);
-    expect(screen.queryByRole('button', { name: /sign out/i })).toBeNull();
-  });
-
-  it('calls signOut and refetch on Sign out click', async () => {
-    const mockSignOut = vi.fn().mockResolvedValue(undefined);
-    vi.spyOn(authClientModule, 'authClient', 'get').mockReturnValue({
-      ...authClientModule.authClient,
-      signOut: mockSignOut,
-    });
-
-    renderPanelWithUser();
-    fireEvent.click(screen.getByRole('button', { name: /sign out/i }));
-
-    await waitFor(() => expect(mockSignOut).toHaveBeenCalled());
-    await waitFor(() => expect(mockRefetch).toHaveBeenCalled());
+    expect(screen.queryByText('Ivan Iuriev')).toBeNull();
+    expect(screen.queryByText('ivan.iuriev@gmail.com')).toBeNull();
   });
 });
 

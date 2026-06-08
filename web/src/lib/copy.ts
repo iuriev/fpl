@@ -11,7 +11,7 @@ export const copy = {
 
   startupMaintenanceTitle: 'We’re updating',
   startupMaintenanceBody:
-    'Loading the latest squad and lineup data. You’ll be able to use the app again in a few minutes.',
+    'Running a one-time data import. You’ll be able to use the app again in a few minutes.',
   startupMaintenanceProgressLabel: 'Startup progress',
 
   // Entry screen
@@ -148,6 +148,20 @@ export const copy = {
   drawerChangeTeam: 'Change your team ID',
   drawerSignOut: 'Sign out',
 
+  // Settings screen
+  settingsOpen: 'Open settings',
+  settingsTitle: 'Settings',
+  settingsBack: 'Squad',
+  settingsAccountLabel: 'Account',
+  settingsTeamHeading: 'FPL team',
+  settingsTeamLabel: 'Team ID',
+  settingsNavLink: 'Settings',
+  settingsAboutTitle: 'About us',
+  settingsAboutBody:
+    'FPL Squad Viewer is a mobile-first companion for Fantasy Premier League managers. Track your squad, plan transfers, and explore predictions — all from your public team ID.',
+  settingsContactTitle: 'Contact',
+  settingsContactEmail: 'squadpath@gmail.com',
+
   // Team info panel
   teamInfoOverallPts: 'Overall pts',
   teamInfoOverallRank: 'Overall rank',
@@ -206,6 +220,7 @@ export const copy = {
   teamOfTheWeekRetry: 'Try again',
   teamOfTheWeekNotAvailable: 'Team of the Week not available yet for this GW',
   teamOfTheWeekNavLink: 'Team of the Week',
+  teamOfTheWeekPlayerBadge: 'Team of the Week',
 
   // Top Players screen
   topPlayersTitle: 'Top Players',
@@ -266,10 +281,17 @@ export const copy = {
   predictionsNavLink: 'Predictions with AI',
   predictionsTitle: 'Predictions with AI',
   predictionsGwLabel: 'GW {n}',
-  predictionsTabPoints: 'Points',
+  predictionsTabPoints: 'FPL points',
   predictionsTabLineups: 'Lineups',
-  predictionsTabCS: 'CS%',
-  predictionsTabXG: 'xG',
+  predictionsTabXA: 'xA',
+  predictionsTabCS: 'Team CS%',
+  predictionsTabTeamXG: 'Team xG',
+  predictedAssistsXaLabel: 'xA',
+  predictedAssistsEmptyPosition: 'No assist predictions available for this position.',
+  predictedAssistsDisclaimer:
+    'Expected assists this gameweek — approximate statistical estimates, not official FPL data.',
+  predictedAssistsModelPending:
+    'Assist predictions are not ready for this gameweek yet.',
   predictionsLineupsPremiumTitle: 'See predicted lineups',
   predictionsLineupsPremiumDescription:
     'Subscribe to unlock predicted starting XIs for all 20 Premier League teams.',
@@ -287,7 +309,7 @@ export const copy = {
   predictedPointsPremiumTitle: 'See all predicted points',
   predictedPointsPremiumDescription:
     'Subscribe to unlock the full ranked list — all players per position for the next gameweek.',
-  predictedPointsPremiumFreeLabel: 'Top 3 per position',
+  predictedPointsPremiumFreeLabel: 'Top 2 per position',
   predictedPointsPremiumPremiumLabel: 'Full ranked list',
   predictedPointsEmptyPosition: 'No prediction data available for this position.',
   predictedPointsDisclaimer:
@@ -627,8 +649,8 @@ export const copy = {
   marketNavLink: 'Market',
   marketTitle: 'Market',
   marketGwLabel: 'GW {n}',
-  marketTabCS: 'CS%',
-  marketTabXG: 'xG',
+  marketTabCS: 'Team CS%',
+  marketTabXG: 'team xG',
   marketUnlockLabel: 'Unlock full market view',
   marketPremiumTitle: 'See the full market',
   marketPremiumDescription:
@@ -636,6 +658,7 @@ export const copy = {
   marketPremiumFreeLabel: 'Top 5 teams',
   marketPremiumPremiumLabel: 'All 20 teams',
   marketEmptyState: 'Market predictions not yet available for GW {n}.',
+  marketCalculatingState: 'Calculating market predictions for GW {n}…',
   marketDisclaimer:
     'CS% and xG are model estimates based on Poisson ratings. For research purposes only.',
 };

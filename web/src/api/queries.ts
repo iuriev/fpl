@@ -161,17 +161,35 @@ export function usePlayerPool() {
   });
 }
 
-export function usePredictions(event: number | null) {
+export function usePredictions(event: number | null, enabled = true) {
   return useQuery({
     queryKey: ['predictions', event],
     queryFn: () => {
       if (event === null) throw new Error('Gameweek required');
       return api.getPredictions(event);
     },
-    enabled: event !== null,
+    enabled: enabled && event !== null,
     staleTime: 1000 * 60 * 30,
     retry: (failureCount, error) => {
-      if (error instanceof ApiError && (error.status === 400 || error.status === 404)) {
+      if (error instanceof ApiError && (error.status === 400 || error.status === 404 || error.status === 403)) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+  });
+}
+
+export function usePredictionsPreview(event: number | null, enabled = true) {
+  return useQuery({
+    queryKey: ['predictions-preview', event],
+    queryFn: () => {
+      if (event === null) throw new Error('Gameweek required');
+      return api.getPredictionsPreview(event);
+    },
+    enabled: enabled && event !== null,
+    staleTime: 1000 * 60 * 30,
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && (error.status === 400 || error.status === 404 || error.status === 401)) {
         return false;
       }
       return failureCount < 3;
@@ -327,17 +345,35 @@ export function usePredictedLineups(gw: number | null, enabled: boolean) {
   });
 }
 
-export function useMarket(event: number | null) {
+export function useMarket(event: number | null, enabled = true) {
   return useQuery({
     queryKey: ['market', event],
     queryFn: () => {
       if (event === null) throw new Error('Gameweek required');
       return api.getMarket(event);
     },
-    enabled: event !== null,
+    enabled: enabled && event !== null,
     staleTime: 1000 * 60 * 30,
     retry: (failureCount, error) => {
-      if (error instanceof ApiError && (error.status === 400 || error.status === 404)) {
+      if (error instanceof ApiError && (error.status === 400 || error.status === 404 || error.status === 403)) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+  });
+}
+
+export function useMarketPreview(event: number | null, enabled = true) {
+  return useQuery({
+    queryKey: ['market-preview', event],
+    queryFn: () => {
+      if (event === null) throw new Error('Gameweek required');
+      return api.getMarketPreview(event);
+    },
+    enabled: enabled && event !== null,
+    staleTime: 1000 * 60 * 30,
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && (error.status === 400 || error.status === 404 || error.status === 401)) {
         return false;
       }
       return failureCount < 3;

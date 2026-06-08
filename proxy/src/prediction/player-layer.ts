@@ -29,10 +29,58 @@ interface EnrichedFact extends PlayerGwFactRow {
   shareXa: number;
 }
 
+const XA_RATE_WINDOW = 8;
+const XA_RATE_FULL_WEIGHT_MINS = 360;
+
 function defaultShare(position: string): { xg: number; xa: number } {
   if (position === 'FWD') return { xg: 0.12, xa: 0.06 };
   if (position === 'MID') return { xg: 0.08, xa: 0.1 };
   return { xg: 0.04, xa: 0.05 };
+}
+
+function defaultXaPer90(position: string): number {
+  if (position === 'MID') return 0.14;
+  if (position === 'FWD') return 0.08;
+  if (position === 'DEF') return 0.05;
+  return 0.01;
+}
+
+function rollingXaPer90(history: PlayerHistory[]): { rate: number; minutes: number } {
+  const recent = history.slice(-XA_RATE_WINDOW);
+  let totalXa = 0;
+  let totalMins = 0;
+  for (const h of recent) {
+    totalXa += h.expectedAssists;
+    totalMins += h.minutes;
+  }
+  if (totalMins <= 0) return { rate: 0, minutes: 0 };
+  return { rate: (totalXa / totalMins) * 90, minutes: totalMins };
+}
+
+function blendedXaPer90(position: string, history: PlayerHistory[]): number {
+  const prior = defaultXaPer90(position);
+  const { rate, minutes } = rollingXaPer90(history);
+  if (minutes <= 0) return prior;
+  const weight = Math.min(minutes / XA_RATE_FULL_WEIGHT_MINS, 1);
+  return weight * rate + (1 - weight) * prior;
+}
+
+function fixtureAttackMultiplier(lamFor: number, fit: TeamPoissonFit): number {
+  const baseline = Math.exp(fit.mu);
+  if (baseline <= 0 || lamFor <= 0) return 1;
+  return Math.sqrt(lamFor / baseline);
+}
+
+function predictXAssists(
+  position: string,
+  lamFor: number,
+  fit: TeamPoissonFit,
+  history: PlayerHistory[],
+  minsProb: number,
+): number {
+  const xaPer90 = blendedXaPer90(position, history);
+  const expectedMins = minsProb * 90;
+  return xaPer90 * (expectedMins / 90) * fixtureAttackMultiplier(lamFor, fit);
 }
 
 function teamKeyForRow(row: PlayerGwFactRow): string {
@@ -141,7 +189,7 @@ function predictFixture(
 
   const minsProb = minutesProb(history);
   const xGoals = lamFor * row.shareXg * minsProb;
-  const xAssists = lamFor * row.shareXa * minsProb * 0.85;
+  const xAssists = predictXAssists(position, lamFor, fit, history, minsProb);
 
   const defconHit = rollingDefconHitRate(
     history.map((h) => ({

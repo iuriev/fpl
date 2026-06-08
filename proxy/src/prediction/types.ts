@@ -68,6 +68,21 @@ export interface PredictionsResponse {
   players: PlayerGameweekPrediction[];
 }
 
+export type PredictionsPreviewByPosition = Record<
+  'FWD' | 'MID' | 'DEF' | 'GK',
+  PlayerGameweekPrediction[]
+>;
+
+export type AssistsPreviewByPosition = Record<'FWD' | 'MID' | 'DEF', PlayerGameweekPrediction[]>;
+
+export interface PredictionsPreviewResponse {
+  event: number;
+  modelRunId: string | null;
+  ready: boolean;
+  byXPts: PredictionsPreviewByPosition;
+  byXAssists: AssistsPreviewByPosition;
+}
+
 export interface TeamFixtureSummary {
   opponentTeamId: number;
   opponentShortName: string;
@@ -90,4 +105,12 @@ export interface MarketResponse {
   modelRunId: string | null;
   ready: boolean;
   teams: TeamMarketDto[];
+}
+
+export interface MarketPreviewResponse {
+  event: number;
+  modelRunId: string | null;
+  ready: boolean;
+  topCs: TeamMarketDto[];
+  topXg: TeamMarketDto[];
 }

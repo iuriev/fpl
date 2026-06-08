@@ -5,9 +5,20 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { Drawer } from './Drawer';
 
-function renderDrawer(open = true, onClose = vi.fn(), header?: React.ReactNode) {
+function renderDrawer(
+  open = true,
+  onClose = vi.fn(),
+  header?: React.ReactNode,
+  headerActions?: React.ReactNode
+) {
   return render(
-    <Drawer open={open} onClose={onClose} header={header} ariaLabel="Team information">
+    <Drawer
+      open={open}
+      onClose={onClose}
+      header={header}
+      headerActions={headerActions}
+      ariaLabel="Team information"
+    >
       <p>panel content</p>
     </Drawer>
   );
@@ -56,6 +67,11 @@ describe('Drawer', () => {
     renderDrawer(false, onClose);
     await user.keyboard('{Escape}');
     expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('renders header actions when provided', () => {
+    renderDrawer(true, vi.fn(), undefined, <button type="button">Settings</button>);
+    expect(screen.getByRole('button', { name: 'Settings' })).toBeInTheDocument();
   });
 
   it('calls onClose on close button click', async () => {

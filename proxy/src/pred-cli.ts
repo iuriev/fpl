@@ -1,13 +1,7 @@
 import { runMigrations } from './db/client';
 import { db } from './db/client';
-import {
-  defaultDataDir,
-  ingestEplMatches,
-  ingestPlayerGwFacts,
-  ingestTeamAlias,
-  loadEplMatchesFromDisk,
-  loadMergedGwFromDisk,
-} from './prediction/ingest';
+import { defaultDataDir, ingestPlayerGwFacts, loadMergedGwFromDisk } from './prediction/ingest';
+import { runPredictionIngest } from './prediction/run-ingest';
 import { runScoreGameweek } from './prediction/score';
 
 const cmd = process.argv[2];
@@ -18,25 +12,15 @@ async function ingest() {
   console.log(`[pred:ingest] data dir: ${dataDir}`);
 
   const onlyFlag = process.argv.find((a) => a.startsWith('--season='));
-  if (!onlyFlag) {
-    const aliasCount = await ingestTeamAlias(db, dataDir);
-    console.log(`[pred:ingest] team aliases: ${aliasCount}`);
-    const matches = await loadEplMatchesFromDisk(dataDir);
-    const matchCount = await ingestEplMatches(db, matches);
-    console.log(`[pred:ingest] epl matches: ${matchCount}`);
+  if (onlyFlag) {
+    const season = onlyFlag.split('=')[1]!;
+    const facts = await loadMergedGwFromDisk(season, dataDir);
+    const n = await ingestPlayerGwFacts(db, facts);
+    console.log(`[pred:ingest] ${season} player-gw facts: ${n}`);
+    return;
   }
-  const seasons = onlyFlag
-    ? [onlyFlag.split('=')[1]]
-    : ['2022-23', '2023-24', '2024-25', '2025-26'];
-  for (const season of seasons) {
-    try {
-      const facts = await loadMergedGwFromDisk(season, dataDir);
-      const n = await ingestPlayerGwFacts(db, facts);
-      console.log(`[pred:ingest] ${season} player-gw facts: ${n}`);
-    } catch (err) {
-      console.warn(`[pred:ingest] skip ${season}:`, err);
-    }
-  }
+
+  await runPredictionIngest(db, dataDir);
 }
 
 async function score() {

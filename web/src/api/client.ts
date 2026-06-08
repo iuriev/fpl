@@ -13,11 +13,13 @@ import {
   LeaderboardSeasonResponse,
   LeaguesResponse,
   LeagueStandingsResponse,
+  MarketPreviewResponse,
   MarketResponse,
   PlayerPoolResponse,
   PlayerProfileResponse,
   PositionFilter,
   PredictedLineupsResponse,
+  PredictionsPreviewResponse,
   PredictionsResponse,
   PriceChangeDirection,
   PriceChangePeriod,
@@ -171,8 +173,16 @@ export const api = {
     ),
 
   getPredictions: (event: number) =>
-    request<PredictionsResponse>(`/predictions?event=${event}`),
+    request<PredictionsResponse>(`/predictions?event=${event}`, { credentials: 'include' }),
+
+  getPredictionsPreview: (event: number) =>
+    request<PredictionsPreviewResponse>(`/predictions/preview?event=${event}`, {
+      credentials: 'include',
+    }),
 
   getMarket: (event: number) =>
-    request<MarketResponse>(`/market?event=${event}`),
+    request<MarketResponse>(`/market?event=${event}`, { credentials: 'include' }),
+
+  getMarketPreview: (event: number) =>
+    request<MarketPreviewResponse>(`/market/preview?event=${event}`, { credentials: 'include' }),
 };

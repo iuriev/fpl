@@ -21,14 +21,14 @@ export const PredictedPointsRow: React.FC<PredictedPointsRowProps> = ({
   row,
   onSelect,
 }) => {
-  const { player, xPts, prediction } = row;
+  const { player, displayValue, displayLabel, prediction } = row;
   const Tag = onSelect ? 'button' : 'div';
 
   return (
     <Tag
       {...(onSelect ? { type: 'button' as const, onClick: () => onSelect(player.id) } : {})}
       className={styles.row}
-      aria-label={`${player.webName}, ${formatPriceTenths(player.nowCost)}, ${xPts.toFixed(1)} ${copy.predictedPointsXptsLabel}`}
+      aria-label={`${player.webName}, ${formatPriceTenths(player.nowCost)}, ${displayValue.toFixed(1)} ${displayLabel}`}
     >
       <span className={styles.rank}>{rank}</span>
       <Jersey size="medium" teamCode={player.teamCode} position={player.position} alt="" />
@@ -42,8 +42,8 @@ export const PredictedPointsRow: React.FC<PredictedPointsRowProps> = ({
       </div>
       <PriceMetricTiles
         nowCost={player.nowCost}
-        expectedPoints={xPts.toFixed(1)}
-        expectedPointsLabel={copy.predictedPointsXptsLabel}
+        expectedPoints={displayValue.toFixed(1)}
+        expectedPointsLabel={displayLabel}
       />
     </Tag>
   );

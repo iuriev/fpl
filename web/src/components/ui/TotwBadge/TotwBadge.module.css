@@ -1,0 +1,17 @@
+.badge {
+  width: var(--fpl-size-status-badge);
+  height: var(--fpl-size-status-badge);
+  border-radius: var(--fpl-radius-pill);
+  background: var(--fpl-bg-deep);
+  color: var(--fpl-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--fpl-shadow-status-dot);
+  flex-shrink: 0;
+}
+
+.badge svg {
+  width: 0.6875rem;
+  height: 0.6875rem;
+}

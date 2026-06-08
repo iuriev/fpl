@@ -30,6 +30,7 @@ import { me } from './me-routes';
 import * as playerPoolService from './player-pool-service';
 import { predictedLineupsRoutes } from './predicted-lineups-routes';
 import { predictionRoutes } from './prediction-routes';
+import { startPredictionsWarmup } from './predictions-warmup';
 import { priceRoutes } from './price-routes';
 import { requestShutdown } from './shutdown';
 import * as squadService from './squad-service';
@@ -482,6 +483,7 @@ httpServer = serve({ fetch: app.fetch, port }, () => {
         console.error('[prefetch] error:', err),
       );
       startLineupsWarmup(db);
+      startPredictionsWarmup(db);
     } catch (err) {
       setStartupSeedDone();
       console.error('[proxy] startup background tasks error:', err);

@@ -18,6 +18,13 @@ const baseHealth: HealthResponse = {
     lastError: null,
     startedAt: null,
   },
+  predictionsWarmup: {
+    phase: 'ingest',
+    ready: false,
+    targetEvent: 34,
+    lastError: null,
+    startedAt: null,
+  },
 };
 
 describe('startupProgressPercent', () => {
@@ -38,6 +45,7 @@ describe('startupProgressPercent', () => {
       startupProgressPercent({
         ...baseHealth,
         lineupsWarmup: { ...baseHealth.lineupsWarmup, phase: 'done' },
+        predictionsWarmup: { ...baseHealth.predictionsWarmup, phase: 'done', ready: true },
       })
     ).toBe(100);
   });

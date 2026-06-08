@@ -115,6 +115,59 @@ def minutes_probability(history: list[dict], default: float = 0.7) -> float:
     return min(max(avg / 90.0, 0.05), 1.0)
 
 
+XA_RATE_WINDOW = 8
+XA_RATE_FULL_WEIGHT_MINS = 360
+
+
+def default_xa_per_90(position: str) -> float:
+    if position == "MID":
+        return 0.14
+    if position == "FWD":
+        return 0.08
+    if position == "DEF":
+        return 0.05
+    return 0.01
+
+
+def rolling_xa_per_90(history: list[dict]) -> tuple[float, float]:
+    recent = history[-XA_RATE_WINDOW:]
+    total_xa = sum(h["expected_assists"] for h in recent)
+    total_mins = sum(h["minutes"] for h in recent)
+    if total_mins <= 0:
+        return 0.0, 0.0
+    return (total_xa / total_mins) * 90.0, float(total_mins)
+
+
+def blended_xa_per_90(position: str, history: list[dict]) -> float:
+    prior = default_xa_per_90(position)
+    rate, minutes = rolling_xa_per_90(history)
+    if minutes <= 0:
+        return prior
+    weight = min(minutes / XA_RATE_FULL_WEIGHT_MINS, 1.0)
+    return weight * rate + (1.0 - weight) * prior
+
+
+def fixture_attack_multiplier(lam_for: float, fit: TeamPoissonFit) -> float:
+    import math
+
+    baseline = math.exp(fit.mu)
+    if baseline <= 0 or lam_for <= 0:
+        return 1.0
+    return math.sqrt(lam_for / baseline)
+
+
+def predict_x_assists(
+    position: str,
+    lam_for: float,
+    fit: TeamPoissonFit,
+    history: list[dict],
+    mins_prob: float,
+) -> float:
+    xa_per_90 = blended_xa_per_90(position, history)
+    expected_mins = mins_prob * 90.0
+    return xa_per_90 * (expected_mins / 90.0) * fixture_attack_multiplier(lam_for, fit)
+
+
 def predict_fixture_row(
     row: pd.Series,
     fit: TeamPoissonFit,
@@ -128,11 +181,10 @@ def predict_fixture_row(
     lam_for, lam_against, cs_team = team_lambda_for_row(fit, team_slug, opp_slug, was_home)
 
     share_xg = float(row.get("share_xg", 0.08))
-    share_xa = float(row.get("share_xa", 0.08))
     mins_prob = minutes_probability(history)
 
     x_goals = lam_for * share_xg * mins_prob
-    x_assists = lam_for * share_xa * mins_prob * 0.85
+    x_assists = predict_x_assists(position, lam_for, fit, history, mins_prob)
 
     hist_df = pd.DataFrame(history) if history else pd.DataFrame()
     defcon_hit_rate = rolling_defcon_hit_rate(hist_df, position)

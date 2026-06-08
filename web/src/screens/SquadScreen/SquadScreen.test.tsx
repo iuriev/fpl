@@ -19,6 +19,7 @@ vi.mock('@/api/queries', () => ({
   useGameweeks: () => ({ data: fixtureGameweeks }),
   useSquad: () => ({ data: null, isLoading: false, isError: false, error: null, refetch: vi.fn() }),
   usePlayerPool: () => ({ data: null }),
+  useTeamOfTheWeek: () => ({ data: null }),
 }));
 
 import { AuthContext, AuthContextValue } from '@/auth/AuthContext';

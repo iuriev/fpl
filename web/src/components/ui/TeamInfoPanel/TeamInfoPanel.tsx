@@ -1,8 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
-import { authClient } from '@/auth/auth-client';
-import { useCurrentUser } from '@/auth/AuthContext';
 import { DemoSignInDialog } from '@/components/ui/DemoSignInDialog/DemoSignInDialog';
 import { DonationBanner } from '@/components/ui/DonationBanner/DonationBanner';
 import { copy, interpolate } from '@/lib/copy';
@@ -36,6 +34,7 @@ const NAV_LINKS: { to: string; label: () => string; featured?: boolean; end?: bo
   { to: '/predictions', label: () => copy.predictionsNavLink },
   { to: '/price-changes', label: () => copy.priceChangesNavLink },
   { to: '/fixtures', label: () => copy.fixturesCalendarNavLink },
+  { to: '/settings', label: () => copy.settingsNavLink },
 ];
 
 export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({
@@ -45,23 +44,6 @@ export const TeamInfoPanel: React.FC<TeamInfoPanelProps> = ({
   navLinksMode = 'full',
   onClose,
 }) => {
-  const navigate = useNavigate();
-  const { user, refetch } = useCurrentUser();
-  const [isSigningOut, setIsSigningOut] = useState(false);
-
-  const handleSignOut = async () => {
-    setIsSigningOut(true);
-    try {
-      await authClient.signOut();
-      await refetch();
-      navigate('/', { replace: true });
-    } catch {
-      setIsSigningOut(false);
-    }
-  };
-
-const userInitial = user ? (user.name || user.email).charAt(0).toUpperCase() : '';
-
   const repo = useWatchlistRepository();
   const [following, setFollowing] = useState(false);
   const [limitReached, setLimitReached] = useState(false);
@@ -100,25 +82,6 @@ const userInitial = user ? (user.name || user.email).charAt(0).toUpperCase() : '
   return (
     <aside className={styles.panel}>
       <div className={styles.panelBody}>
-      {navLinksMode === 'full' && user && (
-        <>
-          <div className={styles.userBlock}>
-            <div className={styles.userAvatar}>{userInitial}</div>
-            <div className={styles.userInfo}>
-              <span className={styles.userName}>{user.name || user.email}</span>
-              <span className={styles.userEmail}>{user.email}</span>
-            </div>
-            <button
-              className={styles.signOutBtn}
-              onClick={handleSignOut}
-              disabled={isSigningOut}
-            >
-              {copy.drawerSignOut}
-            </button>
-          </div>
-        </>
-      )}
-
       <DemoSignInDialog open={demoGateOpen} onClose={() => setDemoGateOpen(false)} />
 
       <div className={styles.stats}>
@@ -162,16 +125,33 @@ const userInitial = user ? (user.name || user.email).charAt(0).toUpperCase() : '
 
       {navLinksMode === 'demo' && (
         <div className={styles.navLinks}>
-          {navLinks.map(({ to, label, featured }) => (
-            <button
-              key={to}
-              type="button"
-              className={`${styles.navLink} ${styles.navLinkDemo}${featured ? ` ${styles.navLinkFeatured}` : ''}`}
-              onClick={() => { openDemoGate(); onClose?.(); }}
-            >
-              {label()}
-            </button>
-          ))}
+          {navLinks.map(({ to, label, featured, end }) =>
+            to === '/settings' ? (
+              <NavLink
+                key={to}
+                to={to}
+                end={end}
+                onClick={onClose}
+                className={({ isActive }) =>
+                  [styles.navLink, isActive ? styles.navLinkActive : ''].filter(Boolean).join(' ')
+                }
+              >
+                {label()}
+              </NavLink>
+            ) : (
+              <button
+                key={to}
+                type="button"
+                className={`${styles.navLink} ${styles.navLinkDemo}${featured ? ` ${styles.navLinkFeatured}` : ''}`}
+                onClick={() => {
+                  openDemoGate();
+                  onClose?.();
+                }}
+              >
+                {label()}
+              </button>
+            )
+          )}
         </div>
       )}
 

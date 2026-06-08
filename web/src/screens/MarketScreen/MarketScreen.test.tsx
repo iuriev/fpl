@@ -30,6 +30,24 @@ vi.mock('@/lib/premium-upsell/PremiumUpsellContext', () => ({
   useRequestPremiumUpsell: () => vi.fn(),
 }));
 
+vi.mock('@/lib/startup-readiness/StartupReadinessContext', () => ({
+  useStartupReadiness: vi.fn(() => ({
+    ready: true,
+    checking: false,
+    health: {
+      status: 'ok',
+      ready: true,
+      seed: { phase: 'skipped' },
+      lineupsWarmup: { phase: 'done', ready: true, hotDone: 0, hotTotal: 0, coldDone: 0, coldTotal: 0, lastError: null, startedAt: null },
+      predictionsWarmup: { phase: 'done', ready: true, targetEvent: 31, lastError: null, startedAt: null },
+    },
+  })),
+}));
+
+vi.mock('@/lib/startup-readiness/use-predictions-warmup-refetch', () => ({
+  usePredictionsWarmupRefetch: vi.fn(),
+}));
+
 const mockQueries = vi.mocked(queries);
 
 import { usePremiumStatus } from '@/lib/use-premium-status';

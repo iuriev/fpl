@@ -14,6 +14,7 @@ export { PredictedPointsScreen } from './PredictedPointsScreen/PredictedPointsSc
 export { PredictionsScreen } from './PredictionsScreen/PredictionsScreen';
 export { PriceChangesScreen } from './PriceChangesScreen/PriceChangesScreen';
 export { ResetPasswordScreen } from './ResetPasswordScreen/ResetPasswordScreen';
+export { SettingsScreen } from './SettingsScreen/SettingsScreen';
 export { SignInScreen } from './SignInScreen/SignInScreen';
 export { SignUpScreen } from './SignUpScreen/SignUpScreen';
 export type { SquadScreenProps } from './SquadScreen/SquadScreen';

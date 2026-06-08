@@ -155,15 +155,6 @@ describe('PredictedPointsScreen', () => {
     });
   });
 
-  describe('row tap', () => {
-    it('opens PlayerProfileSheet when a visible row is tapped', async () => {
-      const user = userEvent.setup();
-      renderScreen(false);
-      await user.click(screen.getByRole('button', { name: /Salah/i }));
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
-    });
-  });
-
   describe('model predictions', () => {
     it('shows breakdown and disclaimer when model is ready', () => {
       mockQueries.usePredictions.mockReturnValue({

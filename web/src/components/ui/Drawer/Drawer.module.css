@@ -62,7 +62,7 @@
   min-width: 0;
 }
 
-.closeBtn {
+.iconBtn {
   width: 2rem;
   height: 2rem;
   border-radius: var(--fpl-radius-pill);
@@ -78,14 +78,14 @@
     color 120ms;
 }
 
-.closeBtn:hover {
+.iconBtn:hover {
   background: rgba(255, 255, 255, 0.1);
   color: var(--fpl-text);
 }
 
-.closeBtn svg {
-  width: 0.75rem;
-  height: 0.75rem;
+.iconBtn svg {
+  width: 0.875rem;
+  height: 0.875rem;
 }
 
 /* ── Desktop: transparent pass-through ────────────────────── */

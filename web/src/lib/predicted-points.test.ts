@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildPredictedPointsRows, formatCsProb } from '@/lib/predicted-points';
-import type { PoolPlayer, PredictionsResponse } from '@/types';
+import {
+  buildPredictedPointsRows,
+  buildPreviewPlayerRows,
+  formatCsProb,
+} from '@/lib/predicted-points';
+import type { PoolPlayer, PredictionsPreviewResponse, PredictionsResponse } from '@/types';
 
 function makePlayer(id: number, code: number, expectedPoints: string): PoolPlayer {
   return {
@@ -68,7 +72,7 @@ describe('buildPredictedPointsRows', () => {
     };
     const rows = buildPredictedPointsRows(players, predictions);
     expect(rows[0].player.id).toBe(2);
-    expect(rows[0].xPts).toBe(8);
+    expect(rows[0].displayValue).toBe(8);
     expect(rows[1].prediction?.fplCode).toBe(10001);
   });
 
@@ -96,7 +100,7 @@ describe('buildPredictedPointsRows', () => {
     };
     const rows = buildPredictedPointsRows(players, predictions);
     expect(rows[0].prediction).toBeUndefined();
-    expect(rows[0].xPts).toBe(5);
+    expect(rows[0].displayValue).toBe(5);
   });
 
   it('falls back to FPL expectedPoints when model not ready', () => {
@@ -109,6 +113,80 @@ describe('buildPredictedPointsRows', () => {
     });
     expect(rows[0].player.id).toBe(2);
     expect(rows[0].prediction).toBeUndefined();
+  });
+  it('sorts by xAssists when metric is xAssists', () => {
+    const players = [makePlayer(1, 10001, '9.0'), makePlayer(2, 10002, '5.0')];
+    const predictions: PredictionsResponse = {
+      event: 34,
+      modelRunId: 'run',
+      ready: true,
+      players: [
+        {
+          fplCode: 10001,
+          playerId: 1,
+          event: 34,
+          xPts: 4.0,
+          xGoals: 0.1,
+          xAssists: 0.5,
+          csProb: null,
+          defconPts: 0,
+          confidence: 'medium',
+          epNextAnchor: 9,
+          modelXPts: 3,
+        },
+        {
+          fplCode: 10002,
+          playerId: 2,
+          event: 34,
+          xPts: 8.0,
+          xGoals: 0.5,
+          xAssists: 0.2,
+          csProb: null,
+          defconPts: 0.1,
+          confidence: 'high',
+          epNextAnchor: 5,
+          modelXPts: 8,
+        },
+      ],
+    };
+    const rows = buildPredictedPointsRows(players, predictions, 'xAssists');
+    expect(rows[0].player.id).toBe(1);
+    expect(rows[0].displayValue).toBe(0.5);
+    expect(rows[0].displayLabel).toBe('xA');
+  });
+});
+
+describe('buildPreviewPlayerRows', () => {
+  it('returns preview players for the requested position and metric', () => {
+    const players = [makePlayer(1, 10001, '5.0')];
+    const preview: PredictionsPreviewResponse = {
+      event: 34,
+      modelRunId: 'run',
+      ready: true,
+      byXPts: { FWD: [], MID: [], DEF: [], GK: [] },
+      byXAssists: {
+        FWD: [],
+        MID: [
+          {
+            fplCode: 10001,
+            playerId: 1,
+            event: 34,
+            xPts: 4,
+            xGoals: 0.1,
+            xAssists: 0.41,
+            csProb: null,
+            defconPts: 0,
+            confidence: 'medium',
+            epNextAnchor: 4,
+            modelXPts: 4,
+          },
+        ],
+        DEF: [],
+      },
+    };
+    const rows = buildPreviewPlayerRows(players, preview, 'MID', 'xAssists');
+    expect(rows).toHaveLength(1);
+    expect(rows[0].displayValue).toBe(0.41);
   });
 });
 

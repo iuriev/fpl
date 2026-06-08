@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { ApiError } from '@/api/client';
-import { useEntry, useGameweeks, usePlayerPool, useSquad } from '@/api/queries';
+import { useEntry, useGameweeks, usePlayerPool, useSquad, useTeamOfTheWeek } from '@/api/queries';
 import { Button } from '@/components/ui/Button/Button';
 import { ListView, ListViewSkeleton } from '@/components/ui/ListView/ListView';
 import { Pitch } from '@/components/ui/Pitch/Pitch';
@@ -83,6 +83,15 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
     return currentGw;
   }, [gwParam, currentGw]);
 
+  const finishedGws = useMemo(
+    () => gameweeksData?.gameweeks.filter((gw) => gw.finished) ?? [],
+    [gameweeksData]
+  );
+  const selectedGwFinished = useMemo(
+    () => finishedGws.some((gw) => gw.id === selectedGw),
+    [finishedGws, selectedGw]
+  );
+
   const viewParam = searchParams.get('view');
   const view: ViewMode = viewParam === 'list' ? 'list' : 'pitch';
 
@@ -99,6 +108,13 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
   const isGwTransition = isFetching && isPlaceholderData && !!squad;
 
   const { data: poolData } = usePlayerPool();
+
+  const { data: totwData } = useTeamOfTheWeek(selectedGwFinished ? selectedGw : null);
+
+  const totwPlayerIds = useMemo(() => {
+    if (!totwData) return null;
+    return new Set(totwData.players.map((p) => p.id));
+  }, [totwData]);
 
   const isNextGw = currentGw !== null && selectedGw !== null && selectedGw === currentGw + 1;
 
@@ -362,6 +378,7 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
                                 key={player.id}
                                 player={player}
                                 size="large"
+                                showTotwBadge={totwPlayerIds?.has(player.id) ?? false}
                                 nextFixture={isNextGw ? pool?.nextFixtures[0] : undefined}
                                 playerInfo={
                                   pool
@@ -398,6 +415,7 @@ export const SquadScreen: React.FC<SquadScreenProps> = ({ teamId, isGuest }) => 
                           key={player.id}
                           player={player}
                           size="medium"
+                          showTotwBadge={totwPlayerIds?.has(player.id) ?? false}
                           playerInfo={
                             pool
                               ? {

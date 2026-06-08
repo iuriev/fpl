@@ -498,6 +498,21 @@ export interface PredictionsResponse {
   players: PlayerGameweekPrediction[];
 }
 
+export type PredictionsPreviewByPosition = Record<
+  'FWD' | 'MID' | 'DEF' | 'GK',
+  PlayerGameweekPrediction[]
+>;
+
+export type AssistsPreviewByPosition = Record<'FWD' | 'MID' | 'DEF', PlayerGameweekPrediction[]>;
+
+export interface PredictionsPreviewResponse {
+  event: number;
+  modelRunId: string | null;
+  ready: boolean;
+  byXPts: PredictionsPreviewByPosition;
+  byXAssists: AssistsPreviewByPosition;
+}
+
 export type LineupsWarmupPhase =
   | 'idle'
   | 'waiting'
@@ -543,11 +558,30 @@ export interface MarketResponse {
   teams: TeamMarketDto[];
 }
 
+export interface MarketPreviewResponse {
+  event: number;
+  modelRunId: string | null;
+  ready: boolean;
+  topCs: TeamMarketDto[];
+  topXg: TeamMarketDto[];
+}
+
 export type StartupSeedPhase = 'pending' | 'running' | 'done' | 'skipped';
+
+export type PredictionsWarmupPhase = 'idle' | 'ingest' | 'score' | 'done' | 'error';
+
+export interface PredictionsWarmupStatus {
+  phase: PredictionsWarmupPhase;
+  ready: boolean;
+  targetEvent: number | null;
+  lastError: string | null;
+  startedAt: string | null;
+}
 
 export interface HealthResponse {
   status: 'ok';
   ready: boolean;
   seed: { phase: StartupSeedPhase };
   lineupsWarmup: LineupsWarmupStatus;
+  predictionsWarmup: PredictionsWarmupStatus;
 }

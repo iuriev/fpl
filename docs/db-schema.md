@@ -208,7 +208,7 @@ seven-day TTL aligned with bootstrap. In-memory key `fixtures:all` mirrors this 
 
 ### `fpl_element_summary_cache`
 
-Persists FPL `element-summary/{id}/` for predicted lineups and player profile. Six-hour TTL;
+Persists FPL `element-summary/{id}/` for predicted lineups and player profile. Twelve-hour TTL;
 background warmup fills rows after proxy start.
 
 | Column | Type | Nullable | Notes |

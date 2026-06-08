@@ -24,7 +24,7 @@ const FREE_VISIBLE = 3;
 const PREMIUM_PAGE_SIZE = 20;
 
 function listItemsKey(items: PredictedPointsRowData[]): string {
-  return items.map((r) => `${r.player.id}:${r.xPts}`).join(',');
+  return items.map((r) => `${r.player.id}:${r.displayValue}`).join(',');
 }
 
 function PremiumPredictedList({ rows }: { rows: PredictedPointsRowData[] }) {

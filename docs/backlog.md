@@ -467,9 +467,14 @@ Two-sided ranking of players by in-match performance:
 | DES-01 | Desktop responsive layout | L | Low priority while the app is pre-launch / mobile-first. |
 | ANA-10 | Player detail stats (points breakdown) | M | Nice-to-have. FPL app does this — we can differentiate with AI commentary. |
 | LIVE-03 | Live in-match scoring | L | Complex edge cases. Research spikes needed. |
-| VIS-02 | Team of the Week badge on squad screen | S | Polish feature. Simple once data source is confirmed. |
+| ~~VIS-02~~ | ~~Team of the Week badge on squad screen~~ | S | ✅ Done — gold star badge on PlayerCard for TOTW players on finished GWs (Squad screen). |
 
 ### Feature details
+
+#### VIS-02: Team of the Week badge on squad screen [SHIPPED]
+On finished gameweeks, squad PlayerCards show a gold star `TotwBadge` for players in that GW's
+Team of the Week. Data from existing `GET /api/team-of-the-week/:gw`; badge hidden for live or
+future GWs.
 
 #### INF-03: Redis cache + background prefetch (5000+ users)
 Replace the current in-process `Map`-based cache with Redis so the cache survives restarts
@@ -592,7 +597,7 @@ xPts for the opening gameweek / fixture difficulty for the first 3–4 rounds.
 
 For reference — features that are live in the codebase:
 
-- **Squad Viewer** — pitch view, list view, gameweek navigation, player status badges
+- **Squad Viewer** — pitch view, list view, gameweek navigation, player status badges; VIS-02 Team of the Week star badge on finished GWs
 - **Proxy Optimization (INF-01, INF-02)** — current-GW TTL increased to 300s; request rate limiting (10 req/s) implemented in `fpl-client`
 - **Help Tour (UX-05)** — interactive walkthrough explaining transfer screen elements (chips, cost strip, badges)
 - **Chips in Planner (CHIP-02)** — Wildcard/Free Hit zero out transfer costs; chip selection in TransferHeader
