@@ -7,6 +7,8 @@ import * as queries from '@/api/queries';
 import {
   fixtureDreamTeam,
   fixtureGameweeks,
+  fixtureLeaderboardGw,
+  fixtureLeaderboardSeason,
   fixtureTeamPlayers,
   fixtureTeams,
   fixtureTopPlayersGw,
@@ -15,11 +17,13 @@ import {
 
 vi.mock('@/api/queries', () => ({
   useGameweeks: vi.fn(),
+  useLeaderboardGw: vi.fn(),
+  useLeaderboardSeason: vi.fn(),
+  useTeamOfTheWeek: vi.fn(),
+  useTeamPlayers: vi.fn(),
+  useTeams: vi.fn(),
   useTopPlayersGw: vi.fn(),
   useTopPlayersSeason: vi.fn(),
-  useTeams: vi.fn(),
-  useTeamPlayers: vi.fn(),
-  useTeamOfTheWeek: vi.fn(),
 }));
 
 const mockQueries = vi.mocked(queries);
@@ -58,6 +62,18 @@ function setupDefaultMocks() {
     error: null,
     refetch: vi.fn(),
   } as unknown as ReturnType<typeof queries.useTeamOfTheWeek>);
+  mockQueries.useLeaderboardGw.mockReturnValue({
+    data: fixtureLeaderboardGw,
+    isLoading: false,
+    isError: false,
+    refetch: vi.fn(),
+  } as unknown as ReturnType<typeof queries.useLeaderboardGw>);
+  mockQueries.useLeaderboardSeason.mockReturnValue({
+    data: fixtureLeaderboardSeason,
+    isLoading: false,
+    isError: false,
+    refetch: vi.fn(),
+  } as unknown as ReturnType<typeof queries.useLeaderboardSeason>);
 }
 
 import { TopPlayersScreen } from './TopPlayersScreen';
@@ -72,24 +88,28 @@ function renderScreen(path = '/top-players') {
 
 describe('TopPlayersScreen', () => {
   beforeEach(() => setupDefaultMocks());
+
   it('renders the heading', () => {
     renderScreen();
     expect(screen.getByText('Top Players')).toBeInTheDocument();
   });
 
-  it('renders GW tab and Season tab', () => {
+  it('renders all 5 tabs', () => {
     renderScreen();
-    expect(screen.getByRole('tab', { name: 'This GW' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Points' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'DEFCON' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'BPS' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'By Team' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Season' })).toBeInTheDocument();
   });
 
-  it('shows This GW tab active by default', () => {
+  it('shows Points tab active by default', () => {
     renderScreen();
-    expect(screen.getByRole('tab', { name: 'This GW' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: 'Points' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('tab', { name: 'Season' })).toHaveAttribute('aria-selected', 'false');
   });
 
-  it('renders top players from the GW fixture', () => {
+  it('renders top players from the GW fixture on Points tab', () => {
     renderScreen();
     expect(screen.getByText('Haaland')).toBeInTheDocument();
     expect(screen.getByText('Salah')).toBeInTheDocument();
@@ -106,7 +126,7 @@ describe('TopPlayersScreen', () => {
     expect(screen.queryByText('Player100')).not.toBeInTheDocument();
   });
 
-  it('renders prev/next gameweek nav buttons on GW tab', () => {
+  it('renders prev/next gameweek nav buttons on Points tab', () => {
     renderScreen();
     expect(screen.getByRole('button', { name: /previous gameweek/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /next gameweek/i })).toBeInTheDocument();
@@ -127,31 +147,77 @@ describe('TopPlayersScreen', () => {
     expect(screen.getByRole('button', { name: /previous gameweek/i })).toBeDisabled();
   });
 
-  it('switches to Season tab on click', async () => {
-    renderScreen();
-    const user = userEvent.setup();
-    await user.click(screen.getByRole('tab', { name: 'Season' }));
-    expect(screen.getByRole('tab', { name: 'Season' })).toHaveAttribute('aria-selected', 'true');
-  });
-
-  it('renders season players after switching tab', async () => {
-    renderScreen();
-    const user = userEvent.setup();
-    await user.click(screen.getByRole('tab', { name: 'Season' }));
-    expect(screen.getByText('Salah')).toBeInTheDocument();
-    expect(screen.getByText('Haaland')).toBeInTheDocument();
-  });
-
-  it('hides GW nav on Season tab', async () => {
-    renderScreen();
-    const user = userEvent.setup();
-    await user.click(screen.getByRole('tab', { name: 'Season' }));
-    expect(screen.queryByRole('button', { name: /previous gameweek/i })).not.toBeInTheDocument();
-  });
-
   it('renders a menu button', () => {
     renderScreen();
     expect(screen.getByRole('button', { name: /open team info/i })).toBeInTheDocument();
+  });
+});
+
+describe('TopPlayersScreen — Points tab view toggle', () => {
+  beforeEach(() => setupDefaultMocks());
+
+  it('renders List/Pitch view toggle on Points tab', () => {
+    renderScreen();
+    expect(screen.getByRole('button', { name: /list/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /pitch/i })).toBeInTheDocument();
+  });
+
+  it('List view is active by default', () => {
+    renderScreen();
+    expect(screen.getByRole('button', { name: /list/i })).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('view toggle is not shown on DEFCON tab', async () => {
+    renderScreen();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('tab', { name: 'DEFCON' }));
+    expect(screen.queryByRole('button', { name: /list/i })).not.toBeInTheDocument();
+  });
+});
+
+describe('TopPlayersScreen — DEFCON tab', () => {
+  beforeEach(() => setupDefaultMocks());
+
+  it('shows DEFCON tab content when DEFCON tab is active', async () => {
+    renderScreen();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('tab', { name: 'DEFCON' }));
+    expect(screen.getByText('Alexander-Arnold')).toBeInTheDocument();
+    expect(screen.getByText('Trippier')).toBeInTheDocument();
+  });
+
+  it('renders GW nav on DEFCON tab', async () => {
+    renderScreen();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('tab', { name: 'DEFCON' }));
+    expect(screen.getByRole('button', { name: /previous gameweek/i })).toBeInTheDocument();
+  });
+
+  it('renders BPS badge labels in DEFCON list', async () => {
+    renderScreen();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('tab', { name: 'DEFCON' }));
+    const badges = screen.getAllByText('BPS');
+    expect(badges.length).toBeGreaterThan(0);
+  });
+});
+
+describe('TopPlayersScreen — BPS tab', () => {
+  beforeEach(() => setupDefaultMocks());
+
+  it('shows BPS tab content when BPS tab is active', async () => {
+    renderScreen();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('tab', { name: 'BPS' }));
+    expect(screen.getByText('Dorgu')).toBeInTheDocument();
+    expect(screen.getByText('Salah')).toBeInTheDocument();
+  });
+
+  it('renders GW nav on BPS tab', async () => {
+    renderScreen();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('tab', { name: 'BPS' }));
+    expect(screen.getByRole('button', { name: /previous gameweek/i })).toBeInTheDocument();
   });
 });
 
@@ -207,6 +273,57 @@ describe('TopPlayersScreen — By Team tab', () => {
   });
 });
 
+describe('TopPlayersScreen — Season tab', () => {
+  beforeEach(() => setupDefaultMocks());
+
+  it('switches to Season tab on click', async () => {
+    renderScreen();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('tab', { name: 'Season' }));
+    expect(screen.getByRole('tab', { name: 'Season' })).toHaveAttribute('aria-selected', 'true');
+  });
+
+  it('shows Points sub-view by default on Season tab', async () => {
+    renderScreen();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('tab', { name: 'Season' }));
+    expect(screen.getByRole('button', { name: 'Points' })).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('renders season players on Points sub-view', async () => {
+    renderScreen();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('tab', { name: 'Season' }));
+    expect(screen.getByText('Salah')).toBeInTheDocument();
+    expect(screen.getByText('Haaland')).toBeInTheDocument();
+  });
+
+  it('hides GW nav on Season tab', async () => {
+    renderScreen();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('tab', { name: 'Season' }));
+    expect(screen.queryByRole('button', { name: /previous gameweek/i })).not.toBeInTheDocument();
+  });
+
+  it('switches to DEFCON season view', async () => {
+    renderScreen();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('tab', { name: 'Season' }));
+    await user.click(screen.getByRole('button', { name: 'DEFCON' }));
+    expect(screen.getByRole('button', { name: 'DEFCON' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByText('Alexander-Arnold')).toBeInTheDocument();
+  });
+
+  it('switches to BPS season view', async () => {
+    renderScreen();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('tab', { name: 'Season' }));
+    await user.click(screen.getByRole('button', { name: 'BPS' }));
+    expect(screen.getByRole('button', { name: 'BPS' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByText('Haaland')).toBeInTheDocument();
+  });
+});
+
 describe('TopPlayersScreen — loading state', () => {
   it('shows loading skeleton when GW data is loading', () => {
     mockQueries.useGameweeks.mockReturnValue({ data: fixtureGameweeks } as ReturnType<
@@ -224,6 +341,18 @@ describe('TopPlayersScreen — loading state', () => {
       isError: false,
       refetch: vi.fn(),
     } as unknown as ReturnType<typeof queries.useTopPlayersSeason>);
+    mockQueries.useLeaderboardGw.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof queries.useLeaderboardGw>);
+    mockQueries.useLeaderboardSeason.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof queries.useLeaderboardSeason>);
     renderScreen();
     expect(screen.getByLabelText(/loading/i)).toBeInTheDocument();
   });
@@ -246,6 +375,18 @@ describe('TopPlayersScreen — error state', () => {
       isError: false,
       refetch: vi.fn(),
     } as unknown as ReturnType<typeof queries.useTopPlayersSeason>);
+    mockQueries.useLeaderboardGw.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof queries.useLeaderboardGw>);
+    mockQueries.useLeaderboardSeason.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof queries.useLeaderboardSeason>);
     renderScreen();
     expect(screen.getByText(/couldn't load top players/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument();
