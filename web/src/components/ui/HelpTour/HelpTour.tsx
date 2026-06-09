@@ -1,5 +1,4 @@
 import './HelpTour.css';
-
 import React from 'react';
 import { ACTIONS, type EventData, EVENTS, Joyride, type Step, type TooltipRenderProps } from 'react-joyride';
 

@@ -216,6 +216,8 @@ export const PredictionsScreen: React.FC = () => {
   const nextGw = gameweeksData?.next ?? gameweeksData?.current ?? null;
 
   const [posTab, setPosTab] = useState<PositionTab>('FWD');
+  const effectivePosTab: PositionTab =
+    (activeTab === 'xa' || activeTab === 'xg') && posTab === 'GK' ? 'FWD' : posTab;
   const { data: poolData, isLoading: poolLoading } = usePlayerPool();
   const { data: predictionsData, isLoading: predictionsLoading } = usePredictions(
     nextGw,
@@ -288,11 +290,6 @@ export const PredictionsScreen: React.FC = () => {
   const [premiumOpen, setPremiumOpen] = useState(false);
   const [profilePlayerId, setProfilePlayerId] = useState<number | null>(null);
 
-  useEffect(() => {
-    if ((activeTab === 'xa' || activeTab === 'xg') && posTab === 'GK') {
-      setPosTab('FWD');
-    }
-  }, [activeTab, posTab]);
 
   const selectedLineupPlayer = useMemo(() => {
     if (profilePlayerId == null) return undefined;
@@ -339,28 +336,28 @@ export const PredictionsScreen: React.FC = () => {
 
   const playerRows = useMemo(() => {
     const players = poolData?.players ?? [];
-    const filtered = players.filter((p) => p.position === posTab);
+    const filtered = players.filter((p) => p.position === effectivePosTab);
 
     if (isPremium) {
       return buildPredictedPointsRows(filtered, predictionsData, activeMetric);
     }
 
     if (activeTab === 'xa') {
-      return buildPreviewPlayerRows(filtered, predictionsPreview, posTab, 'xAssists');
+      return buildPreviewPlayerRows(filtered, predictionsPreview, effectivePosTab, 'xAssists');
     }
 
     if (activeTab === 'xg') {
-      return buildPreviewPlayerRows(filtered, predictionsPreview, posTab, 'xGoals');
+      return buildPreviewPlayerRows(filtered, predictionsPreview, effectivePosTab, 'xGoals');
     }
 
     if (predictionsPreview?.ready) {
-      return buildPreviewPlayerRows(filtered, predictionsPreview, posTab, 'xPts');
+      return buildPreviewPlayerRows(filtered, predictionsPreview, effectivePosTab, 'xPts');
     }
 
     return buildPredictedPointsRows(filtered, undefined, 'xPts');
   }, [
     poolData,
-    posTab,
+    effectivePosTab,
     predictionsData,
     predictionsPreview,
     isPremium,
@@ -469,8 +466,8 @@ export const PredictionsScreen: React.FC = () => {
                 key={pos}
                 type="button"
                 role="tab"
-                aria-selected={posTab === pos}
-                className={`${styles.posTab} ${posTab === pos ? styles.posTabActive : ''}`}
+                aria-selected={effectivePosTab === pos}
+                className={`${styles.posTab} ${effectivePosTab === pos ? styles.posTabActive : ''}`}
                 onClick={() => setPosTab(pos)}
               >
                 {pos}

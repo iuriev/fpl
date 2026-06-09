@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { useGameweeks, usePriceChanges, usePricePredictions } from '@/api/queries';
 import { FilterChipBar } from '@/components/ui/FilterChipBar/FilterChipBar';
@@ -36,7 +36,7 @@ export const PriceChangesScreen: React.FC = () => {
 
   const [mode, setMode] = useState<ScreenMode>('actual');
   const [scope, setScope] = useState<Scope>('all');
-  const [period, setPeriod] = useState<PriceChangePeriod>('gw');
+  const [userPeriod, setPeriod] = useState<PriceChangePeriod | null>(null);
   const [actualDirection, setActualDirection] = useState<PriceChangeDirection>('rise');
   const [predictionDirection, setPredictionDirection] =
     useState<PricePredictionDirection>('rise');
@@ -44,16 +44,8 @@ export const PriceChangesScreen: React.FC = () => {
   const [premiumOpen, setPremiumOpen] = useState(false);
 
   const { data: gameweeksData } = useGameweeks();
-  const periodInitialized = useRef(false);
-
-  useEffect(() => {
-    if (!periodInitialized.current && gameweeksData) {
-      periodInitialized.current = true;
-      if (gameweeksData.current >= MAX_GAMEWEEK) {
-        setPeriod('season');
-      }
-    }
-  }, [gameweeksData]);
+  const period: PriceChangePeriod =
+    userPeriod ?? (gameweeksData && gameweeksData.current >= MAX_GAMEWEEK ? 'season' : 'gw');
 
   const squadScope = scope === 'squad';
 

@@ -1,6 +1,12 @@
 import { Hono } from 'hono';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { auth } from './auth/auth';
+import { db } from './db/client';
+import { LineupsWarmingError } from './lineups-warming-error';
+import * as predictedLineupService from './predicted-lineup-service';
+import { predictedLineupsRoutes } from './predicted-lineups-routes';
+
 vi.mock('./auth/auth', () => ({
   auth: { api: { getSession: vi.fn() }, handler: vi.fn() },
 }));
@@ -12,12 +18,6 @@ vi.mock('./db/client', () => ({
 vi.mock('./predicted-lineup-service', () => ({
   getPredictedLineups: vi.fn(),
 }));
-
-import { auth } from './auth/auth';
-import { db } from './db/client';
-import { LineupsWarmingError } from './lineups-warming-error';
-import * as predictedLineupService from './predicted-lineup-service';
-import { predictedLineupsRoutes } from './predicted-lineups-routes';
 
 const app = new Hono().route('/api', predictedLineupsRoutes);
 

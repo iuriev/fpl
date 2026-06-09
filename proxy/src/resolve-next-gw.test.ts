@@ -14,6 +14,7 @@ function event(
     is_current: opts.is_current ?? false,
     is_next: opts.is_next ?? false,
     finished: opts.finished ?? false,
+    data_checked: false,
     average_entry_score: 0,
     highest_score: 0,
   };
@@ -26,6 +27,8 @@ describe('resolveNextGw', () => {
       teams: [],
       elements: [],
       element_types: [],
+      total_players: 0,
+      chips: [],
     };
     expect(resolveNextGw(bootstrap)).toBe(38);
   });
@@ -36,6 +39,8 @@ describe('resolveNextGw', () => {
       teams: [],
       elements: [],
       element_types: [],
+      total_players: 0,
+      chips: [],
     };
     expect(resolveNextGw(bootstrap)).toBe(38);
   });

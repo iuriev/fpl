@@ -12,17 +12,35 @@ import {
 import type {
   AssistsPreviewByPosition,
   GoalsPreviewByPosition,
+  PlayerGameweekPrediction,
   PredictionsPreviewByPosition,
   PredictionsPreviewResponse,
   PredictionsResponse,
 } from './prediction/types';
+import type { PredictionConfidence } from './prediction/types';
 import type { PlayerPosition } from './types';
 
-type MappedPlayer = NonNullable<
-  Awaited<ReturnType<typeof loadPredictionsForEvent>>
->['players'][number];
+type MappedPlayer = {
+  fplCode: number;
+  seasonElementId: number;
+  position: PlayerPosition;
+  event: number;
+  xPts: number;
+  xGoals: number;
+  xAssists: number;
+  csProb: number | null;
+  defconPts: number;
+  confidence: PredictionConfidence;
+  epNextAnchor: number;
+  modelXPts: number;
+};
 
-async function loadPredictionsForEvent(event: number) {
+async function loadPredictionsForEvent(event: number): Promise<{
+  event: number;
+  modelRunId: string | null;
+  ready: boolean;
+  players: MappedPlayer[];
+}> {
   const [run] = await db
     .select()
     .from(predModelRun)
@@ -59,7 +77,7 @@ async function loadPredictionsForEvent(event: number) {
       if (!el) return null;
       return {
         fplCode: r.fplCode,
-        playerId: el.id,
+        seasonElementId: r.seasonElementId,
         position: el.position,
         event: r.event,
         xPts: r.xPts,
@@ -99,7 +117,7 @@ function topByPosition(
   positions: PlayerPosition[],
   metric: 'xPts' | 'xAssists' | 'xGoals',
 ): PredictionsPreviewByPosition | AssistsPreviewByPosition | GoalsPreviewByPosition {
-  const out: Record<string, MappedPlayer[]> = {};
+  const out: Record<string, PlayerGameweekPrediction[]> = {};
   for (const pos of positions) {
     out[pos] = players
       .filter((p) => p.position === pos)
@@ -107,7 +125,7 @@ function topByPosition(
       .slice(0, PREVIEW_PLAYER_LIMIT)
       .map(({ position: _position, ...player }) => player);
   }
-  return out as PredictionsPreviewByPosition | AssistsPreviewByPosition;
+  return out as unknown as PredictionsPreviewByPosition | AssistsPreviewByPosition;
 }
 
 export async function getPredictionsForEvent(

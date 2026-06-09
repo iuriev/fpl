@@ -30,6 +30,7 @@ export function clearCache(): void {
 }
 
 export const ttl = {
+  BOOTSTRAP: 3600,
   ENTRY: 86400,
   FIXTURES: 3600,
   PLAYER_POOL: 3600,

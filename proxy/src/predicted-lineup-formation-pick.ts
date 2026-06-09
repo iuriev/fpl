@@ -10,7 +10,6 @@ import {
   formationFitsSquad,
   type SquadLineAvailability,
 } from './formation-squad-fit';
-import type { FPLBootstrapStatic } from './fpl-client';
 import { isExcludedFromPredictedLineup } from './lineup-availability';
 import { pickLine, pickLineWithRoleQuotas, type ScoredLineupCandidate } from './lineup-selection';
 import type { LineGroup } from './lineup-slot-requirements';

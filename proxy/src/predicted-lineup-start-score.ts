@@ -4,13 +4,13 @@ const RECENT_SHORT_WINDOW = 3;
 const RECENT_LONG_WINDOW = 8;
 const LONG_STARTS_SAMPLE = 5;
 
-function rowStarted(minutes: number, starts: number): boolean {
+function rowStarted(starts: number): boolean {
   return starts > 0;
 }
 
 function startsRate(rows: FPLElementSummary['history']): number {
   if (rows.length === 0) return 0;
-  const started = rows.filter((r) => rowStarted(r.minutes, r.starts)).length;
+  const started = rows.filter((r) => rowStarted(r.starts)).length;
   return started / rows.length;
 }
 
@@ -46,12 +46,12 @@ export function computePredictedStartScore(
   }
 
   const lastRow = rows.at(-1);
-  const lastMatchBoost = lastRow && rowStarted(lastRow.minutes, lastRow.starts) ? 0.12 : 0;
+  const lastMatchBoost = lastRow && rowStarted(lastRow.starts) ? 0.12 : 0;
 
   const lastTwo = rows.slice(-2);
   const benchStreakMult =
     lastTwo.length === 2 &&
-    lastTwo.every((r) => !rowStarted(r.minutes, r.starts))
+    lastTwo.every((r) => !rowStarted(r.starts))
       ? 0.5
       : 1;
 
@@ -64,7 +64,7 @@ export function computePredictedStartScore(
   const isGk = el.element_type === 1;
   const gkLastOnly =
     isGk && shortRecent.length > 0
-      ? rowStarted(shortRecent.at(-1)!.minutes, shortRecent.at(-1)!.starts)
+      ? rowStarted(shortRecent.at(-1)!.starts)
         ? 0.92
         : startsRate(shortRecent) * 0.7
       : null;
@@ -79,7 +79,7 @@ export function computePredictedStartScore(
 
 export function startedLastMatch(summary: FPLElementSummary | undefined): boolean {
   const last = summary?.history.at(-1);
-  return last != null && rowStarted(last.minutes, last.starts);
+  return last != null && rowStarted(last.starts);
 }
 
 export function effectivePredictedStartScore(

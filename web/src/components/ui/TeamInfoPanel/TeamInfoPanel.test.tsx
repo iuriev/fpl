@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { AuthContext, type AuthContextValue } from '@/auth/AuthContext';
 import { fixtureEntry } from '@/fixtures';
@@ -31,6 +31,7 @@ const mockUser = {
   name: 'Ivan Iuriev',
   fplTeamId: 72828,
   emailVerified: true,
+  subscriptionTier: 'free' as const,
 };
 const mockRefetch = vi.fn();
 

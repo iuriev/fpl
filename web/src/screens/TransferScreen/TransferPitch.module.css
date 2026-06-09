@@ -5,7 +5,39 @@
   min-height: 0;
 }
 
+.pitchBench_aiLoading {
+  position: relative;
+}
+
+.aiLoadingOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.aiSpinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 3px solid rgba(255, 255, 255, 0.12);
+  border-top-color: var(--fpl-accent);
+  border-radius: 50%;
+  animation: aiSpin 0.75s linear infinite;
+}
+
+@keyframes aiSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .pitchWrap {
+  position: relative;
   flex: 1;
   min-height: 0;
   overflow: hidden;
@@ -13,6 +45,35 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
+}
+
+.predictedTotal {
+  position: absolute;
+  top: var(--fpl-space-sm);
+  right: var(--fpl-space-md);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--fpl-space-xs);
+  padding: var(--fpl-space-xs) var(--fpl-space-sm);
+  border-radius: var(--fpl-radius-sm);
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--fpl-bg-hair);
+  pointer-events: none;
+}
+
+.predictedTotalLabel {
+  font: var(--fpl-fw-medium) var(--fpl-fs-micro) / 1 var(--fpl-font-display);
+  color: var(--fpl-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.predictedTotalValue {
+  font: var(--fpl-fw-bold) var(--fpl-fs-body-l) / 1 var(--fpl-font-mono);
+  color: var(--fpl-text-primary);
+  font-variant-numeric: tabular-nums;
 }
 
 .pitchFill {

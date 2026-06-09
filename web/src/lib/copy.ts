@@ -670,8 +670,10 @@ export const copy = {
   aiFreehitButton: 'AI Free Hit',
   aiWildcardButton: 'AI Wildcard',
   aiFreehitPlayed: 'Free Hit already played this season',
+  aiFreehitLoading: 'AI is computing the best squad…',
   aiFreehitError: 'Could not load suggestion — try again',
   aiFreehitNoGain: 'Your squad is already near-optimal for GW {gw}',
+  transferPitchPredictedTotal: 'Predicted total',
 };
 
 /**

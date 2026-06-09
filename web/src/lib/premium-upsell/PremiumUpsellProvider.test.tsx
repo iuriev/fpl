@@ -3,9 +3,11 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { copy } from '@/lib/copy';
+import { usePremiumStatus } from '@/lib/use-premium-status';
 
 import { useRequestPremiumUpsell } from './PremiumUpsellContext';
 import { PremiumUpsellProvider } from './PremiumUpsellProvider';
+import { readPremiumUpsellConfig } from './readPremiumUpsellConfig';
 
 vi.mock('@/lib/use-premium-status', () => ({
   usePremiumStatus: vi.fn(() => false),
@@ -17,10 +19,6 @@ vi.mock('./readPremiumUpsellConfig', () => ({
     cooldownMs: 86_400_000,
   })),
 }));
-
-import { usePremiumStatus } from '@/lib/use-premium-status';
-
-import { readPremiumUpsellConfig } from './readPremiumUpsellConfig';
 
 function Trigger({ screen }: { screen: 'transfer' | 'predictions' }) {
   const request = useRequestPremiumUpsell();

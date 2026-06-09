@@ -3,6 +3,7 @@ import React from 'react';
 import { Pitch } from '@/components/ui/Pitch/Pitch';
 import type { PlayerInfo } from '@/components/ui/PlayerCard/PlayerCard';
 import { PlayerCard } from '@/components/ui/PlayerCard/PlayerCard';
+import { copy } from '@/lib/copy';
 import type { PlayerPosition, PoolPlayer, SquadPlayer } from '@/types';
 
 import styles from './TransferPitch.module.css';
@@ -12,6 +13,7 @@ const POSITION_ORDER: PlayerPosition[] = ['FWD', 'MID', 'DEF', 'GK'];
 export interface TransferPitchProps {
   starters: SquadPlayer[];
   bench: SquadPlayer[];
+  startersPredictedTotal: number | null;
   outPlayerId: number | null;
   inPlayerIds: Set<number>;
   onPlayerClick: (id: number) => void;
@@ -21,6 +23,7 @@ export interface TransferPitchProps {
   onSubIconClick?: (id: number) => void;
   onSubTargetClick?: (id: number) => void;
   onSubCancel?: () => void;
+  isAiLoading?: boolean;
 }
 
 function groupByPosition(players: SquadPlayer[]): Record<PlayerPosition, SquadPlayer[]> {
@@ -42,6 +45,7 @@ function pickTourAnchorId(
 export const TransferPitch: React.FC<TransferPitchProps> = ({
   starters,
   bench,
+  startersPredictedTotal,
   outPlayerId,
   inPlayerIds,
   onPlayerClick,
@@ -51,6 +55,7 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
   onSubIconClick,
   onSubTargetClick,
   onSubCancel,
+  isAiLoading = false,
 }) => {
   const positionGroups = groupByPosition(starters);
   const tourAnchorId = pickTourAnchorId(starters, poolLookup);
@@ -136,8 +141,21 @@ export const TransferPitch: React.FC<TransferPitchProps> = ({
   }
 
   return (
-    <div className={styles.pitchBench}>
+    <div className={`${styles.pitchBench}${isAiLoading ? ` ${styles.pitchBench_aiLoading}` : ''}`}>
+      {isAiLoading && (
+        <div className={styles.aiLoadingOverlay} aria-live="polite" aria-label={copy.aiFreehitLoading}>
+          <div className={styles.aiSpinner} />
+        </div>
+      )}
       <div className={styles.pitchWrap} onClick={handlePitchBackgroundClick}>
+        {startersPredictedTotal !== null && (
+          <div className={styles.predictedTotal} aria-label={copy.transferPitchPredictedTotal}>
+            <span className={styles.predictedTotalLabel}>{copy.transferPitchPredictedTotal}</span>
+            <span className={styles.predictedTotalValue}>
+              {startersPredictedTotal.toFixed(1)}
+            </span>
+          </div>
+        )}
         <Pitch className={styles.pitchFill} preserveAspectRatio="none">
           <div className={styles.pitchRows}>
             {POSITION_ORDER.map((pos) => (

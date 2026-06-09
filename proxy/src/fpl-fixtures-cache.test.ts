@@ -38,7 +38,10 @@ const bootstrap = {
   ],
   teams: [],
   elements: [],
-} as Awaited<ReturnType<typeof dbCache.getOrFetchBootstrap>>;
+  element_types: [],
+  total_players: 0,
+  chips: [],
+} as unknown as Awaited<ReturnType<typeof dbCache.getOrFetchBootstrap>>;
 
 describe('getOrFetchAllFixtures', () => {
   beforeEach(() => {

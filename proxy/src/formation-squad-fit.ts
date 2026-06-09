@@ -81,7 +81,7 @@ function fitFormationToAvailability(
 
   while (def + mid + fwd < 10) {
     const spare = spareCapacity(avail, { def, mid, fwd });
-    const order = (['def', 'mid', 'fwd'] as const).sort((a, b) => spare[b] - spare[a]);
+    const order = (['def', 'mid', 'fwd'] as Array<'def' | 'mid' | 'fwd'>).sort((a, b) => spare[b] - spare[a]);
     const before = def + mid + fwd;
     for (const line of order) bump(line);
     if (def + mid + fwd === before) break;
@@ -93,7 +93,7 @@ function fitFormationToAvailability(
       mid: mid - preferred.mid,
       fwd: fwd - preferred.fwd,
     };
-    const order = (['def', 'mid', 'fwd'] as const).sort((a, b) => excess[b] - excess[a]);
+    const order = (['def', 'mid', 'fwd'] as Array<'def' | 'mid' | 'fwd'>).sort((a, b) => excess[b] - excess[a]);
     const before = def + mid + fwd;
     for (const line of order) {
       if (line === 'def' && def > 3) def--;

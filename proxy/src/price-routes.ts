@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 
 import { type AuthVars, requireUser } from './auth/middleware';
 import * as playerProfileService from './player-profile-service';
-import { type PremiumVars, requirePremiumFplUser } from './premium-middleware';
+import { requirePremiumFplUser } from './premium-middleware';
 import * as priceChangesService from './price-changes-service';
 import * as pricePredictionsService from './price-predictions-service';
 import type { PositionFilter } from './price-shared';

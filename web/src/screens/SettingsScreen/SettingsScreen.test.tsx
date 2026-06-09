@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as authClientModule from '@/auth/auth-client';
 import { AuthContext } from '@/auth/AuthContext';
@@ -14,6 +14,7 @@ const mockUser = {
   name: 'Ivan Iuriev',
   emailVerified: true,
   fplTeamId: 72828,
+  subscriptionTier: 'free' as const,
 };
 
 const mockNavigate = vi.fn();
@@ -34,6 +35,7 @@ function renderSettings(user: typeof mockUser | null = mockUser, isDemoMode = fa
           value={{
             myTeamId: 72828,
             isDemoMode,
+            setMyTeamId: vi.fn(),
             setDemoTeamId: vi.fn(),
             clearDemoMode: vi.fn(),
           }}
@@ -98,11 +100,13 @@ describe('SettingsScreen', () => {
           name: 'Ivan Iuriev',
           emailVerified: true,
           fplTeamId: 72828,
+          subscriptionTier: 'free' as const,
         }, loading: false, refetch: mockRefetch }}>
           <MyTeamContext.Provider
             value={{
               myTeamId: 72828,
               isDemoMode: false,
+              setMyTeamId: vi.fn(),
               setDemoTeamId: vi.fn(),
               clearDemoMode: vi.fn(),
             }}

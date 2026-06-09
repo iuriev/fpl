@@ -1,6 +1,12 @@
 import { Hono } from 'hono';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { auth } from './auth/auth';
+import { db } from './db/client';
+import { marketRoutes } from './market-routes';
+import * as marketService from './market-service';
+import type { MarketResponse } from './prediction/types';
+
 vi.mock('./auth/auth', () => ({
   auth: { api: { getSession: vi.fn() }, handler: vi.fn() },
 }));
@@ -57,12 +63,6 @@ vi.mock('./market-service', () => ({
     ],
   })),
 }));
-
-import { auth } from './auth/auth';
-import { db } from './db/client';
-import { marketRoutes } from './market-routes';
-import * as marketService from './market-service';
-import type { MarketResponse } from './prediction/types';
 
 const app = new Hono().route('/api', marketRoutes);
 

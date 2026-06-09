@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { pickLineWithRoleQuotas } from './lineup-selection';
+import type { RoleQuota } from './lineup-slot-requirements';
+import { assignPlayersToSlots } from './player-lane-registry';
+import { fillTierForRole } from './player-tactical-role';
+
 vi.mock('./data/player-tactical-roles.json', () => ({
   default: {
     '901': { role: 'rw', lane: 'R', secondary: [] },
@@ -10,10 +15,6 @@ vi.mock('./data/player-tactical-roles.json', () => ({
     '906': { role: 'rm', lane: 'R', secondary: [] },
   },
 }));
-
-import { pickLineWithRoleQuotas } from './lineup-selection';
-import { assignPlayersToSlots } from './player-lane-registry';
-import { fillTierForRole } from './player-tactical-role';
 
 function mid(code: number, id: number, startScore: number) {
   return {
@@ -40,15 +41,17 @@ function mid(code: number, id: number, startScore: number) {
       cost_change_event: 0,
       cost_change_start: 0,
       transfers_in_event: 0,
+      transfers_out_event: 0,
+      price_change_percent: '0',
     },
     startScore,
   };
 }
 
-const MID_4_QUOTAS = [
-  { kind: 'group' as const, roles: ['dm', 'cm', 'am'] as const, min: 2 },
-  { kind: 'role' as const, role: 'lm' as const, min: 1 },
-  { kind: 'role' as const, role: 'rm' as const, min: 1 },
+const MID_4_QUOTAS: RoleQuota[] = [
+  { kind: 'group', roles: ['dm', 'cm', 'am'], min: 2 },
+  { kind: 'role', role: 'lm', min: 1 },
+  { kind: 'role', role: 'rm', min: 1 },
 ];
 
 describe('lineup-selection wing balance', () => {

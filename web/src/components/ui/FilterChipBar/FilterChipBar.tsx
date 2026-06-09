@@ -1,5 +1,3 @@
-import React from 'react';
-
 import styles from './FilterChipBar.module.css';
 
 export interface FilterChipBarProps<T extends string> {

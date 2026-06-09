@@ -24,7 +24,7 @@ function minGapMs(priority: FplFetchPriority): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 5000;
 }
 
-function insertQueueEntry<T>(path: string, priority: FplFetchPriority, entry: QueueEntry<T>): void {
+function insertQueueEntry<T>(_path: string, priority: FplFetchPriority, entry: QueueEntry<T>): void {
   if (priority === 'interactive') {
     const firstBackground = queue.findIndex((q) => q.priority === 'background');
     if (firstBackground === -1) {

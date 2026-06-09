@@ -19,6 +19,7 @@ type Story = StoryObj<typeof meta>;
 
 const base: SquadPlayer = {
   id: 1,
+  fplCode: 1,
   name: 'Salah',
   position: 'MID',
   club: 'LIV',

@@ -6,6 +6,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as queries from '@/api/queries';
 import { copy, interpolate } from '@/lib/copy';
+import { usePremiumStatus } from '@/lib/use-premium-status';
+import type { PlayerProfileResponse, PredictedLineupsResponse, TeamMarketDto } from '@/types';
+
+import { PredictionsScreen } from './PredictionsScreen';
 
 vi.mock('@/api/queries', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/api/queries')>();
@@ -51,11 +55,6 @@ vi.mock('@/lib/startup-readiness/StartupReadinessContext', () => ({
 vi.mock('@/lib/startup-readiness/use-predictions-warmup-refetch', () => ({
   usePredictionsWarmupRefetch: vi.fn(),
 }));
-
-import { usePremiumStatus } from '@/lib/use-premium-status';
-import type { PlayerProfileResponse, PredictedLineupsResponse, TeamMarketDto } from '@/types';
-
-import { PredictionsScreen } from './PredictionsScreen';
 
 const mockUsePremiumStatus = vi.mocked(usePremiumStatus);
 const mockQueries = vi.mocked(queries);
@@ -119,12 +118,12 @@ const mockLineups: PredictedLineupsResponse = {
       nextFixture: { opponentShortName: 'CHE', isHome: true, kickoffTime: null },
       players: [
         {
-          id: 10, webName: 'Raya', position: 'GK', teamCode: 3,
+          id: 10, fplCode: 10, webName: 'Raya', position: 'GK', teamCode: 3,
           lane: 'C', pitchOrder: 0, injuryWarning: false, benchRisk: false, chanceOfPlaying: null,
           xMins: 90, xPts: 5.0, status: 'a' as const,
         },
         {
-          id: 11, webName: 'White', position: 'DEF', teamCode: 3,
+          id: 11, fplCode: 11, webName: 'White', position: 'DEF', teamCode: 3,
           lane: 'L', pitchOrder: 1, injuryWarning: false, benchRisk: false, chanceOfPlaying: null,
           xMins: 90, xPts: 4.0, status: 'a' as const,
         },

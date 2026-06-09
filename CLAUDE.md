@@ -16,6 +16,8 @@ The project is built spec-first; application code comes last. Read these before 
 - `docs/architecture.md` — system overview.
 - `docs/decisions/` — Architecture Decision Records (the *why*); see the README index.
 - `docs/frontend.md` — frontend conventions (styling, structure, testing).
+- `docs/react-components.md` — React component and hook patterns (derived state, refs, memoisation).
+- `docs/react-query.md` — React Query hook conventions and test patterns.
 - `docs/design-workflow.md` — how Claude Design exports flow into the codebase.
 - `docs/fpl-api.md` — local reference for the public FPL API endpoints we use.
 - `docs/testing.md` — testing strategy (unit tests).

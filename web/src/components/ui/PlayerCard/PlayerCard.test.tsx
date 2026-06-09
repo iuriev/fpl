@@ -9,6 +9,7 @@ import { PlayerCard } from './PlayerCard';
 
 const makePlayer = (overrides?: Partial<SquadPlayer>): SquadPlayer => ({
   id: 1,
+  fplCode: 1,
   name: 'Saka',
   position: 'MID',
   club: 'ARS',
@@ -176,9 +177,14 @@ describe('PlayerCard info popup', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('renders ownership and expected points in the pill', () => {
+  it('renders expected points in the pill and ownership in the info popup', async () => {
+    const user = userEvent.setup();
     render(<PlayerCard player={makePlayer()} playerInfo={makePlayerInfo({ ownership: '10.5', expectedPoints: '6.2' })} />);
-    expect(screen.getByText('10.5% / 6.2')).toBeInTheDocument();
+    expect(screen.getByText('6.2')).toBeInTheDocument();
+    expect(screen.queryByText('10.5%')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /player info/i }));
+    expect(screen.getByText(/10\.5%/)).toBeInTheDocument();
+    expect(screen.getByText(/6\.2 XP/)).toBeInTheDocument();
   });
 
   it('renders expected points in the info popup async', async () => {
@@ -196,9 +202,9 @@ describe('PlayerCard info popup', () => {
         onSubClick={vi.fn()}
       />
     );
-    const ownership = screen.getByText('44.5% / 4.5');
+    const expectedPoints = screen.getByText('4.5');
     const subBtn = screen.getByRole('button', { name: 'Substitute' });
-    expect(ownership.parentElement).toBe(subBtn.parentElement);
+    expect(expectedPoints.parentElement).toBe(subBtn.parentElement);
   });
 
   it('keeps substitute slot reserved when reserveSubSlot is true without onSubClick', () => {
@@ -210,18 +216,18 @@ describe('PlayerCard info popup', () => {
       />
     );
     expect(screen.queryByRole('button', { name: 'Substitute' })).not.toBeInTheDocument();
-    const ownership = screen.getByText('44.5% / 4.5');
-    expect(ownership.parentElement?.childElementCount).toBe(2);
+    const expectedPoints = screen.getByText('4.5');
+    expect(expectedPoints.parentElement?.childElementCount).toBe(2);
     expect(container.querySelector('[aria-hidden="true"] svg')).toBeTruthy();
   });
 
   it('does not render expected points when missing', async () => {
     const user = userEvent.setup();
     render(<PlayerCard player={makePlayer()} playerInfo={makePlayerInfo({ ownership: '10.5', expectedPoints: undefined })} />);
-    expect(screen.getByText('10.5%')).toBeInTheDocument();
     expect(screen.queryByText(/XP/)).not.toBeInTheDocument();
-    
+
     await user.click(screen.getByRole('button', { name: /player info/i }));
+    expect(screen.getByText(/10\.5%/)).toBeInTheDocument();
     expect(screen.queryByText(/XP/)).not.toBeInTheDocument();
   });
 });

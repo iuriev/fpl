@@ -7,6 +7,7 @@ import { PlayerRankRow } from './PlayerRankRow';
 
 const player: TopPlayersPlayer = {
   id: 1,
+  fplCode: 1,
   webName: 'Haaland',
   position: 'FWD',
   teamCode: 43,

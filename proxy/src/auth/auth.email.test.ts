@@ -1,10 +1,11 @@
+import './auth';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-type SendFn = (...args: unknown[]) => unknown;
-type SendVerificationEmailFn = (args: { user: { email: string }; url: string }) => Promise<void>;
+type SendFn = (...args: unknown[]) => Promise<{ data: unknown; error: unknown }>;
+type SendVerificationEmailFn = (params: { user: { email: string }; url: string }) => Promise<void>;
 
 const hoisted = vi.hoisted(() => ({
-  mockSend: vi.fn(),
+  mockSend: vi.fn<SendFn>(),
   captured: {} as { sendVerificationEmail?: SendVerificationEmailFn },
 }));
 
@@ -33,8 +34,6 @@ vi.mock('better-auth', () => ({
     };
   }),
 }));
-
-import './auth';
 
 beforeEach(() => {
   vi.clearAllMocks();

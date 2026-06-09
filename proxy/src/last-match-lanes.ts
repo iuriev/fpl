@@ -8,12 +8,6 @@ import {
 
 type OutfieldLine = 'DEF' | 'MID' | 'FWD';
 
-const LINE_TYPE: Record<OutfieldLine, number> = {
-  DEF: 2,
-  MID: 3,
-  FWD: 4,
-};
-
 function rowStarted(minutes: number, starts: number): boolean {
   return starts > 0 || (starts === 0 && minutes >= 60);
 }

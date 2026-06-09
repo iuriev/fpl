@@ -87,6 +87,7 @@ function useProgressiveList<T>(items: T[]) {
 function toSquadPlayer(p: TeamOfTheWeekPlayer): SquadPlayer {
   return {
     id: p.id,
+    fplCode: p.id,
     name: p.webName,
     position: p.position,
     club: p.teamShortName,
@@ -173,13 +174,8 @@ export const TopPlayersScreen: React.FC = () => {
     [finishedGws, selectedGw]
   );
 
-  // View mode (List / Pitch) for Points tab — local state, not persisted in URL
-  const [viewMode, setViewMode] = useState<ViewMode>('list');
-  const prevTab = useRef<Tab>(activeTab);
-  if (prevTab.current !== activeTab) {
-    prevTab.current = activeTab;
-    if (activeTab !== 'points') setViewMode('list');
-  }
+  const [userViewMode, setViewMode] = useState<ViewMode>('list');
+  const viewMode = activeTab === 'points' ? userViewMode : 'list';
 
   // Teams query — loaded when "By Team" tab is active
   const { data: teamsData } = useTeams();
@@ -260,11 +256,11 @@ export const TopPlayersScreen: React.FC = () => {
     activeTab === 'points' ? gwPlayers : activeTab === 'team' ? teamPlayers : EMPTY_TOP;
 
   const { visible, sentinelRef, hasMore } = useProgressiveList(activePlayers);
-  const defcon = useProgressiveList(defconPlayers);
-  const bps = useProgressiveList(bpsPlayers);
-  const seasonDefcon = useProgressiveList(seasonDefconPlayers);
-  const seasonBps = useProgressiveList(seasonBpsPlayers);
-  const seasonPoints = useProgressiveList(seasonPlayers);
+  const { visible: defconVisible, hasMore: defconHasMore, sentinelRef: defconSentinelRef } = useProgressiveList(defconPlayers);
+  const { visible: bpsVisible, hasMore: bpsHasMore, sentinelRef: bpsSentinelRef } = useProgressiveList(bpsPlayers);
+  const { visible: seasonDefconVisible, hasMore: seasonDefconHasMore, sentinelRef: seasonDefconSentinelRef } = useProgressiveList(seasonDefconPlayers);
+  const { visible: seasonBpsVisible, hasMore: seasonBpsHasMore, sentinelRef: seasonBpsSentinelRef } = useProgressiveList(seasonBpsPlayers);
+  const { visible: seasonPointsVisible, hasMore: seasonPointsHasMore, sentinelRef: seasonPointsSentinelRef } = useProgressiveList(seasonPlayers);
 
   const gwLabel =
     selectedGw !== null ? interpolate(copy.topPlayersGwLabel, { n: selectedGw }) : '';
@@ -569,11 +565,11 @@ export const TopPlayersScreen: React.FC = () => {
           )}
           {!leaderboardGwQuery.isLoading && !leaderboardGwQuery.isError && (
             <div className={styles.list}>
-              {defcon.visible.map((player, i) => (
+              {defconVisible.map((player, i) => (
                 <BpsRankRow key={player.id} rank={i + 1} player={player} variant="defcon" />
               ))}
-              {defcon.hasMore && (
-                <div ref={defcon.sentinelRef} className={styles.sentinel} aria-hidden="true" />
+              {defconHasMore && (
+                <div ref={defconSentinelRef} className={styles.sentinel} aria-hidden="true" />
               )}
             </div>
           )}
@@ -594,11 +590,11 @@ export const TopPlayersScreen: React.FC = () => {
           )}
           {!leaderboardGwQuery.isLoading && !leaderboardGwQuery.isError && (
             <div className={styles.list}>
-              {bps.visible.map((player, i) => (
+              {bpsVisible.map((player, i) => (
                 <BpsRankRow key={player.id} rank={i + 1} player={player} variant="bps" />
               ))}
-              {bps.hasMore && (
-                <div ref={bps.sentinelRef} className={styles.sentinel} aria-hidden="true" />
+              {bpsHasMore && (
+                <div ref={bpsSentinelRef} className={styles.sentinel} aria-hidden="true" />
               )}
             </div>
           )}
@@ -643,13 +639,13 @@ export const TopPlayersScreen: React.FC = () => {
                   </Button>
                 </div>
               )}
-              {!seasonQuery.isLoading && !seasonQuery.isError && seasonPoints.visible.length > 0 && (
+              {!seasonQuery.isLoading && !seasonQuery.isError && seasonPointsVisible.length > 0 && (
                 <div className={styles.list}>
-                  {seasonPoints.visible.map((player, i) => (
+                  {seasonPointsVisible.map((player, i) => (
                     <FollowableRankRow key={player.id} rank={i + 1} player={player} />
                   ))}
-                  {seasonPoints.hasMore && (
-                    <div ref={seasonPoints.sentinelRef} className={styles.sentinel} aria-hidden="true" />
+                  {seasonPointsHasMore && (
+                    <div ref={seasonPointsSentinelRef} className={styles.sentinel} aria-hidden="true" />
                   )}
                 </div>
               )}
@@ -669,11 +665,11 @@ export const TopPlayersScreen: React.FC = () => {
               )}
               {!leaderboardSeasonQuery.isLoading && !leaderboardSeasonQuery.isError && (
                 <div className={styles.list}>
-                  {seasonDefcon.visible.map((player, i) => (
+                  {seasonDefconVisible.map((player, i) => (
                     <BpsRankRow key={player.id} rank={i + 1} player={player} variant="defcon" />
                   ))}
-                  {seasonDefcon.hasMore && (
-                    <div ref={seasonDefcon.sentinelRef} className={styles.sentinel} aria-hidden="true" />
+                  {seasonDefconHasMore && (
+                    <div ref={seasonDefconSentinelRef} className={styles.sentinel} aria-hidden="true" />
                   )}
                 </div>
               )}
@@ -693,11 +689,11 @@ export const TopPlayersScreen: React.FC = () => {
               )}
               {!leaderboardSeasonQuery.isLoading && !leaderboardSeasonQuery.isError && (
                 <div className={styles.list}>
-                  {seasonBps.visible.map((player, i) => (
+                  {seasonBpsVisible.map((player, i) => (
                     <BpsRankRow key={player.id} rank={i + 1} player={player} variant="bps" />
                   ))}
-                  {seasonBps.hasMore && (
-                    <div ref={seasonBps.sentinelRef} className={styles.sentinel} aria-hidden="true" />
+                  {seasonBpsHasMore && (
+                    <div ref={seasonBpsSentinelRef} className={styles.sentinel} aria-hidden="true" />
                   )}
                 </div>
               )}

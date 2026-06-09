@@ -1,6 +1,4 @@
-import type { Server } from 'node:http';
-
-import { serve } from '@hono/node-server';
+import { serve, type ServerType } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
@@ -219,8 +217,10 @@ app.get('/api/squad/:teamId/free-hit-suggest', optionalUser, async (c) => {
       );
     }
 
-    // Build xPts lookup: fplCode -> xPts
     const xPtsMap = new Map(predictions.players.map((p) => [p.fplCode, p.xPts]));
+    const confidenceMap = new Map(
+      predictions.players.map((p) => [p.fplCode, p.confidence] as const),
+    );
 
     // Build player pool: map bootstrap elements using fplCode to get xPts
     const ELEMENT_TYPE_TO_POS: Record<number, 'GK' | 'DEF' | 'MID' | 'FWD'> = {
@@ -238,6 +238,7 @@ app.get('/api/squad/:teamId/free-hit-suggest', optionalUser, async (c) => {
         teamId: el.team,
         nowCost: el.now_cost,
         xPts: xPtsMap.get(el.code) ?? 0,
+        playConfidence: confidenceMap.get(el.code),
       }));
 
     const result = optimizeFreeHit(totalBudget, optimizerPlayers, targetGw);
@@ -540,7 +541,7 @@ if (process.env.NODE_ENV === 'production') {
 
 const port = Number(process.env.PORT ?? 3001);
 
-let httpServer: Server | null = null;
+let httpServer: ServerType | null = null;
 let shutdownStarted = false;
 
 function shutdown(signal: string): void {

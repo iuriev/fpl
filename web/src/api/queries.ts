@@ -1,8 +1,6 @@
 import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
 import type {
-  LeaderboardGwResponse,
-  LeaderboardSeasonResponse,
   PositionFilter,
   PriceChangeDirection,
   PriceChangePeriod,

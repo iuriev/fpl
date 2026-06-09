@@ -1,6 +1,13 @@
 import { Hono } from 'hono';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { auth } from './auth/auth';
+import { db } from './db/client';
+import * as entryService from './entry-service';
+import { getOrFetchBootstrap } from './fpl-cache/db-cache';
+import { me } from './me-routes';
+import * as playerWatchlistService from './player-watchlist-service';
+
 vi.mock('./auth/auth', () => ({
   auth: {
     api: {
@@ -35,13 +42,6 @@ vi.mock('./player-watchlist-service', async (importOriginal) => {
     ensurePlayerWatchlistSchema: vi.fn(),
   };
 });
-
-import { auth } from './auth/auth';
-import { db } from './db/client';
-import * as entryService from './entry-service';
-import { getOrFetchBootstrap } from './fpl-cache/db-cache';
-import { me } from './me-routes';
-import * as playerWatchlistService from './player-watchlist-service';
 
 const mockDb = vi.mocked(db);
 const mockGetBootstrap = vi.mocked(getOrFetchBootstrap);

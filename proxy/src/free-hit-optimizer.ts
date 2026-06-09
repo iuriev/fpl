@@ -1,4 +1,4 @@
-import type { PlayerPosition } from './types';
+import type { PlayerPosition, PredictionConfidence } from './types';
 
 export interface OptimizerPlayer {
   id: number;
@@ -6,12 +6,49 @@ export interface OptimizerPlayer {
   teamId: number;
   nowCost: number;
   xPts: number;
+  playConfidence?: PredictionConfidence;
 }
 
 export interface FreeHitSquadPlayer {
   id: number;
   position: PlayerPosition;
   nowCost: number;
+  xPts: number;
+}
+
+export function findXiBenchXPtsIssues(
+  orderedSquad: number[],
+  playersById: Map<number, Pick<OptimizerPlayer, 'position' | 'xPts'>>,
+): string[] {
+  if (orderedSquad.length < 15) return [];
+  const issues: string[] = [];
+  const starters = orderedSquad.slice(0, 11).map((id) => playersById.get(id));
+  const bench = orderedSquad.slice(11).map((id) => playersById.get(id));
+  if (starters.some((p) => !p) || bench.some((p) => !p)) return ['missing player data'];
+
+  for (const pos of ['DEF', 'MID', 'FWD'] as const) {
+    const xiPos = starters.filter((p) => p?.position === pos) as OptimizerPlayer[];
+    const benchPos = bench.filter((p) => p?.position === pos) as OptimizerPlayer[];
+    if (xiPos.length === 0 || benchPos.length === 0) continue;
+    const weakest = Math.min(...xiPos.map((p) => p.xPts));
+    for (const b of benchPos) {
+      if (b.xPts > weakest + 0.001) {
+        issues.push(
+          `${pos} bench ${b.xPts} exceeds weakest starter ${weakest}`,
+        );
+      }
+    }
+  }
+
+  const benchOutfield = bench.filter((p) => p?.position !== 'GK') as OptimizerPlayer[];
+  for (let i = 1; i < benchOutfield.length; i++) {
+    if (benchOutfield[i].xPts > benchOutfield[i - 1].xPts + 0.001) {
+      issues.push('outfield bench not sorted by descending xPts');
+      break;
+    }
+  }
+
+  return issues;
 }
 
 export interface FreeHitResult {
@@ -164,15 +201,272 @@ function fillMandatoryBench(
     return { benchGK: null, fillers: [], budget };
   }
 
+  const resolvedBenchGK = benchGK as OptimizerPlayer | null;
   const newBudget =
     budget -
-    (benchGK?.nowCost ?? 0) -
+    (resolvedBenchGK?.nowCost ?? 0) -
     fillers.reduce((sum, p) => sum + p.nowCost, 0);
-  return { benchGK, fillers, budget: newBudget };
+  return { benchGK: resolvedBenchGK, fillers, budget: newBudget };
 }
 
 function isScoringCandidate(p: OptimizerPlayer): boolean {
   return p.xPts > 0;
+}
+
+function playConfidenceRank(confidence?: PredictionConfidence): number {
+  if (confidence === 'high') return 3;
+  if (confidence === 'medium') return 2;
+  if (confidence === 'low') return 1;
+  return 2;
+}
+
+function isPlayableBenchEnabler(p: OptimizerPlayer): boolean {
+  if (p.xPts <= 0) return false;
+  if (p.playConfidence === 'low') return false;
+  return true;
+}
+
+function pickPrimaryBenchUpgrade(
+  current: OptimizerPlayer,
+  remaining: number,
+  selected: Set<number>,
+  clubCounts: Map<number, number>,
+  byXPts: OptimizerPlayer[],
+): OptimizerPlayer | undefined {
+  const affordable = byXPts.filter(
+    (p) =>
+      p.position === current.position &&
+      !selected.has(p.id) &&
+      p.nowCost <= current.nowCost + remaining &&
+      p.nowCost > current.nowCost &&
+      (clubCounts.get(p.teamId) ?? 0) < 3 &&
+      (p.xPts > current.xPts || p.xPts === current.xPts),
+  );
+  affordable.sort((a, b) => b.xPts - a.xPts || b.nowCost - a.nowCost);
+  return affordable[0];
+}
+
+function pickThirdBenchEnabler(
+  current: OptimizerPlayer,
+  remaining: number,
+  selected: Set<number>,
+  clubCounts: Map<number, number>,
+  byCost: OptimizerPlayer[],
+): OptimizerPlayer | undefined {
+  const affordable = byCost.filter(
+    (p) =>
+      p.position === current.position &&
+      !selected.has(p.id) &&
+      isPlayableBenchEnabler(p) &&
+      p.nowCost <= current.nowCost + remaining &&
+      (clubCounts.get(p.teamId) ?? 0) < 3,
+  );
+  affordable.sort(
+    (a, b) =>
+      a.nowCost - b.nowCost ||
+      playConfidenceRank(b.playConfidence) - playConfidenceRank(a.playConfidence) ||
+      b.xPts - a.xPts,
+  );
+  const pick = affordable[0];
+  if (!pick || pick.id === current.id) return undefined;
+  return pick;
+}
+
+function benchOutfieldRoles(
+  fillers: OptimizerPlayer[],
+): { premium: number[]; enabler: number } {
+  const ranked = fillers
+    .map((pl, index) => ({ pl, index }))
+    .sort((a, b) => b.pl.xPts - a.pl.xPts || b.pl.nowCost - a.pl.nowCost);
+  return {
+    premium: [ranked[0]?.index ?? 0, ranked[1]?.index ?? 1],
+    enabler: ranked[2]?.index ?? 2,
+  };
+}
+
+function applyPlayerSwap(
+  current: OptimizerPlayer,
+  upgrade: OptimizerPlayer,
+  selected: Set<number>,
+  clubCounts: Map<number, number>,
+): number {
+  selected.delete(current.id);
+  selected.add(upgrade.id);
+  clubCounts.set(current.teamId, Math.max(0, (clubCounts.get(current.teamId) ?? 0) - 1));
+  clubCounts.set(upgrade.teamId, (clubCounts.get(upgrade.teamId) ?? 0) + 1);
+  return upgrade.nowCost - current.nowCost;
+}
+
+function spendRemainingBudgetOnSquad(
+  fullSquad: OptimizerPlayer[],
+  budget: number,
+  players: OptimizerPlayer[],
+): { squad: OptimizerPlayer[]; budget: number } {
+  let remaining = budget;
+  const squad = [...fullSquad];
+  const byXPts = [...players].filter(isScoringCandidate).sort((a, b) => b.xPts - a.xPts);
+
+  for (let round = 0; round < 80; round++) {
+    const selected = new Set(squad.map((p) => p.id));
+    const clubCounts = new Map<number, number>();
+    for (const p of squad) {
+      clubCounts.set(p.teamId, (clubCounts.get(p.teamId) ?? 0) + 1);
+    }
+
+    const upgradeOrder = [...squad].sort((a, b) => a.xPts - b.xPts || a.nowCost - b.nowCost);
+    let improved = false;
+    for (const current of upgradeOrder) {
+      const avail = remaining + current.nowCost;
+      const upgrade = byXPts.find(
+        (p) =>
+          p.position === current.position &&
+          !selected.has(p.id) &&
+          p.nowCost <= avail &&
+          p.nowCost > current.nowCost &&
+          (clubCounts.get(p.teamId) ?? 0) < 3 &&
+          (p.xPts > current.xPts || p.xPts === current.xPts),
+      );
+      if (!upgrade) continue;
+      const idx = squad.findIndex((p) => p.id === current.id);
+      if (idx === -1) continue;
+      remaining -= upgrade.nowCost - current.nowCost;
+      squad[idx] = upgrade;
+      improved = true;
+      break;
+    }
+    if (!improved) break;
+  }
+
+  return { squad, budget: remaining };
+}
+
+function finalizeSquadLayout(fullSquad: OptimizerPlayer[]): {
+  orderedStarters: OptimizerPlayer[];
+  benchGK: OptimizerPlayer | null;
+  fillers: OptimizerPlayer[];
+  totalXPts: number;
+} {
+  const { starters } = pickBestFormation(fullSquad);
+  const bench = fullSquad.filter((p) => !starters.some((s) => s.id === p.id));
+  const benchGK = bench.find((p) => p.position === 'GK') ?? null;
+  const fillers = bench
+    .filter((p) => p.position !== 'GK')
+    .sort((a, b) => b.xPts - a.xPts);
+  return {
+    orderedStarters: starters,
+    benchGK,
+    fillers,
+    totalXPts: starters.reduce((sum, p) => sum + p.xPts, 0),
+  };
+}
+
+function investRemainingBudget(
+  orderedStarters: OptimizerPlayer[],
+  benchGK: OptimizerPlayer | null,
+  fillers: OptimizerPlayer[],
+  selected: Set<number>,
+  clubCounts: Map<number, number>,
+  budget: number,
+  byXPts: OptimizerPlayer[],
+  byCost: OptimizerPlayer[],
+  releasedFromXi: Set<number>,
+): {
+  orderedStarters: OptimizerPlayer[];
+  benchGK: OptimizerPlayer | null;
+  fillers: OptimizerPlayer[];
+  budget: number;
+} {
+  let remaining = budget;
+  let gk = benchGK;
+  let benchOutfield = [...fillers];
+  let xi = [...orderedStarters];
+
+  for (let round = 0; round < 30; round++) {
+    let improved = false;
+    const roles = benchOutfieldRoles(benchOutfield);
+
+    if (gk) {
+      const upgrade = pickPrimaryBenchUpgrade(gk, remaining, selected, clubCounts, byXPts);
+      if (upgrade) {
+        remaining -= applyPlayerSwap(gk, upgrade, selected, clubCounts);
+        gk = upgrade;
+        improved = true;
+      }
+    }
+
+    for (const index of roles.premium) {
+      const current = benchOutfield[index];
+      if (!current) continue;
+      const upgrade = pickPrimaryBenchUpgrade(current, remaining, selected, clubCounts, byXPts);
+      if (!upgrade) continue;
+      remaining -= applyPlayerSwap(current, upgrade, selected, clubCounts);
+      benchOutfield[index] = upgrade;
+      improved = true;
+    }
+
+    const enabler = benchOutfield[roles.enabler];
+    if (enabler) {
+      const cheaper = pickThirdBenchEnabler(enabler, remaining, selected, clubCounts, byCost);
+      if (cheaper) {
+        remaining -= applyPlayerSwap(enabler, cheaper, selected, clubCounts);
+        benchOutfield[roles.enabler] = cheaper;
+        improved = true;
+      }
+    }
+
+    for (let i = 0; i < xi.length; i++) {
+      const cur = xi[i];
+      const avail = remaining + cur.nowCost;
+      const upgrade = byXPts.find(
+        (p) =>
+          p.position === cur.position &&
+          !selected.has(p.id) &&
+          !releasedFromXi.has(p.id) &&
+          p.xPts > cur.xPts &&
+          p.nowCost <= avail &&
+          (clubCounts.get(p.teamId) ?? 0) < 3,
+      );
+      if (!upgrade) continue;
+
+      remaining = avail - upgrade.nowCost;
+      applyPlayerSwap(cur, upgrade, selected, clubCounts);
+      xi[i] = upgrade;
+      improved = true;
+    }
+
+    const fullSquad = [...xi, ...(gk ? [gk] : []), ...benchOutfield];
+    if (fullSquad.length === 15) {
+      const layout = finalizeSquadLayout(fullSquad);
+      const starterIds = xi.map((p) => p.id).join(',');
+      const nextStarterIds = layout.orderedStarters.map((p) => p.id).join(',');
+      if (starterIds !== nextStarterIds) {
+        xi = layout.orderedStarters;
+        gk = layout.benchGK;
+        benchOutfield = [...layout.fillers];
+        improved = true;
+      }
+    }
+
+    if (!improved) break;
+  }
+
+  const finalSquad = [...xi, ...(gk ? [gk] : []), ...benchOutfield];
+  if (finalSquad.length === 15) {
+    const layout = finalizeSquadLayout(finalSquad);
+    return {
+      orderedStarters: layout.orderedStarters,
+      benchGK: layout.benchGK,
+      fillers: layout.fillers,
+      budget: remaining,
+    };
+  }
+
+  return {
+    orderedStarters: xi,
+    benchGK: gk,
+    fillers: benchOutfield,
+    budget: remaining,
+  };
 }
 
 function fillSquadToFifteen(
@@ -349,16 +643,11 @@ function splitStartersAndBench(fullSquad: OptimizerPlayer[]): {
   benchGK: OptimizerPlayer | null;
   fillers: OptimizerPlayer[];
 } {
-  const pool = fullSquad.filter(isScoringCandidate);
-  let { starters } = pickBestFormation(pool.length >= 11 ? pool : fullSquad);
-  if (starters.length < 11) {
-    starters = pickBestFormation(fullSquad).starters;
-  }
-  const bench = fullSquad.filter((p) => !starters.some((s) => s.id === p.id));
+  const layout = finalizeSquadLayout(fullSquad);
   return {
-    starters,
-    benchGK: bench.find((p) => p.position === 'GK') ?? null,
-    fillers: bench.filter((p) => p.position !== 'GK'),
+    starters: layout.orderedStarters,
+    benchGK: layout.benchGK,
+    fillers: layout.fillers,
   };
 }
 
@@ -373,22 +662,27 @@ function applySquadLayout(
   budget: number;
   totalXPts: number;
 } {
-  let xi = pickBestFormation(fullSquad).starters;
-  if (xi.length < 11) {
-    xi = splitStartersAndBench(fullSquad).starters;
-  }
-  if (xi.length < 11) {
-    xi = fullSquad.slice(0, 11);
-  }
-  const bench = fullSquad.filter((p) => !xi.some((s) => s.id === p.id));
+  const layout =
+    fullSquad.length >= 11
+      ? finalizeSquadLayout(fullSquad)
+      : {
+          orderedStarters: fullSquad.slice(0, 11),
+          benchGK: null,
+          fillers: [],
+          totalXPts: fullSquad.slice(0, 11).reduce((sum, p) => sum + p.xPts, 0),
+        };
   const cost = fullSquad.reduce((sum, p) => sum + p.nowCost, 0);
+  const bench = [
+    ...(layout.benchGK ? [layout.benchGK] : []),
+    ...layout.fillers,
+  ];
   return {
-    orderedStarters: xi,
-    benchGK: bench.find((p) => p.position === 'GK') ?? null,
-    fillers: bench.filter((p) => p.position !== 'GK'),
-    orderedSquad: toOrderedIds(xi, bench),
+    orderedStarters: layout.orderedStarters,
+    benchGK: layout.benchGK,
+    fillers: layout.fillers,
+    orderedSquad: toOrderedIds(layout.orderedStarters, bench),
     budget: totalBudget - cost,
-    totalXPts: xi.reduce((sum, p) => sum + p.xPts, 0),
+    totalXPts: layout.totalXPts,
   };
 }
 
@@ -542,6 +836,9 @@ export function optimizeFreeHit(
   // ── Step 5: Fill bench (mandatory — downgrade starters until 4 bench slots fit) ─
   let benchGK: OptimizerPlayer | null = null;
   let fillers: OptimizerPlayer[] = [];
+  let orderedSquad: number[];
+  let totalXPts: number;
+  let selectedCost: number;
 
   for (let attempt = 0; attempt < 30; attempt++) {
     const filled = fillMandatoryBench(
@@ -585,7 +882,6 @@ export function optimizeFreeHit(
   if (!benchGK || fillers.length < 3) {
     const relaxedSelected = new Set(orderedStarters.map((p) => p.id));
     let relaxedBudget = budget;
-    const relaxedCounts = new Map(clubCounts);
     const startCount = countPositions(orderedStarters);
     const benchOutfieldSlots: PlayerPosition[] = [];
     (['DEF', 'MID', 'FWD'] as const).forEach((pos) => {
@@ -611,50 +907,21 @@ export function optimizeFreeHit(
     budget = relaxedBudget;
   }
 
-  // ── Step 6: Build ordered squad ────────────────────────────────────────────
-  // starters ordered as [GK, DEF..., MID..., FWD...] by best formation
-  // bench ordered as [benchGK, filler1, filler2, filler3] — all cheapest valid
-  let totalXPts = orderedStarters.reduce((sum, p) => sum + p.xPts, 0);
-  let orderedSquad = [
-    ...orderedStarters.map((p) => p.id),
-    ...(benchGK ? [benchGK.id] : []),
-    ...fillers.map((p) => p.id),
-  ];
-
-  let selectedCost = totalBudget - budget;
-
-  for (let round = 0; round < 10; round++) {
-    if (orderedStarters.length === 0) break;
-    const weakestIdx = orderedStarters.reduce(
-      (minIdx, p, i, arr) => (p.xPts < arr[minIdx].xPts ? i : minIdx),
-      0,
-    );
-    const weakest = orderedStarters[weakestIdx];
-    if (!weakest) break;
-    const upgrade = byXPts.find(
-      (p) =>
-        p.position === weakest.position &&
-        !selected.has(p.id) &&
-        !releasedFromXi.has(p.id) &&
-        p.xPts > weakest.xPts &&
-        p.nowCost <= weakest.nowCost + budget &&
-        (clubCounts.get(p.teamId) ?? 0) < 3,
-    );
-    if (!upgrade) break;
-    selected.delete(weakest.id);
-    selected.add(upgrade.id);
-    budget = budget + weakest.nowCost - upgrade.nowCost;
-    clubCounts.set(weakest.teamId, Math.max(0, (clubCounts.get(weakest.teamId) ?? 0) - 1));
-    clubCounts.set(upgrade.teamId, (clubCounts.get(upgrade.teamId) ?? 0) + 1);
-    orderedStarters[weakestIdx] = upgrade;
-    totalXPts = orderedStarters.reduce((sum, p) => sum + p.xPts, 0);
-    orderedSquad = [
-      ...orderedStarters.map((p) => p.id),
-      ...(benchGK ? [benchGK.id] : []),
-      ...fillers.map((p) => p.id),
-    ];
-    selectedCost = totalBudget - budget;
-  }
+  const invested = investRemainingBudget(
+    orderedStarters,
+    benchGK,
+    fillers,
+    selected,
+    clubCounts,
+    budget,
+    byXPts,
+    byCost,
+    releasedFromXi,
+  );
+  orderedStarters = invested.orderedStarters;
+  benchGK = invested.benchGK;
+  fillers = invested.fillers;
+  budget = invested.budget;
 
   let fullSquad = [
     ...orderedStarters,
@@ -681,6 +948,53 @@ export function optimizeFreeHit(
   ];
   selectedCost = totalBudget - budget;
   totalXPts = orderedStarters.reduce((sum, p) => sum + p.xPts, 0);
+
+  if (budget > 0) {
+    const reinvested = investRemainingBudget(
+      orderedStarters,
+      benchGK,
+      fillers,
+      selected,
+      clubCounts,
+      budget,
+      byXPts,
+      byCost,
+      releasedFromXi,
+    );
+    orderedStarters = reinvested.orderedStarters;
+    benchGK = reinvested.benchGK;
+    fillers = reinvested.fillers;
+    budget = reinvested.budget;
+    orderedSquad = [
+      ...orderedStarters.map((p) => p.id),
+      ...(benchGK ? [benchGK.id] : []),
+      ...fillers.map((p) => p.id),
+    ];
+    selectedCost = totalBudget - budget;
+    totalXPts = orderedStarters.reduce((sum, p) => sum + p.xPts, 0);
+  }
+
+  if (orderedStarters.length + (benchGK ? 1 : 0) + fillers.length === 15) {
+    let finalSquadPlayers = [
+      ...orderedStarters,
+      ...(benchGK ? [benchGK] : []),
+      ...fillers,
+    ];
+    const spent = spendRemainingBudgetOnSquad(finalSquadPlayers, budget, players);
+    finalSquadPlayers = spent.squad;
+    budget = spent.budget;
+    const finalLayout = finalizeSquadLayout(finalSquadPlayers);
+    orderedStarters = finalLayout.orderedStarters;
+    benchGK = finalLayout.benchGK;
+    fillers = finalLayout.fillers;
+    totalXPts = finalLayout.totalXPts;
+    orderedSquad = [
+      ...orderedStarters.map((p) => p.id),
+      ...(benchGK ? [benchGK.id] : []),
+      ...fillers.map((p) => p.id),
+    ];
+    selectedCost = totalBudget - budget;
+  }
 
   while (budget < 0 && orderedStarters.length > 0) {
     const starterByCostAsc = [...orderedStarters].sort((a, b) => a.nowCost - b.nowCost);
@@ -742,6 +1056,7 @@ export function optimizeFreeHit(
     id: p.id,
     position: p.position,
     nowCost: p.nowCost,
+    xPts: p.xPts,
   }));
 
   return {

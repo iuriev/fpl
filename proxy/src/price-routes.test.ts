@@ -1,6 +1,13 @@
 import { Hono } from 'hono';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { auth } from './auth/auth';
+import { db } from './db/client';
+import * as priceChangesService from './price-changes-service';
+import * as pricePredictionsService from './price-predictions-service';
+import { priceRoutes } from './price-routes';
+import { getSquadPlayerIds } from './squad-player-ids';
+
 vi.mock('./auth/auth', () => ({
   auth: { api: { getSession: vi.fn() }, handler: vi.fn() },
 }));
@@ -22,13 +29,6 @@ vi.mock('./price-predictions-service', () => ({
 vi.mock('./squad-player-ids', () => ({
   getSquadPlayerIds: vi.fn(),
 }));
-
-import { auth } from './auth/auth';
-import { db } from './db/client';
-import * as priceChangesService from './price-changes-service';
-import * as pricePredictionsService from './price-predictions-service';
-import { priceRoutes } from './price-routes';
-import { getSquadPlayerIds } from './squad-player-ids';
 
 const app = new Hono().route('/api', priceRoutes);
 
@@ -95,7 +95,7 @@ describe('GET /api/price-changes/squad', () => {
 
     const res = await app.request('/api/price-changes/squad?period=gw&direction=rise&position=all');
     expect(res.status).toBe(403);
-    const body = await res.json();
+    const body = await res.json() as { error: string };
     expect(body.error).toBe('premium_required');
   });
 

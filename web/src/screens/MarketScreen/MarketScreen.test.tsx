@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import * as queries from '@/api/queries';
 import { copy } from '@/lib/copy';
+import { usePremiumStatus } from '@/lib/use-premium-status';
 
 import { MarketScreen } from './MarketScreen';
 
@@ -49,8 +50,6 @@ vi.mock('@/lib/startup-readiness/use-predictions-warmup-refetch', () => ({
 }));
 
 const mockQueries = vi.mocked(queries);
-
-import { usePremiumStatus } from '@/lib/use-premium-status';
 const mockUsePremiumStatus = vi.mocked(usePremiumStatus);
 
 function makeTeam(id: number, csProb: number, xG: number) {

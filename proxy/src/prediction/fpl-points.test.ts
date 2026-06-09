@@ -2,19 +2,6 @@ import { describe, expect, it } from 'vitest';
 
 import { modelXPts } from './fpl-points';
 
-const BASE = {
-  xGoals: 0,
-  xAssists: 0,
-  csProb: null,
-  lambdaAgainst: 1.0,
-  minsProb: 1.0,
-  prob60Plus: 1.0,
-  defconPts: 0,
-  bonusPts: 0,
-  savesPts: 0,
-  yellowDeduction: 0,
-} as const;
-
 describe('modelXPts', () => {
   it('starter who plays 90 min with no contributions earns 2 appearance pts', () => {
     expect(

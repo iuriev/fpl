@@ -24,6 +24,7 @@ const ZERO_STATS: SquadPlayer['stats'] = {
 function makePlayer(id: number, position: SquadPlayer['position']): SquadPlayer {
   return {
     id,
+    fplCode: id,
     name: `Player${id}`,
     position,
     club: 'TST',

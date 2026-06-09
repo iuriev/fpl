@@ -9,6 +9,7 @@ import { PlayerPickerSheet } from './PlayerPickerSheet';
 
 const makePoolPlayer = (id: number, overrides?: Partial<PoolPlayer>): PoolPlayer => ({
   id,
+  code: id,
   webName: `Player${id}`,
   firstName: 'A',
   lastName: 'B',

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { copy } from '@/lib/copy';
 import { startupProgressPercent } from '@/lib/startup-readiness/startup-progress';
 import { useStartupReadiness } from '@/lib/startup-readiness/StartupReadinessContext';

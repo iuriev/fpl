@@ -28,6 +28,7 @@ const ZERO_STATS: SquadPlayer['stats'] = {
 function makePlayer(id: number, name: string, position: SquadPlayer['position']): SquadPlayer {
   return {
     id,
+    fplCode: id,
     name,
     position,
     club: 'TST',
@@ -77,6 +78,7 @@ const SQUAD_DATA: SquadResponse = {
 
 const POOL_PLAYERS: PoolPlayer[] = SQUAD_DATA.starters.concat(SQUAD_DATA.bench).map((p) => ({
   id: p.id,
+  code: p.id,
   webName: p.name,
   firstName: p.name,
   lastName: p.name,
@@ -93,11 +95,12 @@ const POOL_PLAYERS: PoolPlayer[] = SQUAD_DATA.starters.concat(SQUAD_DATA.bench).
   selectedByPercent: '10',
   expectedPoints: '5.0',
   form: '5.0',
-  nextFixtures: [{ opponent: 'TOT', home: true, difficulty: 3 }],
+  nextFixtures: [{ gw: 34, opponent: 'TOT', home: true, difficulty: 3 }],
 }));
 
 const EXTRA_PLAYER: PoolPlayer = {
   id: 99,
+  code: 99,
   webName: 'Extra',
   firstName: 'Extra',
   lastName: 'Player',
@@ -125,6 +128,10 @@ const mockState = {
 
 const mockRequestPremiumUpsell = vi.fn();
 const mockFetch = vi.fn();
+
+vi.mock('@/lib/use-premium-status', () => ({
+  usePremiumStatus: vi.fn(() => false),
+}));
 
 vi.mock('@/lib/premium-upsell/PremiumUpsellContext', () => ({
   useRequestPremiumUpsell: () => mockRequestPremiumUpsell,
@@ -423,7 +430,7 @@ describe('TransferScreen Reset button', () => {
     await user.click(subIcon);
 
     expect(within(edersonCard).queryByLabelText('Substitute')).not.toBeInTheDocument();
-    expect(within(edersonCard).getByText('10% / 5.0').parentElement?.childElementCount).toBe(2);
+    expect(within(edersonCard).getByText('5.0').parentElement?.childElementCount).toBe(2);
 
     // Hart is a starter
     const hartCard = screen.getByRole('button', { name: /Hart/i });

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { formationLabel, type InferredFormation } from './formation-inference';
+import type { InferredFormation } from './formation-inference';
 import { countEligibleByLine } from './formation-squad-fit';
 import type { FPLBootstrapStatic } from './fpl-client';
 import type { ScoredLineupCandidate } from './lineup-selection';

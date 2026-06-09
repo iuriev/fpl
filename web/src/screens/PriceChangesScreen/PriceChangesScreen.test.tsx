@@ -1,7 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -39,13 +38,13 @@ function renderPriceScreen() {
     isLoading: false,
     isError: false,
     refetch: vi.fn(),
-  } as ReturnType<typeof queries.usePriceChanges>);
+  } as unknown as ReturnType<typeof queries.usePriceChanges>);
   mockQueries.usePricePredictions.mockReturnValue({
     data: emptyPredictions,
     isLoading: false,
     isError: false,
     refetch: vi.fn(),
-  } as ReturnType<typeof queries.usePricePredictions>);
+  } as unknown as ReturnType<typeof queries.usePricePredictions>);
 
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
@@ -74,7 +73,7 @@ describe('PriceChangesScreen', () => {
   it('defaults period to Season when current gameweek is 38', async () => {
     mockQueries.useGameweeks.mockReturnValue({
       data: { current: 38, next: 38, gameweeks: [] },
-    } as ReturnType<typeof queries.useGameweeks>);
+    } as unknown as ReturnType<typeof queries.useGameweeks>);
     renderPriceScreen();
     await waitFor(() => {
       expect(mockQueries.usePriceChanges).toHaveBeenLastCalledWith(
@@ -90,7 +89,7 @@ describe('PriceChangesScreen', () => {
   it('keeps This GW as default when current gameweek is below 38', () => {
     mockQueries.useGameweeks.mockReturnValue({
       data: { current: 37, next: 38, gameweeks: [] },
-    } as ReturnType<typeof queries.useGameweeks>);
+    } as unknown as ReturnType<typeof queries.useGameweeks>);
     renderPriceScreen();
     expect(mockQueries.usePriceChanges).toHaveBeenLastCalledWith(
       'gw',

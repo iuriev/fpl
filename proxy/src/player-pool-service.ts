@@ -2,6 +2,8 @@ import * as cacheLayer from './cache';
 import { db } from './db/client';
 import * as fixturesService from './fixtures-service';
 import { getOrFetchBootstrap } from './fpl-cache/db-cache';
+import * as predictionService from './prediction-service';
+import { resolveNextGw } from './resolve-next-gw';
 import type { PlayerPoolResponse, PlayerPosition, PlayerStatus, PoolPlayer } from './types';
 
 const POSITION_MAP: Record<number, PlayerPosition> = {
@@ -20,6 +22,12 @@ export async function getPlayerPool(): Promise<PlayerPoolResponse> {
     getOrFetchBootstrap(db),
     fixturesService.getUpcomingFixtures(),
   ]);
+
+  const targetGw = resolveNextGw(bootstrap);
+  const predictions = await predictionService.getPredictionsForEvent(targetGw);
+  const xPtsByCode = predictions.ready
+    ? new Map(predictions.players.map((p) => [p.fplCode, p.xPts] as const))
+    : null;
 
   const teamMap = new Map(
     bootstrap.teams.map((t) => [t.id, { shortName: t.short_name, code: t.code }]),
@@ -42,7 +50,10 @@ export async function getPlayerPool(): Promise<PlayerPoolResponse> {
     chanceOfPlaying: el.chance_of_playing_this_round,
     news: el.news,
     selectedByPercent: el.selected_by_percent,
-    expectedPoints: el.ep_next,
+    expectedPoints:
+      xPtsByCode?.get(el.code) != null
+        ? xPtsByCode.get(el.code)!.toFixed(1)
+        : el.ep_next,
     form: el.form,
     nextFixtures: fixtures[el.team] ?? [],
     isWatchlisted: false,

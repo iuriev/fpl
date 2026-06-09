@@ -3,7 +3,14 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 
+import { AuthContext, AuthContextValue } from '@/auth/AuthContext';
+import { fixtureEntry, fixtureGameweeks } from '@/fixtures';
+import { MyTeamProvider } from '@/lib/my-team/MyTeamProvider';
+
+import { SquadScreen } from './SquadScreen';
+
 const mockNavigate = vi.fn();
+
 vi.mock('react-router-dom', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react-router-dom')>();
   return {
@@ -12,8 +19,6 @@ vi.mock('react-router-dom', async (importOriginal) => {
   };
 });
 
-import { fixtureEntry, fixtureGameweeks } from '@/fixtures';
-
 vi.mock('@/api/queries', () => ({
   useEntry: () => ({ data: fixtureEntry, isError: false }),
   useGameweeks: () => ({ data: fixtureGameweeks }),
@@ -21,11 +26,6 @@ vi.mock('@/api/queries', () => ({
   usePlayerPool: () => ({ data: null }),
   useTeamOfTheWeek: () => ({ data: null }),
 }));
-
-import { AuthContext, AuthContextValue } from '@/auth/AuthContext';
-import { MyTeamProvider } from '@/lib/my-team/MyTeamProvider';
-
-import { SquadScreen } from './SquadScreen';
 
 const mockAuthContext: AuthContextValue = {
   user: null,

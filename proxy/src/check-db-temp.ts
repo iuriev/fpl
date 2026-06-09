@@ -1,5 +1,6 @@
-import { db } from './db/client';
 import { sql } from 'drizzle-orm';
+
+import { db } from './db/client';
 
 async function main() {
   const rows = await db.execute(sql`

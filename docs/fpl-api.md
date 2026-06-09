@@ -99,6 +99,9 @@ Used for: each player's points in the selected gameweek (`stats.total_points`).
 - `/api/entry/:teamId` ← entry summary
 - `/api/squad/:teamId/:gw` ← `bootstrap-static` (metadata, status, avg/high) + picks
   (`picks` + `entry_history`) + live (points)
+- `/api/squad/:teamId/free-hit-suggest?gw={n}` ← bootstrap + squad picks (sell prices + bank)
+  + model predictions for target GW; returns optimal 15 (`orderedSquad`, per-player `xPts`,
+  `totalXPts`, budget fields). Premium-gated on the client; 404 when predictions unavailable.
 
 ### Transfer Planner endpoints (planned)
 

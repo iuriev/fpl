@@ -1,5 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import {
+  bestQuotaRoleMeritScore,
+  fillTierForRole,
+  getPlayerTacticalRole,
+  playerFillsRole,
+  playerQualifiesForQuotaRole,
+  roleMeritScore,
+} from './player-tactical-role';
+
 vi.mock('./data/player-tactical-roles.json', () => ({
   default: {
     '100': { role: 'cb', lane: 'C', secondary: ['lb'] },
@@ -14,15 +23,6 @@ vi.mock('./data/player-tactical-roles.json', () => ({
     '109': { role: 'rm', lane: 'R', secondary: [] },
   },
 }));
-
-import {
-  bestQuotaRoleMeritScore,
-  fillTierForRole,
-  getPlayerTacticalRole,
-  playerFillsRole,
-  playerQualifiesForQuotaRole,
-  roleMeritScore,
-} from './player-tactical-role';
 
 describe('player-tactical-role', () => {
   it('uses primary role first', () => {

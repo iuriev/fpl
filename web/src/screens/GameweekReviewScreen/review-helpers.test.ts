@@ -14,6 +14,7 @@ import {
 function makePlayer(id: number, name: string, points: number): SquadPlayer {
   return {
     id,
+    fplCode: id,
     name,
     points,
     position: 'MID',
@@ -45,6 +46,7 @@ function makePlayer(id: number, name: string, points: number): SquadPlayer {
 function makePoolPlayer(id: number, eventPoints: number): PoolPlayer {
   return {
     id,
+    code: id,
     eventPoints,
     webName: 'Player',
     firstName: 'A',

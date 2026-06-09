@@ -19,7 +19,7 @@ export { SignInScreen } from './SignInScreen/SignInScreen';
 export { SignUpScreen } from './SignUpScreen/SignUpScreen';
 export type { SquadScreenProps } from './SquadScreen/SquadScreen';
 export { SquadScreen } from './SquadScreen/SquadScreen';
-export { TopPlayersScreen } from './TopPlayersScreen/TopPlayersScreen';
+export { TopPlayersScreen as TeamOfTheWeekScreen,TopPlayersScreen } from './TopPlayersScreen/TopPlayersScreen';
 export type { TransferScreenProps } from './TransferScreen/TransferScreen';
 export { TransferScreen } from './TransferScreen/TransferScreen';
 export { WatchlistScreen } from './WatchlistScreen/WatchlistScreen';

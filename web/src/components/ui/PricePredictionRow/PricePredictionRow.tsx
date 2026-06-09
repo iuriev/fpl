@@ -4,7 +4,7 @@ import { Jersey } from '@/components/ui/Jersey/Jersey';
 import { PositionBadge } from '@/components/ui/PositionBadge/PositionBadge';
 import { PriceMetricTiles } from '@/components/ui/PriceMetricTiles/PriceMetricTiles';
 import { copy, interpolate } from '@/lib/copy';
-import { formatPriceTenths, formatTransferCount } from '@/lib/format-price';
+import { formatTransferCount } from '@/lib/format-price';
 import type { PricePredictionPlayer } from '@/types';
 
 import styles from './PricePredictionRow.module.css';

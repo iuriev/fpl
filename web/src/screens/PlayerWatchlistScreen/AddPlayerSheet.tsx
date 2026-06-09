@@ -70,6 +70,7 @@ export const AddPlayerSheet: React.FC<AddPlayerSheetProps> = ({ open, onClose, c
 
   useEffect(() => {
     if (open) searchRef.current?.focus();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     else setQuery('');
   }, [open]);
 

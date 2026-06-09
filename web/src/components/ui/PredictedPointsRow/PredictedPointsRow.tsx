@@ -4,7 +4,6 @@ import { Jersey } from '@/components/ui/Jersey/Jersey';
 import { PlayerPredictionBreakdown } from '@/components/ui/PlayerPredictionBreakdown/PlayerPredictionBreakdown';
 import { PositionBadge } from '@/components/ui/PositionBadge/PositionBadge';
 import { PriceMetricTiles } from '@/components/ui/PriceMetricTiles/PriceMetricTiles';
-import { copy } from '@/lib/copy';
 import { formatPriceTenths } from '@/lib/format-price';
 import type { PredictedPointsRowData } from '@/lib/predicted-points';
 

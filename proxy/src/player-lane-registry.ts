@@ -1,4 +1,3 @@
-import playerLanesData from './data/player-lanes.json';
 import {
   getLineupSlotSpecs,
   type LineGroup,
@@ -10,22 +9,13 @@ import {
   fillTierForSlot,
   type FillTierOptions,
   getPlayerLaneFromProfile,
-  getPlayerTacticalProfile,
   getPlayerTacticalRole,
-  hasTacticalProfile,
   isCentralOnlyMidRole,
   isWidePrimaryOnLine,
   prefersCentralSlot,
 } from './player-tactical-role';
 
 export type PlayerLane = 'L' | 'C' | 'R';
-
-const laneFallback = playerLanesData as Record<string, PlayerLane>;
-
-export function getPlayerLane(code: number): PlayerLane {
-  if (hasTacticalProfile(code)) return getPlayerLaneFromProfile(code);
-  return laneFallback[String(code)] ?? 'C';
-}
 
 const SLOT_TEMPLATES: Record<string, PlayerLane[]> = {
   'DEF-3': ['L', 'C', 'R'],

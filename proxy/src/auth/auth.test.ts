@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { auth } from './auth';
+
 vi.mock('./auth', () => ({
   auth: {
     handler: vi.fn(),
@@ -16,8 +18,6 @@ vi.mock('../db/client', () => ({
 vi.mock('resend', () => ({
   Resend: vi.fn(() => ({ emails: { send: vi.fn() } })),
 }));
-
-import { auth } from './auth';
 
 const mockHandler = vi.mocked(auth.handler);
 

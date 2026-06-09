@@ -4,6 +4,7 @@ import type { PoolPlayer, SquadPlayer, TransferDraft } from '@/types';
 
 import {
   applySwapsToSquad,
+  buildFreeHitOrderSubs,
   buildFreeHitSubs,
   buildFreeHitSwaps,
   calcBank,
@@ -195,7 +196,36 @@ describe('transfer-draft', () => {
         12, 10, 13, 14,
       ];
       const subs = buildFreeHitSubs(squad, target, 11);
-      expect(subs).toContainEqual({ fieldId: 10, benchId: 20 });
+      const working = squad.map((p) => ({ ...p }));
+      for (const sub of subs) {
+        const fi = working.findIndex((p) => p.id === sub.fieldId);
+        const bi = working.findIndex((p) => p.id === sub.benchId);
+        [working[fi], working[bi]] = [working[bi], working[fi]];
+      }
+      expect(working.map((p) => p.id)).toEqual(target);
+      expect(working.slice(0, 11).map((p) => p.id)).toContain(20);
+      expect(working.slice(0, 11).map((p) => p.id)).not.toContain(10);
+    });
+
+    it('reorders bench slots to match target outfield sub priority', () => {
+      const squad = Array.from({ length: 15 }, (_, i) =>
+        makeFullPlayer(i + 1, i < 11 ? 'MID' : 'DEF')
+      );
+      squad[0] = makeFullPlayer(1, 'GK');
+      squad[11] = makeFullPlayer(101, 'GK');
+      const target = [
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+        101, 15, 14, 13,
+      ];
+      const subs = buildFreeHitOrderSubs(squad, target);
+      expect(subs.length).toBeGreaterThan(0);
+      const working = squad.map((p) => ({ ...p }));
+      for (const sub of subs) {
+        const fi = working.findIndex((p) => p.id === sub.fieldId);
+        const bi = working.findIndex((p) => p.id === sub.benchId);
+        [working[fi], working[bi]] = [working[bi], working[fi]];
+      }
+      expect(working.map((p) => p.id)).toEqual(target);
     });
 
     it('leaves lineup unchanged when swaps already match target starters', () => {

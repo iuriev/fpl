@@ -369,16 +369,19 @@ Note: legal check needed before public launch.
 
 | ID | Task | Effort | Why |
 |----|------|--------|-----|
-| ~~CHIP-03~~ | ~~Free Hit "best squad" assistant~~ | L | ✅ Done. |
+| ~~CHIP-03~~ | ~~Free Hit "best squad" assistant~~ | L | ✅ Done — AI Free Hit optimiser, model xPts alignment, bench strategy, Predicted total overlay (OpenSpec `archive/2026-06-09-chip-03-free-hit-optimizer-polish`). |
 | CHIP-04 | Wildcard recommendation (next 5 GWs FDR analysis) | L | Most asked FPL question: "should I wildcard now?" |
 | CHIP-05 | Triple Captain recommendation | M | Straightforward: rank players by xPts × FDR for each GW. |
 | CHIP-06 | Bench Boost recommendation | M | Similar to TC but sum of bench 4 players' xPts. |
 
 ### Feature details
 
-#### CHIP-03: Free Hit — "best squad" assistant
-When the user activates or is considering a Free Hit chip, show the optimal 15-player squad
-for the upcoming gameweek based on fixture difficulty, form, and xPts.
+#### CHIP-03: Free Hit — "best squad" assistant [SHIPPED]
+Premium **AI Free Hit** on the Transfer Screen builds an optimal 15-player squad for the target
+gameweek using model xPts, invests remaining budget in premium bench subs, orders bench for
+auto-sub priority, and shows **Predicted total** on the pitch. OpenSpec
+`archive/2026-06-08-chip-03-ai-free-hit-assistant` (MVP),
+`archive/2026-06-09-chip-03-free-hit-optimizer-polish` (optimiser + UI polish).
 
 #### CHIP-04: Wildcard recommendation
 Feature that recommends *when* to play the Wildcard chip — analysing the next 5 gameweeks'
@@ -624,6 +627,7 @@ For reference — features that are live in the codebase:
 - **Transfer screen polish** — captain badge right, team abbrev + FDR chip under PlayerCard, outfield picker, position filter tabs, Sort button (UX-01 SwapsStrip scroll, UX-02 next 3 fixtures column, UX-03 %, pts, xPts columns); UX-04 player info popup (fixtures + price); DES-04 FDR colour tokens; VIS-01 goals/assists badges + ownership pill on all card sizes
 - **Cloudflare migration (INFRA-01)** — OpenSpec change `openspec/changes/infra-01-cloudflare-migration`; moves SPA to Cloudflare Pages and proxy to Cloudflare Workers; Supabase unchanged. Replaces Fly.io deployment.
 - **Active chip display (CHIP-01)** — chip cell replaces AVERAGE+HIGHEST in SummaryStrip when a chip is active; octagonal badge icon + chip name + ACTIVE label; per-chip accent colours (Wildcard gold, Triple Captain red, Free Hit cyan, Bench Boost green)
+- **AI Free Hit assistant (CHIP-03)** — premium Transfer Screen button; `GET /api/squad/:teamId/free-hit-suggest`; greedy optimiser with bench strategy and model xPts; **Predicted total** on pitch; OpenSpec `archive/2026-06-08-chip-03-ai-free-hit-assistant`, `archive/2026-06-09-chip-03-free-hit-optimizer-polish`
 - **Auth (AUTH-01)** — login/password + Google OAuth, backend user profile; OpenSpec change 2026-06-02-auth-01-user-accounts.
 - **League participants browser (ANA-12)** — click a league in Stats to browse all participants and view their squads; OpenSpec change 2026-06-02-ana-12-league-participants-browser.
 - **Price changes & predictions (ANA-03, PRED-06)** — `/price-changes` screen: Actual (GW/season risers/fallers) + Tonight predictions; All FPL free, My squad premium; player profile sheet; OpenSpec `ana-03-pred-06-price-changes`.

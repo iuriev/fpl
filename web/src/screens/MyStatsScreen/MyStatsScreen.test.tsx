@@ -4,7 +4,8 @@ import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as queries from '@/api/queries';
-import type { HistoryResponse, LeaguesResponse } from '@/types';
+
+import { MyStatsScreen } from './MyStatsScreen';
 
 vi.mock('@/components/ui/TeamNavDrawer/TeamNavDrawer', () => ({
   TeamNavDrawer: () => null,
@@ -15,47 +16,24 @@ vi.mock('@/api/queries', () => ({
   useHistory: vi.fn(),
 }));
 
-const mockLeagues: LeaguesResponse = {
-  teamId: 72828,
-  classic: [{ id: 1, name: 'Overall', rank: 100, lastRank: 120 }],
-  h2h: [],
-};
-
-const mockHistory: HistoryResponse = {
-  teamId: 72828,
-  gameweeks: [
-    {
-      gw: 2,
-      overallRank: 50000,
-      overallPoints: 120,
-      gwRank: 100000,
-      gwPoints: 55,
-      pointsOnBench: 4,
-      transfers: 1,
-      transferCost: 0,
-      teamValue: 1005,
-    },
-  ],
-};
-
-const mockQueries = vi.mocked(queries);
-
 function setupMocks() {
-  mockQueries.useLeagues.mockReturnValue({
-    data: mockLeagues,
+  vi.mocked(queries.useLeagues).mockReturnValue({
+    data: { teamId: 72828, classic: [{ id: 1, name: 'Overall', rank: 100, lastRank: null }], h2h: [] },
     isLoading: false,
     isError: false,
     refetch: vi.fn(),
-  } as ReturnType<typeof queries.useLeagues>);
-  mockQueries.useHistory.mockReturnValue({
-    data: mockHistory,
-    isLoading: false,
-    isError: false,
-    refetch: vi.fn(),
-  } as ReturnType<typeof queries.useHistory>);
-}
+  } as unknown as ReturnType<typeof queries.useLeagues>);
 
-import { MyStatsScreen } from './MyStatsScreen';
+  vi.mocked(queries.useHistory).mockReturnValue({
+    data: {
+      teamId: 72828,
+      gameweeks: [{ gw: 2, overallRank: 1000, overallPoints: 50, gwRank: 500, gwPoints: 10, pointsOnBench: 2, transfers: 1, transferCost: 0, teamValue: 1000 }],
+    },
+    isLoading: false,
+    isError: false,
+    refetch: vi.fn(),
+  } as unknown as ReturnType<typeof queries.useHistory>);
+}
 
 function renderScreen(path = '/stats') {
   return render(

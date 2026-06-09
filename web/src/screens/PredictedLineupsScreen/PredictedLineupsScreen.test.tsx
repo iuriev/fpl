@@ -4,6 +4,12 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { useGameweeks, usePredictedLineups } from '@/api/queries';
+import { usePremiumStatus } from '@/lib/use-premium-status';
+import type { PredictedLineupsResponse } from '@/types';
+
+import { PredictedLineupsScreen } from './PredictedLineupsScreen';
+
 vi.mock('@/api/queries', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/api/queries')>();
   return {
@@ -25,12 +31,6 @@ vi.mock('@/lib/use-follow-player', () => ({
   useFollowPlayer: vi.fn(() => ({ following: false, toggle: vi.fn() })),
 }));
 
-import { useGameweeks, usePredictedLineups } from '@/api/queries';
-import { usePremiumStatus } from '@/lib/use-premium-status';
-import type { PredictedLineupsResponse } from '@/types';
-
-import { PredictedLineupsScreen } from './PredictedLineupsScreen';
-
 const mockLineups: PredictedLineupsResponse = {
   gameweek: 10,
   teams: [
@@ -43,6 +43,7 @@ const mockLineups: PredictedLineupsResponse = {
       players: [
         {
           id: 1,
+          fplCode: 1,
           webName: 'Raya',
           position: 'GK',
           teamCode: 3,
@@ -57,6 +58,7 @@ const mockLineups: PredictedLineupsResponse = {
         },
         {
           id: 2,
+          fplCode: 2,
           webName: 'White',
           position: 'DEF',
           teamCode: 3,
@@ -71,6 +73,7 @@ const mockLineups: PredictedLineupsResponse = {
         },
         {
           id: 3,
+          fplCode: 3,
           webName: 'Saliba',
           position: 'DEF',
           teamCode: 3,
@@ -85,6 +88,7 @@ const mockLineups: PredictedLineupsResponse = {
         },
         {
           id: 4,
+          fplCode: 4,
           webName: 'Gabriel',
           position: 'DEF',
           teamCode: 3,
@@ -99,6 +103,7 @@ const mockLineups: PredictedLineupsResponse = {
         },
         {
           id: 5,
+          fplCode: 5,
           webName: 'Timber',
           position: 'DEF',
           teamCode: 3,
@@ -113,6 +118,7 @@ const mockLineups: PredictedLineupsResponse = {
         },
         {
           id: 6,
+          fplCode: 6,
           webName: 'Ødegaard',
           position: 'MID',
           teamCode: 3,
@@ -127,6 +133,7 @@ const mockLineups: PredictedLineupsResponse = {
         },
         {
           id: 7,
+          fplCode: 7,
           webName: 'Rice',
           position: 'MID',
           teamCode: 3,
@@ -141,6 +148,7 @@ const mockLineups: PredictedLineupsResponse = {
         },
         {
           id: 8,
+          fplCode: 8,
           webName: 'Saka',
           position: 'MID',
           teamCode: 3,
@@ -155,6 +163,7 @@ const mockLineups: PredictedLineupsResponse = {
         },
         {
           id: 9,
+          fplCode: 9,
           webName: 'Havertz',
           position: 'FWD',
           teamCode: 3,
@@ -169,6 +178,7 @@ const mockLineups: PredictedLineupsResponse = {
         },
         {
           id: 10,
+          fplCode: 10,
           webName: 'Martinelli',
           position: 'FWD',
           teamCode: 3,
@@ -183,6 +193,7 @@ const mockLineups: PredictedLineupsResponse = {
         },
         {
           id: 11,
+          fplCode: 11,
           webName: 'Jesus',
           position: 'FWD',
           teamCode: 3,

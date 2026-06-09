@@ -228,8 +228,9 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
 
   const allPoolPlayers = useMemo(() => poolData?.players ?? [], [poolData]);
   const [aiSuggestedPlayers, setAiSuggestedPlayers] = useState<
-    Array<{ id: number; position: PlayerPosition; nowCost: number }>
+    Array<{ id: number; position: PlayerPosition; nowCost: number; xPts?: number }>
   >([]);
+  const [aiFreeHitTotalXPts, setAiFreeHitTotalXPts] = useState<number | null>(null);
   const effectivePoolPlayers = useMemo(
     () => augmentPoolWithSuggested(allPoolPlayers, aiSuggestedPlayers),
     [allPoolPlayers, aiSuggestedPlayers]
@@ -317,7 +318,26 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
     ? allPoolPlayers.filter((p) => p.position === outPlayer.position)
     : [];
 
-  const poolLookup = useMemo(() => new Map(allPoolPlayers.map((p) => [p.id, p])), [allPoolPlayers]);
+  const poolLookup = useMemo(
+    () => new Map(effectivePoolPlayers.map((p) => [p.id, p])),
+    [effectivePoolPlayers],
+  );
+
+  const startersPredictedTotal = useMemo(() => {
+    if (aiFreeHitTotalXPts != null && draft?.chip === 'freehit') {
+      return aiFreeHitTotalXPts;
+    }
+    if (displayStarters.length === 0) return null;
+    let sum = 0;
+    let hasPrediction = false;
+    for (const player of displayStarters) {
+      const ep = parseFloat(poolLookup.get(player.id)?.expectedPoints ?? '');
+      if (!Number.isFinite(ep)) continue;
+      sum += ep;
+      hasPrediction = true;
+    }
+    return hasPrediction ? sum : null;
+  }, [aiFreeHitTotalXPts, draft?.chip, displayStarters, poolLookup]);
 
   const squadPlayerIds = useMemo(() => new Set(displaySquad.map((p) => p.id)), [displaySquad]);
 
@@ -401,6 +421,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
 
   const handleReset = () => {
     setAiSuggestedPlayers([]);
+    setAiFreeHitTotalXPts(null);
     setPlanChip(initialChip);
     updateDraft((d) => ({
       ...d,
@@ -423,12 +444,14 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
       if (!res.ok) throw new Error('request failed');
       const data = (await res.json()) as {
         orderedSquad: number[];
-        players: Array<{ id: number; position: PlayerPosition; nowCost: number }>;
+        players: Array<{ id: number; position: PlayerPosition; nowCost: number; xPts: number }>;
+        totalXPts: number;
         totalBudget: number;
         remainingBudget: number;
       };
       if (data.orderedSquad.length !== 15) throw new Error('incomplete squad');
       setAiSuggestedPlayers(data.players);
+      setAiFreeHitTotalXPts(data.totalXPts);
       const pool = augmentPoolWithSuggested(allPoolPlayers, data.players);
       const positionById = new Map(pool.map((p) => [p.id, p.position]));
       for (const p of originalSquad) {
@@ -546,6 +569,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
             <TransferPitch
               starters={displayStarters}
               bench={displayBench}
+              startersPredictedTotal={startersPredictedTotal}
               outPlayerId={selectedPlayerId}
               inPlayerIds={inPlayerIds}
               onPlayerClick={handlePlayerClick}
@@ -555,6 +579,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
               onSubIconClick={handleSubIconClick}
               onSubTargetClick={handleSubTargetClick}
               onSubCancel={cancelSub}
+              isAiLoading={isAiLoading}
             />
           </div>
 

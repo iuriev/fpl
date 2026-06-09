@@ -6,7 +6,10 @@ import { describe, expect, it, vi } from 'vitest';
 import * as queries from '@/api/queries';
 import { fixtureSquad } from '@/fixtures';
 
+import { ManagerRow } from './ManagerRow';
+
 const mockNavigate = vi.fn();
+
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return { ...actual, useNavigate: () => mockNavigate };
@@ -23,8 +26,6 @@ vi.mock('@/api/queries', () => ({
     isLoading: false,
   })),
 }));
-
-import { ManagerRow } from './ManagerRow';
 
 const defaultEntryData = {
   teamId: 72828,

@@ -1,9 +1,9 @@
 import eslint from '@eslint/js';
-import tseslint from 'typescript-eslint';
+import prettierConfig from 'eslint-config-prettier';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
-import prettierConfig from 'eslint-config-prettier';
+import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   { ignores: ['dist/**'] },
@@ -19,8 +19,19 @@ export default tseslint.config(
   {
     plugins: { 'simple-import-sort': simpleImportSort },
     rules: {
-      'simple-import-sort/imports': 'error',
+      'simple-import-sort/imports': ['error', {
+        groups: [
+          ['^node:'],
+          ['^[^./]'],
+          ['^@/'],
+          ['^\\.'],
+        ],
+      }],
       'simple-import-sort/exports': 'error',
+      'no-restricted-syntax': ['error', {
+        selector: 'CallExpression[callee.object.name="vi"][callee.property.name="mock"] ~ ImportDeclaration',
+        message: 'Import declarations must come before vi.mock() calls.',
+      }],
     },
   },
   {

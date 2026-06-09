@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useEntry } from '@/api/queries';
@@ -28,12 +28,11 @@ export const TeamNavDrawer: React.FC<TeamNavDrawerProps> = ({
   const navigate = useNavigate();
   const { data: entry, isError: entryIsError } = useEntry(teamId);
 
-  const flag = useMemo(() => {
-    if (!entry?.regionIsoCode) return null;
-    return [...entry.regionIsoCode.toUpperCase()]
-      .map((c) => String.fromCodePoint(c.codePointAt(0)! - 65 + 0x1f1e6))
-      .join('');
-  }, [entry?.regionIsoCode]);
+  const flag = entry?.regionIsoCode
+    ? [...entry.regionIsoCode.toUpperCase()]
+        .map((c) => String.fromCodePoint(c.codePointAt(0)! - 65 + 0x1f1e6))
+        .join('')
+    : null;
 
   const header = entry ? (
     <div className={styles.drawerHeader}>

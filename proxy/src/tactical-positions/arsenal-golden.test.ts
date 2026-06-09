@@ -17,11 +17,11 @@ describe('Arsenal tactical golden (after Transfermarkt ingest)', () => {
     >;
     const bootstrap = await (
       await fetch('https://fantasy.premierleague.com/api/bootstrap-static/')
-    ).json();
-    const ars = bootstrap.teams.find((t: { short_name: string }) => t.short_name === 'ARS').id;
+    ).json() as { teams: { id: number; short_name: string }[]; elements: { id: number; team: number; web_name: string; code: number }[] };
+    const ars = bootstrap.teams.find((t) => t.short_name === 'ARS')!.id;
     const byName = (webName: string) => {
       const el = bootstrap.elements.find(
-        (e: { team: number; web_name: string }) => e.team === ars && e.web_name === webName
+        (e) => e.team === ars && e.web_name === webName
       );
       return el ? roles[String(el.code)] : undefined;
     };

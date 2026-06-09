@@ -24,6 +24,7 @@ const ZERO_STATS: SquadPlayer['stats'] = {
 function makePlayer(id: number, name: string, position: SquadPlayer['position']): SquadPlayer {
   return {
     id,
+    fplCode: id,
     name,
     position,
     club: 'TST',
@@ -66,6 +67,7 @@ function renderPitch(overrides: Partial<React.ComponentProps<typeof TransferPitc
     <TransferPitch
       starters={STARTERS}
       bench={BENCH}
+      startersPredictedTotal={null}
       outPlayerId={null}
       inPlayerIds={new Set()}
       onPlayerClick={vi.fn()}

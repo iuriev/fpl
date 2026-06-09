@@ -1,10 +1,33 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
+import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
+import { Route, Routes, useSearchParams } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 
 import { AuthUser } from '@/auth/auth-client';
 import { AuthContext, AuthContextValue } from '@/auth/AuthContext';
+import { useCurrentUser } from '@/auth/AuthContext';
+import { ProtectedRoute } from '@/auth/ProtectedRoute';
 import { MyTeamContext, MyTeamContextValue } from '@/lib/my-team/MyTeamContext';
+import { useMyTeam } from '@/lib/my-team/MyTeamContext';
+import {
+  EntryScreen,
+  ForgotPasswordScreen,
+  GameweekReviewScreen,
+  LeagueStandingsScreen,
+  MyStatsScreen,
+  PlayerWatchlistScreen,
+  ResetPasswordScreen,
+  SignInScreen,
+  SignUpScreen,
+  SquadScreen,
+  TeamOfTheWeekScreen,
+  TopPlayersScreen,
+  TransferScreen,
+  WatchlistScreen,
+} from '@/screens';
 
 vi.mock('@/screens', () => ({
   EntryScreen: () => <div data-testid="entry-screen" />,
@@ -42,31 +65,6 @@ vi.mock('@/lib/player-watchlist-repository', () => ({
   PlayerWatchlistRepositoryContext: { Provider: ({ children }: { children: React.ReactNode }) => <>{children}</> },
   LocalStoragePlayerWatchlistRepository: class {},
 }));
-
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import React from 'react';
-import { Route, Routes, useSearchParams } from 'react-router-dom';
-import { Navigate } from 'react-router-dom';
-
-import { useCurrentUser } from '@/auth/AuthContext';
-import { ProtectedRoute } from '@/auth/ProtectedRoute';
-import { useMyTeam } from '@/lib/my-team/MyTeamContext';
-import {
-  EntryScreen,
-  ForgotPasswordScreen,
-  GameweekReviewScreen,
-  LeagueStandingsScreen,
-  MyStatsScreen,
-  PlayerWatchlistScreen,
-  ResetPasswordScreen,
-  SignInScreen,
-  SignUpScreen,
-  SquadScreen,
-  TeamOfTheWeekScreen,
-  TopPlayersScreen,
-  TransferScreen,
-  WatchlistScreen,
-} from '@/screens';
 
 function AuthAndTeamProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useCurrentUser();

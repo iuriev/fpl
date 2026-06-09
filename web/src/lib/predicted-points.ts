@@ -92,5 +92,5 @@ export function buildPreviewPlayerRows(
         prediction,
       };
     })
-    .filter((row): row is PredictedPointsRowData => row !== null);
+    .filter((row): row is NonNullable<typeof row> => row !== null);
 }

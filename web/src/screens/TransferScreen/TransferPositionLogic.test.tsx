@@ -16,7 +16,7 @@ const ZERO_STATS: SquadPlayer['stats'] = {
 
 function makePlayer(id: number, name: string, position: SquadPlayer['position']): SquadPlayer {
   return {
-    id, name, position, club: 'TST', teamCode: 1, teamId: 1, nowCost: 50, points: 0,
+    id, fplCode: id, name, position, club: 'TST', teamCode: 1, teamId: 1, nowCost: 50, points: 0,
     isCaptain: false, isViceCaptain: false, status: 'a', chanceOfPlaying: null, news: '',
     stats: ZERO_STATS,
   };
@@ -41,17 +41,21 @@ const SQUAD_DATA: SquadResponse = {
 };
 
 const POOL_PLAYERS: PoolPlayer[] = [
-  { id: 1, webName: 'Hart', firstName: 'H', lastName: 'T', team: 1, teamCode: 1, teamShortName: 'TST', position: 'GK', nowCost: 50, totalPoints: 0, eventPoints: 0, status: 'a', chanceOfPlaying: null, news: '', selectedByPercent: '10', expectedPoints: '5.0', form: '5.0', nextFixtures: [] },
-  { id: 2, webName: 'Walker', firstName: 'K', lastName: 'W', team: 1, teamCode: 1, teamShortName: 'TST', position: 'DEF', nowCost: 50, totalPoints: 0, eventPoints: 0, status: 'a', chanceOfPlaying: null, news: '', selectedByPercent: '10', expectedPoints: '5.0', form: '5.0', nextFixtures: [] },
-  { id: 3, webName: 'Saka', firstName: 'B', lastName: 'S', team: 1, teamCode: 1, teamShortName: 'TST', position: 'MID', nowCost: 50, totalPoints: 0, eventPoints: 0, status: 'a', chanceOfPlaying: null, news: '', selectedByPercent: '10', expectedPoints: '5.0', form: '5.0', nextFixtures: [] },
-  { id: 4, webName: 'Gabriel', firstName: 'G', lastName: 'M', team: 1, teamCode: 1, teamShortName: 'TST', position: 'DEF', nowCost: 50, totalPoints: 0, eventPoints: 0, status: 'a', chanceOfPlaying: null, news: '', selectedByPercent: '10', expectedPoints: '5.0', form: '5.0', nextFixtures: [] },
-  { id: 5, webName: 'Salah', firstName: 'M', lastName: 'S', team: 1, teamCode: 1, teamShortName: 'TST', position: 'MID', nowCost: 50, totalPoints: 0, eventPoints: 0, status: 'a', chanceOfPlaying: null, news: '', selectedByPercent: '10', expectedPoints: '5.0', form: '5.0', nextFixtures: [] },
+  { id: 1, code: 1, webName: 'Hart', firstName: 'H', lastName: 'T', team: 1, teamCode: 1, teamShortName: 'TST', position: 'GK', nowCost: 50, totalPoints: 0, eventPoints: 0, status: 'a', chanceOfPlaying: null, news: '', selectedByPercent: '10', expectedPoints: '5.0', form: '5.0', nextFixtures: [] },
+  { id: 2, code: 2, webName: 'Walker', firstName: 'K', lastName: 'W', team: 1, teamCode: 1, teamShortName: 'TST', position: 'DEF', nowCost: 50, totalPoints: 0, eventPoints: 0, status: 'a', chanceOfPlaying: null, news: '', selectedByPercent: '10', expectedPoints: '5.0', form: '5.0', nextFixtures: [] },
+  { id: 3, code: 3, webName: 'Saka', firstName: 'B', lastName: 'S', team: 1, teamCode: 1, teamShortName: 'TST', position: 'MID', nowCost: 50, totalPoints: 0, eventPoints: 0, status: 'a', chanceOfPlaying: null, news: '', selectedByPercent: '10', expectedPoints: '5.0', form: '5.0', nextFixtures: [] },
+  { id: 4, code: 4, webName: 'Gabriel', firstName: 'G', lastName: 'M', team: 1, teamCode: 1, teamShortName: 'TST', position: 'DEF', nowCost: 50, totalPoints: 0, eventPoints: 0, status: 'a', chanceOfPlaying: null, news: '', selectedByPercent: '10', expectedPoints: '5.0', form: '5.0', nextFixtures: [] },
+  { id: 5, code: 5, webName: 'Salah', firstName: 'M', lastName: 'S', team: 1, teamCode: 1, teamShortName: 'TST', position: 'MID', nowCost: 50, totalPoints: 0, eventPoints: 0, status: 'a', chanceOfPlaying: null, news: '', selectedByPercent: '10', expectedPoints: '5.0', form: '5.0', nextFixtures: [] },
 ];
 
 const mockState = {
   squad: SQUAD_DATA,
   pool: { players: POOL_PLAYERS },
 };
+
+vi.mock('@/lib/use-premium-status', () => ({
+  usePremiumStatus: vi.fn(() => false),
+}));
 
 vi.mock('@/lib/premium-upsell/PremiumUpsellContext', () => ({
   useRequestPremiumUpsell: () => vi.fn(),

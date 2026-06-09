@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { isLineupsSeedOnStartEnabled, maybeRunLineupsSeedOnStart } from './lineups-seed-on-start';
+
 const { spawnMock } = vi.hoisted(() => ({
   spawnMock: vi.fn(),
 }));
@@ -7,8 +9,6 @@ const { spawnMock } = vi.hoisted(() => ({
 vi.mock('node:child_process', () => ({
   spawn: spawnMock,
 }));
-
-import { isLineupsSeedOnStartEnabled, maybeRunLineupsSeedOnStart } from './lineups-seed-on-start';
 
 describe('lineups-seed-on-start', () => {
   afterEach(() => {

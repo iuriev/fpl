@@ -1,6 +1,11 @@
 import { Hono } from 'hono';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { auth } from './auth/auth';
+import { db } from './db/client';
+import { predictionRoutes } from './prediction-routes';
+import * as predictionService from './prediction-service';
+
 vi.mock('./auth/auth', () => ({
   auth: { api: { getSession: vi.fn() }, handler: vi.fn() },
 }));
@@ -25,11 +30,6 @@ vi.mock('./prediction-service', () => ({
     byXGoals: { FWD: [], MID: [], DEF: [] },
   })),
 }));
-
-import { auth } from './auth/auth';
-import { db } from './db/client';
-import { predictionRoutes } from './prediction-routes';
-import * as predictionService from './prediction-service';
 
 const app = new Hono().route('/api', predictionRoutes);
 

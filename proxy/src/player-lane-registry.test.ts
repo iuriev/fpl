@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { assignPlayersToSlots, getSlotLanes } from './player-lane-registry';
+
 vi.mock('./data/player-lanes.json', () => ({
   default: { '100': 'L', '101': 'C', '102': 'C', '103': 'R' },
 }));
@@ -29,8 +31,6 @@ vi.mock('./data/player-tactical-roles.json', () => ({
     '214': { role: 'cb', lane: 'C', secondary: [] },
   },
 }));
-
-import { assignPlayersToSlots, getSlotLanes } from './player-lane-registry';
 
 describe('player-lane-registry', () => {
   it('returns 4-def slot template L-C-C-R', () => {

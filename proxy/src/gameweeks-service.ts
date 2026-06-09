@@ -1,6 +1,5 @@
 import { db } from './db/client';
 import { getOrFetchBootstrap } from './fpl-cache/db-cache';
-import { deriveSeason } from './fpl-cache/season';
 import { resolveNextGw } from './resolve-next-gw';
 import type { GameweeksResponse } from './types';
 

@@ -43,11 +43,17 @@ const POSITION_ORDER: PlayerPosition[] = ['GK', 'DEF', 'MID', 'FWD'];
 
 export function augmentPoolWithSuggested(
   pool: PoolPlayer[],
-  suggested: Array<{ id: number; position: PlayerPosition; nowCost: number }>
+  suggested: Array<{ id: number; position: PlayerPosition; nowCost: number; xPts?: number }>
 ): PoolPlayer[] {
   const byId = new Map(pool.map((p) => [p.id, p]));
   for (const s of suggested) {
-    if (byId.has(s.id)) continue;
+    const existing = byId.get(s.id);
+    if (existing) {
+      if (s.xPts != null) {
+        byId.set(s.id, { ...existing, expectedPoints: s.xPts.toFixed(1) });
+      }
+      continue;
+    }
     byId.set(s.id, {
       id: s.id,
       code: 0,
@@ -65,7 +71,7 @@ export function augmentPoolWithSuggested(
       chanceOfPlaying: null,
       news: '',
       selectedByPercent: '0',
-      expectedPoints: '0',
+      expectedPoints: s.xPts != null ? s.xPts.toFixed(1) : '0',
       form: '0',
       nextFixtures: [],
     });
@@ -151,43 +157,28 @@ export function applySwapsToSquad(
 export function buildFreeHitSubs(
   squadAfterSwaps: SquadPlayer[],
   targetOrderedSquad: number[],
-  startersCount: number
+  _startersCount: number
 ): SubSwap[] {
-  const targetStarters = new Set(targetOrderedSquad.slice(0, startersCount));
-  const subs: SubSwap[] = [];
+
+  if (squadAfterSwaps.length !== 15 || targetOrderedSquad.length !== 15) return [];
+  return buildFreeHitOrderSubs(squadAfterSwaps, targetOrderedSquad);
+}
+
+export function buildFreeHitOrderSubs(
+  squadAfterSwaps: SquadPlayer[],
+  targetOrderedSquad: number[]
+): SubSwap[] {
+  if (squadAfterSwaps.length !== 15 || targetOrderedSquad.length !== 15) return [];
+
   const working = squadAfterSwaps.map((p) => ({ ...p }));
+  const subs: SubSwap[] = [];
 
-  const swapSlots = (fieldId: number, benchId: number): void => {
-    const fi = working.findIndex((p) => p.id === fieldId);
-    const bi = working.findIndex((p) => p.id === benchId);
-    if (fi === -1 || bi === -1) return;
-    [working[fi], working[bi]] = [working[bi], working[fi]];
-  };
-
-  for (let guard = 0; guard < 20; guard++) {
-    const starters = working.slice(0, startersCount);
-    const bench = working.slice(startersCount);
-    const wrongOnField = starters.filter((p) => !targetStarters.has(p.id));
-    const wrongOnBench = bench.filter((p) => targetStarters.has(p.id));
-    if (wrongOnField.length === 0) break;
-
-    let madeSub = false;
-    for (const field of wrongOnField) {
-      for (const benchPlayer of wrongOnBench) {
-        const trialStarters = starters.map((p) => {
-          if (p.id === field.id) return benchPlayer;
-          if (p.id === benchPlayer.id) return field;
-          return p;
-        });
-        if (!isFormationValid(trialStarters)) continue;
-        subs.push({ fieldId: field.id, benchId: benchPlayer.id });
-        swapSlots(field.id, benchPlayer.id);
-        madeSub = true;
-        break;
-      }
-      if (madeSub) break;
-    }
-    if (!madeSub) break;
+  for (let i = 0; i < 15; i++) {
+    if (working[i].id === targetOrderedSquad[i]) continue;
+    const j = working.findIndex((p) => p.id === targetOrderedSquad[i]);
+    if (j === -1) return subs;
+    subs.push({ fieldId: working[i].id, benchId: working[j].id });
+    [working[i], working[j]] = [working[j], working[i]];
   }
 
   return subs;

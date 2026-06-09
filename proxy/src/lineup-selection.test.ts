@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { pickLineWithRoleQuotas } from './lineup-selection';
+
 vi.mock('./player-tactical-role', async (importOriginal) => {
   const actual = await importOriginal<typeof import('./player-tactical-role')>();
   const primary: Record<number, string> = {
@@ -28,8 +30,6 @@ vi.mock('./player-tactical-role', async (importOriginal) => {
   };
 });
 
-import { pickLineWithRoleQuotas } from './lineup-selection';
-
 function el(id: number, code: number) {
   return {
     el: {
@@ -55,6 +55,8 @@ function el(id: number, code: number) {
       cost_change_event: 0,
       cost_change_start: 0,
       transfers_in_event: 0,
+      transfers_out_event: 0,
+      price_change_percent: '0',
     },
     startScore: id / 10,
   };
