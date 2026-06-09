@@ -81,6 +81,7 @@ describe('prefetchMissingGwData', () => {
   });
 
   it('continues after individual fetch errors', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const events = makeBootstrapEvents(2);
     vi.mocked(fplClient.getLive).mockRejectedValueOnce(new Error('FPL API error'));
     vi.mocked(fplClient.getLive).mockResolvedValue(mockLive as never);
@@ -92,6 +93,7 @@ describe('prefetchMissingGwData', () => {
     await fetchPromise;
 
     expect(fplClient.getLive).toHaveBeenCalledTimes(2);
+    errorSpy.mockRestore();
   });
 });
 

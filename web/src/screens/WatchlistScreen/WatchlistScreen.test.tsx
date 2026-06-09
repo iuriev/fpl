@@ -101,12 +101,18 @@ describe('WatchlistScreen', () => {
 
   it('shows add input and Follow button', async () => {
     renderScreen();
+    await waitFor(() => {
+      expect(screen.getByText(/0\/2 following/i)).toBeInTheDocument();
+    });
     expect(screen.getByPlaceholderText(/enter team id/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /follow/i })).toBeInTheDocument();
   });
 
   it('shows From My Leagues section', async () => {
     renderScreen();
+    await waitFor(() => {
+      expect(screen.getByText(/0\/2 following/i)).toBeInTheDocument();
+    });
     expect(screen.getByText(/from my leagues/i)).toBeInTheDocument();
   });
 

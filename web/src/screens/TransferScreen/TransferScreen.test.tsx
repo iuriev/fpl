@@ -214,8 +214,11 @@ describe('TransferScreen', () => {
     });
   });
 
-  it('does not request premium upsell without squad', () => {
+  it('does not request premium upsell without squad', async () => {
     renderScreen();
+    await waitFor(() => {
+      expect(screen.getByText('Transfers')).toBeInTheDocument();
+    });
     expect(mockRequestPremiumUpsell).not.toHaveBeenCalled();
   });
 
@@ -322,13 +325,18 @@ describe('TransferScreen help tour', () => {
 
   it('does not start the tour automatically even if not seen', async () => {
     renderScreen();
-    // Should NOT find Chip Badges automatically anymore
+    await waitFor(() => {
+      expect(screen.getByText('Transfers')).toBeInTheDocument();
+    });
     expect(screen.queryByText('Chip Badges')).not.toBeInTheDocument();
   });
 
   it('does not start the tour if already seen', async () => {
     localStorage.setItem('fpl_tour_seen_transfer_v1', 'true');
     renderScreen();
+    await waitFor(() => {
+      expect(screen.getByText('Transfers')).toBeInTheDocument();
+    });
     expect(screen.queryByText('Chip Badges')).not.toBeInTheDocument();
   });
 
