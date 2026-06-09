@@ -276,7 +276,7 @@ Useful for long-term planning — build a shortlist without committing a transfe
 |----|------|--------|-----|
 | ~~PRED-06~~ | ~~FPL Price Change Predictions table~~ | M | ✅ Done — Tonight tab on `/price-changes` (OpenSpec `ana-03-pred-06-price-changes`). |
 | ~~PRED-05~~ | ~~Clean sheet probability & xG/xA market screen (per-team stats)~~ | M | ✅ Done — `/market`; CS% and xG panels, DGW aggregation, free top-5 + upsell; OpenSpec `archive/2026-06-07-pred-05-cs-xg-market-screen`. |
-| PRED-07 | Predicted goals & assists screen | M | Complement to PRED-05; popular FPL decision-making tool. PRED-09 production API shipped — ready to implement. |
+| ~~PRED-07~~ | ~~Predicted goals & assists screen~~ | M | ✅ Done. |
 | ~~PRED-08~~ | ~~Predicted lineups for all 20 PL teams~~ | L | ✅ Done — `/predicted-lineups`; premium-only; FPL formation inference + Transfermarkt flank registry; background warmup (OpenSpec `archive/2026-06-04-pred-08-predicted-lineups`, `archive/2026-06-08-pred-08-lineups-warmup`, `archive/2026-06-08-pred-10-transfermarkt-tactical-positions`). |
 | ~~PRED-10~~ | ~~Transfermarkt tactical positions (offline ingest)~~ | M | ✅ Done — `player-tactical-roles.json` from TM ingest CLI; heuristic seed retired (OpenSpec `archive/2026-06-08-pred-10-transfermarkt-tactical-positions`). |
 | ~~PRED-02~~ | ~~Predicted points list screen (free: top 3, locked: rest)~~ | M | ✅ Done — `/predicted-points`; GK/DEF/MID/FWD tabs sorted by `ep_next`; free top-3 + blur+upsell; premium progressive load. Upgrade to PRED-09 model `xPts` via `GET /api/predictions` (API shipped). |
@@ -369,7 +369,7 @@ Note: legal check needed before public launch.
 
 | ID | Task | Effort | Why |
 |----|------|--------|-----|
-| CHIP-03 | Free Hit "best squad" assistant | L | Need xPts data + optimisation logic. High value in double-GW weeks. |
+| ~~CHIP-03~~ | ~~Free Hit "best squad" assistant~~ | L | ✅ Done. |
 | CHIP-04 | Wildcard recommendation (next 5 GWs FDR analysis) | L | Most asked FPL question: "should I wildcard now?" |
 | CHIP-05 | Triple Captain recommendation | M | Straightforward: rank players by xPts × FDR for each GW. |
 | CHIP-06 | Bench Boost recommendation | M | Similar to TC but sum of bench 4 players' xPts. |
@@ -426,7 +426,7 @@ Reference: fpl.team Transfer Solver.
 | ID | Task | Effort | Why |
 |----|------|--------|-----|
 | ~~FIX-02~~ | ~~Full-season Fixtures Calendar (FDR heatmap, DGW/BGW, Recovery views)~~ | L | ✅ Done — `/fixtures` screen; 5 tabs (Official/Overall/Defensive/Attacking/Rest Days); DGW/BGW detection; 12h cache. OpenSpec `2026-06-04-fix-02-fixtures-calendar`. |
-| APP-01 | About page | S | Builds trust. Needed before wider launch. |
+| ~~APP-01~~ | ~~About page~~ | S | ✅ Done. |
 
 ### Feature details
 

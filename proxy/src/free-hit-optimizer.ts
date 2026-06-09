@@ -15,9 +15,6 @@ export interface FreeHitResult {
   selectedCost: number;
 }
 
-const POSITIONS: PlayerPosition[] = ['GK', 'DEF', 'MID', 'FWD'];
-
-// All valid outfield formations: [DEF, MID, FWD] summing to 10
 const VALID_OUTFIELD_FORMATIONS: Array<[number, number, number]> = [
   [3, 5, 2],
   [3, 4, 3],
@@ -29,18 +26,7 @@ const VALID_OUTFIELD_FORMATIONS: Array<[number, number, number]> = [
   [5, 2, 3],
 ];
 
-function minCostByPosition(players: OptimizerPlayer[]): Record<PlayerPosition, number> {
-  const mins: Record<PlayerPosition, number> = { GK: 0, DEF: 0, MID: 0, FWD: 0 };
-  for (const pos of POSITIONS) {
-    const costs = players.filter((p) => p.position === pos).map((p) => p.nowCost);
-    mins[pos] = costs.length > 0 ? Math.min(...costs) : 0;
-  }
-  return mins;
-}
-
-function pickBestFormation(
-  squad: OptimizerPlayer[],
-): { starters: OptimizerPlayer[]; bench: OptimizerPlayer[] } {
+function pickBestFormation(squad: OptimizerPlayer[]): { starters: OptimizerPlayer[] } {
   const gk = squad.filter((p) => p.position === 'GK').sort((a, b) => b.xPts - a.xPts);
   const defs = squad.filter((p) => p.position === 'DEF').sort((a, b) => b.xPts - a.xPts);
   const mids = squad.filter((p) => p.position === 'MID').sort((a, b) => b.xPts - a.xPts);
@@ -58,10 +44,7 @@ function pickBestFormation(
       bestStarters = candidates;
     }
   }
-
-  const starterIds = new Set(bestStarters.map((p) => p.id));
-  const bench = squad.filter((p) => !starterIds.has(p.id));
-  return { starters: bestStarters, bench };
+  return { starters: bestStarters };
 }
 
 export function optimizeFreeHit(
@@ -69,131 +52,163 @@ export function optimizeFreeHit(
   players: OptimizerPlayer[],
   targetGw: number,
 ): FreeHitResult {
-  const sortedByXPts = [...players].sort((a, b) => b.xPts - a.xPts);
-  const sortedByCost = [...players].sort((a, b) => a.nowCost - b.nowCost);
-  const gkByCost = sortedByCost.filter((p) => p.position === 'GK');
-  const gkByXPts = [...players].filter((p) => p.position === 'GK').sort((a, b) => b.xPts - a.xPts);
-  const outfieldByCost = sortedByCost.filter((p) => p.position !== 'GK');
+  const byXPts = [...players].sort((a, b) => b.xPts - a.xPts);
+  const byCost = [...players].sort((a, b) => a.nowCost - b.nowCost);
+  const gkByCost = byCost.filter((p) => p.position === 'GK');
+  const outfieldByCost = byCost.filter((p) => p.position !== 'GK');
 
-  // Minimum cost to fill 10 outfield starter slots (cheapest 10 outfield players)
-  const min10OutfieldCost = outfieldByCost.slice(0, 10).reduce((s, p) => s + p.nowCost, 0);
-
-  // Reserve enough budget for 4 bench slots: cheapest GK + 3 cheapest outfield
-  const minBenchCost =
+  // ── Step 1: Reserve minimum bench budget ───────────────────────────────────
+  // Bench = 1 cheapest GK + 3 cheapest outfield (positions TBD after starters)
+  const benchReserve =
     (gkByCost[0]?.nowCost ?? 0) +
     (outfieldByCost[0]?.nowCost ?? 0) +
     (outfieldByCost[1]?.nowCost ?? 0) +
     (outfieldByCost[2]?.nowCost ?? 0);
 
-  const mins = minCostByPosition(players);
+  const minN = (pos: PlayerPosition, n: number): number =>
+    byCost.filter((p) => p.position === pos).slice(0, n).reduce((s, p) => s + p.nowCost, 0);
+  const minOutN = (n: number): number =>
+    outfieldByCost.slice(0, n).reduce((s, p) => s + p.nowCost, 0);
 
-  // Slot caps for the 11-player starting XI
-  const remaining: Record<PlayerPosition, number> = { GK: 1, DEF: 5, MID: 5, FWD: 3 };
+  let budget = totalBudget;
+  const selected = new Set<number>();
   const starters: OptimizerPlayer[] = [];
-  const selectedIds = new Set<number>();
   const clubCounts = new Map<number, number>();
-  let budgetLeft = totalBudget;
 
-  // Phase 0: Pre-select the starting GK — best xPts GK that leaves enough for 10 outfield + bench.
-  // Picking GK first avoids the budget being drained by outfield players, forcing a bad GK.
-  const gkBudget = totalBudget - minBenchCost - min10OutfieldCost;
-  const startingGK = gkByXPts.find(
-    (p) => p.nowCost <= gkBudget && (clubCounts.get(p.teamId) ?? 0) < 3,
-  );
-  if (startingGK) {
-    starters.push(startingGK);
-    selectedIds.add(startingGK.id);
-    budgetLeft -= startingGK.nowCost;
-    remaining['GK'] = 0;
-    clubCounts.set(startingGK.teamId, (clubCounts.get(startingGK.teamId) ?? 0) + 1);
-  }
-
-  // Phase 1: Greedy outfield starters — maximise xPts, leaving bench budget untouched
-  for (const player of sortedByXPts) {
-    if (starters.length === 11) break;
-    const pos = player.position;
-    if (pos === 'GK') continue; // already filled
-    if (remaining[pos] === 0) continue;
-    if ((clubCounts.get(player.teamId) ?? 0) >= 3) continue;
-
-    const slotsAfter = { ...remaining, [pos]: remaining[pos] - 1 };
-    const starterReserve = POSITIONS.reduce((s, p) => s + mins[p] * slotsAfter[p], 0);
-    if (player.nowCost > budgetLeft - starterReserve - minBenchCost) continue;
-
-    starters.push(player);
-    selectedIds.add(player.id);
-    budgetLeft -= player.nowCost;
-    remaining[pos] -= 1;
-    clubCounts.set(player.teamId, (clubCounts.get(player.teamId) ?? 0) + 1);
-  }
-
-  // Phase 1b: Fallback — fill any remaining starter slots with cheapest valid
-  for (const pos of POSITIONS) {
-    if (pos === 'GK' && remaining['GK'] === 0) continue;
-    const candidates = sortedByCost.filter(
-      (p) => p.position === pos && !selectedIds.has(p.id) && (clubCounts.get(p.teamId) ?? 0) < 3,
-    );
-    for (const p of candidates) {
-      if (remaining[pos] === 0) break;
-      if (p.nowCost > budgetLeft - minBenchCost) break;
+  // ── Step 2: Build starting XI spine ───────────────────────────────────────
+  // Order: FWD(2) → MID(3) → DEF(3) → GK(1) → flex(2, best remaining outfield)
+  // Each step reserves minimums for all subsequent steps + bench.
+  const pickN = (pos: PlayerPosition, n: number, subsequentReserve: number): void => {
+    let cnt = 0;
+    for (const p of byXPts) {
+      if (cnt === n) break;
+      if (p.position !== pos || selected.has(p.id)) continue;
+      if ((clubCounts.get(p.teamId) ?? 0) >= 3) continue;
+      if (p.nowCost > budget - subsequentReserve - benchReserve) continue;
       starters.push(p);
-      selectedIds.add(p.id);
-      budgetLeft -= p.nowCost;
-      remaining[pos] -= 1;
+      selected.add(p.id);
+      budget -= p.nowCost;
       clubCounts.set(p.teamId, (clubCounts.get(p.teamId) ?? 0) + 1);
+      cnt++;
+    }
+  };
+
+  pickN('FWD', 2, minN('MID', 3) + minN('DEF', 3) + minN('GK', 1) + minOutN(2));
+  pickN('MID', 3, minN('DEF', 3) + minN('GK', 1) + minOutN(2));
+  pickN('DEF', 3, minN('GK', 1) + minOutN(2));
+  pickN('GK', 1, minOutN(2));
+
+  // Flex: 2 best remaining outfield, respecting squad slot limits (DEF≤2, MID≤2, FWD≤1)
+  const flexSlots = { DEF: 2, MID: 2, FWD: 1 };
+  let flexCnt = 0;
+  for (const p of byXPts) {
+    if (flexCnt === 2) break;
+    if (p.position === 'GK' || selected.has(p.id)) continue;
+    if ((clubCounts.get(p.teamId) ?? 0) >= 3) continue;
+    if ((flexSlots[p.position] ?? 0) === 0) continue;
+    if (p.nowCost > budget - benchReserve) continue;
+    starters.push(p);
+    selected.add(p.id);
+    budget -= p.nowCost;
+    clubCounts.set(p.teamId, (clubCounts.get(p.teamId) ?? 0) + 1);
+    flexSlots[p.position]--;
+    flexCnt++;
+  }
+
+  // ── Step 3: 3-round hill-climbing normalization ────────────────────────────
+  // Each round: for every starter try to find a strictly better same-position
+  // player that fits in the available budget. Converges to a local optimum.
+  for (let round = 0; round < 3; round++) {
+    for (let i = 0; i < starters.length; i++) {
+      const cur = starters[i];
+      const avail = budget + cur.nowCost; // budget if cur is removed
+      const upgrade = byXPts.find(
+        (p) =>
+          p.position === cur.position &&
+          !selected.has(p.id) &&
+          p.xPts > cur.xPts &&
+          p.nowCost <= avail &&
+          (clubCounts.get(p.teamId) ?? 0) < 3,
+      );
+      if (!upgrade) continue;
+      selected.delete(cur.id);
+      selected.add(upgrade.id);
+      starters[i] = upgrade;
+      budget = avail - upgrade.nowCost;
+      clubCounts.set(cur.teamId, Math.max(0, (clubCounts.get(cur.teamId) ?? 0) - 1));
+      clubCounts.set(upgrade.teamId, (clubCounts.get(upgrade.teamId) ?? 0) + 1);
     }
   }
 
-  // Phase 2a: Bench GK — cheapest eligible goalkeeper
+  // ── Step 4: Fill bench ─────────────────────────────────────────────────────
+
+  // Bench GK: cheapest eligible goalkeeper
   const benchGK = gkByCost.find(
-    (p) => !selectedIds.has(p.id) && (clubCounts.get(p.teamId) ?? 0) < 3 && p.nowCost <= budgetLeft,
+    (p) => !selected.has(p.id) && (clubCounts.get(p.teamId) ?? 0) < 3 && p.nowCost <= budget,
   );
   if (benchGK) {
-    selectedIds.add(benchGK.id);
-    budgetLeft -= benchGK.nowCost;
+    selected.add(benchGK.id);
+    budget -= benchGK.nowCost;
     clubCounts.set(benchGK.teamId, (clubCounts.get(benchGK.teamId) ?? 0) + 1);
   }
 
-  // Phase 2b: Priority sub (bench slot 1) — highest-xPts outfield within remaining budget
-  // Reserve enough for 2 cheap fillers before committing budget to the priority sub
-  const remainingOutfieldByCost = outfieldByCost.filter(
-    (p) => !selectedIds.has(p.id) && (clubCounts.get(p.teamId) ?? 0) < 3,
+  // Determine bench outfield positions: fill remaining squad slots (5 DEF, 5 MID, 3 FWD total)
+  const startCount: Record<PlayerPosition, number> = { GK: 0, DEF: 0, MID: 0, FWD: 0 };
+  for (const p of starters) startCount[p.position]++;
+  const benchOutfieldSlots: PlayerPosition[] = [];
+  (['DEF', 'MID', 'FWD'] as const).forEach((pos) => {
+    const total = pos === 'FWD' ? 3 : 5;
+    for (let i = startCount[pos]; i < total; i++) benchOutfieldSlots.push(pos);
+  });
+
+  // Priority sub (bench slot 1): highest-xPts eligible player for any bench outfield position.
+  // Reserve minimum for remaining filler slots before committing to priority sub budget.
+  const fillerReserve = outfieldByCost
+    .filter((p) => !selected.has(p.id) && (clubCounts.get(p.teamId) ?? 0) < 3)
+    .slice(0, benchOutfieldSlots.length - 1)
+    .reduce((s, p) => s + p.nowCost, 0);
+
+  const prioritySub = byXPts.find(
+    (p) =>
+      p.position !== 'GK' &&
+      !selected.has(p.id) &&
+      (clubCounts.get(p.teamId) ?? 0) < 3 &&
+      benchOutfieldSlots.includes(p.position) &&
+      p.nowCost <= budget - fillerReserve,
   );
-  const minFiller1 = remainingOutfieldByCost[0]?.nowCost ?? 0;
-  const minFiller2 = remainingOutfieldByCost[1]?.nowCost ?? 0;
-
-  const prioritySub = [...players]
-    .filter(
-      (p) =>
-        p.position !== 'GK' &&
-        !selectedIds.has(p.id) &&
-        (clubCounts.get(p.teamId) ?? 0) < 3 &&
-        p.nowCost <= budgetLeft - minFiller1 - minFiller2,
-    )
-    .sort((a, b) => b.xPts - a.xPts)[0];
-
   if (prioritySub) {
-    selectedIds.add(prioritySub.id);
-    budgetLeft -= prioritySub.nowCost;
+    selected.add(prioritySub.id);
+    budget -= prioritySub.nowCost;
     clubCounts.set(prioritySub.teamId, (clubCounts.get(prioritySub.teamId) ?? 0) + 1);
   }
 
-  // Phase 2c: 2 fillers — cheapest eligible outfield players
+  // Fillers: cheapest eligible player for each remaining bench outfield position
+  const fillerSlots = [...benchOutfieldSlots];
+  if (prioritySub) {
+    const idx = fillerSlots.indexOf(prioritySub.position);
+    if (idx !== -1) fillerSlots.splice(idx, 1);
+  }
   const fillers: OptimizerPlayer[] = [];
-  for (const p of outfieldByCost) {
-    if (fillers.length === 2) break;
-    if (selectedIds.has(p.id) || (clubCounts.get(p.teamId) ?? 0) >= 3) continue;
-    if (p.nowCost > budgetLeft) break;
-    fillers.push(p);
-    selectedIds.add(p.id);
-    budgetLeft -= p.nowCost;
-    clubCounts.set(p.teamId, (clubCounts.get(p.teamId) ?? 0) + 1);
+  for (const pos of fillerSlots) {
+    const filler = outfieldByCost.find(
+      (p) =>
+        p.position === pos &&
+        !selected.has(p.id) &&
+        (clubCounts.get(p.teamId) ?? 0) < 3 &&
+        p.nowCost <= budget,
+    );
+    if (!filler) continue;
+    fillers.push(filler);
+    selected.add(filler.id);
+    budget -= filler.nowCost;
+    clubCounts.set(filler.teamId, (clubCounts.get(filler.teamId) ?? 0) + 1);
   }
 
-  // Build ordered squad: starters (GK, DEF..., MID..., FWD...) | benchGK | prioritySub | filler1 | filler2
+  // ── Step 5: Build ordered squad ────────────────────────────────────────────
+  // starters ordered as [GK, DEF..., MID..., FWD...] by best formation
+  // bench ordered as [benchGK, prioritySub, filler1, filler2]
   const { starters: orderedStarters } = pickBestFormation(starters);
   const totalXPts = orderedStarters.reduce((sum, p) => sum + p.xPts, 0);
-
   const orderedSquad = [
     ...orderedStarters.map((p) => p.id),
     ...(benchGK ? [benchGK.id] : []),
@@ -201,6 +216,6 @@ export function optimizeFreeHit(
     ...fillers.map((p) => p.id),
   ];
 
-  const selectedCost = totalBudget - budgetLeft;
+  const selectedCost = totalBudget - budget;
   return { orderedSquad, totalXPts, targetGw, selectedCost };
 }

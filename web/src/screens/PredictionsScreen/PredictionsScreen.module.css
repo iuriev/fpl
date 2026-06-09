@@ -34,6 +34,11 @@
   text-align: center;
 }
 
+.tab:focus-visible {
+  outline: none;
+  border-bottom-color: var(--fpl-accent);
+}
+
 .tab:hover {
   color: var(--fpl-text-soft);
 }

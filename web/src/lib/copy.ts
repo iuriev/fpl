@@ -281,7 +281,7 @@ export const copy = {
   predictionsNavLink: 'Predictions with AI',
   predictionsTitle: 'Predictions with AI',
   predictionsGwLabel: 'GW {n}',
-  predictionsTabPoints: 'FPL points',
+  predictionsTabPoints: 'Points',
   predictionsTabLineups: 'Lineups',
   predictionsTabXG: 'xG',
   predictionsTabXA: 'xA',

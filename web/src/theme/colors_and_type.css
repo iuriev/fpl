@@ -179,6 +179,37 @@ body {
   --fpl-radius-xl3: 1.125rem;
   --fpl-radius-pill: 9999px;
 
+  /* ── semantic aliases ───────────────────────────────────────────── */
+  --fpl-r-sm: var(--fpl-radius-sm);
+  --fpl-r-md: var(--fpl-radius-md);
+  --fpl-radius-full: var(--fpl-radius-pill);
+
+  --fpl-text-primary: var(--fpl-text);
+  --fpl-text-secondary: var(--fpl-text-soft);
+  --fpl-border: var(--fpl-bg-hair);
+  --fpl-bg-panel: var(--fpl-bg-card);
+  --fpl-bg-raised: var(--fpl-bg-soft);
+  --fpl-surface-2: var(--fpl-bg-soft);
+
+  --fpl-font-body: var(--fpl-font-display);
+  --fpl-fs-caption: var(--fpl-fs-cap);
+  --fpl-fs-label: var(--fpl-fs-body-xs);
+  --fpl-tr-label: var(--fpl-tr-cap-m);
+
+  --fpl-positive: var(--fpl-accent);
+  --fpl-positive-bg: var(--fpl-accent-faint);
+  --fpl-negative: var(--fpl-error);
+  --fpl-cyan: var(--fpl-sub-target);
+
+  --fpl-accent-subtle: var(--fpl-accent-faint);
+  --fpl-accent-border: rgba(0, 255, 135, 0.3);
+  --fpl-accent-warm: var(--fpl-accent);
+  --fpl-success-soft: var(--fpl-accent-faint);
+
+  --fpl-fdr-1: var(--fpl-fdr-1-ink);
+  --fpl-fdr-2: var(--fpl-fdr-2-bg);
+  --fpl-fdr-5: var(--fpl-fdr-5-ink);
+
   /* ── elevation ──────────────────────────────────────────────────── */
   --fpl-shadow-pill-soft: 0 2px 6px rgba(0, 0, 0, 0.35);
   --fpl-shadow-pill-firm: 0 2px 6px rgba(0, 0, 0, 0.45);
