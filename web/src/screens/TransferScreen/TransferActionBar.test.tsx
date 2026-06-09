@@ -48,31 +48,17 @@ describe('TransferActionBar', () => {
     expect(screen.getByText(copy.aiWildcardButton)).toBeDisabled();
   });
 
-  it('AI Free Hit triggers upsell for non-premium users', async () => {
+  // Gates are off by default (VITE_AI_FREEHIT_GATES_ENABLED=false in test env)
+  it('AI Free Hit is always active when gates disabled (default)', async () => {
     mockIsPremium = false;
     const user = userEvent.setup();
-    render(<TransferActionBar {...defaultProps} />);
-    await user.click(screen.getByText(copy.aiFreehitButton));
-    expect(mockRequestPremiumUpsell).toHaveBeenCalledWith('transfer');
-    expect(defaultProps.onAiFreeHit).not.toHaveBeenCalled();
-  });
-
-  it('AI Free Hit calls onAiFreeHit for premium users when available', async () => {
-    mockIsPremium = true;
-    const user = userEvent.setup();
-    render(<TransferActionBar {...defaultProps} freehitAvailable={true} />);
+    render(<TransferActionBar {...defaultProps} freehitAvailable={false} />);
     await user.click(screen.getByText(copy.aiFreehitButton));
     expect(defaultProps.onAiFreeHit).toHaveBeenCalled();
-  });
-
-  it('AI Free Hit is disabled for premium users when freehit already played', () => {
-    mockIsPremium = true;
-    render(<TransferActionBar {...defaultProps} freehitAvailable={false} />);
-    expect(screen.getByText(copy.aiFreehitButton)).toBeDisabled();
+    expect(mockRequestPremiumUpsell).not.toHaveBeenCalled();
   });
 
   it('AI Free Hit shows loading state', () => {
-    mockIsPremium = true;
     render(<TransferActionBar {...defaultProps} isAiLoading={true} />);
     expect(screen.getByText('…')).toBeDisabled();
   });

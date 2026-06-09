@@ -19,6 +19,8 @@ export interface TransferActionBarProps {
   freehitAvailable: boolean;
 }
 
+const AI_GATES_ENABLED = import.meta.env.VITE_AI_FREEHIT_GATES_ENABLED === 'true';
+
 export const TransferActionBar: React.FC<TransferActionBarProps> = ({
   onOpenTransfers,
   onReset,
@@ -34,12 +36,18 @@ export const TransferActionBar: React.FC<TransferActionBarProps> = ({
   const requestPremiumUpsell = useRequestPremiumUpsell();
 
   const handleAiFreeHit = () => {
-    if (!isPremium) {
+    if (AI_GATES_ENABLED && !isPremium) {
       requestPremiumUpsell('transfer');
       return;
     }
     onAiFreeHit();
   };
+
+  const aiFreehitDisabled =
+    isAiLoading || (AI_GATES_ENABLED && !freehitAvailable);
+
+  const aiFreehitTitle =
+    AI_GATES_ENABLED && !freehitAvailable ? copy.aiFreehitPlayed : undefined;
 
   return (
     <div className={styles.bar} data-tour="step-9">
@@ -58,16 +66,12 @@ export const TransferActionBar: React.FC<TransferActionBarProps> = ({
         <Button
           variant="secondary"
           onClick={handleAiFreeHit}
-          disabled={isAiLoading || (isPremium && !freehitAvailable)}
-          title={isPremium && !freehitAvailable ? copy.aiFreehitPlayed : undefined}
+          disabled={aiFreehitDisabled}
+          title={aiFreehitTitle}
         >
           {isAiLoading ? '…' : copy.aiFreehitButton}
         </Button>
-        <Button
-          variant="secondary"
-          disabled
-          title="Coming soon"
-        >
+        <Button variant="secondary" disabled title="Coming soon">
           {copy.aiWildcardButton}
         </Button>
       </div>

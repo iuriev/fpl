@@ -114,6 +114,30 @@ export async function getBulkFreshElementSummaries(
   return result;
 }
 
+export async function getBulkAllElementSummaries(
+  db: Db,
+  season: string,
+  elementIds: number[]
+): Promise<Map<number, FPLElementSummary>> {
+  if (elementIds.length === 0) return new Map();
+  const rows = await db
+    .select()
+    .from(schema.fplElementSummaryCache)
+    .where(
+      and(
+        eq(schema.fplElementSummaryCache.season, season),
+        inArray(schema.fplElementSummaryCache.elementId, elementIds)
+      )
+    );
+  const result = new Map<number, FPLElementSummary>();
+  for (const row of rows) {
+    const data = row.data as FPLElementSummary;
+    result.set(row.elementId, data);
+    cacheLayer.set(`element-summary:${row.elementId}`, data, ELEMENT_SUMMARY_TTL_SECONDS);
+  }
+  return result;
+}
+
 export async function countFreshSummaries(
   db: Db,
   season: string,
@@ -129,6 +153,24 @@ export async function countFreshSummaries(
         eq(schema.fplElementSummaryCache.season, season),
         inArray(schema.fplElementSummaryCache.elementId, elementIds),
         gt(schema.fplElementSummaryCache.fetchedAt, cutoff)
+      )
+    );
+  return Number(row?.count ?? 0);
+}
+
+export async function countAllSummaries(
+  db: Db,
+  season: string,
+  elementIds: number[]
+): Promise<number> {
+  if (elementIds.length === 0) return 0;
+  const [row] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(schema.fplElementSummaryCache)
+    .where(
+      and(
+        eq(schema.fplElementSummaryCache.season, season),
+        inArray(schema.fplElementSummaryCache.elementId, elementIds)
       )
     );
   return Number(row?.count ?? 0);

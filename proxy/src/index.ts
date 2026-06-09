@@ -172,51 +172,6 @@ app.get('/api/entry/:teamId/history', async (c) => {
   }
 });
 
-// GET /api/squad/:teamId/:gw
-app.get('/api/squad/:teamId/:gw', optionalUser, async (c) => {
-  try {
-    const teamId = parseInt(c.req.param('teamId'), 10);
-    const gw = parseInt(c.req.param('gw'), 10);
-
-    if (isNaN(teamId) || teamId <= 0 || isNaN(gw) || gw < 1 || gw > MAX_GAMEWEEK) {
-      return c.json({ error: 'Invalid team ID or gameweek' }, { status: 400 });
-    }
-
-    const user = c.var.user;
-    const [result, watchlistedCodes] = await Promise.all([
-      squadService.getSquad(teamId, gw),
-      user ? loadWatchlistedFplCodes(user.id) : Promise.resolve(new Set<number>()),
-    ]);
-
-    const withWatchlist = {
-      ...result,
-      starters: result.starters.map((p) => ({
-        ...p,
-        isWatchlisted: watchlistedCodes.has(p.fplCode),
-      })),
-      bench: result.bench.map((p) => ({
-        ...p,
-        isWatchlisted: watchlistedCodes.has(p.fplCode),
-      })),
-    };
-
-    return c.json(withWatchlist);
-  } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : String(error);
-    if (errorMsg.includes('No picks available')) {
-      return c.json(
-        { error: `No squad available for gameweek ${c.req.param('gw')}` },
-        { status: 404 }
-      );
-    }
-    if (errorMsg.includes('not found')) {
-      return c.json({ error: 'Team or gameweek not found' }, { status: 404 });
-    }
-    console.error('Error fetching squad:', error);
-    return c.json({ error: 'Unable to fetch squad' }, { status: 500 });
-  }
-});
-
 // GET /api/squad/:teamId/free-hit-suggest?gw=N
 app.get('/api/squad/:teamId/free-hit-suggest', optionalUser, async (c) => {
   const teamId = parseInt(c.req.param('teamId'), 10);
@@ -293,6 +248,51 @@ app.get('/api/squad/:teamId/free-hit-suggest', optionalUser, async (c) => {
     }
     console.error('Error in free-hit-suggest:', error);
     return c.json({ error: 'Unable to generate free hit suggestion' }, { status: 500 });
+  }
+});
+
+// GET /api/squad/:teamId/:gw
+app.get('/api/squad/:teamId/:gw', optionalUser, async (c) => {
+  try {
+    const teamId = parseInt(c.req.param('teamId'), 10);
+    const gw = parseInt(c.req.param('gw'), 10);
+
+    if (isNaN(teamId) || teamId <= 0 || isNaN(gw) || gw < 1 || gw > MAX_GAMEWEEK) {
+      return c.json({ error: 'Invalid team ID or gameweek' }, { status: 400 });
+    }
+
+    const user = c.var.user;
+    const [result, watchlistedCodes] = await Promise.all([
+      squadService.getSquad(teamId, gw),
+      user ? loadWatchlistedFplCodes(user.id) : Promise.resolve(new Set<number>()),
+    ]);
+
+    const withWatchlist = {
+      ...result,
+      starters: result.starters.map((p) => ({
+        ...p,
+        isWatchlisted: watchlistedCodes.has(p.fplCode),
+      })),
+      bench: result.bench.map((p) => ({
+        ...p,
+        isWatchlisted: watchlistedCodes.has(p.fplCode),
+      })),
+    };
+
+    return c.json(withWatchlist);
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    if (errorMsg.includes('No picks available')) {
+      return c.json(
+        { error: `No squad available for gameweek ${c.req.param('gw')}` },
+        { status: 404 }
+      );
+    }
+    if (errorMsg.includes('not found')) {
+      return c.json({ error: 'Team or gameweek not found' }, { status: 404 });
+    }
+    console.error('Error fetching squad:', error);
+    return c.json({ error: 'Unable to fetch squad' }, { status: 500 });
   }
 });
 

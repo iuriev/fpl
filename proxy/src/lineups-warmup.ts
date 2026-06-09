@@ -5,7 +5,9 @@ import { lineupsWarmupFlagLog } from './flagged-log';
 import { getOrFetchBootstrap } from './fpl-cache/db-cache';
 import { deriveSeason } from './fpl-cache/season';
 import {
+  countAllSummaries,
   countFreshSummaries,
+  getBulkAllElementSummaries,
   getBulkFreshElementSummaries,
   getOrFetchElementSummary,
 } from './fpl-element-summary-cache';
@@ -15,6 +17,7 @@ import {
   hotElementIdsPerTeam,
 } from './lineups-player-sets';
 import * as predictedLineupService from './predicted-lineup-service';
+import { isSeasonComplete } from './prediction/current-season';
 import { isShuttingDown } from './shutdown';
 
 type Db = PostgresJsDatabase<typeof schema>;
@@ -127,6 +130,7 @@ async function warmElementIds(
   season: string,
   ids: number[],
   label: string,
+  seasonComplete: boolean,
   onProgress: (done: number) => void
 ): Promise<void> {
   if (ids.length === 0) {
@@ -134,7 +138,9 @@ async function warmElementIds(
     return;
   }
 
-  const cachedMap = await getBulkFreshElementSummaries(db, season, ids);
+  const cachedMap = seasonComplete
+    ? await getBulkAllElementSummaries(db, season, ids)
+    : await getBulkFreshElementSummaries(db, season, ids);
 
   let done = 0;
   let fetches = 0;
@@ -152,7 +158,10 @@ async function warmElementIds(
     );
   };
 
-  logWarmup(`${label}: warming ${ids.length} players… (${cachedMap.size} in DB, ${ids.length - cachedMap.size} need FPL fetch)`);
+  const fetchNeeded = ids.length - cachedMap.size;
+  logWarmup(
+    `${label}: warming ${ids.length} players… (${cachedMap.size} in DB, ${fetchNeeded} need FPL fetch${seasonComplete ? ', season complete — no TTL applied' : ''})`
+  );
   maybeLogProgress(true);
 
   for (const elementId of ids) {
@@ -212,13 +221,19 @@ export async function runLineupsWarmup(db: Db, onComplete?: () => Promise<void>)
     logWarmup('loading bootstrap for player list');
     const bootstrap = await getOrFetchBootstrap(db);
     const season = deriveSeason(bootstrap.events);
+    const seasonComplete = isSeasonComplete(bootstrap);
+    if (seasonComplete) {
+      logWarmup('season is complete — element summaries will be loaded from DB without TTL check, no FPL fetches unless data is missing');
+    }
     const hotIds = hotElementIdsPerTeam(bootstrap, hotPerTeam());
     const hotSet = new Set(hotIds);
     const coldIds = coldElementIds(bootstrap, hotSet);
 
+    const countSummaries = seasonComplete ? countAllSummaries : countFreshSummaries;
+
     status.hotTotal = hotIds.length;
     logWarmup(`counting cached summaries for ${hotIds.length} hot players…`);
-    status.hotDone = await countFreshSummaries(db, season, hotIds);
+    status.hotDone = await countSummaries(db, season, hotIds);
     const hotCached = status.hotDone;
     status.phase = 'hot';
     const toFetch = hotIds.length - hotCached;
@@ -228,15 +243,15 @@ export async function runLineupsWarmup(db: Db, onComplete?: () => Promise<void>)
     if (toFetch === 0) {
       logWarmup('no FPL element-summary calls needed for hot tier');
     }
-    await warmElementIds(db, season, hotIds, 'hot', (done) => {
+    await warmElementIds(db, season, hotIds, 'hot', seasonComplete, (done) => {
       status.hotDone = done;
     });
     if (isShuttingDown()) return;
 
-    status.hotDone = await countFreshSummaries(db, season, hotIds);
+    status.hotDone = await countSummaries(db, season, hotIds);
 
     status.coldTotal = coldIds.length;
-    status.coldDone = await countFreshSummaries(db, season, coldIds);
+    status.coldDone = await countSummaries(db, season, coldIds);
     status.phase = 'cold';
     const coldCached = status.coldDone;
     const coldToFetch = coldIds.length - coldCached;
@@ -246,12 +261,12 @@ export async function runLineupsWarmup(db: Db, onComplete?: () => Promise<void>)
     if (coldToFetch === 0) {
       logWarmup('no FPL element-summary calls needed for cold tier');
     }
-    await warmElementIds(db, season, coldIds, 'cold', (done) => {
+    await warmElementIds(db, season, coldIds, 'cold', seasonComplete, (done) => {
       status.coldDone = done;
     });
     if (isShuttingDown()) return;
 
-    status.coldDone = await countFreshSummaries(db, season, coldIds);
+    status.coldDone = await countSummaries(db, season, coldIds);
     status.phase = 'lineups';
     logWarmup(
       `phase=lineups (${formatLineupsWarmupStatus()}) — building predicted-lineups cache with hot+cold summaries`
