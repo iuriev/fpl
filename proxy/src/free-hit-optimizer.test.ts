@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { OptimizerPlayer } from './free-hit-optimizer';
-import { optimizeFreeHit } from './free-hit-optimizer';
+import { optimizeFreeHit, resolveFreeHitBudget } from './free-hit-optimizer';
 
 function p(
   id: number,
@@ -48,10 +48,25 @@ function makePool(): OptimizerPlayer[] {
   ];
 }
 
+describe('resolveFreeHitBudget', () => {
+  it('falls back to entry value when selling prices are missing', () => {
+    const budget = resolveFreeHitBudget(
+      {
+        picks: [{ element: 999 }],
+        entry_history: { value: 1001 },
+      },
+      new Map()
+    );
+    expect(budget).toBe(1001);
+  });
+});
+
 describe('optimizeFreeHit', () => {
   it('fills all 15 squad slots', () => {
     const result = optimizeFreeHit(5000, makePool(), 38);
     expect(result.orderedSquad).toHaveLength(15);
+    expect(result.players).toHaveLength(15);
+    expect(result.remainingBudget).toBeGreaterThanOrEqual(0);
   });
 
   it('does not exceed total budget', () => {
@@ -60,6 +75,8 @@ describe('optimizeFreeHit', () => {
     const budget = 1100;
     const result = optimizeFreeHit(budget, pool, 38);
     expect(result.selectedCost).toBeLessThanOrEqual(budget);
+    expect(result.remainingBudget).toBeGreaterThanOrEqual(0);
+    expect(result.totalBudget).toBe(budget);
   });
 
   it('respects max 3 players per club', () => {
@@ -86,6 +103,19 @@ describe('optimizeFreeHit', () => {
     expect(benchGK?.nowCost).toBe(cheapestCost);
   });
 
+  it('bench outfield uses cheapest players, not high-xPts assets', () => {
+    const pool = [
+      ...makePool(),
+      p(40, 'DEF', 6, 75, 8.0),
+      p(41, 'MID', 7, 80, 8.5),
+    ];
+    const result = optimizeFreeHit(5000, pool, 38);
+    const benchOutfieldIds = result.orderedSquad.slice(12, 15);
+    const benchOutfield = benchOutfieldIds.map((id) => pool.find((q) => q.id === id)!);
+    expect(benchOutfield.some((p) => p.id === 40 || p.id === 41)).toBe(false);
+    expect(benchOutfield.every((p) => p.nowCost <= 50)).toBe(true);
+  });
+
   it('starting XI has no duplicate player IDs', () => {
     const result = optimizeFreeHit(5000, makePool(), 38);
     const starterIds = result.orderedSquad.slice(0, 11);
@@ -96,5 +126,48 @@ describe('optimizeFreeHit', () => {
     const result = optimizeFreeHit(5000, makePool(), 38);
     expect(result.totalXPts).toBeGreaterThan(0);
     expect(result.targetGw).toBe(38);
+  });
+
+  it('always fills all 15 squad slots even with tight budget', () => {
+    // Exercises the benchReserve guard in hill-climbing: without it, hill-climbing spends
+    // bench budget on starters, leaving bench slots unfilled and causing bank to go negative
+    // when the frontend keeps existing players at the unfilled positions.
+    // Budget must be high enough for the greedy to build a valid 11-player starters XI
+    // (the test pool has sparse mid-range MIDs, so ~1200 is needed).
+    const pool = makePool();
+    const budget = 1200;
+    const result = optimizeFreeHit(budget, pool, 38);
+    expect(result.orderedSquad).toHaveLength(15);
+    expect(result.selectedCost).toBeLessThanOrEqual(budget);
+  });
+
+  it('falls back to cheapest fifteen when greedy path is incomplete', () => {
+    const pool = makePool().map((p) =>
+      p.id >= 15 && p.id <= 17 ? { ...p, xPts: 0 } : p
+    );
+    const budget = 5000;
+    const result = optimizeFreeHit(budget, pool, 38);
+    expect(result.orderedSquad).toHaveLength(15);
+    expect(result.selectedCost).toBeLessThanOrEqual(budget);
+  });
+
+  it('fills 15 slots when cheap bench players have zero xPts', () => {
+    const pool = makePool().map((p) =>
+      p.id >= 15 && p.id <= 17 ? { ...p, xPts: 0 } : p
+    );
+    const result = optimizeFreeHit(5000, pool, 38);
+    expect(result.orderedSquad).toHaveLength(15);
+    expect(result.remainingBudget).toBeGreaterThanOrEqual(0);
+  });
+
+  it('does not exceed budget when all squad slots are unique', () => {
+    const pool = makePool();
+    const budget = 1000;
+    const result = optimizeFreeHit(budget, pool, 38);
+    const squadCost = result.orderedSquad.reduce((sum, id) => {
+      const player = pool.find((p) => p.id === id);
+      return sum + (player?.nowCost ?? 0);
+    }, 0);
+    expect(squadCost).toBeLessThanOrEqual(budget);
   });
 });

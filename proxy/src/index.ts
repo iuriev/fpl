@@ -17,7 +17,7 @@ import { flaggedError } from './flagged-log';
 import { getOrFetchBootstrap, getOrFetchSquad } from './fpl-cache/db-cache';
 import { prefetchMissingGwData } from './fpl-cache/prefetch';
 import { deriveSeason } from './fpl-cache/season';
-import { optimizeFreeHit } from './free-hit-optimizer';
+import { optimizeFreeHit, resolveFreeHitBudget } from './free-hit-optimizer';
 import * as gameweeksService from './gameweeks-service';
 import * as historyService from './history-service';
 import * as leaderboardService from './leaderboard-service';
@@ -204,9 +204,13 @@ app.get('/api/squad/:teamId/free-hit-suggest', optionalUser, async (c) => {
 
     const picks = await getOrFetchSquad(db, season, teamId, currentGw, bootstrap.events);
 
-    const totalBudget =
-      picks.picks.reduce((sum, p) => sum + p.selling_price, 0) +
-      picks.entry_history.bank;
+    const playerNowCostById = new Map(
+      bootstrap.elements.map((el) => [el.id, el.now_cost] as const)
+    );
+    const totalBudget = resolveFreeHitBudget(picks, playerNowCostById);
+    if (totalBudget <= 0) {
+      return c.json({ error: 'Could not determine squad budget' }, { status: 400 });
+    }
     const predictions = await predictionService.getPredictionsForEvent(targetGw);
     if (!predictions.ready || predictions.players.length === 0) {
       return c.json(
@@ -234,10 +238,23 @@ app.get('/api/squad/:teamId/free-hit-suggest', optionalUser, async (c) => {
         teamId: el.team,
         nowCost: el.now_cost,
         xPts: xPtsMap.get(el.code) ?? 0,
-      }))
-      .filter((p) => p.xPts > 0);
+      }));
 
     const result = optimizeFreeHit(totalBudget, optimizerPlayers, targetGw);
+    if (result.orderedSquad.length !== 15) {
+      console.error(
+        'free-hit-suggest incomplete squad',
+        teamId,
+        targetGw,
+        result.orderedSquad.length,
+        totalBudget,
+        optimizerPlayers.length,
+      );
+      return c.json(
+        { error: 'Could not build a valid 15-player squad within budget' },
+        { status: 400 },
+      );
+    }
     return c.json(result);
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);

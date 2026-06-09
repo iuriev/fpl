@@ -169,6 +169,7 @@ export async function getSquad(teamId: number, gameweek: number): Promise<SquadR
       teamCode: playerData.team_code,
       teamId: playerData.team,
       nowCost: playerData.now_cost,
+      sellPrice: pick.selling_price,
       points: stats.total_points,
       isCaptain: pick.is_captain,
       isViceCaptain: pick.is_vice_captain,

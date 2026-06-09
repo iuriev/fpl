@@ -8,7 +8,16 @@ import { TeamNavDrawer } from '@/components/ui/TeamNavDrawer/TeamNavDrawer';
 import { copy, interpolate } from '@/lib/copy';
 import { useMyTeam } from '@/lib/my-team/MyTeamContext';
 import { useRequestPremiumUpsell } from '@/lib/premium-upsell/PremiumUpsellContext';
-import { calcBank, calcTransferCost, poolPlayerToSquadPlayer } from '@/lib/transfer-draft';
+import {
+  applySwapsToSquad,
+  augmentPoolWithSuggested,
+  buildFreeHitSubs,
+  buildFreeHitSwaps,
+  calcBank,
+  calcTransferCost,
+  poolPlayerToSquadPlayer,
+  squadIdsAfterSwaps,
+} from '@/lib/transfer-draft';
 import {
   ApiTransferDraftRepository,
   resolveTransferDraft,
@@ -218,12 +227,19 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   }, [squadData]);
 
   const allPoolPlayers = useMemo(() => poolData?.players ?? [], [poolData]);
+  const [aiSuggestedPlayers, setAiSuggestedPlayers] = useState<
+    Array<{ id: number; position: PlayerPosition; nowCost: number }>
+  >([]);
+  const effectivePoolPlayers = useMemo(
+    () => augmentPoolWithSuggested(allPoolPlayers, aiSuggestedPlayers),
+    [allPoolPlayers, aiSuggestedPlayers]
+  );
 
   const displaySquad = useMemo(() => {
     if (!draft) return originalSquad;
     const swapMap = new Map(
       draft.swaps.map((s) => {
-        const inPlayer = allPoolPlayers.find((p) => p.id === s.inId);
+        const inPlayer = effectivePoolPlayers.find((p) => p.id === s.inId);
         return [s.outId, inPlayer] as const;
       })
     );
@@ -244,7 +260,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
       }
     }
     return squad;
-  }, [originalSquad, draft, allPoolPlayers]);
+  }, [originalSquad, draft, effectivePoolPlayers]);
 
   const displayStarters = useMemo(
     () => displaySquad.filter((_, i) => i < (squadData?.starters.length ?? 11)),
@@ -258,13 +274,32 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   const inPlayerIds = useMemo(() => new Set(draft?.swaps.map((s) => s.inId) ?? []), [draft]);
 
   const allPlayerCosts = useMemo(() => {
-    const out = originalSquad.map((p) => ({ id: p.id, nowCost: p.nowCost }));
-    const ins = allPoolPlayers.map((p) => ({ id: p.id, nowCost: p.nowCost }));
+    const out = originalSquad.map((p) => ({
+      id: p.id,
+      nowCost: p.nowCost,
+      sellPrice: p.sellPrice,
+    }));
+    const ins = effectivePoolPlayers.map((p) => ({ id: p.id, nowCost: p.nowCost }));
     return [...out, ...ins];
-  }, [originalSquad, allPoolPlayers]);
+  }, [originalSquad, effectivePoolPlayers]);
 
   const initialBank = squadData?.summary.bank ?? 0;
-  const currentBank = draft ? calcBank(initialBank, draft.swaps, allPlayerCosts) : initialBank;
+  const currentBank = useMemo(() => {
+    if (!draft) return initialBank;
+    if (draft.chip === 'freehit' && draft.freeHitTotalBudget != null) {
+      const squadCost = displaySquad.reduce((sum, p) => sum + p.nowCost, 0);
+      return draft.freeHitTotalBudget - squadCost;
+    }
+    if (draft.chip === 'freehit' || draft.chip === 'wildcard') {
+      const squadValue = originalSquad.reduce(
+        (sum, p) => sum + (p.sellPrice ?? p.nowCost),
+        0,
+      );
+      const squadCost = displaySquad.reduce((sum, p) => sum + p.nowCost, 0);
+      return initialBank + squadValue - squadCost;
+    }
+    return calcBank(initialBank, draft.swaps, allPlayerCosts);
+  }, [draft, initialBank, originalSquad, displaySquad, allPlayerCosts]);
   const transferCost = draft
     ? calcTransferCost(draft.swaps.length, draft.freeTransfers, draft.chip)
     : 0;
@@ -365,6 +400,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
   };
 
   const handleReset = () => {
+    setAiSuggestedPlayers([]);
     setPlanChip(initialChip);
     updateDraft((d) => ({
       ...d,
@@ -385,23 +421,46 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
     try {
       const res = await fetch(`/api/squad/${teamId}/free-hit-suggest?gw=${nextGw}`);
       if (!res.ok) throw new Error('request failed');
-      const data = (await res.json()) as { orderedSquad: number[]; totalXPts: number };
-      const currentOrder = [...(squadData?.starters ?? []), ...(squadData?.bench ?? [])].map((p) => p.id);
-      const swaps = data.orderedSquad
-        .map((newId, i) => ({ outId: currentOrder[i], inId: newId }))
-        .filter((s) => s.outId !== undefined && s.inId !== undefined && s.outId !== s.inId) as Array<{ outId: number; inId: number }>;
-      if (swaps.length === 0) {
+      const data = (await res.json()) as {
+        orderedSquad: number[];
+        players: Array<{ id: number; position: PlayerPosition; nowCost: number }>;
+        totalBudget: number;
+        remainingBudget: number;
+      };
+      if (data.orderedSquad.length !== 15) throw new Error('incomplete squad');
+      setAiSuggestedPlayers(data.players);
+      const pool = augmentPoolWithSuggested(allPoolPlayers, data.players);
+      const positionById = new Map(pool.map((p) => [p.id, p.position]));
+      for (const p of originalSquad) {
+        if (!positionById.has(p.id)) positionById.set(p.id, p.position);
+      }
+      const swaps = buildFreeHitSwaps(originalSquad, data.orderedSquad, positionById);
+      const startersCount = squadData?.starters.length ?? 11;
+      const squadAfterSwaps = applySwapsToSquad(originalSquad, swaps, pool);
+      const targetSet = new Set(data.orderedSquad);
+      const afterSwapIds = squadIdsAfterSwaps(originalSquad, swaps, pool);
+      if (afterSwapIds.size !== 15 || [...targetSet].some((id) => !afterSwapIds.has(id))) {
+        throw new Error('incomplete swaps');
+      }
+      const subs = buildFreeHitSubs(squadAfterSwaps, data.orderedSquad, startersCount);
+      if (swaps.length === 0 && subs.length === 0) {
         setToast(interpolate(copy.aiFreehitNoGain, { gw: String(nextGw) }));
       } else {
         setPlanChip('freehit');
-        updateDraft((d) => ({ ...d, chip: 'freehit', swaps }));
+        updateDraft((d) => ({
+          ...d,
+          chip: 'freehit',
+          swaps,
+          subs,
+          freeHitTotalBudget: data.totalBudget,
+        }));
       }
     } catch {
       setToast(copy.aiFreehitError);
     } finally {
       setIsAiLoading(false);
     }
-  }, [teamId, nextGw, updateDraft, squadData]);
+  }, [teamId, nextGw, updateDraft, originalSquad, allPoolPlayers, squadData]);
 
   const handleChipToggle = (chip: PlanChip) => {
     setPlanChip((prev) => {

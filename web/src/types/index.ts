@@ -55,6 +55,7 @@ export interface SquadPlayer {
   teamCode: number;
   teamId: number;
   nowCost: number;
+  sellPrice?: number;
   points: number;
   isCaptain: boolean;
   isViceCaptain: boolean;
@@ -354,6 +355,7 @@ export interface TransferDraft {
   chip: TransferChip;
   swaps: TransferSwap[];
   subs: SubSwap[];
+  freeHitTotalBudget?: number;
 }
 
 export interface LeaderboardPlayer {

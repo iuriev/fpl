@@ -55,6 +55,7 @@ export interface SquadPlayer {
   teamCode: number;
   teamId: number;
   nowCost: number;
+  sellPrice: number;
   points: number;
   isCaptain: boolean;
   isViceCaptain: boolean;
