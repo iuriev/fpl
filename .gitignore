@@ -44,3 +44,6 @@ storybook-static/
 # Superpowers local working files (brainstorms, docs)
 .superpowers/
 docs/superpowers/
+
+# Agent ephemeral working files (handoffs, logs, scratch)
+.tmp/

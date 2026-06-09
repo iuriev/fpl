@@ -201,10 +201,6 @@ Combined with PRED-06 in OpenSpec `archive/2026-06-03-ana-03-pred-06-price-chang
 Show the user's historical captain pick record:
 total captain points earned, success rate per pick, best/worst calls.
 
-#### ANA-09: Transfer Analyzer
-Show the user's historical transfers:
-net transfer points (total pts gained vs. cost of hits), which moves succeeded, which hurt.
-
 #### ANA-12: League participants browser
 On the Stats / Leagues screen, click a league to see all participants.
 Scroll the list; click a manager to view their squad using the existing squad viewer.
@@ -455,7 +451,6 @@ Write original copy (do not copy fpl.team text); use https://fpl.team/about/ as 
 |----|------|--------|-----|
 | ~~STAT-01~~ | ~~DEFCON / BPS leaderboard screen~~ | S | ✅ Done — merged into `/top-players` as DEFCON + BPS tabs (GW + Season); `/leaderboard` route deleted. |
 | ANA-08 | Captain Picks Analyzer | M | Helps users see if their captaincy decisions are paying off. |
-| ANA-09 | Transfer Analyzer | M | Net transfer points history — was each transfer worth it? |
 ### Feature details
 
 #### STAT-01: DEFCON / BPS leaderboard [SHIPPED]
@@ -481,7 +476,6 @@ Two-sided ranking of players by in-match performance:
 | START-01 | GW1 draft assistant | L | Seasonal feature (once a year). High viral potential before season start. |
 | DES-01 | Desktop responsive layout | L | Low priority while the app is pre-launch / mobile-first. |
 | ANA-10 | Player detail stats (points breakdown) | M | Nice-to-have. FPL app does this — we can differentiate with AI commentary. |
-| LIVE-03 | Live in-match scoring | L | Complex edge cases. Research spikes needed. |
 | ~~VIS-02~~ | ~~Team of the Week badge on squad screen~~ | S | ✅ Done — gold star badge on PlayerCard for TOTW players on finished GWs (Squad screen). |
 
 ### Feature details
