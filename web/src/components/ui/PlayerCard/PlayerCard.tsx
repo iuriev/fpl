@@ -251,8 +251,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
         <div className={styles.metaRow}>
           {playerInfo && (
             <span className={styles.ownershipPill} data-tour={ownershipTourAttr}>
-              {playerInfo.ownership}%
-              {playerInfo.expectedPoints ? ` / ${playerInfo.expectedPoints}` : ''}
+              {playerInfo.expectedPoints ?? ''}
             </span>
           )}
           {(onSubClick || reserveSubSlot) && (

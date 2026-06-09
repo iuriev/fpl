@@ -57,6 +57,10 @@
 }
 
 .playerBtn {
+  flex: 1 1 0;
+  max-width: calc((100% - 4 * var(--fpl-space-sm)) / 5);
+  display: flex;
+  flex-direction: column;
   position: relative;
   background: none;
   border: none;

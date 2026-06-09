@@ -385,19 +385,23 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
     try {
       const res = await fetch(`/api/squad/${teamId}/free-hit-suggest?gw=${nextGw}`);
       if (!res.ok) throw new Error('request failed');
-      const data = (await res.json()) as { swaps: Array<{ outId: number; inId: number }>; totalXPts: number };
-      if (data.swaps.length === 0) {
+      const data = (await res.json()) as { orderedSquad: number[]; totalXPts: number };
+      const currentOrder = [...(squadData?.starters ?? []), ...(squadData?.bench ?? [])].map((p) => p.id);
+      const swaps = data.orderedSquad
+        .map((newId, i) => ({ outId: currentOrder[i], inId: newId }))
+        .filter((s) => s.outId !== undefined && s.inId !== undefined && s.outId !== s.inId) as Array<{ outId: number; inId: number }>;
+      if (swaps.length === 0) {
         setToast(interpolate(copy.aiFreehitNoGain, { gw: String(nextGw) }));
       } else {
         setPlanChip('freehit');
-        updateDraft((d) => ({ ...d, chip: 'freehit', swaps: data.swaps }));
+        updateDraft((d) => ({ ...d, chip: 'freehit', swaps }));
       }
     } catch {
       setToast(copy.aiFreehitError);
     } finally {
       setIsAiLoading(false);
     }
-  }, [teamId, nextGw, updateDraft]);
+  }, [teamId, nextGw, updateDraft, squadData]);
 
   const handleChipToggle = (chip: PlanChip) => {
     setPlanChip((prev) => {

@@ -285,7 +285,7 @@
 .ownershipPill {
   flex: 1;
   min-width: 0;
-  font-size: var(--fpl-fs-nano);
+  font-size: var(--fpl-fs-micro);
   font-weight: var(--fpl-fw-bold);
   padding: 0.125rem 0.25rem;
   border-radius: var(--fpl-radius-xs);

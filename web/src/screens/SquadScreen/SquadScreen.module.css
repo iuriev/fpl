@@ -320,11 +320,7 @@
   justify-content: center;
   gap: var(--fpl-space-sm);
   flex-wrap: nowrap;
-}
-
-.playerRow:has(> :nth-child(5)) {
-  --_card-max-w: 4.25rem;
-  gap: var(--fpl-space-xs);
+  --_card-max-w: calc((100% - 4 * var(--fpl-space-sm)) / 5);
 }
 
 .bench {

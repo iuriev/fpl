@@ -207,8 +207,6 @@ app.get('/api/squad/:teamId/free-hit-suggest', optionalUser, async (c) => {
     const totalBudget =
       picks.picks.reduce((sum, p) => sum + p.selling_price, 0) +
       picks.entry_history.bank;
-    const currentSquadIds = picks.picks.map((p) => p.element);
-
     const predictions = await predictionService.getPredictionsForEvent(targetGw);
     if (!predictions.ready || predictions.players.length === 0) {
       return c.json(
@@ -239,7 +237,7 @@ app.get('/api/squad/:teamId/free-hit-suggest', optionalUser, async (c) => {
       }))
       .filter((p) => p.xPts > 0);
 
-    const result = optimizeFreeHit(totalBudget, optimizerPlayers, currentSquadIds, targetGw);
+    const result = optimizeFreeHit(totalBudget, optimizerPlayers, targetGw);
     return c.json(result);
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
