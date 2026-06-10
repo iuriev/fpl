@@ -5,6 +5,7 @@
 
 import {
   CalendarResponse,
+  ChipStrategyResponse,
   EntryResponse,
   GameweeksResponse,
   HealthResponse,
@@ -185,4 +186,7 @@ export const api = {
 
   getMarketPreview: (event: number) =>
     request<MarketPreviewResponse>(`/market/preview?event=${event}`, { credentials: 'include' }),
+
+  getChipStrategy: (teamId: number) =>
+    request<ChipStrategyResponse>(`/squad/${teamId}/chip-strategy`, { credentials: 'include' }),
 };

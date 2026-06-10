@@ -33,6 +33,7 @@ const NAV_LINKS: { to: string; label: () => string; featured?: boolean; end?: bo
   { to: '/top-players', label: () => copy.topPlayersNavLink },
   { to: '/predictions', label: () => copy.predictionsNavLink },
   { to: '/price-changes', label: () => copy.priceChangesNavLink },
+  { to: '/chip-strategy', label: () => copy.chipStrategyNavLink },
   { to: '/fixtures', label: () => copy.fixturesCalendarNavLink },
 ];
 

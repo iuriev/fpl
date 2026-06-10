@@ -110,6 +110,27 @@ export interface ChipStatuses {
   '3xc': ChipInfo;
 }
 
+export type ChipStrategyStatus = 'recommended' | 'used' | 'active';
+
+export interface ChipMetric {
+  label: string;
+  value: string;
+}
+
+export interface ChipRecommendation {
+  chip: 'wildcard' | 'freehit' | 'bboost' | '3xc';
+  status: ChipStrategyStatus;
+  recommendedGw?: number;
+  usedInGw?: number;
+  isDgw?: boolean;
+  isBgw?: boolean;
+  approximated?: boolean;
+  metrics: ChipMetric[];
+  rationale: string;
+}
+
+export type ChipStrategyResponse = ChipRecommendation[];
+
 export interface SquadResponse {
   gameweek: number;
   activeChip: ActiveChip;

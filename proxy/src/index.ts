@@ -5,16 +5,19 @@ import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 
 import { auth } from './auth/auth';
+import { requireUser } from './auth/middleware';
 import { optionalUser } from './auth/middleware';
+import { computeChipStrategy } from './chip-strategy-service';
 import { closeDb, runMigrations } from './db/client';
 import { db } from './db/client';
 import * as entryService from './entry-service';
 import * as fixturesCalendarService from './fixtures-calendar-service';
 import * as fixturesService from './fixtures-service';
 import { flaggedError } from './flagged-log';
-import { getOrFetchBootstrap, getOrFetchSquad } from './fpl-cache/db-cache';
+import { getOrFetchBootstrap, getOrFetchHistory, getOrFetchSquad, getSeasonMeta } from './fpl-cache/db-cache';
 import { prefetchMissingGwData } from './fpl-cache/prefetch';
 import { deriveSeason } from './fpl-cache/season';
+import { getFixturesAll } from './fpl-client';
 import { optimizeFreeHit, resolveFreeHitBudget } from './free-hit-optimizer';
 import * as gameweeksService from './gameweeks-service';
 import * as historyService from './history-service';
@@ -36,6 +39,7 @@ import { runScoreGameweek } from './prediction/score';
 import { predictionRoutes } from './prediction-routes';
 import * as predictionService from './prediction-service';
 import { startPredictionsWarmup } from './predictions-warmup';
+import { requirePremiumFplUser } from './premium-middleware';
 import { priceRoutes } from './price-routes';
 import { resolveNextGw } from './resolve-next-gw';
 import { requestShutdown } from './shutdown';
@@ -264,6 +268,67 @@ app.get('/api/squad/:teamId/free-hit-suggest', optionalUser, async (c) => {
     }
     console.error('Error in free-hit-suggest:', error);
     return c.json({ error: 'Unable to generate free hit suggestion' }, { status: 500 });
+  }
+});
+
+// GET /api/squad/:teamId/chip-strategy
+app.get('/api/squad/:teamId/chip-strategy', requireUser, requirePremiumFplUser, async (c) => {
+  const teamId = parseInt(c.req.param('teamId'), 10);
+  if (isNaN(teamId) || teamId <= 0) {
+    return c.json({ error: 'Invalid team ID' }, { status: 400 });
+  }
+
+  try {
+    const bootstrap = await getOrFetchBootstrap(db);
+    const season = deriveSeason(bootstrap.events);
+
+    let currentGw = bootstrap.events.find((e) => e.is_current)?.id;
+    if (!currentGw) {
+      const finished = bootstrap.events.filter((e) => e.finished);
+      currentGw = finished.length > 0 ? finished[finished.length - 1].id : 1;
+    }
+
+    const { isComplete } = await getSeasonMeta(db, season);
+    const [picks, history, fixtures] = await Promise.all([
+      getOrFetchSquad(db, season, teamId, currentGw, bootstrap.events),
+      getOrFetchHistory(db, season, teamId, bootstrap.events, isComplete),
+      getFixturesAll('background'),
+    ]);
+
+    const PRED_HORIZON = 6;
+    const predGws = Array.from({ length: PRED_HORIZON }, (_, i) => currentGw! + i).filter(
+      (gw) => gw <= 38,
+    );
+    const predResults = await Promise.all(
+      predGws.map((gw) => predictionService.getPredictionsForEvent(gw)),
+    );
+
+    const predMap = new Map<number, Map<number, number>>();
+    for (const pred of predResults) {
+      if (!pred.ready) continue;
+      for (const p of pred.players) {
+        if (!predMap.has(p.fplCode)) predMap.set(p.fplCode, new Map());
+        predMap.get(p.fplCode)!.set(p.event, p.xPts);
+      }
+    }
+
+    const result = await computeChipStrategy({
+      bootstrap,
+      picks,
+      history,
+      fixtures,
+      currentGw,
+      predMap,
+    });
+
+    return c.json(result);
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    if (msg.includes('No picks available')) {
+      return c.json({ error: 'Squad not found for this team' }, { status: 404 });
+    }
+    console.error('Error in chip-strategy:', error);
+    return c.json({ error: 'Unable to compute chip strategy' }, { status: 500 });
   }
 });
 

@@ -663,6 +663,17 @@ export const copy = {
     'CS probability and expected goals for all 20 teams — identify clean sheet defenders and high-xG attackers.',
   marketPremiumFreeLabel: 'Top 5 teams',
   marketPremiumPremiumLabel: 'All 20 teams',
+  chipStrategyNavLink: 'Chip Strategy',
+  chipStrategyTitle: 'Chip Strategy',
+  chipStrategySubtitle: 'Optimal gameweek for each chip based on your squad',
+  chipStrategyCalculate: '⟳ Calculate',
+  chipStrategyCalculating: 'Calculating…',
+  chipStrategyError: 'Could not load chip strategy — try again',
+  chipStrategyPremiumTitle: 'Unlock Chip Strategy',
+  chipStrategyPremiumDescription:
+    'See the optimal gameweek to play each of your 4 chips based on your squad fixtures and xPts data.',
+  chipStrategyPremiumFreeLabel: 'Basic chip tips',
+  chipStrategyPremiumPremiumLabel: 'Full optimizer with xPts',
   marketEmptyState: 'Market predictions not yet available for GW {n}.',
   marketCalculatingState: 'Calculating market predictions for GW {n}…',
   marketDisclaimer:

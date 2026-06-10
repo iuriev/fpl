@@ -1,3 +1,4 @@
+export { ChipStrategyScreen } from './ChipStrategyScreen/ChipStrategyScreen';
 export type { EntryScreenProps } from './EntryScreen/EntryScreen';
 export { EntryScreen } from './EntryScreen/EntryScreen';
 export { FixturesCalendarScreen } from './FixturesCalendarScreen/FixturesCalendarScreen';

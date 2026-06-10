@@ -21,6 +21,7 @@ import {
   WatchlistRepositoryContext,
 } from '@/lib/watchlist-repository';
 import {
+  ChipStrategyScreen,
   EntryScreen,
   FixturesCalendarScreen,
   ForgotPasswordScreen,
@@ -165,6 +166,14 @@ function AppContent() {
       <Route path="/player-watchlist" element={<ProtectedRoute />}>
         <Route index element={<PlayerWatchlistScreen />} />
       </Route>
+      <Route
+        path="/chip-strategy"
+        element={
+          <AuthAndTeamProtectedRoute>
+            <ChipStrategyScreen />
+          </AuthAndTeamProtectedRoute>
+        }
+      />
     </Routes>
   );
 }

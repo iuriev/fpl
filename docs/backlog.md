@@ -33,6 +33,32 @@ matching FPL design conventions.
 
 ---
 
+## 🟠 P1 — Chip strategy advisor
+
+| ID | Task | Effort | Why |
+|----|------|--------|-----|
+| CHIP-07 | Unified chip strategy advisor — per-chip GW recommendation based on squad FDR + xPts + DGW analysis | L | Most-asked FPL question: "when should I play my chips?" Covers all 4 chips × 2 half-seasons. Premium feature. |
+| CHIP-08 | Wildcard Optimizer — build the optimal squad for wildcarding (like Free Hit Optimizer but persistent) | L | Companion to CHIP-07: advisor says WHEN, optimizer says WHAT squad to build. Reuses free-hit-optimizer infrastructure. |
+
+### Feature details
+
+#### CHIP-07: Unified chip strategy advisor
+A module that analyses the current manager's squad and recommends the optimal gameweek to use each chip (Wildcard, Free Hit, Triple Captain, Bench Boost) for the current half-season window.
+
+**Core logic:**
+- For each future GW in the current half-season window, compute a **GW score** for the squad based on per-player xPts, fixture difficulty (FDR), and DGW/BGW flags.
+- **Bench Boost:** highest-value GW where all 15 players have fixtures; strong preference for DGWs.
+- **Triple Captain:** GW where the best player has the highest xPts × DGW multiplier; single easy fixture beats double hard fixture.
+- **Wildcard:** GW before the longest run of easy fixtures (squad FDR) — signal that now is the right time to restructure. Min GW 3 in each half.
+- **Free Hit:** BGW (player has 1–2 starters blanking) or DGW (as an alternative to WC); min GW 3.
+- If a chip is already played in the current window → show "Used (GW N)" instead of recommendation.
+- Recalculated on demand every time the user views the screen.
+
+**Half-season windows (2025/26):** GW 1–19 and GW 20–38 (from `bootstrap-static.chips`).
+**UI:** 4 chip cards, each showing recommended GW + brief rationale. Already-used chips marked "Used".
+
+---
+
 ## 🟠 P1 — Research & Data
 
 | ID | Task | Effort | Why |

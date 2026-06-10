@@ -378,3 +378,21 @@ export function useMarketPreview(event: number | null, enabled = true) {
     },
   });
 }
+
+export function useChipStrategy(teamId: number | null) {
+  return useQuery({
+    queryKey: ['chip-strategy', teamId],
+    queryFn: () => {
+      if (teamId === null) throw new Error('Team ID required');
+      return api.getChipStrategy(teamId);
+    },
+    enabled: false,
+    staleTime: Infinity,
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && (error.status === 400 || error.status === 403 || error.status === 404)) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+  });
+}
