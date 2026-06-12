@@ -92,13 +92,24 @@ async function main(): Promise<void> {
     return clubMap[id].shortName === clubFilter;
   });
 
+  const skippedClubs: string[] = [];
+
   for (let i = 0; i < teamIds.length; i++) {
     const teamId = Number(teamIds[i]);
     const club = clubMap[String(teamId)];
     const short = teamShort.get(teamId) ?? club.shortName;
     console.log(`[${i + 1}/${teamIds.length}] ${short} — fetching Transfermarkt squad…`);
 
-    const tmSquad = await fetchTransfermarktSquad(club.slug, club.clubId, SEASON_ID);
+    let tmSquad: TmSquadPlayer[];
+    try {
+      tmSquad = await fetchTransfermarktSquad(club.slug, club.clubId, SEASON_ID);
+    } catch (err) {
+      console.warn(`  [${short}] fetch failed, skipping: ${String(err)}`);
+      skippedClubs.push(short);
+      if (i < teamIds.length - 1) await sleep(DELAY_MS);
+      continue;
+    }
+
     for (const p of tmSquad) tmById.set(p.id, p);
 
     const fplPlayers = bootstrap.elements
@@ -187,6 +198,10 @@ async function main(): Promise<void> {
     }
 
     if (i < teamIds.length - 1) await sleep(DELAY_MS);
+  }
+
+  if (skippedClubs.length > 0) {
+    console.warn(`[phase1] Skipped ${skippedClubs.length} clubs due to fetch errors: ${skippedClubs.join(', ')}`);
   }
 
   for (const el of bootstrap.elements) {

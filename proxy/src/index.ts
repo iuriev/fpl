@@ -639,10 +639,19 @@ process.once('SIGINT', () => shutdown('SIGINT'));
 httpServer = serve({ fetch: app.fetch, port }, () => {
   console.log(`Proxy server running on port ${port}`);
   void (async () => {
+    setStartupSeedRunning();
     try {
-      setStartupSeedRunning();
       await maybeRunLineupsSeedOnStart();
+    } catch (err) {
+      flaggedError(
+        ['LINEUPS_SEED_ON_START'],
+        'startup seed error (continuing):',
+        err,
+      );
+    } finally {
       setStartupSeedDone();
+    }
+    try {
       const bootstrap = await getOrFetchBootstrap(db);
       const season = deriveSeason(bootstrap.events);
       prefetchMissingGwData(db, season, bootstrap.events).catch((err) =>
@@ -657,9 +666,8 @@ httpServer = serve({ fetch: app.fetch, port }, () => {
         await runScoreGameweek(db, currentSeason, targetEvent, defaultDataDir());
       });
     } catch (err) {
-      setStartupSeedDone();
       flaggedError(
-        ['LINEUPS_SEED_ON_START', 'LINEUPS_WARMUP_ENABLED', 'PREDICTIONS_WARMUP_ENABLED'],
+        ['LINEUPS_WARMUP_ENABLED', 'PREDICTIONS_WARMUP_ENABLED'],
         'startup background tasks error:',
         err,
       );
