@@ -59,13 +59,17 @@ them. Manual `npm run db:migrate -w proxy` is optional (same migrator, useful fo
 
 ## Caching
 
-FPL API responses are persisted in Postgres via `proxy/src/fpl-cache/db-cache.ts`. See
-ADR 0018 for the full rationale and design.
+The proxy uses a **two-level cache** for all FPL API data. See ADR 0018 (L2 design) and
+ADR 0021 (L1 addition) for rationale.
 
-**Key rules:**
-- Rows with `frozen = true` are returned from DB without any FPL API call (used for
-  finished gameweeks where data is permanently final).
-- Bootstrap TTL: 12 hours during active/pre-season; 168 hours once the season is complete.
+```
+Request → L1 (process memory, cache.ts) → L2 (Postgres, db-cache.ts) → L3 (FPL API)
+```
+
+**L2 — Postgres (`proxy/src/fpl-cache/db-cache.ts`):**
+- Rows with `frozen = true` are returned from DB without any FPL API call (finished
+  gameweeks where data is permanently final).
+- Bootstrap TTL: 7 days during pre-season and complete; 12 hours during active season.
 - Current-GW live data TTL: 3 hours.
 - History and transfers: re-fetched only when a new gameweek finishes (`last_finished_gw`
   staleness check), not on a wall-clock TTL.
@@ -74,8 +78,14 @@ ADR 0018 for the full rationale and design.
 - Startup prefetch: on boot, a background job (rate-limited to 1 req/s, max 10 requests)
   fills in any missing frozen GW rows.
 
-The in-memory `cache.ts` is retained only for computed, non-FPL results (player pool,
-fixtures).
+**L1 — Memory (`proxy/src/cache.ts`):**
+- Frozen rows: 7 days.
+- Shared non-frozen data (bootstrap, gw-live): remaining L2 TTL — both layers expire together.
+- Per-team non-frozen data (squad, history, transfers): 5 minutes. Users see at most 5 minutes
+  of staleness after making a transfer on fpl.com.
+
+**Rule:** Every `getOrFetch*` function in `db-cache.ts` MUST include an L1 check before
+the Postgres query. See ADR 0021 for the TTL table and constants.
 
 ## FPL identity
 

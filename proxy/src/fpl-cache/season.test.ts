@@ -73,8 +73,8 @@ describe('getBootstrapTtlSeconds', () => {
     expect(getBootstrapTtlSeconds('active')).toBe(43200);
   });
 
-  it('returns 12 hours for pre-season', () => {
-    expect(getBootstrapTtlSeconds('pre-season')).toBe(43200);
+  it('returns 1 week for pre-season', () => {
+    expect(getBootstrapTtlSeconds('pre-season')).toBe(604800);
   });
 });
 

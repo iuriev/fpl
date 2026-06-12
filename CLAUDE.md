@@ -82,6 +82,12 @@ The project is built spec-first; application code comes last. Read these before 
   skill — it contains the code→spec mapping table and consistency checklist. The spec files
   in `openspec/specs/predictions/` are the single source of truth for how predictions work.
   A code change without a matching spec update is incomplete.
+- **Two-level cache pattern (ADR 0021).** Every new `getOrFetch*` function added to
+  `proxy/src/fpl-cache/db-cache.ts` MUST include an L1 in-memory check (`cacheLayer.get`)
+  before the Postgres query. Use `FROZEN_CACHE_TTL_SECONDS` (7 days) for frozen or
+  complete-season data; `SHORT_CACHE_TTL_SECONDS` (5 minutes) for active per-team data;
+  remaining L2 TTL for shared (non-per-team) data. Skipping L1 causes Supabase egress
+  overages. See `docs/decisions/0021-two-level-cache.md`.
 - **DB schema documentation.** Whenever `proxy/src/db/schema.ts` is created or modified,
   update `docs/db-schema.md` in the same change: keep the per-table Markdown column table and
   the Mermaid ER diagram in sync with the Drizzle schema. This is the non-developer-friendly

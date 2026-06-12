@@ -1,7 +1,11 @@
 import { and, desc, eq, } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
+import * as cacheLayer from '../cache';
 import * as schema from '../db/schema';
+
+const FROZEN_CACHE_TTL_SECONDS = 604800; // 7 days
+const SHORT_CACHE_TTL_SECONDS = 300;     // 5 minutes
 import type {
   FPLBootstrapStatic,
   FPLDreamTeam,
@@ -24,6 +28,9 @@ type Db = PostgresJsDatabase<typeof schema>;
 // ─── Bootstrap ───────────────────────────────────────────────────────────────
 
 export async function getOrFetchBootstrap(db: Db): Promise<FPLBootstrapStatic> {
+  const memCached = cacheLayer.get<FPLBootstrapStatic>('fpl:bootstrap');
+  if (memCached) return memCached;
+
   const [metaRow] = await db
     .select()
     .from(schema.fplMeta)
@@ -48,7 +55,10 @@ export async function getOrFetchBootstrap(db: Db): Promise<FPLBootstrapStatic> {
     const state = getSeasonState(bootstrap.events, isComplete);
     const ttl = getBootstrapTtlSeconds(state);
     const ageSeconds = (Date.now() - cached.fetchedAt.getTime()) / 1000;
-    if (ageSeconds < ttl) return bootstrap;
+    if (ageSeconds < ttl) {
+      cacheLayer.set('fpl:bootstrap', bootstrap, ttl - ageSeconds);
+      return bootstrap;
+    }
   }
 
   const bootstrap = await fplClient.getBootstrapStatic();
@@ -75,13 +85,16 @@ export async function getOrFetchBootstrap(db: Db): Promise<FPLBootstrapStatic> {
   });
 
   const gw38 = bootstrap.events.find((e) => e.id === 38);
-  if (gw38?.finished && gw38.data_checked) {
+  const isNowComplete = Boolean(gw38?.finished && gw38.data_checked);
+  if (isNowComplete) {
     await db
       .update(schema.fplMeta)
       .set({ isComplete: true })
       .where(eq(schema.fplMeta.season, newSeason));
   }
 
+  const newState = getSeasonState(bootstrap.events, isNowComplete);
+  cacheLayer.set('fpl:bootstrap', bootstrap, getBootstrapTtlSeconds(newState));
   return bootstrap;
 }
 
@@ -104,6 +117,10 @@ export async function getOrFetchGwLive(
   gw: number,
   bootstrapEvents: FPLBootstrapStatic['events'],
 ): Promise<FPLLive> {
+  const memKey = `fpl:live:${season}:${gw}`;
+  const memCached = cacheLayer.get<FPLLive>(memKey);
+  if (memCached) return memCached;
+
   const [cached] = await db
     .select()
     .from(schema.fplGwLiveCache)
@@ -111,9 +128,15 @@ export async function getOrFetchGwLive(
     .limit(1);
 
   if (cached) {
-    if (cached.frozen) return cached.data as FPLLive;
+    if (cached.frozen) {
+      cacheLayer.set(memKey, cached.data as FPLLive, FROZEN_CACHE_TTL_SECONDS);
+      return cached.data as FPLLive;
+    }
     const ageSeconds = (Date.now() - cached.fetchedAt.getTime()) / 1000;
-    if (ageSeconds < getLiveTtlSeconds()) return cached.data as FPLLive;
+    if (ageSeconds < getLiveTtlSeconds()) {
+      cacheLayer.set(memKey, cached.data as FPLLive, getLiveTtlSeconds() - ageSeconds);
+      return cached.data as FPLLive;
+    }
   }
 
   const data = await fplClient.getLive(gw);
@@ -128,6 +151,7 @@ export async function getOrFetchGwLive(
       set: { data: data as unknown as Record<string, unknown>, frozen, fetchedAt: new Date() },
     });
 
+  cacheLayer.set(memKey, data, frozen ? FROZEN_CACHE_TTL_SECONDS : getLiveTtlSeconds());
   return data;
 }
 
@@ -140,6 +164,10 @@ export async function getOrFetchSquad(
   gw: number,
   bootstrapEvents: FPLBootstrapStatic['events'],
 ): Promise<FPLPicks> {
+  const memKey = `fpl:squad:${season}:${teamId}:${gw}`;
+  const memCached = cacheLayer.get<FPLPicks>(memKey);
+  if (memCached) return memCached;
+
   const [cached] = await db
     .select()
     .from(schema.fplSquadCache)
@@ -153,9 +181,15 @@ export async function getOrFetchSquad(
     .limit(1);
 
   if (cached) {
-    if (cached.frozen) return cached.data as FPLPicks;
+    if (cached.frozen) {
+      cacheLayer.set(memKey, cached.data as FPLPicks, FROZEN_CACHE_TTL_SECONDS);
+      return cached.data as FPLPicks;
+    }
     const ageSeconds = (Date.now() - cached.fetchedAt.getTime()) / 1000;
-    if (ageSeconds < getLiveTtlSeconds()) return cached.data as FPLPicks;
+    if (ageSeconds < getLiveTtlSeconds()) {
+      cacheLayer.set(memKey, cached.data as FPLPicks, SHORT_CACHE_TTL_SECONDS);
+      return cached.data as FPLPicks;
+    }
   }
 
   const data = await fplClient.getPicks(teamId, gw);
@@ -177,6 +211,7 @@ export async function getOrFetchSquad(
       set: { data: data as unknown as Record<string, unknown>, frozen, fetchedAt: new Date() },
     });
 
+  cacheLayer.set(memKey, data, frozen ? FROZEN_CACHE_TTL_SECONDS : SHORT_CACHE_TTL_SECONDS);
   return data;
 }
 
@@ -224,6 +259,10 @@ export async function getOrFetchHistory(
   bootstrapEvents: FPLBootstrapStatic['events'],
   isComplete: boolean,
 ): Promise<FPLHistory> {
+  const memKey = `fpl:history:${season}:${teamId}`;
+  const memCached = cacheLayer.get<FPLHistory>(memKey);
+  if (memCached) return memCached;
+
   const [cached] = await db
     .select()
     .from(schema.fplHistoryCache)
@@ -235,8 +274,14 @@ export async function getOrFetchHistory(
   const currentLatestFinishedGw = latestFinishedGw(bootstrapEvents) ?? 0;
 
   if (cached) {
-    if (isComplete) return cached.data as FPLHistory;
-    if (cached.lastFinishedGw >= currentLatestFinishedGw) return cached.data as FPLHistory;
+    if (isComplete) {
+      cacheLayer.set(memKey, cached.data as FPLHistory, FROZEN_CACHE_TTL_SECONDS);
+      return cached.data as FPLHistory;
+    }
+    if (cached.lastFinishedGw >= currentLatestFinishedGw) {
+      cacheLayer.set(memKey, cached.data as FPLHistory, SHORT_CACHE_TTL_SECONDS);
+      return cached.data as FPLHistory;
+    }
   }
 
   const data = await fplClient.getHistory(teamId);
@@ -259,6 +304,7 @@ export async function getOrFetchHistory(
       },
     });
 
+  cacheLayer.set(memKey, data, isComplete ? FROZEN_CACHE_TTL_SECONDS : SHORT_CACHE_TTL_SECONDS);
   return data;
 }
 
@@ -271,6 +317,10 @@ export async function getOrFetchTransfers(
   bootstrapEvents: FPLBootstrapStatic['events'],
   isComplete: boolean,
 ): Promise<FPLTransfer[]> {
+  const memKey = `fpl:transfers:${season}:${teamId}`;
+  const memCached = cacheLayer.get<FPLTransfer[]>(memKey);
+  if (memCached) return memCached;
+
   const [cached] = await db
     .select()
     .from(schema.fplTransfersCache)
@@ -285,8 +335,14 @@ export async function getOrFetchTransfers(
   const currentLatestFinishedGw = latestFinishedGw(bootstrapEvents) ?? 0;
 
   if (cached) {
-    if (isComplete) return cached.data as FPLTransfer[];
-    if (cached.lastFinishedGw >= currentLatestFinishedGw) return cached.data as FPLTransfer[];
+    if (isComplete) {
+      cacheLayer.set(memKey, cached.data as FPLTransfer[], FROZEN_CACHE_TTL_SECONDS);
+      return cached.data as FPLTransfer[];
+    }
+    if (cached.lastFinishedGw >= currentLatestFinishedGw) {
+      cacheLayer.set(memKey, cached.data as FPLTransfer[], SHORT_CACHE_TTL_SECONDS);
+      return cached.data as FPLTransfer[];
+    }
   }
 
   const data = await fplClient.getTransfers(teamId);
@@ -309,5 +365,6 @@ export async function getOrFetchTransfers(
       },
     });
 
+  cacheLayer.set(memKey, data, isComplete ? FROZEN_CACHE_TTL_SECONDS : SHORT_CACHE_TTL_SECONDS);
   return data;
 }

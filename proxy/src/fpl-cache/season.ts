@@ -20,8 +20,9 @@ export function getSeasonState(
 }
 
 export function getBootstrapTtlSeconds(state: SeasonState): number {
-  if (state === 'complete') return 604800; // 1 week
-  return 43200; // 12 hours for both pre-season and active
+  if (state === 'complete') return 604800;
+  if (state === 'active') return 43200;
+  return 604800; // pre-season: off-season data rarely changes
 }
 
 export function getFixturesTtlSeconds(state: SeasonState): number {
