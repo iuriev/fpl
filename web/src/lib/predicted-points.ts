@@ -21,7 +21,7 @@ export function formatCsProb(csProb: number | null): string {
 }
 
 export function formatPredictionDecimal(value: number): string {
-  return value.toFixed(1);
+  return (Number.isFinite(value) ? value : 0).toFixed(1);
 }
 
 function metricValue(prediction: PlayerGameweekPrediction, metric: PredictionMetric): number {
@@ -85,9 +85,10 @@ export function buildPreviewPlayerRows(
     .map((prediction) => {
       const player = poolByCode.get(prediction.fplCode);
       if (!player) return null;
+      const raw = metricValue(prediction, metric);
       return {
         player,
-        displayValue: metricValue(prediction, metric),
+        displayValue: Number.isFinite(raw) ? raw : 0,
         displayLabel: metricLabel(metric),
         prediction,
       };

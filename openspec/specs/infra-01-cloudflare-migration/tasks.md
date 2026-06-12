@@ -3,7 +3,7 @@
 ## Step 1 — Verify Workers runtime compatibility
 
 Outcome: confirmed that `better-auth` + `drizzle-orm` + `postgres` run under
-`nodejs_compat` in a local Wrangler dev session against Supabase.
+`nodejs_compat` in a local Wrangler dev session against the Postgres DB.
 
 - [ ] Install `wrangler` as a dev dependency in `proxy/`.
 - [ ] Add minimal `wrangler.toml` with `nodejs_compat` flag.

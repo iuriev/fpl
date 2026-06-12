@@ -1,6 +1,6 @@
 # ADR 0015: Adopt Postgres (Supabase) as the user-data store
 
-- Status: Accepted
+- Status: Superseded by [ADR 0023](0023-drop-supabase-plain-postgres.md)
 - Date: 2026-06-02
 - Deciders: ivan.iuriev
 - Supersedes: ADR 0013 (for the user-data persistence slice)

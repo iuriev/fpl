@@ -7,7 +7,7 @@ context: |
   the user enters a public FPL team ID and views their squad, player points, availability
   statuses, and per-gameweek summary.
 
-  Auth is being added (better-auth + Google OAuth, Supabase Postgres), but the core app
+  Auth is being added (better-auth + Google OAuth, Postgres), but the core app
   remains usable without signing in.
 
   ## Stack
@@ -17,7 +17,7 @@ context: |
     border widths and shadow offsets only.
   - **Proxy / BFF:** Hono on Node.js (`proxy/`). Thin layer: fronts the public FPL API
     (no CORS headers), caches responses, reshapes payloads. Also serves the built SPA.
-  - **Database:** Supabase Postgres via Drizzle ORM. Used for user data (accounts,
+  - **Database:** Postgres via Drizzle ORM. Used for user data (accounts,
     watchlists, preferences). Schema in `proxy/src/db/schema.ts`; docs in `docs/db-schema.md`.
   - **Auth:** better-auth with Google OAuth. HttpOnly session cookie. Secrets:
     `DATABASE_URL`, `BETTER_AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`.

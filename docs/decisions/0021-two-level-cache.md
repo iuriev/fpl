@@ -10,11 +10,10 @@
 ADR 0018 introduced a Postgres-backed L2 cache to protect the FPL API from burst
 requests on process restarts. It worked: FPL API traffic dropped to near zero.
 
-However, ADR 0018 deliberately removed the in-memory FPL cache and did not account for
-Supabase egress costs. Each `getOrFetch*` call issues a full Postgres query returning a
-large JSONB blob (bootstrap ~2–3 MB, gw-live ~1–2 MB). With 12 call sites and no
-in-memory layer, a single page load triggers 3–5 Postgres reads totalling 10+ MB.
-This caused 19.75 GB of egress in a single billing period (5 GB included in the free tier).
+However, ADR 0018 deliberately removed the in-memory FPL cache. Each `getOrFetch*` call
+issues a full Postgres query returning a large JSONB blob (bootstrap ~2–3 MB,
+gw-live ~1–2 MB). With 12 call sites and no in-memory layer, a single page load triggers
+3–5 Postgres reads totalling 10+ MB — excessive DB load under real traffic.
 
 ## Decision
 
@@ -74,4 +73,4 @@ between deployments. The change applies to both L1 and L2 via `getBootstrapTtlSe
 Every new `getOrFetch*` function added to `db-cache.ts` MUST include an L1 in-memory
 check before the Postgres query. Use `FROZEN_CACHE_TTL_SECONDS` for frozen/complete data,
 `SHORT_CACHE_TTL_SECONDS` for active per-team data, and remaining L2 TTL for shared
-(non-per-team) data. Skipping L1 causes Supabase egress overages.
+(non-per-team) data. Skipping L1 causes excessive Postgres load.

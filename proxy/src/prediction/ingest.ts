@@ -30,7 +30,7 @@ const FD_CODES: Record<string, string> = {
 
 export function defaultDataDir(): string {
   const here = fileURLToPath(new URL('.', import.meta.url));
-  return process.env.PRED_DATA_DIR ?? join(here, '../../../research/pred-09/data');
+  return process.env.PRED_DATA_DIR ?? join(here, '../data/pred');
 }
 
 function parseDateUk(value: string): string | null {

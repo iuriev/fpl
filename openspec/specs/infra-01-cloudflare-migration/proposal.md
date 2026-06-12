@@ -14,9 +14,9 @@ Migrate hosting to **Cloudflare**:
 - **SPA** → **Cloudflare Pages** (static hosting, global CDN, free tier, no cold starts).
 - **Proxy** → **Cloudflare Workers** (Hono natively supports CF Workers runtime, free tier
   100k req/day, sub-millisecond cold starts, global edge network).
-- **Database** → **Supabase** stays unchanged. Workers connect to Supabase Postgres via
-  TCP using the Node.js compatibility layer (`nodejs_compat` flag) or via
-  **Cloudflare Hyperdrive** for pooled, edge-proxied connections.
+- **Database** → **Postgres** stays unchanged. Workers connect via TCP using the Node.js
+  compatibility layer (`nodejs_compat` flag) or via **Cloudflare Hyperdrive** for pooled,
+  edge-proxied connections.
 
 This change is purely infrastructure — no API contracts, data models, or UI change.
 
@@ -47,7 +47,7 @@ This change is purely infrastructure — no API contracts, data models, or UI ch
 ### Out of scope
 
 - Any change to API contracts, data models, or frontend behaviour.
-- Adopting Cloudflare D1 or KV — Supabase Postgres remains the database.
+- Adopting Cloudflare D1 or KV — plain Postgres remains the database.
 - Custom domain setup (can follow as a trivial one-liner after migration).
 - Edge caching via Cloudflare Cache API (separate improvement).
 

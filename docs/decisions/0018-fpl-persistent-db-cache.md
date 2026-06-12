@@ -89,7 +89,7 @@ previously in `cache.ts` have been removed.
 
 **Negative / watch:**
 - The proxy now has a hard DB dependency for all FPL data. If the DB is unavailable the
-  service degrades (though Supabase has high availability).
+  service degrades.
 - `db-cache.ts` is a new abstraction layer; bugs there affect all endpoints uniformly.
 - The DB will grow over time (one row per team per gameweek for squad/history/transfers).
   At FPL scale this is manageable (≤38 GWs, tens of thousands of teams queried), but

@@ -128,7 +128,7 @@ Copy `.env.example` to `.env` and fill in:
 
 | Secret | Description |
 | --- | --- |
-| `DATABASE_URL` | Supabase Postgres connection string (pooler URL, port 6543) |
+| `DATABASE_URL` | Postgres connection string |
 | `BETTER_AUTH_SECRET` | Random 32-byte hex string — used to sign sessions and tokens |
 | `GOOGLE_CLIENT_ID` | OAuth 2.0 client ID from Google Cloud Console |
 | `GOOGLE_CLIENT_SECRET` | OAuth 2.0 client secret from Google Cloud Console |

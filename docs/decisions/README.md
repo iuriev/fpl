@@ -33,7 +33,7 @@ it behaves. Avoid duplicating: link between them instead.
 | [0014](0014-native-css-primitives.md) | Prefer native CSS: Popover API, :has(), @starting-style | Accepted |
 | [0015](0015-player-tactical-positions.md) | Tactical roles (CB/FB/DM/…) for predicted lineups | Accepted (ingest superseded by 0016) |
 | [0016](0016-transfermarkt-tactical-positions.md) | Transfermarkt offline ingest for tactical registry | Accepted |
-| [0015](0015-database-postgres.md) | Adopt Postgres (Supabase) as the user-data store | Accepted |
+| [0015](0015-database-postgres.md) | Adopt Postgres (Supabase) as the user-data store | Superseded by 0023 |
 | [0016](0016-auth-better-auth.md) | Use better-auth for authentication | Accepted |
 | [0017](0017-session-transport-cookie.md) | Session transport — HttpOnly cookie | Accepted |
 | [0018](0018-fpl-persistent-db-cache.md) | FPL persistent DB cache to minimise FPL API calls | Accepted |
@@ -41,6 +41,7 @@ it behaves. Avoid duplicating: link between them instead.
 | [0020](0020-fpl-identity-model.md) | FPL identity model — canonical player and team codes | Accepted |
 | [0021](0021-two-level-cache.md) | Two-level cache (L1 in-memory + L2 Postgres) | Accepted |
 | [0022](0022-deployment-docker-compose-vps.md) | Deployment — Docker Compose + VPS (Fly.io removed) | Accepted |
+| [0023](0023-drop-supabase-plain-postgres.md) | Switch from Supabase to self-hosted plain Postgres | Accepted |
 
 ## Template
 

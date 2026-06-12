@@ -19,8 +19,8 @@
    |
    |-- /api/* ----------> [ Cloudflare Workers ]  (proxy/src, Hono fetch handler)
                                |
-                               +--> [ Supabase Postgres ]  (unchanged, TCP via Hyperdrive
-                                                            or nodejs_compat)
+                               +--> [ Postgres ]  (unchanged, TCP via Hyperdrive
+                                                  or nodejs_compat)
                                |
                                +--> [ Public FPL API ]  (fantasy.premierleague.com)
 ```

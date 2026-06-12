@@ -8,7 +8,7 @@ export function buildPredictionBlurb(
   position: PlayerPosition,
   firstFixture: FixtureInfo | undefined,
 ): string {
-  const xPtsFormatted = prediction.xPts.toFixed(1);
+  const xPtsFormatted = (Number.isFinite(prediction.xPts) ? prediction.xPts : 0).toFixed(1);
 
   let sentence1: string;
   if (firstFixture) {

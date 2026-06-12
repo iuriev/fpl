@@ -572,10 +572,10 @@ closed tab) can linger indefinitely. No scheduled cleanup exists today.
   `true` in production, `false` in local dev to avoid surprising deletes during auth testing).
 - Log deleted row count at `info` level; metric hook later if needed.
 
-**Alternative A — Supabase `pg_cron` (no proxy code):**
+**Alternative A — `pg_cron` (no proxy code):**
 
-- Enable `pg_cron` extension in Supabase (project must support it).
-- Schedule in SQL Editor:
+- Enable `pg_cron` extension on the Postgres instance.
+- Schedule in SQL:
   ```sql
   SELECT cron.schedule(
     'purge-expired-sessions',
@@ -584,12 +584,11 @@ closed tab) can linger indefinitely. No scheduled cleanup exists today.
   );
   ```
 - Pros: runs even if proxy is down; no extra dependency.
-- Cons: ops live outside repo unless documented in `docs/db-schema.md` + migration note;
-  verify RLS/service role (table is service-managed today).
+- Cons: ops live outside repo unless documented in `docs/db-schema.md` + migration note.
 
 **Alternative B — one-off / manual (dev only):**
 
-- Supabase Table Editor or `psql`: `DELETE FROM session WHERE expires_at < NOW();`
+- `psql`: `DELETE FROM session WHERE expires_at < NOW();`
 
 **Per-user session cap (phase 2, optional):**
 
@@ -610,8 +609,8 @@ closed tab) can linger indefinitely. No scheduled cleanup exists today.
 
 **Deploy notes:**
 - Fly.io: in-process cron on the always-on machine is sufficient until horizontal scaling.
-- INFRA-01 (Cloudflare Workers): in-process `node-cron` will **not** work — use Supabase
-  `pg_cron`, Workers Cron Trigger + internal admin route, or a tiny scheduled Fly job.
+- INFRA-01 (Cloudflare Workers): in-process `node-cron` will **not** work — use `pg_cron`,
+  Workers Cron Trigger + internal admin route, or a tiny scheduled Fly job.
 - Promote via `/opsx:propose` when ready to implement.
 
 **Effort:** S (purge only) · S+ (purge + cap + tests).
@@ -645,7 +644,7 @@ For reference — features that are live in the codebase:
 - **Top Players Screen** — top performers for a GW; 5 tabs: Points (list + TOTW pitch toggle), DEFCON, BPS, By Team, Season (Points · DEFCON · BPS sub-toggle)
 - **Transfer Planner** — pick players to transfer in/out, budget tracking, squad validation; saved draft syncs to account via `/api/me/transfer-draft` (PLAN-00)
 - **Transfer screen polish** — captain badge right, team abbrev + FDR chip under PlayerCard, outfield picker, position filter tabs, Sort button (UX-01 SwapsStrip scroll, UX-02 next 3 fixtures column, UX-03 %, pts, xPts columns); UX-04 player info popup (fixtures + price); DES-04 FDR colour tokens; VIS-01 goals/assists badges + ownership pill on all card sizes
-- **Cloudflare migration (INFRA-01)** — OpenSpec change `openspec/changes/infra-01-cloudflare-migration`; moves SPA to Cloudflare Pages and proxy to Cloudflare Workers; Supabase unchanged. Replaces Fly.io deployment.
+- **Cloudflare migration (INFRA-01)** — OpenSpec change `openspec/changes/infra-01-cloudflare-migration`; moves SPA to Cloudflare Pages and proxy to Cloudflare Workers. Replaces Fly.io deployment.
 - **Active chip display (CHIP-01)** — chip cell replaces AVERAGE+HIGHEST in SummaryStrip when a chip is active; octagonal badge icon + chip name + ACTIVE label; per-chip accent colours (Wildcard gold, Triple Captain red, Free Hit cyan, Bench Boost green)
 - **AI Free Hit assistant (CHIP-03)** — premium Transfer Screen button; `GET /api/squad/:teamId/free-hit-suggest`; greedy optimiser with bench strategy and model xPts; **Predicted total** on pitch; OpenSpec `archive/2026-06-08-chip-03-ai-free-hit-assistant`, `archive/2026-06-09-chip-03-free-hit-optimizer-polish`
 - **Auth (AUTH-01)** — login/password + Google OAuth, backend user profile; OpenSpec change 2026-06-02-auth-01-user-accounts.
