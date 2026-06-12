@@ -1,0 +1,11 @@
+134.209.229.85.nip.io {
+    handle /api/* {
+        reverse_proxy proxy:3000
+    }
+
+    handle {
+        root * /srv/web
+        try_files {path} /index.html
+        file_server
+    }
+}
