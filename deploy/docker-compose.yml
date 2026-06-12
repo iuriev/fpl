@@ -17,9 +17,9 @@ services:
     image: node:20-alpine
     restart: unless-stopped
     working_dir: /app
-    command: sh -c "npm ci --omit=dev --silent && node dist/index.js"
+    command: sh -c "npm install --silent && tsx src/index.ts"
     volumes:
-      - ./proxy:/app:ro
+      - ./proxy:/app
     env_file: .env
     depends_on:
       - db

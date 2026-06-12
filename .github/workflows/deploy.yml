@@ -20,8 +20,6 @@ jobs:
 
       - run: npm run build -w web
 
-      - run: npm run build -w proxy
-
       - name: Copy web to server
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -38,7 +36,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "proxy/dist/,proxy/package.json,proxy/package-lock.json"
+          source: "proxy/src/,proxy/package.json"
           target: "/opt/fpl/proxy/"
           strip_components: 1
 
