@@ -39,6 +39,8 @@ it behaves. Avoid duplicating: link between them instead.
 | [0018](0018-fpl-persistent-db-cache.md) | FPL persistent DB cache to minimise FPL API calls | Accepted |
 | [0019](0019-prediction-scoring-model-extension.md) | Prediction scoring model extension (PRED-11) | Accepted |
 | [0020](0020-fpl-identity-model.md) | FPL identity model — canonical player and team codes | Accepted |
+| [0021](0021-two-level-cache.md) | Two-level cache (L1 in-memory + L2 Postgres) | Accepted |
+| [0022](0022-deployment-docker-compose-vps.md) | Deployment — Docker Compose + VPS (Fly.io removed) | Accepted |
 
 ## Template
 

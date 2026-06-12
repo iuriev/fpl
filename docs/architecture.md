@@ -105,15 +105,26 @@ before each deadline, expose via `GET /api/predictions?event=`. Ops: `research/p
 
 ## Production
 
-Live at **https://fpl-squad-viewer.fly.dev/** — single Hono service on Fly.io (London, `shared-cpu-1x`, 256 MB RAM, 1 machine, always-on).
+Deployment target: any standard Linux VPS using Docker Compose. Hosting provider TBD (see ADR 0022).
 
 The proxy serves both the built SPA (`web/dist/`) and all `/api/*` routes from one process, preserving the in-memory cache across requests.
 
-Deploy: `fly deploy` from repo root.
+### Local development
 
-## Required secrets (Fly.io)
+```bash
+cp .env.example .env   # once — set BETTER_AUTH_SECRET at minimum
+docker compose up      # app on http://localhost:3001 + Postgres
+docker compose down    # stop
+docker compose down -v # stop + wipe database
+```
 
-Set these with `fly secrets set KEY=value` before deploying:
+### Remote deployment
+
+Deferred until hosting provider is chosen. Will use GitHub Actions (SSH + Docker Compose pull/restart). See ADR 0022.
+
+## Required environment variables
+
+Copy `.env.example` to `.env` and fill in:
 
 | Secret | Description |
 | --- | --- |
@@ -121,7 +132,7 @@ Set these with `fly secrets set KEY=value` before deploying:
 | `BETTER_AUTH_SECRET` | Random 32-byte hex string — used to sign sessions and tokens |
 | `GOOGLE_CLIENT_ID` | OAuth 2.0 client ID from Google Cloud Console |
 | `GOOGLE_CLIENT_SECRET` | OAuth 2.0 client secret from Google Cloud Console |
-| `PUBLIC_APP_URL` | Full origin of the deployed app, e.g. `https://fpl-squad-viewer.fly.dev` |
+| `PUBLIC_APP_URL` | Full origin of the deployed app, e.g. `https://your-domain.com` |
 | `RESEND_API_KEY` | Resend API key for transactional email (email verification) |
 | `FROM_EMAIL` | Sender address for verification emails, e.g. `noreply@fpl-squad-viewer.fly.dev` |
 
