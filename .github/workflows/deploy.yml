@@ -49,16 +49,6 @@ jobs:
           envs: POSTGRES_PASSWORD,BETTER_AUTH_SECRET,PUBLIC_APP_URL,GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET
           script: |
             cd /opt/fpl
-            cat > .env <<EOF
-            POSTGRES_DB=fpl
-            POSTGRES_USER=fpl-admin
-            POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-            DATABASE_URL=postgresql://fpl-admin:${POSTGRES_PASSWORD}@db:5432/fpl
-            PORT=3000
-            NODE_ENV=production
-            BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
-            PUBLIC_APP_URL=${PUBLIC_APP_URL}
-            GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-            GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-            EOF
+            printf "POSTGRES_DB=fpl\nPOSTGRES_USER=fpl-admin\nPOSTGRES_PASSWORD=%s\nDATABASE_URL=postgresql://fpl-admin:%s@db:5432/fpl\nPORT=3000\nNODE_ENV=production\nBETTER_AUTH_SECRET=%s\nPUBLIC_APP_URL=%s\nGOOGLE_CLIENT_ID=%s\nGOOGLE_CLIENT_SECRET=%s\n" \
+              "$POSTGRES_PASSWORD" "$POSTGRES_PASSWORD" "$BETTER_AUTH_SECRET" "$PUBLIC_APP_URL" "$GOOGLE_CLIENT_ID" "$GOOGLE_CLIENT_SECRET" > .env
             docker compose up -d --force-recreate proxy caddy
