@@ -233,20 +233,26 @@ async function main(): Promise<void> {
     .map(([code]) => Number(code))
     .filter((code) => fplCodeToTmId.has(code));
 
+  const fplCodeToWebName = new Map(bootstrap.elements.map((el) => [el.code, el.web_name]));
+
   console.log(`\n[phase2] Scraping set-piece roles for ${setpieceCandidates.length} attacking players…`);
   let setpieceHits = 0;
   for (let i = 0; i < setpieceCandidates.length; i++) {
     const code = setpieceCandidates[i];
     const tmId = fplCodeToTmId.get(code)!;
+    const name = fplCodeToWebName.get(code) ?? String(code);
+    const prefix = `  [${i + 1}/${setpieceCandidates.length}] ${name} (tmId=${tmId})`;
     try {
       const roles = await fetchSetpieceRoles(tmId);
       if (roles.length > 0) {
         profiles[String(code)].setpiece = roles;
         setpieceHits++;
-        console.log(`  [${i + 1}/${setpieceCandidates.length}] code=${code} tmId=${tmId} → ${roles.join(', ')}`);
+        console.log(`${prefix} → ${roles.join(', ')}`);
+      } else {
+        console.log(`${prefix} → none`);
       }
     } catch (err) {
-      console.warn(`  [${i + 1}/${setpieceCandidates.length}] code=${code} tmId=${tmId} ERROR: ${String(err)}`);
+      console.warn(`${prefix} ERROR: ${String(err)}`);
     }
     if (i < setpieceCandidates.length - 1) await sleep(DELAY_MS);
   }
