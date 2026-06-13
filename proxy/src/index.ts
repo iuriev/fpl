@@ -40,7 +40,7 @@ import { defaultDataDir } from './prediction/ingest';
 import { runScoreGameweek } from './prediction/score';
 import { predictionRoutes } from './prediction-routes';
 import * as predictionService from './prediction-service';
-import { startPredictionsWarmup } from './predictions-warmup';
+import { runPredictionsWarmup, startPredictionsWarmup } from './predictions-warmup';
 import { requirePremiumFplUser } from './premium-middleware';
 import { priceRoutes } from './price-routes';
 import { resolveNextGw } from './resolve-next-gw';
@@ -87,6 +87,12 @@ function healthPayload() {
 
 app.get('/health', (c) => c.json(healthPayload()));
 app.get('/api/health', (c) => c.json(healthPayload()));
+
+// POST /api/admin/predictions/warmup — retrigger prediction warmup without restarting the server
+app.post('/api/admin/predictions/warmup', async (c) => {
+  void runPredictionsWarmup(db);
+  return c.json({ ok: true, message: 'warmup triggered' });
+});
 
 // GET /api/gameweeks
 app.get('/api/gameweeks', async (c) => {

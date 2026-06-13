@@ -441,6 +441,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
     setIsAiLoading(true);
     try {
       const res = await fetch(`/api/squad/${teamId}/free-hit-suggest?gw=${nextGw}`);
+      if (res.status === 404) throw new Error('no_predictions');
       if (!res.ok) throw new Error('request failed');
       const data = (await res.json()) as {
         orderedSquad: number[];
@@ -478,8 +479,12 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
           freeHitTotalBudget: data.totalBudget,
         }));
       }
-    } catch {
-      setToast(copy.aiFreehitError);
+    } catch (err) {
+      if (err instanceof Error && err.message === 'no_predictions') {
+        setToast(interpolate(copy.aiFreehitNoPredictions, { gw: String(nextGw) }));
+      } else {
+        setToast(copy.aiFreehitError);
+      }
     } finally {
       setIsAiLoading(false);
     }

@@ -114,6 +114,29 @@ Full detail in `CLAUDE.md` and `docs/frontend.md`. Non-negotiable highlights:
 - **Native CSS primitives (ADR 0014)** — prefer Popover API, `:has()`, and `@starting-style`
   over JS overlay/state wiring when possible; see `docs/frontend.md`
 
+## Operations (production admin)
+
+### Health check
+
+```bash
+curl https://<HOST>/api/health
+```
+
+Response includes `predictionsWarmup.phase` (`idle | ingest | score | done | error`) and
+`predictionsWarmup.lastError`. Check this first when AI suggestions are unavailable.
+
+### Re-trigger prediction warmup
+
+If `phase = error` or prediction data is missing for the current GW, retrigger without
+restarting the server:
+
+```bash
+curl -X POST https://<HOST>/api/admin/predictions/warmup
+```
+
+After calling, poll `/api/health` until `predictionsWarmup.phase = done`.
+The warmup is a no-op while already running — safe to call multiple times.
+
 ## Test team ID
 
 Use team ID **72828** when verifying squad-related behavior against spec scenarios.
