@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { IconChips } from '@/components/ui/icons/IconChips';
 import { IconFixtures } from '@/components/ui/icons/IconFixtures';
@@ -27,6 +27,7 @@ const SHEET_ITEMS = [
 
 export function NavMoreSheet() {
   const navigate = useNavigate();
+  const location = useLocation();
   const popoverRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef(0);
   const draggingRef = useRef(false);
@@ -80,18 +81,22 @@ export function NavMoreSheet() {
       >
         <div className={styles.handle} aria-hidden="true" />
         <div className={styles.grid}>
-          {SHEET_ITEMS.map(({ label, route, Icon }) => (
-            <button
-              key={route}
-              type="button"
-              className={styles.gridItem}
-              onClick={() => handleItemClick(route)}
-              aria-label={label}
-            >
-              <Icon size={30} />
-              <span className={styles.gridLabel}>{label}</span>
-            </button>
-          ))}
+          {SHEET_ITEMS.map(({ label, route, Icon }) => {
+            const active = location.pathname.startsWith(route);
+            return (
+              <button
+                key={route}
+                type="button"
+                className={`${styles.gridItem} ${active ? styles.gridItemActive : ''}`}
+                onClick={() => handleItemClick(route)}
+                aria-label={label}
+                aria-current={active ? 'page' : undefined}
+              >
+                <Icon size={30} />
+                <span className={styles.gridLabel}>{label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

@@ -7,7 +7,7 @@ import styles from './Jersey.module.css';
 const FPL_SHIRTS_CDN = 'https://fantasy.premierleague.com/dist/img/shirts/standard';
 
 export interface JerseyProps {
-  size?: 'large' | 'medium';
+  size?: 'large' | 'medium' | 'small';
   teamCode?: number;
   position?: PlayerPosition;
   alt?: string;

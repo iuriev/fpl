@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   gap: var(--fpl-space-sm);
-  padding: var(--fpl-space-sm) var(--fpl-space-xl);
+  padding: var(--fpl-space-sm) var(--fpl-space-base);
   border-bottom: 1px solid var(--fpl-border);
 }
 
@@ -11,11 +11,11 @@
 }
 
 .rank {
-  width: 1.25rem;
+  width: 1.5rem;
   flex-shrink: 0;
-  font-size: var(--fpl-fs-body-s);
+  font: var(--fpl-fw-semibold) var(--fpl-fs-micro) / 1 var(--fpl-font-display);
   color: var(--fpl-muted);
-  text-align: right;
+  text-align: left;
   font-variant-numeric: tabular-nums;
 }
 
@@ -43,8 +43,9 @@
 }
 
 .club {
-  font-size: var(--fpl-fs-caption);
+  font: var(--fpl-fw-medium) var(--fpl-fs-micro) / 1 var(--fpl-font-display);
   color: var(--fpl-muted);
+  letter-spacing: var(--fpl-tr-head-s);
 }
 
 .points {

@@ -2,6 +2,8 @@ import './theme/colors_and_type.css';
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 
+history.scrollRestoration = 'manual';
+
 import { App } from './App';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

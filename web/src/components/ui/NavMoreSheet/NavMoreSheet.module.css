@@ -107,6 +107,15 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
+.gridItemActive {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--fpl-accent);
+}
+
+.gridItemActive .gridLabel {
+  color: var(--fpl-accent);
+}
+
 .gridAbbr {
   font-size: var(--fpl-fs-cap);
   font-weight: var(--fpl-fw-heavy);

@@ -1,5 +1,6 @@
 .large,
-.medium {
+.medium,
+.small {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -15,6 +16,12 @@
 
 .medium {
   width: min(var(--fpl-size-jersey-m), 100%);
+  aspect-ratio: 1;
+  height: auto;
+}
+
+.small {
+  width: 2rem;
   aspect-ratio: 1;
   height: auto;
 }

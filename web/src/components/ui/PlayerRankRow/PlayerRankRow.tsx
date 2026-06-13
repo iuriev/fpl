@@ -35,7 +35,7 @@ export const PlayerRankRow: React.FC<PlayerRankRowProps> = ({
   return (
     <div className={styles.row}>
       <span className={styles.rank}>{rank}</span>
-      <Jersey size="medium" teamCode={player.teamCode} position={player.position} alt="" />
+      <Jersey size="small" teamCode={player.teamCode} position={player.position} alt="" />
       <div className={styles.info}>
         <span className={styles.name}>{player.webName}</span>
         <span className={styles.meta}>

@@ -10,6 +10,8 @@ import styles from './BottomNav.module.css';
 
 const NAV_MORE_SHEET_ID = 'nav-more-sheet';
 
+const MORE_ROUTES = ['/stats', '/watchlist', '/player-watchlist', '/top-players', '/price-changes', '/chip-strategy', '/fixtures'];
+
 export function BottomNav() {
   const location = useLocation();
 
@@ -67,7 +69,7 @@ export function BottomNav() {
 
       <button
         type="button"
-        className={styles.item}
+        className={`${styles.item} ${MORE_ROUTES.some(r => location.pathname.startsWith(r)) ? styles.active : ''}`}
         popoverTarget={NAV_MORE_SHEET_ID}
         aria-haspopup="dialog"
         aria-label="More"

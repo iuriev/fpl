@@ -3,7 +3,7 @@
   align-items: center;
   gap: var(--fpl-space-sm);
   width: 100%;
-  padding: var(--fpl-space-sm) var(--fpl-space-xl3);
+  padding: var(--fpl-space-sm) var(--fpl-space-base);
   background: none;
   border: none;
   border-bottom: 1px solid var(--fpl-bg-hair);
@@ -20,9 +20,9 @@
 .rank {
   flex-shrink: 0;
   width: 1.5rem;
-  font: var(--fpl-fw-semibold) var(--fpl-fs-body-s) / 1 var(--fpl-font-display);
+  font: var(--fpl-fw-semibold) var(--fpl-fs-micro) / 1 var(--fpl-font-display);
   color: var(--fpl-muted);
-  text-align: right;
+  text-align: left;
 }
 
 .info {

@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import React from 'react';
-import { BrowserRouter, Navigate, Route, Routes, useSearchParams } from 'react-router-dom';
+import React, { useLayoutEffect } from 'react';
+import { BrowserRouter, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 
 import { useCurrentUser } from '@/auth/AuthContext';
 import { AuthProvider } from '@/auth/AuthProvider';
@@ -45,6 +45,16 @@ import {
 const queryClient = new QueryClient();
 const watchlistRepo = new ApiWatchlistRepository();
 const playerWatchlistRepo = new ApiPlayerWatchlistRepository();
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useLayoutEffect(() => {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    document.body.removeAttribute('data-compact');
+  }, [pathname]);
+  return null;
+}
 
 function AuthAndTeamProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useCurrentUser();
@@ -192,6 +202,7 @@ export function App() {
               <ToastProvider>
                 <PlayerWatchlistPremiumProvider>
                   <BrowserRouter>
+                    <ScrollToTop />
                     <AuthProvider>
                       <MyTeamProvider>
                         <PremiumUpsellProvider>
