@@ -242,6 +242,7 @@
   gap: var(--fpl-space-sm);
   flex-wrap: nowrap;
   width: 100%;
+  --_card-max-w: 5.5rem;
 }
 
 .playerRow:has(> :nth-child(5)) {
@@ -259,7 +260,6 @@
   max-width: var(--_card-max-w);
   display: flex;
   justify-content: center;
-  --_card-max-w: 5.5rem;
 }
 
 .skeletonBar {

@@ -3,7 +3,7 @@
   align-items: center;
   gap: var(--fpl-space-sm);
   width: 100%;
-  padding: var(--fpl-space-sm) var(--fpl-space-xl3);
+  padding: var(--fpl-space-sm) var(--fpl-space-xl);
   border-bottom: 1px solid var(--fpl-bg-hair);
   filter: blur(0.35rem);
   opacity: 0.45;
