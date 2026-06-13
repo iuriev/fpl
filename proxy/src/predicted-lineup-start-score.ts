@@ -87,6 +87,7 @@ export function effectivePredictedStartScore(
   summary: FPLElementSummary | undefined
 ): number {
   const raw = computePredictedStartScore(el, summary);
+  if (!summary) return raw;
   if (el.element_type === 4 && !startedLastMatch(summary)) {
     return raw * 0.5;
   }

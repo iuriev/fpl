@@ -10,7 +10,10 @@ import { countEligibleByLine } from './formation-squad-fit';
 import { getOrFetchBootstrap } from './fpl-cache/db-cache';
 import { deriveSeason } from './fpl-cache/season';
 import type { FPLBootstrapStatic, FPLElementSummary, FPLFixture } from './fpl-client';
-import { getBulkFreshElementSummaries } from './fpl-element-summary-cache';
+import {
+  getBulkAllElementSummaries,
+  getBulkFreshElementSummaries,
+} from './fpl-element-summary-cache';
 import { getOrFetchAllFixtures } from './fpl-fixtures-cache';
 import { buildLastMatchLaneMap } from './last-match-lanes';
 import {
@@ -27,6 +30,7 @@ import {
 } from './predicted-lineup-formation-pick';
 import { predictedLineupPoolElements } from './predicted-lineup-pool';
 import { effectivePredictedStartScore } from './predicted-lineup-start-score';
+import { isSeasonComplete } from './prediction/current-season';
 import { loadPreviousSeasonFormationsByTeam } from './previous-season-formation';
 import { resolveNextGw } from './resolve-next-gw';
 import type {
@@ -220,9 +224,14 @@ async function loadSummariesForTeams(
       predictedLineupPoolElements(bootstrap, teamId, targetGw).map((el) => el.id)
     )
   )];
-  logPredictedLineups(`loading ${ids.length} element summaries from cache (bulk DB query)`);
+  const seasonComplete = isSeasonComplete(bootstrap);
+  logPredictedLineups(
+    `loading ${ids.length} element summaries from cache (bulk DB query, seasonComplete=${seasonComplete})`
+  );
   const started = Date.now();
-  const map = await getBulkFreshElementSummaries(db, season, ids);
+  const map = seasonComplete
+    ? await getBulkAllElementSummaries(db, season, ids)
+    : await getBulkFreshElementSummaries(db, season, ids);
   logPredictedLineups(
     `summaries loaded: ${map.size}/${ids.length} hit in ${Date.now() - started}ms`
   );
