@@ -1,17 +1,39 @@
+.wrap {
+  padding: 0 var(--fpl-space-xl3);
+}
+
 .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(2.75rem, 1fr));
+  display: flex;
+  flex-direction: row;
   gap: var(--fpl-space-sm);
-  flex-shrink: 0;
-  padding: var(--fpl-space-md) var(--fpl-space-xl3);
+  overflow-x: auto;
+  padding: var(--fpl-space-md) 0 var(--fpl-space-sm);
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--fpl-accent) 40%, transparent) transparent;
+}
+
+.grid::-webkit-scrollbar {
+  height: 2px;
+}
+
+.grid::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.grid::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--fpl-accent) 40%, transparent);
+  border-radius: 1px;
 }
 
 .chip {
+  flex: 0 0 2.75rem;
   aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--fpl-space-xs);
+  scroll-snap-align: start;
   background: var(--fpl-bg-raised);
   border: 2px solid var(--fpl-bg-hair);
   border-radius: var(--fpl-radius-md);

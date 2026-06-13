@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "predev": "lsof -ti :3000 -ti :3001 | xargs kill -9 2>/dev/null; true",
-    "dev": "concurrently -n proxy,web -c blue,green \"npm run dev -w proxy\" \"npm run dev -w web\"",
+    "dev": "concurrently -n proxy,web,tunnel -c blue,green,magenta \"npm run dev -w proxy\" \"npm run dev -w web\" \"sleep 5 && npx ngrok http 3000 --host-header=rewrite\"",
     "build": "npm run --workspaces build",
     "lint": "npm run --workspaces lint",
     "format": "prettier --write \"**/*.{ts,tsx,json,css,md}\" --ignore-path .gitignore",
@@ -18,7 +18,8 @@
     "test:coverage": "npm run --workspaces test:coverage",
     "test:ui": "npm run --workspaces --if-present test:ui",
     "deploy": "fly deploy",
-    "lineup:eval": "npx tsx --env-file=proxy/.env research/lineup-eval-gw37/run-eval.ts"
+    "lineup:eval": "npx tsx --env-file=proxy/.env research/lineup-eval-gw37/run-eval.ts",
+    "tunnel": "npx ngrok http 3000 --host-header=rewrite"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",

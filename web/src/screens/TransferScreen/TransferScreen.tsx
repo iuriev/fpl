@@ -37,10 +37,10 @@ type PlanChip = TransferChip | 'bboost' | '3xc';
 
 import { PlayerPickerSheet } from './PlayerPickerSheet';
 import { SwapsStrip } from './SwapsStrip';
-import { TransferActionBar } from './TransferActionBar';
 import { TransferHeader } from './TransferHeader';
 import { TransferPitch } from './TransferPitch';
 import styles from './TransferScreen.module.css';
+import { TransferSpeedDial } from './TransferSpeedDial';
 import { useSubMode } from './useSubMode';
 
 export interface TransferScreenProps {
@@ -588,13 +588,19 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({ teamId }) => {
             />
           </div>
 
-          <TransferActionBar
+          <TransferSpeedDial
             onOpenTransfers={() => setIsTransfersOpen(true)}
             onReset={handleReset}
             onSave={handleSave}
-            onAiFreeHit={() => { void handleAiFreeHit(); }}
+            onAiFreeHit={() => {
+              void handleAiFreeHit();
+            }}
             hasSwaps={(draft?.swaps.length ?? 0) > 0}
-            hasChanges={(draft?.swaps.length ?? 0) > 0 || (draft?.subs.length ?? 0) > 0 || planChip !== initialChip}
+            hasChanges={
+              (draft?.swaps.length ?? 0) > 0 ||
+              (draft?.subs.length ?? 0) > 0 ||
+              planChip !== initialChip
+            }
             isDirty={isDirty}
             isAiLoading={isAiLoading}
             freehitAvailable={squadData?.chipStatuses.freehit.status === 'available'}

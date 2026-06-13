@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -79,49 +79,21 @@ it('does not render Follow button by default (own team)', () => {
 });
 
 describe('TeamInfoPanel — navLinksMode', () => {
-  it('full mode renders nav links as <Link> elements', () => {
+  it('renders no nav links regardless of navLinksMode (nav moved to BottomNav)', () => {
     renderPanel({}, 'full');
-    expect(screen.getByRole('link', { name: /My Squad/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /My Stats/i })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /My Stats/i })).toBeNull();
+    expect(screen.queryByRole('link', { name: /My Squad/i })).toBeNull();
   });
 
-  it('full mode My Squad link points to /', () => {
-    renderPanel({}, 'full');
-    expect(screen.getByRole('link', { name: /My Squad/i }).getAttribute('href')).toBe('/');
+  it('renders no nav links in demo mode', () => {
+    renderPanel({}, 'demo');
+    expect(screen.queryByRole('link', { name: /My Stats/i })).toBeNull();
+    expect(screen.queryByRole('button', { name: /My Stats/i })).toBeNull();
   });
 
-  it('full mode My Stats link points to /stats', () => {
-    renderPanel({}, 'full');
-    expect(screen.getByRole('link', { name: /My Stats/i }).getAttribute('href')).toBe('/stats');
-  });
-
-  it('does not render a separate My GW history nav link', () => {
-    renderPanel({}, 'full');
-    expect(screen.queryByRole('link', { name: /My GW history/i })).toBeNull();
-  });
-
-  it('hidden mode renders no nav links', () => {
+  it('renders no nav links in hidden mode', () => {
     renderPanel({}, 'hidden');
     expect(screen.queryByRole('link', { name: /My Stats/i })).toBeNull();
-  });
-
-  it('demo mode renders nav links as buttons', () => {
-    renderPanel({}, 'demo');
-    expect(screen.queryByRole('link', { name: /My Stats/i })).toBeNull();
-    expect(screen.getByRole('button', { name: /My Stats/i })).toBeInTheDocument();
-  });
-
-  it('demo mode nav link button opens the sign-in dialog when clicked', () => {
-    renderPanel({}, 'demo');
-    const statsBtn = screen.getByRole('button', { name: /My Stats/i });
-    fireEvent.click(statsBtn);
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    expect(screen.getByText(/sign in to unlock/i)).toBeInTheDocument();
-  });
-
-  it('defaults to full mode when navLinksMode is not specified', () => {
-    renderPanel();
-    expect(screen.getByRole('link', { name: /My Stats/i })).toBeInTheDocument();
   });
 });
 

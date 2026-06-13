@@ -226,6 +226,12 @@ body {
   --fpl-size-jersey-l: 3.375rem;
   --fpl-size-jersey-m: 3rem;
   --fpl-popup-inset-b: 6rem;
+
+  /* ── navigation chrome ──────────────────────────────────────────── */
+  --nav-height: 4rem;
+  --nav-height-compact: 3rem;
+  --nav-z: 100;
+  --sheet-z: 200;
 }
 
 /* ── semantic role classes (optional) ───────────────────────────────── */

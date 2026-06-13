@@ -256,6 +256,7 @@
   cursor: pointer;
   flex: 1;
   min-width: 0;
+  max-width: var(--_card-max-w);
   display: flex;
   justify-content: center;
   --_card-max-w: 5.5rem;

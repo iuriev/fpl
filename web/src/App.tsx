@@ -5,6 +5,7 @@ import { BrowserRouter, Navigate, Route, Routes, useSearchParams } from 'react-r
 import { useCurrentUser } from '@/auth/AuthContext';
 import { AuthProvider } from '@/auth/AuthProvider';
 import { ProtectedRoute } from '@/auth/ProtectedRoute';
+import { AppLayout } from '@/components/ui/AppLayout/AppLayout';
 import { useMyTeam } from '@/lib/my-team/MyTeamContext';
 import { MyTeamProvider } from '@/lib/my-team/MyTeamProvider';
 import { PlayerWatchlistPremiumProvider } from '@/lib/player-watchlist-premium/PlayerWatchlistPremiumProvider';
@@ -79,101 +80,104 @@ function AppContent() {
 
   return (
     <Routes>
-      <Route path="/" element={rootElement()} />
       <Route path="/sign-in" element={<SignInScreen />} />
       <Route path="/sign-up" element={<SignUpScreen />} />
       <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
       <Route path="/reset-password" element={<ResetPasswordScreen />} />
       <Route path="/entry" element={<EntryScreen />} />
-      <Route
-        path="/settings"
-        element={
-          <AuthAndTeamProtectedRoute>
-            <SettingsScreen />
-          </AuthAndTeamProtectedRoute>
-        }
-      />
-      <Route
-        path="/stats"
-        element={
-          <AuthAndTeamProtectedRoute>
-            <MyStatsScreen teamId={myTeamId!} />
-          </AuthAndTeamProtectedRoute>
-        }
-      />
-      <Route
-        path="/review"
-        element={
-          <AuthAndTeamProtectedRoute>
-            <GameweekReviewScreen teamId={myTeamId!} />
-          </AuthAndTeamProtectedRoute>
-        }
-      />
-      <Route
-        path="/top-players"
-        element={
-          <AuthAndTeamProtectedRoute>
-            <TopPlayersScreen />
-          </AuthAndTeamProtectedRoute>
-        }
-      />
-      <Route path="/predicted-points" element={<Navigate to="/predictions?tab=points" replace />} />
-      <Route path="/predicted-lineups" element={<Navigate to="/predictions?tab=lineups" replace />} />
-      <Route path="/market" element={<Navigate to="/predictions?tab=cs" replace />} />
-      <Route
-        path="/predictions"
-        element={
-          <AuthAndTeamProtectedRoute>
-            <PredictionsScreen />
-          </AuthAndTeamProtectedRoute>
-        }
-      />
-      <Route
-        path="/price-changes"
-        element={
-          <AuthAndTeamProtectedRoute>
-            <PriceChangesScreen />
-          </AuthAndTeamProtectedRoute>
-        }
-      />
-      <Route
-        path="/fixtures"
-        element={
-          <AuthAndTeamProtectedRoute>
-            <FixturesCalendarScreen />
-          </AuthAndTeamProtectedRoute>
-        }
-      />
-      <Route
-        path="/transfers"
-        element={
-          <AuthAndTeamProtectedRoute>
-            <TransferScreen teamId={myTeamId!} />
-          </AuthAndTeamProtectedRoute>
-        }
-      />
-      <Route path="/watchlist" element={<ProtectedRoute />}>
-        <Route index element={<WatchlistScreen />} />
+
+      <Route element={<AppLayout />}>
+        <Route path="/" element={rootElement()} />
+        <Route
+          path="/settings"
+          element={
+            <AuthAndTeamProtectedRoute>
+              <SettingsScreen />
+            </AuthAndTeamProtectedRoute>
+          }
+        />
+        <Route
+          path="/stats"
+          element={
+            <AuthAndTeamProtectedRoute>
+              <MyStatsScreen teamId={myTeamId!} />
+            </AuthAndTeamProtectedRoute>
+          }
+        />
+        <Route
+          path="/review"
+          element={
+            <AuthAndTeamProtectedRoute>
+              <GameweekReviewScreen teamId={myTeamId!} />
+            </AuthAndTeamProtectedRoute>
+          }
+        />
+        <Route
+          path="/top-players"
+          element={
+            <AuthAndTeamProtectedRoute>
+              <TopPlayersScreen />
+            </AuthAndTeamProtectedRoute>
+          }
+        />
+        <Route path="/predicted-points" element={<Navigate to="/predictions?tab=points" replace />} />
+        <Route path="/predicted-lineups" element={<Navigate to="/predictions?tab=lineups" replace />} />
+        <Route path="/market" element={<Navigate to="/predictions?tab=cs" replace />} />
+        <Route
+          path="/predictions"
+          element={
+            <AuthAndTeamProtectedRoute>
+              <PredictionsScreen />
+            </AuthAndTeamProtectedRoute>
+          }
+        />
+        <Route
+          path="/price-changes"
+          element={
+            <AuthAndTeamProtectedRoute>
+              <PriceChangesScreen />
+            </AuthAndTeamProtectedRoute>
+          }
+        />
+        <Route
+          path="/fixtures"
+          element={
+            <AuthAndTeamProtectedRoute>
+              <FixturesCalendarScreen />
+            </AuthAndTeamProtectedRoute>
+          }
+        />
+        <Route
+          path="/transfers"
+          element={
+            <AuthAndTeamProtectedRoute>
+              <TransferScreen teamId={myTeamId!} />
+            </AuthAndTeamProtectedRoute>
+          }
+        />
+        <Route path="/watchlist" element={<ProtectedRoute />}>
+          <Route index element={<WatchlistScreen />} />
+        </Route>
+        <Route
+          path="/leagues/:leagueId/standings"
+          element={
+            <AuthAndTeamProtectedRoute>
+              <LeagueStandingsScreen />
+            </AuthAndTeamProtectedRoute>
+          }
+        />
+        <Route path="/player-watchlist" element={<ProtectedRoute />}>
+          <Route index element={<PlayerWatchlistScreen />} />
+        </Route>
+        <Route
+          path="/chip-strategy"
+          element={
+            <AuthAndTeamProtectedRoute>
+              <ChipStrategyScreen />
+            </AuthAndTeamProtectedRoute>
+          }
+        />
       </Route>
-      <Route
-        path="/leagues/:leagueId/standings"
-        element={
-          <AuthAndTeamProtectedRoute>
-            <LeagueStandingsScreen />
-          </AuthAndTeamProtectedRoute>
-        }
-      />
-      <Route path="/player-watchlist" element={<ProtectedRoute />}>
-        <Route index element={<PlayerWatchlistScreen />} />
-      </Route>
-      <Route
-        path="/chip-strategy"
-        element={
-          <AuthAndTeamProtectedRoute>
-            <ChipStrategyScreen />
-          </AuthAndTeamProtectedRoute>
-        }
-      />
     </Routes>
   );
 }

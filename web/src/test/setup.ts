@@ -74,6 +74,29 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
+// Polyfill Popover API (not implemented in jsdom)
+if (!HTMLElement.prototype.showPopover) {
+  HTMLElement.prototype.showPopover = function () {
+    this.setAttribute('popover-open', '');
+  };
+}
+if (!HTMLElement.prototype.hidePopover) {
+  HTMLElement.prototype.hidePopover = function () {
+    this.removeAttribute('popover-open');
+  };
+}
+if (!HTMLElement.prototype.togglePopover) {
+  HTMLElement.prototype.togglePopover = function () {
+    if (this.hasAttribute('popover-open')) {
+      this.hidePopover();
+      return false;
+    } else {
+      this.showPopover();
+      return true;
+    }
+  };
+}
+
 // Polyfill HTMLDialogElement (jsdom does not implement showModal/close)
 if (!HTMLDialogElement.prototype.showModal) {
   HTMLDialogElement.prototype.showModal = function () {

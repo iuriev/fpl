@@ -23,22 +23,24 @@ export const TeamPickerGrid: React.FC<TeamPickerGridProps> = ({
   onSelectTeam,
   ariaLabel,
 }) => (
-  <div className={styles.grid} role="tablist" aria-label={ariaLabel}>
-    {teams.map((team) => (
-      <button
-        key={team.teamId}
-        type="button"
-        role="tab"
-        aria-selected={team.teamId === selectedTeamId}
-        aria-label={team.shortName}
-        className={`${styles.chip} ${team.teamId === selectedTeamId ? styles.chipActive : ''}`}
-        onClick={() => onSelectTeam(team.teamId)}
-      >
-        <span className={styles.badgeWrap}>
-          <TeamBadge teamCode={team.teamCode} shortName={team.shortName} />
-        </span>
-      </button>
-    ))}
+  <div className={styles.wrap}>
+    <div className={styles.grid} role="tablist" aria-label={ariaLabel}>
+      {teams.map((team) => (
+        <button
+          key={team.teamId}
+          type="button"
+          role="tab"
+          aria-selected={team.teamId === selectedTeamId}
+          aria-label={team.shortName}
+          className={`${styles.chip} ${team.teamId === selectedTeamId ? styles.chipActive : ''}`}
+          onClick={() => onSelectTeam(team.teamId)}
+        >
+          <span className={styles.badgeWrap}>
+            <TeamBadge teamCode={team.teamCode} shortName={team.shortName} />
+          </span>
+        </button>
+      ))}
+    </div>
   </div>
 );
 

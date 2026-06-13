@@ -13,12 +13,12 @@
 
 .pitchArea {
   flex: 1;
-  min-height: 34rem;
-  overflow-y: auto;
+  min-height: 0;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   transition: opacity 0.2s;
-  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(var(--nav-height) + 1.25rem);
 }
 
 .pitchArea_dimmed {

@@ -9,6 +9,7 @@
 
 .screenTotw {
   height: 100dvh;
+  padding-bottom: calc(var(--nav-height) + 1rem);
 }
 
 /* Tabs row */
